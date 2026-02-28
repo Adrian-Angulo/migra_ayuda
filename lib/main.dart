@@ -13,14 +13,11 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (context) => AuthProvider(),)
-      ],
+      providers: [ChangeNotifierProvider(create: (context) => AuthProvider())],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primarySwatch: Colors.teal,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
           visualDensity: VisualDensity.adaptivePlatformDensity,
           fontFamily: 'Inter',
         ),

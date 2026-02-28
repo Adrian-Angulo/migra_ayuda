@@ -43,7 +43,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                       Text(
-                        "Comienza ahora",
+                        "Comenzar ahora",
                         style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,

@@ -1,8 +1,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:migra_ayuda/presentation/pages/widget/button_google_widget.dart';
+import 'package:migra_ayuda/presentation/pages/widget/dropdown_field_widget.dart';
 import 'package:migra_ayuda/presentation/pages/widget/text_fiel_pasword_widget.dart';
 import 'package:migra_ayuda/presentation/pages/widget/text_fiel_widget.dart';
 import 'package:migra_ayuda/presentation/pages/widget/text_field_numeric_widget.dart';
+import 'package:migra_ayuda/presentation/widgets/button_widget.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -88,79 +91,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
             Row(
               spacing: 10,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Pais de origen'),
-                      DropdownButtonFormField(
-                        value: selectedOriginCountry,
-                        // Validación del campo
-                        validator: (value) {
-                          if (value == null) {
-                            return "Por favor selecciona un país";
-                          }
-                          return null;
-                        },
-                        items: countries.map((country) {
-                          return DropdownMenuItem<String>(
-                            value: country, // Valor interno
-                            child: Text(country), // Lo que se muestra
-                          );
-                        }).toList(),
-                        // Se ejecuta cuando el usuario selecciona algo
-                        onChanged: (value) {
-                          setState(() {
-                            selectedOriginCountry =
-                                value; // Actualiza el estado
-                          });
-                        },
-                        hint: Text("Elige una opcion"),
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                DropdownFieldWidget(
+                  title: 'Pais de origen',
+                  value: selectedOriginCountry,
+                  items: countries,
+                  hint: "Elige una opcion",
+                  onChanged: (value) {
+                    setState(() {
+                      selectedOriginCountry = value;
+                    });
+                  },
                 ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Pais de destino'),
-                      DropdownButtonFormField(
-                        value: selectedDestinationCountry,
-                        // Validación del campo
-                        validator: (value) {
-                          if (value == null) {
-                            return "Por favor selecciona un país";
-                          }
-                          return null;
-                        },
-                        items: countries.map((country) {
-                          return DropdownMenuItem<String>(
-                            value: country, // Valor interno
-                            child: Text(country), // Lo que se muestra
-                          );
-                        }).toList(),
-                        // Se ejecuta cuando el usuario selecciona algo
-                        onChanged: (value) {
-                          setState(() {
-                            selectedDestinationCountry =
-                                value; // Actualiza el estado
-                          });
-                        },
-                        hint: Text("Elige una opcion"),
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                DropdownFieldWidget(
+                  title: 'Pais de destino',
+                  value: selectedOriginCountry,
+                  items: countries,
+                  hint: "Elige una opcion",
+                  onChanged: (value) {
+                    setState(() {
+                      selectedOriginCountry = value;
+                    });
+                  },
                 ),
               ],
             ),
@@ -190,16 +141,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   title: "Edad",
                   hintText: "Ej. 25",
                   controller: _edadController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor ingresa tu edad';
-                    }
-                    final age = int.tryParse(value);
-                    if (age == null || age < 18 || age > 100) {
-                      return 'Edad debe ser entre 18 y 100 años';
-                    }
-                    return null;
-                  },
                 ),
               ],
             ),
@@ -275,36 +216,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             SizedBox(height: 16),
 
-            ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate() && acceptTerms) {
-                  // Lógica para registrarse
-                  print('Formulario válido');
-                } else if (!acceptTerms) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Debes aceptar los términos y condiciones'),
-                    ),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF64999A),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                minimumSize: Size(double.infinity, 48),
-              ),
-              child: Text(
-                "Registrarse",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 2,
-                ),
-              ),
-            ),
+            ButtonWidget(formKey: _formKey, acceptTerms: acceptTerms),
             SizedBox(height: 16),
             Row(
               children: [
@@ -315,33 +227,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
 
             SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () {
-                // Lógica para autenticación con Google
-                print('Autenticación con Google');
-              },
-              icon: Image.asset(
-                'assets/icons/google.png', // Asegúrate de tener el ícono de Google
-                height: 24,
-                width: 24,
-              ),
-              label: Text(
-                "Continuar con Google",
-                style: TextStyle(
-                  color: Colors.black87,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                side: BorderSide(color: Colors.grey.shade300),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                minimumSize: Size(double.infinity, 48),
-              ),
-            ),
+            ButtonGoogleWidget(),
+            SizedBox(height: 20),
           ],
         ),
       ),

@@ -14,7 +14,7 @@ class LoginRegisterSwitcher extends StatelessWidget {
       height: 60,
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5F6F9),
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: Row(
@@ -58,7 +58,7 @@ class _SwitchButton extends StatelessWidget {
         height: 44,
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isActive ? Colors.white : Colors.transparent,
+          color: isActive ? Colors.teal[300] : Colors.transparent,
           borderRadius: BorderRadius.circular(6),
           boxShadow: isActive
               ? [
@@ -75,7 +75,7 @@ class _SwitchButton extends StatelessWidget {
           textAlign: TextAlign.center,
           style: TextStyle(
             fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-            color: isActive ? Colors.black87 : Colors.black54,
+            color: isActive ? Colors.white : Colors.black54,
           ),
         ),
       ),
