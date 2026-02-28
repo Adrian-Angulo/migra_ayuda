@@ -1,0 +1,74 @@
+import 'package:flutter/material.dart';
+import 'package:migra_ayuda/presentation/pages/register_screen.dart';
+import 'package:migra_ayuda/presentation/pages/widget/login_register_switcher.dart';
+import 'package:migra_ayuda/presentation/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
+
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  // Lista de opciones que aparecerán en el desplegable
+  final List<String> countries = ["Colombia", "México", "Argentina", "Chile"];
+
+  String? selectedCountry;
+
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = context.watch<AuthProvider>().isSelected;
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: double.infinity,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(30),
+                        child: Image.asset(
+                          'assets/logo/Logo.png',
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Text(
+                        "Comienza ahora",
+                        style: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "Completa tus datos para crear una cuenta",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color.fromRGBO(108, 114, 120, 1),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16),
+                  // -----------------botones iniciar session y registro-------------
+                  LoginRegisterSwitcher(),
+                  SizedBox(height: 16),
+                  isSelected ? Center(child: Text("Login")) : RegisterScreen(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
