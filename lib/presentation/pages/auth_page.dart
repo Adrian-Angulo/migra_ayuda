@@ -4,14 +4,14 @@ import 'package:migra_ayuda/presentation/pages/widget/login_register_switcher.da
 import 'package:migra_ayuda/presentation/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 
-class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+class AuthPage extends StatefulWidget {
+  const AuthPage({super.key});
 
   @override
-  State<RegisterPage> createState() => _RegisterPageState();
+  State<AuthPage> createState() => _AuthPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _AuthPageState extends State<AuthPage> {
   // Lista de opciones que aparecerán en el desplegable
   final List<String> countries = ["Colombia", "México", "Argentina", "Chile"];
 

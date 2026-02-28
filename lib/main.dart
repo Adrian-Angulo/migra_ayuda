@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/presentation/pages/register_page.dart';
+import 'package:migra_ayuda/presentation/pages/auth_page.dart';
+
 import 'package:migra_ayuda/presentation/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -21,7 +22,7 @@ class MainApp extends StatelessWidget {
           visualDensity: VisualDensity.adaptivePlatformDensity,
           fontFamily: 'Inter',
         ),
-        home: RegisterPage(),
+        home: AuthPage(),
       ),
     );
   }
