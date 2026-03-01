@@ -61,27 +61,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
             Row(
               spacing: 10,
               children: [
-                TextFieldWidget(
-                  title: "Nombre",
-                  hintText: "Juan",
-                  controller: _nombreController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor ingresa tu nombre';
-                    }
-                    return null;
-                  },
+                Expanded(
+                  child: TextFieldWidget(
+                    title: "Nombre",
+                    hintText: "Juan",
+                    controller: _nombreController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor ingresa tu nombre';
+                      }
+                      return null;
+                    },
+                  ),
                 ),
-                TextFieldWidget(
-                  title: "Apellido",
-                  hintText: "Castillo",
-                  controller: _apellidoController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor ingresa tu apellido';
-                    }
-                    return null;
-                  },
+                Expanded(
+                  child: TextFieldWidget(
+                    title: "Apellido",
+                    hintText: "Castillo",
+                    controller: _apellidoController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor ingresa tu apellido';
+                      }
+                      return null;
+                    },
+                  ),
                 ),
               ],
             ),
@@ -89,58 +93,66 @@ class _RegisterScreenState extends State<RegisterScreen> {
             //--------------------- Seccion pais de origen y destino -----------------------
             SizedBox(height: 16),
             Row(
-              spacing: 10,
               children: [
-                DropdownFieldWidget(
-                  title: 'Pais de origen',
-                  value: selectedOriginCountry,
-                  items: countries,
-                  hint: "Elige una opcion",
-                  onChanged: (value) {
-                    setState(() {
-                      selectedOriginCountry = value;
-                    });
-                  },
+                Expanded(
+                  child: DropdownFieldWidget(
+                    title: 'Pais de origen',
+                    value: selectedOriginCountry,
+                    items: countries,
+                    hint: "Elige una opcion",
+                    onChanged: (value) {
+                      setState(() {
+                        selectedOriginCountry = value;
+                      });
+                    },
+                  ),
                 ),
-                DropdownFieldWidget(
-                  title: 'Pais de destino',
-                  value: selectedOriginCountry,
-                  items: countries,
-                  hint: "Elige una opcion",
-                  onChanged: (value) {
-                    setState(() {
-                      selectedOriginCountry = value;
-                    });
-                  },
+                SizedBox(width: 10),
+                Expanded(
+                  child: DropdownFieldWidget(
+                    title: 'Pais de destino',
+                    value: selectedDestinationCountry,
+                    items: countries,
+                    hint: "Elige una opcion",
+                    onChanged: (value) {
+                      setState(() {
+                        selectedDestinationCountry = value;
+                      });
+                    },
+                  ),
                 ),
               ],
             ),
-
             SizedBox(height: 16),
             Row(
               spacing: 10,
               children: [
-                TextFieldWidget(
-                  title: "Correo electrònico",
-                  hintText: "Ej. usuario@gmail.com",
+                Flexible(
                   flex: 3,
-                  controller: _correoController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor ingresa tu correo';
-                    }
-                    if (!RegExp(
-                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                    ).hasMatch(value)) {
-                      return 'Por favor ingresa un correo válido';
-                    }
-                    return null;
-                  },
+                  child: TextFieldWidget(
+                    title: "Correo electrònico",
+                    hintText: "Ej. usuario@gmail.com",
+
+                    controller: _correoController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor ingresa tu correo';
+                      }
+                      if (!RegExp(
+                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                      ).hasMatch(value)) {
+                        return 'Por favor ingresa un correo válido';
+                      }
+                      return null;
+                    },
+                  ),
                 ),
-                TextFieldNumericWidget(
-                  title: "Edad",
-                  hintText: "Ej. 25",
-                  controller: _edadController,
+                Flexible(
+                  child: TextFieldNumericWidget(
+                    title: "Edad",
+                    hintText: "Ej. 25",
+                    controller: _edadController,
+                  ),
                 ),
               ],
             ),
@@ -216,7 +228,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             SizedBox(height: 16),
 
-            ButtonWidget(formKey: _formKey, acceptTerms: acceptTerms),
+            ButtonWidget(formKey: _formKey, text: 'Registrarse'),
             SizedBox(height: 16),
             Row(
               children: [

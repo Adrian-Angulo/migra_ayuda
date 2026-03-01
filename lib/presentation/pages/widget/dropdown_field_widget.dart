@@ -23,10 +23,11 @@ class DropdownFieldWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title),
+          const SizedBox(height: 8),
           DropdownButtonFormField<String>(
             value: value,
             validator: (value) {
-              if (value == null) {
+              if (value == null || value.isEmpty) {
                 return "Por favor selecciona una opción";
               }
               return null;

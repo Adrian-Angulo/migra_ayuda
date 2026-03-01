@@ -1,38 +1,25 @@
 import 'package:flutter/material.dart';
 
 class ButtonWidget extends StatelessWidget {
-  const ButtonWidget({
-    super.key,
-    required GlobalKey<FormState> formKey,
-    required this.acceptTerms,
-  }) : _formKey = formKey;
+  const ButtonWidget({super.key, required GlobalKey<FormState> formKey, required this.text})
+    : _formKey = formKey;
 
   final GlobalKey<FormState> _formKey;
-  final bool acceptTerms;
+  final String text;
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        if (_formKey.currentState!.validate() && acceptTerms) {
-          
-        } else if (!acceptTerms) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Debes aceptar los términos y condiciones'),
-            ),
-          );
-        }
+        if (_formKey.currentState!.validate()) {}
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.teal,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         minimumSize: Size(double.infinity, 48),
       ),
       child: Text(
-        "Registrarse",
+        text,
         style: TextStyle(
           color: Colors.white,
           fontSize: 16,

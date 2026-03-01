@@ -24,6 +24,7 @@ class _TextFieldPaswordWidgetState extends State<TextFieldPaswordWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      spacing: 5,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(widget.title),

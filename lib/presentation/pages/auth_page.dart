@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:migra_ayuda/presentation/pages/login_screen.dart';
 import 'package:migra_ayuda/presentation/pages/register_screen.dart';
 import 'package:migra_ayuda/presentation/pages/widget/login_register_switcher.dart';
 import 'package:migra_ayuda/presentation/providers/auth_provider.dart';
@@ -13,7 +14,6 @@ class AuthPage extends StatefulWidget {
 
 class _AuthPageState extends State<AuthPage> {
   // Lista de opciones que aparecerán en el desplegable
-  final List<String> countries = ["Colombia", "México", "Argentina", "Chile"];
 
   String? selectedCountry;
 
@@ -62,7 +62,7 @@ class _AuthPageState extends State<AuthPage> {
                   // -----------------botones iniciar session y registro-------------
                   LoginRegisterSwitcher(),
                   SizedBox(height: 16),
-                  isSelected ? Center(child: Text("Login")) : RegisterScreen(),
+                  isSelected ? LoginScreen() : RegisterScreen(),
                 ],
               ),
             ),
