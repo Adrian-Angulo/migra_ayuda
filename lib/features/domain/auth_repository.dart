@@ -10,4 +10,11 @@ abstract class AuthRepository {
     bool aceptaTerminos,
   );
   Future<void> login(String email, String password);
+  Future<void> logout();
+  Future<bool> isLoggedIn();
+  Future<String?> getCurrentUserId();
+  Future<void> resetPassword(String email);
+  Future<void> changePassword(String currentPassword, String newPassword);
+  Future<void> deleteAccount();
+  Future<void> refreshToken();
 }

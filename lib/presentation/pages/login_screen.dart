@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:migra_ayuda/features/provider/auth_provider.dart';
 import 'package:migra_ayuda/presentation/pages/widget/button_google_widget.dart';
 import 'package:migra_ayuda/presentation/pages/widget/text_fiel_pasword_widget.dart';
 import 'package:migra_ayuda/presentation/pages/widget/text_fiel_widget.dart';
 import 'package:migra_ayuda/presentation/widgets/button_widget.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -41,12 +43,20 @@ class _LoginScreenState extends State<LoginScreen> {
             controller: passController,
           ),
           const SizedBox(height: 16),
-          ButtonWidget(formKey: formKey, text: 'Iniciar Sesión'),
+          ButtonWidget(
+            formKey: formKey,
+            text: 'Iniciar Sesión',
+            onPressed: () {
+              if (formKey.currentState!.validate()) {
+              }
+            },
+          ),
           const SizedBox(height: 16),
           const Row(
+            spacing: 20,
             children: [
               Expanded(child: Divider(height: 2)),
-              Text("O Registrase con"),
+              Text("O"),
               Expanded(child: Divider(height: 2)),
             ],
           ),

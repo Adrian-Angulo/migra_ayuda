@@ -28,6 +28,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? selectedOriginCountry;
   String? selectedDestinationCountry;
   bool acceptTerms = false;
+  bool isLoading = false;
 
   final List<String> countries = [
     'México',
@@ -39,6 +40,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
     'Costa Rica',
     'Panamá',
   ];
+
+  void _clearControllers() {
+    _nombreController.clear();
+    _apellidoController.clear();
+    _correoController.clear();
+    _edadController.clear();
+    _passwordController.clear();
+    _confirmPasswordController.clear();
+    setState(() {
+      selectedOriginCountry = null;
+      selectedDestinationCountry = null;
+      acceptTerms = false;
+    });
+  }
 
   @override
   void dispose() {
@@ -213,33 +228,62 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ],
             ),
             SizedBox(height: 16),
-
             ButtonWidget(
               formKey: _formKey,
-              text: 'Registrarse',
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  try {
-                    context.read<AuthProvider>().register(
-                      _correoController.text,
-                      _passwordController.text,
-                      _nombreController.text,
-                      _apellidoController.text,
-                      "Cali",
-                      "Cali",
-                      20,
-                      true,
-                    );
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Error al registrar usuario: $e'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                }
-              },
+              text: isLoading ? 'Registrando...' : 'Registrarse',
+              onPressed: isLoading
+                  ? null
+                  : () async {
+                      if (_formKey.currentState!.validate() && acceptTerms) {
+                        setState(() {
+                          isLoading = true;
+                        });
+
+                        try {
+                          await context.read<AuthProvider>().register(
+                            _correoController.text,
+                            _passwordController.text,
+                            _nombreController.text,
+                            _apellidoController.text,
+                            selectedOriginCountry ?? "No especificado",
+                            selectedDestinationCountry ?? "No especificado",
+                            int.tryParse(_edadController.text) ?? 0,
+                            acceptTerms,
+                          );
+
+                          _clearControllers();
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                '¡Registro completado exitosamente!',
+                              ),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error al registrar usuario: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        } finally {
+                          setState(() {
+                            isLoading = false;
+                          });
+                        }
+                      } else if (!acceptTerms) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Debes aceptar los términos y condiciones',
+                            ),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                      }
+                    },
             ),
             SizedBox(height: 16),
             Row(

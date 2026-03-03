@@ -43,4 +43,68 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> login(String email, String password) async {
     await _auth.signInWithEmailAndPassword(email: email, password: password);
   }
+
+  @override
+  Future<void> changePassword(
+    String currentPassword,
+    String newPassword,
+  ) async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception('Usuario no autenticado');
+    }
+
+    // Re-autenticar al usuario con la contraseña actual
+    final credential = EmailAuthProvider.credential(
+      email: user.email!,
+      password: currentPassword,
+    );
+
+    await user.reauthenticateWithCredential(credential);
+
+    // Cambiar la contraseña
+    await user.updatePassword(newPassword);
+  }
+
+  @override
+  Future<void> deleteAccount() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw Exception('Usuario no autenticado');
+    }
+
+    // Eliminar datos del usuario de Firestore
+    await _firestore.collection('users').doc(user.uid).delete();
+
+    // Eliminar la cuenta de Firebase Auth
+    await user.delete();
+  }
+
+  @override
+  Future<String?> getCurrentUserId() async {
+    return _auth.currentUser?.uid;
+  }
+
+  @override
+  Future<bool> isLoggedIn() async {
+    return _auth.currentUser != null;
+  }
+
+  @override
+  Future<void> logout() async {
+    await _auth.signOut();
+  }
+
+  @override
+  Future<void> refreshToken() async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      await user.reload();
+    }
+  }
+
+  @override
+  Future<void> resetPassword(String email) async {
+    await _auth.sendPasswordResetEmail(email: email);
+  }
 }
