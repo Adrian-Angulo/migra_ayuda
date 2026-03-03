@@ -28,7 +28,7 @@ class LoginScreen extends StatelessWidget {
             SizedBox(height: 16),
             TextFieldPaswordWidget(
               title: "Contraseña",
-              hintText: "",
+              
               controller: _passController,
             ),
             SizedBox(height: 16),

@@ -18,33 +18,31 @@ class DropdownFieldWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title),
-          const SizedBox(height: 8),
-          DropdownButtonFormField<String>(
-            value: value,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return "Por favor selecciona una opción";
-              }
-              return null;
-            },
-            items: items.map((item) {
-              return DropdownMenuItem<String>(value: item, child: Text(item));
-            }).toList(),
-            onChanged: onChanged,
-            hint: Text(hint),
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<String>(
+          value: value,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return "Por favor selecciona una opción";
+            }
+            return null;
+          },
+          items: items.map((item) {
+            return DropdownMenuItem<String>(value: item, child: Text(item));
+          }).toList(),
+          onChanged: onChanged,
+          hint: Text(hint),
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

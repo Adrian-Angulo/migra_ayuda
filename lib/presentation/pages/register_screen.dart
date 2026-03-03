@@ -92,42 +92,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             //--------------------- Seccion pais de origen y destino -----------------------
             SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: DropdownFieldWidget(
-                    title: 'Pais de origen',
-                    value: selectedOriginCountry,
-                    items: countries,
-                    hint: "Elige una opcion",
-                    onChanged: (value) {
-                      setState(() {
-                        selectedOriginCountry = value;
-                      });
-                    },
-                  ),
-                ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: DropdownFieldWidget(
-                    title: 'Pais de destino',
-                    value: selectedDestinationCountry,
-                    items: countries,
-                    hint: "Elige una opcion",
-                    onChanged: (value) {
-                      setState(() {
-                        selectedDestinationCountry = value;
-                      });
-                    },
-                  ),
-                ),
-              ],
+            DropdownFieldWidget(
+              title: 'Pais de origen',
+              value: selectedOriginCountry,
+              items: countries,
+              hint: "Elige una opcion",
+              onChanged: (value) {
+                setState(() {
+                  selectedOriginCountry = value;
+                });
+              },
+            ),
+            SizedBox(width: 10),
+            DropdownFieldWidget(
+              title: 'Pais de destino',
+              value: selectedDestinationCountry,
+              items: countries,
+              hint: "Elige una opcion",
+              onChanged: (value) {
+                setState(() {
+                  selectedDestinationCountry = value;
+                });
+              },
             ),
             SizedBox(height: 16),
             Row(
               spacing: 10,
               children: [
-                Flexible(
+                Expanded(
                   flex: 3,
                   child: TextFieldWidget(
                     title: "Correo electrònico",
@@ -147,10 +139,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                   ),
                 ),
-                Flexible(
+
+                Expanded(
                   child: TextFieldNumericWidget(
                     title: "Edad",
-                    hintText: "Ej. 25",
+                    hintText: "Ej. 24",
                     controller: _edadController,
                   ),
                 ),
@@ -159,22 +152,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
             SizedBox(height: 16),
             TextFieldPaswordWidget(
               title: "Contraseña",
-              hintText: "******",
+
               controller: _passwordController,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Por favor ingresa una contraseña';
-                }
-                if (value.length < 6) {
-                  return 'La contraseña debe tener al menos 6 caracteres';
-                }
-                return null;
-              },
             ),
             SizedBox(height: 16),
             TextFieldPaswordWidget(
               title: "Confirmar contraseña",
-              hintText: "******",
+
               controller: _confirmPasswordController,
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -233,7 +217,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             Row(
               children: [
                 Expanded(child: Divider(height: 2)),
-                Text("O Registrase con"),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: Text("O Registrase con"),
+                ),
                 Expanded(child: Divider(height: 2)),
               ],
             ),
