@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:migra_ayuda/presentation/pages/login_screen.dart';
 import 'package:migra_ayuda/presentation/pages/register_screen.dart';
 import 'package:migra_ayuda/presentation/pages/widget/login_register_switcher.dart';
-import 'package:migra_ayuda/presentation/providers/auth_provider.dart';
+import 'package:migra_ayuda/features/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
 
 class AuthPage extends StatefulWidget {

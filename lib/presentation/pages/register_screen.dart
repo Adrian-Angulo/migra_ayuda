@@ -1,11 +1,13 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:migra_ayuda/features/provider/auth_provider.dart';
 import 'package:migra_ayuda/presentation/pages/widget/button_google_widget.dart';
 import 'package:migra_ayuda/presentation/pages/widget/dropdown_field_widget.dart';
 import 'package:migra_ayuda/presentation/pages/widget/text_fiel_pasword_widget.dart';
 import 'package:migra_ayuda/presentation/pages/widget/text_fiel_widget.dart';
 import 'package:migra_ayuda/presentation/pages/widget/text_field_numeric_widget.dart';
 import 'package:migra_ayuda/presentation/widgets/button_widget.dart';
+import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -212,7 +214,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             SizedBox(height: 16),
 
-            ButtonWidget(formKey: _formKey, text: 'Registrarse'),
+            ButtonWidget(
+              formKey: _formKey,
+              text: 'Registrarse',
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  try {
+                    context.read<AuthProvider>().register(
+                      _correoController.text,
+                      _passwordController.text,
+                      _nombreController.text,
+                      _apellidoController.text,
+                      "Cali",
+                      "Cali",
+                      20,
+                      true,
+                    );
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error al registrar usuario: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              },
+            ),
             SizedBox(height: 16),
             Row(
               children: [

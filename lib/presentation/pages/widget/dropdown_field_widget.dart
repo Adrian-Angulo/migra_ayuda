@@ -24,7 +24,7 @@ class DropdownFieldWidget extends StatelessWidget {
         Text(title),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          value: value,
+          initialValue: value,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return "Por favor selecciona una opción";
@@ -37,9 +37,7 @@ class DropdownFieldWidget extends StatelessWidget {
           onChanged: onChanged,
           hint: Text(hint),
           decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           ),
         ),
       ],

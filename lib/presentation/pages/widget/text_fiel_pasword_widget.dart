@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 
 class TextFieldPaswordWidget extends StatefulWidget {
   final String title;
-
   final TextEditingController controller;
   final String? Function(String?)? validator;
 
   const TextFieldPaswordWidget({
     super.key,
     required this.title,
-
     required this.controller,
     this.validator,
   });

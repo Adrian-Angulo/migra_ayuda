@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "230355024122",
+    "project_id": "migraayuda-fb971",
+    "storage_bucket": "migraayuda-fb971.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230355024122:android:529414eae9fb827a57f143",
+        "android_client_info": {
+          "package_name": "com.example.migra_ayuda"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCS9dWZSewXldqcf4jWbNCKzzP_OsjG6zw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/presentation/providers/auth_provider.dart';
+import 'package:migra_ayuda/features/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
 
 class LoginRegisterSwitcher extends StatelessWidget {
@@ -63,7 +63,7 @@ class _SwitchButton extends StatelessWidget {
           boxShadow: isActive
               ? [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withValues(alpha: 0.05),
                     blurRadius: 2,
                     offset: const Offset(0, 1),
                   ),
