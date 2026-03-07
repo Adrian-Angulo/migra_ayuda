@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/features/provider/auth_provider.dart';
-import 'package:migra_ayuda/presentation/pages/widget/button_google_widget.dart';
-import 'package:migra_ayuda/presentation/pages/widget/text_fiel_pasword_widget.dart';
-import 'package:migra_ayuda/presentation/pages/widget/text_fiel_widget.dart';
-import 'package:migra_ayuda/presentation/widgets/button_widget.dart';
+import 'package:migra_ayuda/provider/auth_provider.dart';
+import 'package:migra_ayuda/ui/pages/HomeScreen/home_screen.dart';
+
+import 'package:migra_ayuda/ui/pages/widget/button_google_widget.dart';
+import 'package:migra_ayuda/ui/pages/widget/text_fiel_pasword_widget.dart';
+import 'package:migra_ayuda/ui/pages/widget/text_fiel_widget.dart';
+import 'package:migra_ayuda/ui/widgets/button_widget.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -27,6 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final autProvider = context.read<AuthProvider>();
     return Form(
       key: formKey,
       child: Column(
@@ -46,8 +49,29 @@ class _LoginScreenState extends State<LoginScreen> {
           ButtonWidget(
             formKey: formKey,
             text: 'Iniciar Sesión',
-            onPressed: () {
+            onPressed: () async {
               if (formKey.currentState!.validate()) {
+                await autProvider.logout();
+                // ✅ Esperas que termine el login
+                await autProvider.login(
+                    emailController.text, passController.text);
+
+                // ✅ Verificas DESPUÉS de que terminó
+                if (autProvider.error == null) {
+                  emailController.clear();
+                  passController.clear();
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(autProvider.error!),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               }
             },
           ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/features/provider/auth_provider.dart';
+import 'package:migra_ayuda/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
 
 class LoginRegisterSwitcher extends StatelessWidget {

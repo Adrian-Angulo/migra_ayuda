@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:migra_ayuda/ui/pages/auth_page.dart';
 
 class PerfilScreen extends StatelessWidget {
   const PerfilScreen({super.key});
@@ -12,7 +13,6 @@ class PerfilScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
-
               const SizedBox(height: 30),
 
               // Avatar
@@ -59,9 +59,9 @@ class PerfilScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Chips de información
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   _InfoChip(label: "Origen", value: "Venezuela"),
                   SizedBox(width: 10),
                   _InfoChip(label: "Destino", value: "Perú"),
@@ -88,7 +88,13 @@ class PerfilScreen extends StatelessWidget {
               _ProfileOption(
                 icon: Icons.logout,
                 text: "Cerrar Sesión",
-                onTap: () {},
+                onTap: () {
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AuthPage(),
+                      ));
+                },
               ),
             ],
           ),

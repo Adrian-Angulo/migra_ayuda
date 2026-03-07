@@ -1,12 +1,14 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/features/provider/auth_provider.dart';
-import 'package:migra_ayuda/presentation/pages/widget/button_google_widget.dart';
-import 'package:migra_ayuda/presentation/pages/widget/dropdown_field_widget.dart';
-import 'package:migra_ayuda/presentation/pages/widget/text_fiel_pasword_widget.dart';
-import 'package:migra_ayuda/presentation/pages/widget/text_fiel_widget.dart';
-import 'package:migra_ayuda/presentation/pages/widget/text_field_numeric_widget.dart';
-import 'package:migra_ayuda/presentation/widgets/button_widget.dart';
+import 'package:migra_ayuda/core/utils/constants.dart';
+import 'package:migra_ayuda/core/utils/validation/email_validator.dart';
+import 'package:migra_ayuda/provider/auth_provider.dart';
+import 'package:migra_ayuda/ui/pages/widget/button_google_widget.dart';
+import 'package:migra_ayuda/ui/pages/widget/dropdown_field_widget.dart';
+import 'package:migra_ayuda/ui/pages/widget/text_fiel_pasword_widget.dart';
+import 'package:migra_ayuda/ui/pages/widget/text_fiel_widget.dart';
+import 'package:migra_ayuda/ui/pages/widget/text_field_numeric_widget.dart';
+import 'package:migra_ayuda/ui/widgets/button_widget.dart';
 import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -68,8 +70,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final error = context.watch<AuthProvider>().error;
     return Padding(
-      padding: EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.only(bottom: UIConstants.spacingL),
       child: Form(
         key: _formKey,
         child: Column(
@@ -108,7 +111,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
 
             //--------------------- Seccion pais de origen y destino -----------------------
-            SizedBox(height: 16),
+            const SizedBox(height: UIConstants.spacingM),
             DropdownFieldWidget(
               title: 'Pais de origen',
               value: selectedOriginCountry,
@@ -120,7 +123,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 });
               },
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: UIConstants.spacingS),
             DropdownFieldWidget(
               title: 'Pais de destino',
               value: selectedDestinationCountry,
@@ -132,31 +135,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 });
               },
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: UIConstants.spacingM),
             Row(
               spacing: 10,
               children: [
                 Expanded(
                   flex: 3,
                   child: TextFieldWidget(
-                    title: "Correo electrònico",
-                    hintText: "Ej. usuario@gmail.com",
-
-                    controller: _correoController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor ingresa tu correo';
-                      }
-                      if (!RegExp(
-                        r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                      ).hasMatch(value)) {
-                        return 'Por favor ingresa un correo válido';
-                      }
-                      return null;
-                    },
-                  ),
+                      title: "Correo electrònico",
+                      hintText: "Ej. usuario@gmail.com",
+                      controller: _correoController,
+                      validator: EmailValidator.validateFormat),
                 ),
-
                 Expanded(
                   child: TextFieldNumericWidget(
                     title: "Edad",
@@ -166,16 +156,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: UIConstants.spacingM),
             TextFieldPaswordWidget(
               title: "Contraseña",
-
               controller: _passwordController,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: UIConstants.spacingM),
             TextFieldPaswordWidget(
               title: "Confirmar contraseña",
-
               controller: _confirmPasswordController,
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -187,7 +175,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 return null;
               },
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: UIConstants.spacingM),
             Row(
               children: [
                 Checkbox(
@@ -201,21 +189,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Flexible(
                   child: RichText(
                     text: TextSpan(
-                      style: TextStyle(fontSize: 14, color: Colors.black),
+                      style: const TextStyle(fontSize: 14, color: Colors.black),
                       children: [
-                        TextSpan(text: "Acepto los "),
+                        const TextSpan(text: "Acepto los "),
                         TextSpan(
                           text: "términos y condiciones de uso",
-                          style: TextStyle(color: Color(0xFF64999A)),
+                          style: const TextStyle(color: Color(0xFF64999A)),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
                               // Lógica para abrir términos y condiciones
                             },
                         ),
-                        TextSpan(text: " y la "),
+                        const TextSpan(text: " y la "),
                         TextSpan(
                           text: "política de privacidad",
-                          style: TextStyle(color: Color(0xFF64999A)),
+                          style: const TextStyle(color: Color(0xFF64999A)),
                           recognizer: TapGestureRecognizer()
                             ..onTap = () {
                               // Lógica para abrir política de privacidad
@@ -227,66 +215,59 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: UIConstants.spacingM),
             ButtonWidget(
-              formKey: _formKey,
-              text: isLoading ? 'Registrando...' : 'Registrarse',
-              onPressed: isLoading
-                  ? null
-                  : () async {
-                      if (_formKey.currentState!.validate() && acceptTerms) {
-                        setState(() {
-                          isLoading = true;
-                        });
+                formKey: _formKey,
+                text: isLoading ? 'Registrando...' : 'Registrarse',
+                onPressed: () async {
+                  // 1. Validar formulario
+                  if (!_formKey.currentState!.validate()) return;
 
-                        try {
-                          await context.read<AuthProvider>().register(
-                            _correoController.text,
-                            _passwordController.text,
-                            _nombreController.text,
-                            _apellidoController.text,
-                            selectedOriginCountry ?? "No especificado",
-                            selectedDestinationCountry ?? "No especificado",
-                            int.tryParse(_edadController.text) ?? 0,
-                            acceptTerms,
-                          );
+                  // 2. Validar términos
+                  if (!acceptTerms) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content:
+                            Text('Debes aceptar los términos y condiciones'),
+                        backgroundColor: Colors.orange,
+                      ),
+                    );
+                    return;
+                  }
 
-                          _clearControllers();
+                  // 3. Llamar al provider (él maneja isLoading y error)
+                  await context.read<AuthProvider>().register(
+                        _correoController.text,
+                        _passwordController.text,
+                        _nombreController.text,
+                        _apellidoController.text,
+                        selectedOriginCountry ?? 'No especificado',
+                        selectedDestinationCountry ?? 'No especificado',
+                        int.tryParse(_edadController.text) ?? 0,
+                        acceptTerms,
+                      );
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                '¡Registro completado exitosamente!',
-                              ),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Error al registrar usuario: $e'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        } finally {
-                          setState(() {
-                            isLoading = false;
-                          });
-                        }
-                      } else if (!acceptTerms) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Debes aceptar los términos y condiciones',
-                            ),
-                            backgroundColor: Colors.orange,
-                          ),
-                        );
-                      }
-                    },
-            ),
-            SizedBox(height: 16),
-            Row(
+                  // 4. Revisar resultado DESPUÉS del registro
+                  final auth = context.read<AuthProvider>();
+                  if (auth.error == null) {
+                    _clearControllers(); // ✅ limpias solo si fue exitoso
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('¡Registro completado exitosamente!'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(auth.error!),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }),
+            const SizedBox(height: UIConstants.spacingM),
+            const Row(
               children: [
                 Expanded(child: Divider(height: 2)),
                 Padding(
@@ -297,9 +278,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ],
             ),
 
-            SizedBox(height: 16),
-            ButtonGoogleWidget(),
-            SizedBox(height: 20),
+            const SizedBox(height: UIConstants.spacingM),
+            const ButtonGoogleWidget(),
+            const SizedBox(height: UIConstants.spacingM),
           ],
         ),
       ),

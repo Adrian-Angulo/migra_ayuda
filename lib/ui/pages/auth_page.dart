@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/presentation/pages/login_screen.dart';
-import 'package:migra_ayuda/presentation/pages/register_screen.dart';
-import 'package:migra_ayuda/presentation/pages/widget/login_register_switcher.dart';
-import 'package:migra_ayuda/features/provider/auth_provider.dart';
+import 'package:migra_ayuda/ui/pages/login_screen.dart';
+import 'package:migra_ayuda/ui/pages/register_screen.dart';
+import 'package:migra_ayuda/ui/pages/widget/login_register_switcher.dart';
+import 'package:migra_ayuda/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
 
 class AuthPage extends StatefulWidget {
@@ -13,7 +13,7 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
-  // Lista de opciones que aparecerán en el desplegable
+  
 
   String? selectedCountry;
 
@@ -42,14 +42,14 @@ class _AuthPageState extends State<AuthPage> {
                           fit: BoxFit.cover,
                         ),
                       ),
-                      Text(
+                      const Text(
                         "Comenzar ahora",
                         style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
+                      const Text(
                         "Completa tus datos para crear una cuenta",
                         style: TextStyle(
                           fontSize: 14,
@@ -58,11 +58,11 @@ class _AuthPageState extends State<AuthPage> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   // -----------------botones iniciar session y registro-------------
-                  LoginRegisterSwitcher(),
-                  SizedBox(height: 16),
-                  isSelected ? LoginScreen() : RegisterScreen(),
+                  const LoginRegisterSwitcher(),
+                  const SizedBox(height: 16),
+                  isSelected ? const LoginScreen() : const RegisterScreen(),
                 ],
               ),
             ),

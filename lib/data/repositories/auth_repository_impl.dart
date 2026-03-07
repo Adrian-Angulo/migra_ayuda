@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../domain/auth_repository.dart';
+import './auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -17,14 +17,14 @@ class AuthRepositoryImpl implements AuthRepository {
     int edad,
     bool aceptaTerminos,
   ) async {
-    if (!aceptaTerminos) {
-      throw Exception('Debe aceptar los términos y condiciones');
-    }
+    
     UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
-
+    // ✅ Envía el email de verificación automáticamente
+    await userCredential.user!.sendEmailVerification();
+    
     // Actualizar el perfil del usuario con información adicional
     await userCredential.user?.updateDisplayName('$nombre $apellido');
 
@@ -40,8 +40,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> login(String email, String password) async {
-    await _auth.signInWithEmailAndPassword(email: email, password: password);
+  Future<UserCredential> login(String email, String password) async {
+    return await _auth.signInWithEmailAndPassword(email: email, password: password);
   }
 
   @override
@@ -107,4 +107,6 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> resetPassword(String email) async {
     await _auth.sendPasswordResetEmail(email: email);
   }
+
+  
 }
