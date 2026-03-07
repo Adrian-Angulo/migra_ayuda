@@ -218,7 +218,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             const SizedBox(height: UIConstants.spacingM),
             ButtonWidget(
                 formKey: _formKey,
-                text: isLoading ? 'Registrando...' : 'Registrarse',
+                text: 'Registrarse',
+                loading: isLoading,
                 onPressed: () async {
                   // 1. Validar formulario
                   if (!_formKey.currentState!.validate()) return;
@@ -266,21 +267,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     );
                   }
                 }),
-            const SizedBox(height: UIConstants.spacingM),
-            const Row(
-              children: [
-                Expanded(child: Divider(height: 2)),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Text("O Registrase con"),
-                ),
-                Expanded(child: Divider(height: 2)),
-              ],
-            ),
-
-            const SizedBox(height: UIConstants.spacingM),
-            const ButtonGoogleWidget(),
-            const SizedBox(height: UIConstants.spacingM),
+            const SizedBox(height: UIConstants.spacingM),    
           ],
         ),
       ),

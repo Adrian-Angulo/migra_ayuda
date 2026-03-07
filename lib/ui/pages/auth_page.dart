@@ -13,13 +13,12 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
-  
-
   String? selectedCountry;
 
   @override
   Widget build(BuildContext context) {
     final isSelected = context.watch<AuthProvider>().isSelected;
+    final isLogin = context.watch<AuthProvider>().isLogin;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -31,6 +30,7 @@ class _AuthPageState extends State<AuthPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  
                   Column(
                     children: [
                       ClipRRect(

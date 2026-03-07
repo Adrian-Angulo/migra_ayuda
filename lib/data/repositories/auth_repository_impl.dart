@@ -6,24 +6,26 @@ import './auth_repository.dart';
 class AuthRepositoryImpl implements AuthRepository {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
+  final GoogleSignIn googleSignIn = GoogleSignIn();
   @override
   Future<UserCredential?> signInWithGoogle() async {
-    // Trigger the authentication flow
-    final GoogleSignInAccount? googleUser =
-        await GoogleSignIn.instance.authenticate();
+    // En v6 creas tu propia instancia
+
+    // .signIn() en lugar de .authenticate()
+    final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
     if (googleUser == null) return null;
 
+    // En v6 SÍ necesita await
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
 
-    // Obtener tokens
-    final GoogleSignInAuthentication googleAuth = googleUser!.authentication;
+    // Podías usar accessToken también
+    final OAuthCredential credential = GoogleAuthProvider.credential(
+      idToken: googleAuth.idToken,
+      accessToken: googleAuth.accessToken,
+    );
 
-    // Create a new credential
-    final credential =
-        GoogleAuthProvider.credential(idToken: googleAuth.idToken);
-
-    // Iniciar sesion en firebase
     return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
@@ -114,6 +116,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> logout() async {
     await _auth.signOut();
+    await googleSignIn.signOut();
   }
 
   @override

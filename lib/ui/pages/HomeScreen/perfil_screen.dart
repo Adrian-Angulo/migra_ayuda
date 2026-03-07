@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:migra_ayuda/provider/auth_provider.dart';
 import 'package:migra_ayuda/ui/pages/auth_page.dart';
+import 'package:provider/provider.dart';
 
 class PerfilScreen extends StatelessWidget {
   const PerfilScreen({super.key});
@@ -88,7 +90,8 @@ class PerfilScreen extends StatelessWidget {
               _ProfileOption(
                 icon: Icons.logout,
                 text: "Cerrar Sesión",
-                onTap: () {
+                onTap: () async {
+                  await context.read<AuthProvider>().logout();
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(

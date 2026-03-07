@@ -6,7 +6,7 @@ class AuthProvider extends ChangeNotifier {
   final AuthRepository repository;
   bool _isSeleted = false;
   String? error;
-
+  bool isLogin = false;
   AuthProvider(this.repository);
 
   bool isLoading = false;
@@ -57,6 +57,22 @@ class AuthProvider extends ChangeNotifier {
   set isSelected(bool value) {
     _isSeleted = value;
     notifyListeners();
+  }
+
+  Future<bool?> signInWithGoogle() async {
+    _clearError();
+    notifyListeners();
+
+    try {
+      final userCredential = await repository.signInWithGoogle();
+      return userCredential?.additionalUserInfo?.isNewUser;
+    } catch (e) {
+      error = e.toString();
+
+      return null;
+    } finally {
+      notifyListeners();
+    }
   }
 
   Future<void> login(String email, String password) async {
@@ -114,12 +130,11 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> isLoggedIn() async {
+  Future<void> isLoggedIn() async {
     try {
-      return await repository.isLoggedIn();
+      isLogin = await repository.isLoggedIn();
     } catch (e) {
       error = e.toString();
-      return false;
     }
   }
 
