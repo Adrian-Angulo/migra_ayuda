@@ -30,6 +30,8 @@ class MainApp extends StatelessWidget {
         ),
         home: AuthPage(),
       ),
+      home: const HomeScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
