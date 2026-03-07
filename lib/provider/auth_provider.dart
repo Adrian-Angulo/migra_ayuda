@@ -71,7 +71,9 @@ class AuthProvider extends ChangeNotifier {
       // ✅ Verifica si el correo está confirmado
       if (user != null && !user.emailVerified) {
         error =
-            'Debes verificar tu correo antes de ingresar. Revisa tu bandeja.';
+            'Debes verificar tu correo antes de ingresar. Revisa tu bandeja spam.';
+        isLoading = false;
+        notifyListeners();
         return;
       }
     } on FirebaseAuthException catch (e) {

@@ -49,6 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ButtonWidget(
             formKey: formKey,
             text: 'Iniciar Sesión',
+            loading: context.watch<AuthProvider>().isLoading,
             onPressed: () async {
               if (formKey.currentState!.validate()) {
                 await autProvider.logout();
