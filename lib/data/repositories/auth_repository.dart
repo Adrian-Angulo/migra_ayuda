@@ -19,5 +19,5 @@ abstract class AuthRepository {
   Future<void> changePassword(String currentPassword, String newPassword);
   Future<void> deleteAccount();
   Future<void> refreshToken();
-  
+  Future<UserCredential?> signInWithGoogle();
 }

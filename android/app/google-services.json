@@ -12,7 +12,20 @@
           "package_name": "com.example.migra_ayuda"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "230355024122-vgfmmnk914sf8no6p65knai3ji763k9h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.migra_ayuda",
+            "certificate_hash": "0fcc40a32b40675d4c3cae7016395b4180a29c58"
+          }
+        },
+        {
+          "client_id": "230355024122-1dn13j2cddcva1gq52gr69gsml8t0r6c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCS9dWZSewXldqcf4jWbNCKzzP_OsjG6zw"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "230355024122-1dn13j2cddcva1gq52gr69gsml8t0r6c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "230355024122-gd5qc6uh8cp9hjpbmu3tmehbb7b5p7nn.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.migraAyuda"
+              }
+            }
+          ]
         }
       }
     }
