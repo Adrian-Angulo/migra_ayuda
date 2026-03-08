@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:migra_ayuda/provider/auth_provider.dart';
+import 'package:migra_ayuda/ui/pages/HomeScreen/home_screen.dart';
 import 'package:migra_ayuda/ui/pages/widget/dropdown_field_widget.dart';
 import 'package:migra_ayuda/ui/pages/widget/text_fiel_widget.dart';
 import 'package:migra_ayuda/ui/pages/widget/text_field_numeric_widget.dart';
 import 'package:migra_ayuda/ui/widgets/button_widget.dart';
-
+import 'package:provider/provider.dart';
 
 class CompleteInfoScreen extends StatefulWidget {
   const CompleteInfoScreen({super.key});
@@ -15,12 +17,10 @@ class CompleteInfoScreen extends StatefulWidget {
 
 class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nombreController = TextEditingController();
-  final _apellidoController = TextEditingController();
   final _edadController = TextEditingController();
 
-  String? selectedOriginCountry;
-  String? selectedDestinationCountry;
+  String? originCountry;
+  String? destinationCountry;
   bool acceptTerms = false;
   bool isLoading = false;
 
@@ -36,27 +36,26 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
   ];
 
   void _clearControllers() {
-    _nombreController.clear();
-    _apellidoController.clear();
     _edadController.clear();
 
     setState(() {
-      selectedOriginCountry = null;
-      selectedDestinationCountry = null;
+      originCountry = null;
+      destinationCountry = null;
       acceptTerms = false;
     });
   }
 
   @override
   void dispose() {
-    _nombreController.dispose();
-    _apellidoController.dispose();
     _edadController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final authProviderWatch = context.watch<AuthProvider>();
+    final authProviderRead = context.read<AuthProvider>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Completar información'),
@@ -70,58 +69,27 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
               key: _formKey,
               child: Column(
                 children: [
-                  Row(
-                    spacing: 10,
-                    children: [
-                      Expanded(
-                        child: TextFieldWidget(
-                          title: "Nombre",
-                          hintText: "Juan",
-                          controller: _nombreController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Por favor ingresa tu nombre';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                      Expanded(
-                        child: TextFieldWidget(
-                          title: "Apellido",
-                          hintText: "Castillo",
-                          controller: _apellidoController,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Por favor ingresa tu apellido';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
                   const SizedBox(height: 16),
                   DropdownFieldWidget(
                     title: 'Pais de origen',
-                    value: selectedOriginCountry,
+                    value: originCountry,
                     items: countries,
                     hint: "Elige una opcion",
                     onChanged: (value) {
                       setState(() {
-                        selectedOriginCountry = value;
+                        originCountry = value;
                       });
                     },
                   ),
                   const SizedBox(height: 16),
                   DropdownFieldWidget(
                     title: 'Pais de destino',
-                    value: selectedDestinationCountry,
+                    value: destinationCountry,
                     items: countries,
                     hint: "Elige una opcion",
                     onChanged: (value) {
                       setState(() {
-                        selectedDestinationCountry = value;
+                        destinationCountry = value;
                       });
                     },
                   ),
@@ -173,10 +141,33 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
                   const SizedBox(height: 16),
                   ButtonWidget(
                     formKey: _formKey,
-                    text: 'Completar info',
+                    text: 'Completar Informacíon',
                     loading: isLoading,
                     onPressed: () async {
                       if (!_formKey.currentState!.validate()) return;
+
+                      await authProviderRead.completedPerfil(
+                          paisOrigen: originCountry ?? "No definido",
+                          paisDestino: destinationCountry ?? "No definido",
+                          edad: int.parse(_edadController.text),
+                          aceptaTerminos: acceptTerms);
+
+                      if (authProviderWatch.error != null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(authProviderWatch.error!),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      } else {
+                        _clearControllers();
+                      
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HomeScreen(),
+                            ));
+                      }
                     },
                   ),
                   const SizedBox(height: 16),

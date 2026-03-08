@@ -98,7 +98,29 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> completedPerfil({
+    required String paisOrigen,
+    required String paisDestino,
+    required int edad,
+    required bool aceptaTerminos,
+  }) async {
+    isLoading = true;
+    _clearError();
+    notifyListeners();
 
+    try {
+      await repository.completeGoogleProfile(
+          paisOrigen: paisOrigen,
+          paisDestino: paisDestino,
+          edad: edad,
+          aceptaTerminos: aceptaTerminos);
+    } catch (e) {
+      error = e.toString();
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
 
   Future<void> login(String email, String password) async {
     isLoading = true;

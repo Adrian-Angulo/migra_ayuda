@@ -74,8 +74,7 @@ class AuthRepositoryImpl implements AuthRepository {
     final user = _auth.currentUser;
     if (user == null) return false;
 
-    final doc =
-        await _firestore.collection('users').doc(user.uid).get();
+    final doc = await _firestore.collection('users').doc(user.uid).get();
 
     if (!doc.exists) return false;
 
@@ -139,7 +138,6 @@ class AuthRepositoryImpl implements AuthRepository {
       'paisDestino': paisDestino,
       'edad': edad,
       'email': email,
-      'photoURL': null,
       'aceptaTerminos': aceptaTerminos,
       'profileComplete': true, // 👈 ya viene completo
       'createdAt': FieldValue.serverTimestamp(),
@@ -187,6 +185,24 @@ class AuthRepositoryImpl implements AuthRepository {
 
     await _firestore.collection('users').doc(user.uid).delete();
     await user.delete();
+  }
+
+  // Limpia sesión cuando el perfil quedó incompleto
+  Future<void> clearIncompleteSession() async {
+    try {
+      final user = _auth.currentUser;
+
+      // Opcional: eliminar el documento incompleto de Firestore
+      if (user != null) {
+        await _firestore.collection('users').doc(user.uid).delete();
+      }
+
+      await _auth.signOut();
+      await googleSignIn.signOut();
+    } catch (e) {
+      // Aunque falle, lo importante es cerrar la sesión
+      await _auth.signOut();
+    }
   }
 
   // ─────────────────────────────────────────────────────────────

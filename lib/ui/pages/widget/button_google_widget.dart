@@ -12,6 +12,7 @@ class ButtonGoogleWidget extends StatelessWidget {
     return ElevatedButton.icon(
       onPressed: () async {
         final authProvider = context.read<AuthProvider>();
+        await authProvider.logout();
         await authProvider.handleGoogleLogin(context);
         if (!context.mounted) return;
         if (authProvider.error != null) {
@@ -25,7 +26,6 @@ class ButtonGoogleWidget extends StatelessWidget {
             ),
           );
         }
-        
       },
       icon: Image.asset(
         'assets/icons/google.png', // Asegúrate de tener el ícono de Google
@@ -51,5 +51,3 @@ class ButtonGoogleWidget extends StatelessWidget {
     );
   }
 }
-
-
