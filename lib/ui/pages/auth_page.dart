@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:migra_ayuda/core/utils/constants.dart';
 import 'package:migra_ayuda/ui/pages/login_screen.dart';
 import 'package:migra_ayuda/ui/pages/register_screen.dart';
 import 'package:migra_ayuda/ui/pages/widget/login_register_switcher.dart';
@@ -18,7 +19,7 @@ class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     final isSelected = context.watch<AuthProvider>().isSelected;
-    final isLogin = context.watch<AuthProvider>().isLogin;
+    
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -58,7 +59,7 @@ class _AuthPageState extends State<AuthPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                   const SizedBox(height: UIConstants.spacingM),
                   // -----------------botones iniciar session y registro-------------
                   const LoginRegisterSwitcher(),
                   const SizedBox(height: 16),

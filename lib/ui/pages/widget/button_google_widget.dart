@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/provider/auth_provider.dart';
-import 'package:migra_ayuda/ui/pages/HomeScreen/home_screen.dart';
 import 'package:provider/provider.dart';
 
 class ButtonGoogleWidget extends StatelessWidget {
@@ -13,10 +12,8 @@ class ButtonGoogleWidget extends StatelessWidget {
     return ElevatedButton.icon(
       onPressed: () async {
         final authProvider = context.read<AuthProvider>();
-        final isNewUser = await authProvider.signInWithGoogle();
-
+        await authProvider.handleGoogleLogin(context);
         if (!context.mounted) return;
-
         if (authProvider.error != null) {
           // Error en la autenticación
           print(authProvider.error);
@@ -28,25 +25,7 @@ class ButtonGoogleWidget extends StatelessWidget {
             ),
           );
         }
-        if (isNewUser != false) {
-          // Usuario autenticado exitosamente
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const Scaffold(
-                  body: Center(
-                    child: Text("Completar informacion"),
-                  ),
-                ),
-              ));
-        } else {
-          // Usuario autenticado exitosamente
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const HomeScreen(),
-              ));
-        }
+        
       },
       icon: Image.asset(
         'assets/icons/google.png', // Asegúrate de tener el ícono de Google
@@ -72,3 +51,5 @@ class ButtonGoogleWidget extends StatelessWidget {
     );
   }
 }
+
+

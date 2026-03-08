@@ -20,4 +20,11 @@ abstract class AuthRepository {
   Future<void> deleteAccount();
   Future<void> refreshToken();
   Future<UserCredential?> signInWithGoogle();
+  Future<bool> isProfileComplete();
+  Future<void> completeGoogleProfile({
+    required String paisOrigen,
+    required String paisDestino,
+    required int edad,
+    required bool aceptaTerminos,
+  });
 }

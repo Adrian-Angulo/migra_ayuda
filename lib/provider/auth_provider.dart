@@ -1,15 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/data/repositories/auth_repository.dart';
+import 'package:migra_ayuda/ui/pages/HomeScreen/home_screen.dart';
+import 'package:migra_ayuda/ui/pages/complete_info_screen.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthRepository repository;
-  bool _isSeleted = false;
+  bool _isSeleted = true;
   String? error;
-  bool isLogin = false;
-  AuthProvider(this.repository);
-
   bool isLoading = false;
+  UserCredential? userCredential;
+
+  AuthProvider(this.repository);
 
   void _clearError() {
     error = null;
@@ -59,21 +61,44 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool?> signInWithGoogle() async {
+  Future<void> handleGoogleLogin(BuildContext context) async {
     _clearError();
+    isLoading = true;
     notifyListeners();
 
     try {
-      final userCredential = await repository.signInWithGoogle();
-      return userCredential?.additionalUserInfo?.isNewUser;
+      final result = await repository.signInWithGoogle();
+      if (result == null) {
+        error = 'Error al iniciar sesión con Google';
+        return;
+      }
+
+      final bool profileComplete = await repository.isProfileComplete();
+
+      if (profileComplete) {
+        // ✅ Tiene todo completo → Home
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const HomeScreen(),
+            ));
+      } else {
+        // ⏳ Le faltan datos → completar perfil
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const CompleteInfoScreen(),
+            ));
+      }
     } catch (e) {
       error = e.toString();
-
-      return null;
     } finally {
+      isLoading = false;
       notifyListeners();
     }
   }
+
+
 
   Future<void> login(String email, String password) async {
     isLoading = true;
@@ -132,7 +157,7 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> isLoggedIn() async {
     try {
-      isLogin = await repository.isLoggedIn();
+      await repository.isLoggedIn();
     } catch (e) {
       error = e.toString();
     }
