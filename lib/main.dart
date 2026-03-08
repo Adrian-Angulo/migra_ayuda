@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/data/repositories/auth_repository_impl.dart';
+import 'package:migra_ayuda/ui/pages/HomeScreen/home_screen.dart';
 import 'package:migra_ayuda/ui/pages/auth_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -31,7 +32,15 @@ class MainApp extends StatelessWidget {
           visualDensity: VisualDensity.adaptivePlatformDensity,
           fontFamily: 'Inter',
         ),
-        home: const AuthPage(),
+        home: Consumer<AuthProvider>(
+          builder: (context, authProvider, child) {
+            if (authProvider.currentUser != null) {
+              return const HomeScreen(); // Replace with your actual home page
+            } else {
+              return const AuthPage();
+            }
+          },
+        ),
       ),
     );
   }

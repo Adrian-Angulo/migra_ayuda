@@ -1,8 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/data/repositories/auth_repository.dart';
-import 'package:migra_ayuda/ui/pages/HomeScreen/home_screen.dart';
-import 'package:migra_ayuda/ui/pages/complete_info_screen.dart';
 
 class AuthProvider extends ChangeNotifier {
   final AuthRepository repository;
@@ -10,11 +8,44 @@ class AuthProvider extends ChangeNotifier {
   String? error;
   bool isLoading = false;
   UserCredential? userCredential;
+  User? _currentUser;
 
-  AuthProvider(this.repository);
+  AuthProvider(this.repository) {
+    _initializeAuthState();
+  }
+
+  User? get currentUser => _currentUser;
+
+  // Inicializar el estado de autenticación
+  void _initializeAuthState() {
+    _currentUser = FirebaseAuth.instance.currentUser;
+
+    // Escuchar cambios en el estado de autenticación
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      _currentUser = user;
+      notifyListeners();
+    });
+  }
 
   void _clearError() {
     error = null;
+  }
+
+  // Verificar si hay una sesión activa
+  Future<bool> checkActiveSession() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        // Recargar el usuario para obtener información actualizada
+        await user.reload();
+        _currentUser = FirebaseAuth.instance.currentUser;
+        return _currentUser != null;
+      }
+      return false;
+    } catch (e) {
+      error = e.toString();
+      return false;
+    }
   }
 
   Future<void> register(
@@ -45,6 +76,8 @@ class AuthProvider extends ChangeNotifier {
     } catch (e) {
       if (e.toString().contains('email-already-in-use')) {
         error = 'Este correo electrónico ya está registrado';
+      } else if (e.toString().contains('network-request-failed')) {
+        error = 'Sin conexión a internet. Verifica tu conexión';
       } else {
         error = e.toString();
       }
@@ -61,7 +94,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> handleGoogleLogin(BuildContext context) async {
+  Future<bool?> handleGoogleLogin() async {
     _clearError();
     isLoading = true;
     notifyListeners();
@@ -70,32 +103,23 @@ class AuthProvider extends ChangeNotifier {
       final result = await repository.signInWithGoogle();
       if (result == null) {
         error = 'Error al iniciar sesión con Google';
-        return;
+        return null;
       }
 
       final bool profileComplete = await repository.isProfileComplete();
-
-      if (profileComplete) {
-        // ✅ Tiene todo completo → Home
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const HomeScreen(),
-            ));
-      } else {
-        // ⏳ Le faltan datos → completar perfil
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const CompleteInfoScreen(),
-            ));
-      }
+      return profileComplete;
     } catch (e) {
-      error = e.toString();
+      if (e.toString().contains('network-request-failed')) {
+        error = 'Sin conexión a internet. Verifica tu conexión';
+      } else {
+        error = e.toString();
+        return null;
+      }
     } finally {
       isLoading = false;
       notifyListeners();
     }
+    return null;
   }
 
   Future<void> completedPerfil({
@@ -153,6 +177,10 @@ class AuthProvider extends ChangeNotifier {
         error = 'Demasiados intentos, espera un momento';
       } else if (e.toString().contains('invalid-credential')) {
         error = 'Correo y/o contraseña invalidas';
+      } else if (e.toString().contains('invalid-credential')) {
+        error = 'Correo y/o contraseña invalidas';
+      } else if (e.toString().contains('network-request-failed')) {
+        error = 'Sin conexión a internet. Verifica tu conexión';
       } else {
         error = e.toString();
       }
@@ -170,6 +198,7 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       await repository.logout();
+      _currentUser = null;
     } catch (e) {
       error = e.toString();
     }
@@ -199,27 +228,6 @@ class AuthProvider extends ChangeNotifier {
     isLoading = false;
     notifyListeners();
   }
-  /* Future<void> updateProfile(
-    String nombre,
-    String apellido,
-    String paisOrigen,
-    String paisDestino,
-    int edad,
-  ) async {
-    isLoading = true;
-    notifyListeners();
-
-    await repository.updateProfile(
-      nombre,
-      apellido,
-      paisOrigen,
-      paisDestino,
-      edad,
-    );
-
-    isLoading = false;
-    notifyListeners();
-  } */
 
   Future<void> deleteAccount() async {
     isLoading = true;
@@ -228,6 +236,7 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       await repository.deleteAccount();
+      _currentUser = null;
     } catch (e) {
       error = e.toString();
     }

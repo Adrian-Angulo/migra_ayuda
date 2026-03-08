@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/provider/auth_provider.dart';
+import 'package:migra_ayuda/ui/pages/HomeScreen/home_screen.dart';
+import 'package:migra_ayuda/ui/pages/complete_info_screen.dart';
 import 'package:provider/provider.dart';
 
 class ButtonGoogleWidget extends StatelessWidget {
@@ -13,11 +15,12 @@ class ButtonGoogleWidget extends StatelessWidget {
       onPressed: () async {
         final authProvider = context.read<AuthProvider>();
         await authProvider.logout();
-        await authProvider.handleGoogleLogin(context);
+        final profileComplete = await authProvider.handleGoogleLogin();
+
         if (!context.mounted) return;
+
         if (authProvider.error != null) {
           // Error en la autenticación
-          print(authProvider.error);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -25,10 +28,29 @@ class ButtonGoogleWidget extends StatelessWidget {
               backgroundColor: Colors.red,
             ),
           );
+        } else if (profileComplete != null) {
+          // Navegación basada en si el perfil está completo
+          if (profileComplete) {
+            // Perfil completo → Home
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const HomeScreen(),
+              ),
+            );
+          } else {
+            // Perfil incompleto → Completar información
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const CompleteInfoScreen(),
+              ),
+            );
+          }
         }
       },
       icon: Image.asset(
-        'assets/icons/google.png', // Asegúrate de tener el ícono de Google
+        'assets/icons/google.png',
         height: 24,
         width: 24,
       ),
