@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
-import 'screen/recuperar_contraseña/recuperar_contrasena_screen.dart';
+import 'package:migra_ayuda/data/repositories/auth_repository_impl.dart';
+import 'package:migra_ayuda/ui/pages/HomeScreen/home_screen.dart';
+import 'package:migra_ayuda/ui/pages/auth_page.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:migra_ayuda/provider/auth_provider.dart';
+import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MainApp());
 }
 
@@ -10,11 +20,27 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Migra Ayuda",
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-        useMaterial3: true,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+            create: (context) => AuthProvider(AuthRepositoryImpl()))
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          fontFamily: 'Inter',
+        ),
+        home: Consumer<AuthProvider>(
+          builder: (context, authProvider, child) {
+            if (authProvider.currentUser != null) {
+              return const HomeScreen(); // Replace with your actual home page
+            } else {
+              return const AuthPage();
+            }
+          },
+        ),
       ),
       home: const ForgotPasswordScreen(),
       debugShowCheckedModeBanner: false,
