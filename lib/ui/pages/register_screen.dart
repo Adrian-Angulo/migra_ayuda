@@ -219,7 +219,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ButtonWidget(
                 formKey: _formKey,
                 text: 'Registrarse',
-                loading: isLoading,
+                loading: context.watch<AuthProvider>().isLoading,
                 onPressed: () async {
                   // 1. Validar formulario
                   if (!_formKey.currentState!.validate()) return;

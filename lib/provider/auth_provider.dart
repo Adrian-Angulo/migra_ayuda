@@ -19,7 +19,7 @@ class AuthProvider extends ChangeNotifier {
   // Inicializar el estado de autenticación
   void _initializeAuthState() {
     _currentUser = FirebaseAuth.instance.currentUser;
-
+    
     // Escuchar cambios en el estado de autenticación
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       _currentUser = user;
@@ -168,6 +168,8 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  
 
   Future<void> login(String email, String password) async {
     isLoading = true;

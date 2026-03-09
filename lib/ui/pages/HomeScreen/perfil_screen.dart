@@ -3,11 +3,18 @@ import 'package:migra_ayuda/provider/auth_provider.dart';
 import 'package:migra_ayuda/ui/pages/auth_page.dart';
 import 'package:provider/provider.dart';
 
-class PerfilScreen extends StatelessWidget {
+class PerfilScreen extends StatefulWidget {
   const PerfilScreen({super.key});
 
   @override
+  State<PerfilScreen> createState() => _PerfilScreenState();
+}
+
+class _PerfilScreenState extends State<PerfilScreen> {
+  @override
   Widget build(BuildContext context) {
+    final user = context.read<AuthProvider>().currentUser;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F7),
       body: SafeArea(
@@ -40,9 +47,9 @@ class PerfilScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Nombre
-              const Text(
-                "Carlos Méndez",
-                style: TextStyle(
+              Text(
+                "${user?.displayName}",
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
@@ -50,9 +57,9 @@ class PerfilScreen extends StatelessWidget {
 
               const SizedBox(height: 5),
 
-              const Text(
-                "c.mendez@usuario.org",
-                style: TextStyle(
+              Text(
+                "${user?.email}",
+                style: const TextStyle(
                   fontSize: 14,
                   color: Colors.grey,
                 ),
