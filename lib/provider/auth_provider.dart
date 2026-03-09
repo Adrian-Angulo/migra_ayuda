@@ -48,6 +48,29 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> resetPassword(String email) async {
+    isLoading = true;
+    _clearError();
+    notifyListeners();
+
+    try {
+      await repository.resetPassword(email);
+    } catch (e) {
+      if (e.toString().contains('user-not-found')) {
+        error = 'No existe una cuenta con este correo';
+      } else if (e.toString().contains('invalid-email')) {
+        error = 'El correo no es válido';
+      } else if (e.toString().contains('network-request-failed')) {
+        error = 'Sin conexión a internet. Verifica tu conexión';
+      } else {
+        error = e.toString();
+      }
+    }
+
+    isLoading = false;
+    notifyListeners();
+  }
+
   Future<void> register(
     String email,
     String password,
@@ -212,21 +235,6 @@ class AuthProvider extends ChangeNotifier {
     } catch (e) {
       error = e.toString();
     }
-  }
-
-  Future<void> resetPassword(String email) async {
-    isLoading = true;
-    _clearError();
-    notifyListeners();
-
-    try {
-      await repository.resetPassword(email);
-    } catch (e) {
-      error = e.toString();
-    }
-
-    isLoading = false;
-    notifyListeners();
   }
 
   Future<void> deleteAccount() async {

@@ -237,20 +237,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   }
 
                   // 3. Llamar al provider (él maneja isLoading y error)
-                  await context.read<AuthProvider>().register(
-                        _correoController.text,
-                        _passwordController.text,
-                        _nombreController.text,
-                        _apellidoController.text,
-                        selectedOriginCountry ?? 'No especificado',
-                        selectedDestinationCountry ?? 'No especificado',
-                        int.tryParse(_edadController.text) ?? 0,
-                        acceptTerms,
-                      );
+                  final authProvider = context.read<AuthProvider>();
+                  await authProvider.register(
+                    _correoController.text,
+                    _passwordController.text,
+                    _nombreController.text,
+                    _apellidoController.text,
+                    selectedOriginCountry ?? 'No especificado',
+                    selectedDestinationCountry ?? 'No especificado',
+                    int.tryParse(_edadController.text) ?? 0,
+                    acceptTerms,
+                  );
+
+                  if (!context.mounted) return;
 
                   // 4. Revisar resultado DESPUÉS del registro
-                  final auth = context.read<AuthProvider>();
-                  if (auth.error == null) {
+                  if (authProvider.error == null) {
                     _clearControllers(); // ✅ limpias solo si fue exitoso
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -261,13 +263,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(auth.error!),
+                        content: Text(authProvider.error!),
                         backgroundColor: Colors.red,
                       ),
                     );
                   }
                 }),
-            const SizedBox(height: UIConstants.spacingM),    
+            const SizedBox(height: UIConstants.spacingM),
           ],
         ),
       ),

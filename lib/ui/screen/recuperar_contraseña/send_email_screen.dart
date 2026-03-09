@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
-import 'validar_cod_screen.dart';
+import 'package:migra_ayuda/provider/auth_provider.dart';
+import 'package:migra_ayuda/ui/pages/auth_page.dart';
+import 'package:migra_ayuda/ui/pages/login_screen.dart';
+import 'package:migra_ayuda/ui/screen/recuperar_contrase%C3%B1a/success_screen.dart';
+import 'package:provider/provider.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({super.key});
+class SendEmailScreen extends StatefulWidget {
+  const SendEmailScreen({super.key});
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  State<SendEmailScreen> createState() => _SendEmailScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+class _SendEmailScreenState extends State<SendEmailScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
 
@@ -18,19 +22,43 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     super.dispose();
   }
 
-  void _handleSubmit() {
-    if (_formKey.currentState!.validate()) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const VerifyCodeScreen(),
-        ),
-      );
-    }
+  void _showSnackBar(String message, {bool isError = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red : Colors.green,
+        duration: const Duration(seconds: 3),
+      ),
+    );
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
+    final autProviderRead = context.read<AuthProvider>();
+
+    void handleSubmit() async {
+      if (!_formKey.currentState!.validate()) return;
+
+      await autProviderRead.resetPassword(_emailController.text.trim());
+
+      if (!mounted) return;
+
+      final error = autProviderRead.error;
+
+      if (error != null) {
+        _showSnackBar(error, isError: true);
+      } else {
+       /*  _showSnackBar("Código enviado, revisa tu correo o spam"); */
+        await Future.delayed(const Duration(seconds: 5));
+        if (!mounted) return;
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => const SuccessScreen()));
+      }
+    }
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
       body: SafeArea(
@@ -43,7 +71,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               children: [
                 // Logo
                 Image.asset(
-                  'assets/logo_login.png',
+                  'assets/Logo.png',
                   height: 100,
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
@@ -108,9 +136,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     fillColor: Color(0xFFFFFFFF),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                      color: Colors.grey,
-                      width: 1.5),
+                      borderSide: BorderSide(color: Colors.grey, width: 1.5),
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -128,7 +154,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     if (!value.contains('@')) {
                       return 'Ingresa un correo válido';
                     }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                        .hasMatch(value)) {
                       return 'Formato de correo inválido';
                     }
                     return null;
@@ -146,7 +173,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: _handleSubmit,
+                  onPressed: handleSubmit,
                   child: const Text(
                     "Enviar código",
                     style: TextStyle(
@@ -158,23 +185,24 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
 
                 const SizedBox(height: 20),
-                
+
                 // Volver al inicio de sesión con flecha
-              TextButton.icon(
-                onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
-                icon: const Icon(
-                  Icons.arrow_back,
-                  size: 18,
-                  color: Colors.grey,
+                TextButton.icon(
+                  onPressed: () =>
+                      Navigator.popUntil(context, (route) => route.isFirst),
+                  icon: const Icon(
+                    Icons.arrow_back,
+                    size: 18,
+                    color: Colors.grey,
+                  ),
+                  label: const Text(
+                    "Volver al inicio de sesión",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                  ),
                 ),
-                label: const Text(
-                  "Volver al inicio de sesión",
-                  style: TextStyle(color: Colors.grey),
-                ),
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                ),
-              ),
               ],
             ),
           ),

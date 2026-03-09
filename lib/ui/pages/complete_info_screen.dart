@@ -152,16 +152,18 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
                           edad: int.parse(_edadController.text),
                           aceptaTerminos: acceptTerms);
 
-                      if (authProviderWatch.error != null) {
+                      if (!context.mounted) return;
+
+                      if (authProviderRead.error != null) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(authProviderWatch.error!),
+                            content: Text(authProviderRead.error!),
                             backgroundColor: Colors.red,
                           ),
                         );
                       } else {
                         _clearControllers();
-                      
+
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(

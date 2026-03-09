@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:migra_ayuda/ui/pages/auth_page.dart';
 
 class SuccessScreen extends StatelessWidget {
   const SuccessScreen({super.key});
@@ -22,7 +23,7 @@ class SuccessScreen extends StatelessWidget {
                     height: 100,
                     width: 100,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF6FA3A1).withOpacity(0.2),
+                      color: const Color(0xFF6FA3A1).withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
@@ -64,7 +65,11 @@ class SuccessScreen extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.popUntil(context, (route) => route.isFirst);
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AuthPage(),
+                      ));
                 },
                 child: const Text(
                   "Volver al inicio de sesión",

@@ -5,6 +5,7 @@ import 'package:migra_ayuda/ui/pages/HomeScreen/home_screen.dart';
 import 'package:migra_ayuda/ui/pages/widget/button_google_widget.dart';
 import 'package:migra_ayuda/ui/pages/widget/text_fiel_pasword_widget.dart';
 import 'package:migra_ayuda/ui/pages/widget/text_fiel_widget.dart';
+import 'package:migra_ayuda/ui/screen/recuperar_contrase%C3%B1a/send_email_screen.dart';
 import 'package:migra_ayuda/ui/widgets/button_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -45,7 +46,21 @@ class _LoginScreenState extends State<LoginScreen> {
             title: "Contraseña",
             controller: passController,
           ),
-          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SendEmailScreen(),
+                      ));
+                },
+                child: const Text("¿Olvidaste tu contraseña?"),
+              ),
+            ],
+          ),
           ButtonWidget(
             formKey: formKey,
             text: 'Iniciar Sesión',
@@ -56,6 +71,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 // ✅ Esperas que termine el login
                 await autProvider.login(
                     emailController.text, passController.text);
+
+                if (!context.mounted) return;
 
                 // ✅ Verificas DESPUÉS de que terminó
                 if (autProvider.error == null) {

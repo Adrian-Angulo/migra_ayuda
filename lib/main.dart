@@ -42,8 +42,7 @@ class MainApp extends StatelessWidget {
           },
         ),
       ),
-      home: const ForgotPasswordScreen(),
-      debugShowCheckedModeBanner: false,
+      
     );
   }
 }

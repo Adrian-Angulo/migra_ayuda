@@ -91,7 +91,11 @@ class PerfilScreen extends StatelessWidget {
                 icon: Icons.logout,
                 text: "Cerrar Sesión",
                 onTap: () async {
-                  await context.read<AuthProvider>().logout();
+                  final authProvider = context.read<AuthProvider>();
+                  await authProvider.logout();
+
+                  if (!context.mounted) return;
+
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
