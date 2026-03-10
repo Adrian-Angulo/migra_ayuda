@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/data/repositories/auth_repository_impl.dart';
 import 'package:migra_ayuda/ui/pages/HomeScreen/home_screen.dart';
+import 'package:migra_ayuda/ui/pages/admin/home_screen_admin.dart';
 import 'package:migra_ayuda/ui/pages/auth_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -34,15 +35,21 @@ class MainApp extends StatelessWidget {
         ),
         home: Consumer<AuthProvider>(
           builder: (context, authProvider, child) {
-            if (authProvider.currentUser != null) {
-              return const HomeScreen(); // Replace with your actual home page
+            if (authProvider.currentUser != null &&
+                authProvider.currentUser!.emailVerified) {
+              if (authProvider.user?.role == "Admin") {
+                return const HomeScreenAdmin();
+              } else if (authProvider.user?.role == "Migrante") {
+                return const HomeScreen();
+              } else {
+                return const AuthPage();
+              }
             } else {
               return const AuthPage();
             }
           },
         ),
       ),
-      
     );
   }
 }

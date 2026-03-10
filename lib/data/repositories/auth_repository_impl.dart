@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:migra_ayuda/data/models/user_model.dart';
 import './auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -48,18 +49,14 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> _createGoogleUserInFirestore(User user) async {
     await _firestore.collection('users').doc(user.uid).set({
       // ✅ Datos que Google nos da automáticamente
-      'nombre': user.displayName?.split(' ').first ?? '',
-      'apellido': user.displayName?.split(' ').skip(1).join(' ') ?? '',
+      'name': user.displayName?.split(' ').first ?? '',
+      'lasname': user.displayName?.split(' ').skip(1).join(' ') ?? '',
       'email': user.email,
-      'photoURL': user.photoURL,
-
+      'rol': "Migrante",
       // ⏳ Datos que el usuario debe completar después
-      'paisOrigen': null,
-      'paisDestino': null,
-      'edad': null,
-      'aceptaTerminos': false,
-
-      // 👇 Flag clave: false hasta que complete el perfil
+      'originCountry': null,
+      'destinationCountry': null,
+      'age': null,
       'profileComplete': false,
       'createdAt': FieldValue.serverTimestamp(),
     });
@@ -87,20 +84,19 @@ class AuthRepositoryImpl implements AuthRepository {
   // ─────────────────────────────────────────────────────────────
   @override
   Future<void> completeGoogleProfile({
-    required String paisOrigen,
-    required String paisDestino,
-    required int edad,
+    required String originCountry,
+    required String destinationCountry,
+    required int age,
     required bool aceptaTerminos,
   }) async {
     final user = _auth.currentUser;
     if (user == null) throw Exception('Usuario no autenticado');
 
     await _firestore.collection('users').doc(user.uid).update({
-      'paisOrigen': paisOrigen,
-      'paisDestino': paisDestino,
-      'edad': edad,
-      'aceptaTerminos': aceptaTerminos,
-      'profileComplete': true, // 👈 ahora sí está completo
+      'originCountry': originCountry,
+      'destinationCountry': destinationCountry,
+      'age': age,
+      'profileComplete': true,
       'updatedAt': FieldValue.serverTimestamp(),
     });
   }
@@ -111,14 +107,13 @@ class AuthRepositoryImpl implements AuthRepository {
   // ─────────────────────────────────────────────────────────────
   @override
   Future<void> register(
+    String name,
+    String lasname,
     String email,
     String password,
-    String nombre,
-    String apellido,
-    String paisOrigen,
-    String paisDestino,
-    int edad,
-    bool aceptaTerminos,
+    String originCountry,
+    String destinationCountry,
+    int age,
   ) async {
     final UserCredential userCredential =
         await _auth.createUserWithEmailAndPassword(
@@ -126,22 +121,21 @@ class AuthRepositoryImpl implements AuthRepository {
       password: password,
     );
 
-    await userCredential.user!.sendEmailVerification();
-    await userCredential.user?.updateDisplayName('$nombre $apellido');
-
     // Registro normal siempre tiene todos los datos
     // por eso profileComplete va true desde el inicio
     await _firestore.collection('users').doc(userCredential.user?.uid).set({
-      'nombre': nombre,
-      'apellido': apellido,
-      'paisOrigen': paisOrigen,
-      'paisDestino': paisDestino,
-      'edad': edad,
+      'name': name,
+      'lastname': lasname,
+      'originCountry': originCountry,
+      'destinationCountry': destinationCountry,
       'email': email,
-      'aceptaTerminos': aceptaTerminos,
-      'profileComplete': true, // 👈 ya viene completo
+      'age': age,
+      'profileComplete': true,
+      'role': "Migrante",
       'createdAt': FieldValue.serverTimestamp(),
     });
+    await userCredential.user!.sendEmailVerification();
+    await userCredential.user?.updateDisplayName('$name $lasname');
   }
 
   // ─────────────────────────────────────────────────────────────
@@ -243,5 +237,18 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> resetPassword(String email) async {
     await _auth.sendPasswordResetEmail(email: email);
+  }
+
+  @override
+  Future<UserModel?> getUsuarioActual() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return null;
+
+    final doc =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
+
+    if (!doc.exists) return null;
+
+    return UserModel.fromFirestore(doc);
   }
 }

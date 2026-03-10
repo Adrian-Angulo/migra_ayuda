@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:migra_ayuda/data/models/user_model.dart';
 import 'package:migra_ayuda/data/repositories/auth_repository.dart';
 
 class AuthProvider extends ChangeNotifier {
@@ -9,19 +10,24 @@ class AuthProvider extends ChangeNotifier {
   bool isLoading = false;
   UserCredential? userCredential;
   User? _currentUser;
+  bool _isRegistering = false;
+  UserModel? _userModel;
 
   AuthProvider(this.repository) {
     _initializeAuthState();
   }
 
   User? get currentUser => _currentUser;
-
+  UserModel? get user => _userModel;
+  String? get rol => _userModel?.role;
   // Inicializar el estado de autenticación
   void _initializeAuthState() {
     _currentUser = FirebaseAuth.instance.currentUser;
-    
+
     // Escuchar cambios en el estado de autenticación
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (_isRegistering) return;
+
       _currentUser = user;
       notifyListeners();
     });
@@ -31,12 +37,10 @@ class AuthProvider extends ChangeNotifier {
     error = null;
   }
 
-  // Verificar si hay una sesión activa
   Future<bool> checkActiveSession() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        // Recargar el usuario para obtener información actualizada
         await user.reload();
         _currentUser = FirebaseAuth.instance.currentUser;
         return _currentUser != null;
@@ -72,30 +76,23 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> register(
+    String name,
+    String lastname,
     String email,
     String password,
-    String nombre,
-    String apellido,
-    String paisOrigen,
-    String paisDestino,
-    int edad,
-    bool aceptaTerminos,
+    String originCountry,
+    String destinationCountry,
+    int age,
   ) async {
     isLoading = true;
+    _isRegistering = true;
     _clearError();
     notifyListeners();
 
     try {
-      await repository.register(
-        email,
-        password,
-        nombre,
-        apellido,
-        paisOrigen,
-        paisDestino,
-        edad,
-        aceptaTerminos,
-      );
+      await repository.register(name, lastname, email, password, originCountry,
+          destinationCountry, age);
+      await FirebaseAuth.instance.signOut();
     } catch (e) {
       if (e.toString().contains('email-already-in-use')) {
         error = 'Este correo electrónico ya está registrado';
@@ -105,7 +102,7 @@ class AuthProvider extends ChangeNotifier {
         error = e.toString();
       }
     }
-
+    _isRegistering = false;
     isLoading = false;
     notifyListeners();
   }
@@ -128,27 +125,34 @@ class AuthProvider extends ChangeNotifier {
         error = 'Error al iniciar sesión con Google';
         return null;
       }
+      _userModel = await repository.getUsuarioActual();
 
-      final bool profileComplete = await repository.isProfileComplete();
-      return profileComplete;
-    } catch (e) {
-      if (e.toString().contains('network-request-failed')) {
-        error = 'Sin conexión a internet. Verifica tu conexión';
-      } else {
-        error = e.toString();
-        return null;
+      if (_userModel?.role == "Admin") {
+        return true;
       }
+
+      return await repository.isProfileComplete();
+    } catch (e) {
+      _handleGoogleLoginError(e);
+      return null;
     } finally {
       isLoading = false;
       notifyListeners();
     }
-    return null;
+  }
+
+  void _handleGoogleLoginError(dynamic e) {
+    if (e.toString().contains('network-request-failed')) {
+      error = 'Sin conexión a internet. Verifica tu conexión';
+    } else {
+      error = e.toString();
+    }
   }
 
   Future<void> completedPerfil({
-    required String paisOrigen,
-    required String paisDestino,
-    required int edad,
+    required String originCountry,
+    required String destinationCountry,
+    required int age,
     required bool aceptaTerminos,
   }) async {
     isLoading = true;
@@ -157,9 +161,9 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       await repository.completeGoogleProfile(
-          paisOrigen: paisOrigen,
-          paisDestino: paisDestino,
-          edad: edad,
+          originCountry: originCountry,
+          destinationCountry: destinationCountry,
+          age: age,
           aceptaTerminos: aceptaTerminos);
     } catch (e) {
       error = e.toString();
@@ -168,8 +172,6 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-  
 
   Future<void> login(String email, String password) async {
     isLoading = true;
@@ -187,6 +189,10 @@ class AuthProvider extends ChangeNotifier {
         isLoading = false;
         notifyListeners();
         return;
+      }
+
+      if (user != null) {
+        _userModel = await repository.getUsuarioActual();
       }
     } on FirebaseAuthException catch (e) {
       // ✅ Mensajes amigables según el error
@@ -218,6 +224,7 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> logout() async {
     isLoading = true;
+    _userModel = null;
     _clearError();
     notifyListeners();
 

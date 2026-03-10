@@ -3,7 +3,6 @@ import 'package:flutter/gestures.dart';
 import 'package:migra_ayuda/provider/auth_provider.dart';
 import 'package:migra_ayuda/ui/pages/HomeScreen/home_screen.dart';
 import 'package:migra_ayuda/ui/pages/widget/dropdown_field_widget.dart';
-import 'package:migra_ayuda/ui/pages/widget/text_fiel_widget.dart';
 import 'package:migra_ayuda/ui/pages/widget/text_field_numeric_widget.dart';
 import 'package:migra_ayuda/ui/widgets/button_widget.dart';
 import 'package:provider/provider.dart';
@@ -53,7 +52,6 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProviderWatch = context.watch<AuthProvider>();
     final authProviderRead = context.read<AuthProvider>();
 
     return Scaffold(
@@ -147,9 +145,9 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
                       if (!_formKey.currentState!.validate()) return;
 
                       await authProviderRead.completedPerfil(
-                          paisOrigen: originCountry ?? "No definido",
-                          paisDestino: destinationCountry ?? "No definido",
-                          edad: int.parse(_edadController.text),
+                          originCountry: originCountry ?? "No definido",
+                          destinationCountry: destinationCountry ?? "No definido",
+                          age: int.parse(_edadController.text),
                           aceptaTerminos: acceptTerms);
 
                       if (!context.mounted) return;

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/provider/auth_provider.dart';
 import 'package:migra_ayuda/ui/pages/HomeScreen/home_screen.dart';
+import 'package:migra_ayuda/ui/pages/admin/home_screen_admin.dart';
+import 'package:migra_ayuda/ui/pages/auth_page.dart';
 import 'package:migra_ayuda/ui/pages/complete_info_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -32,12 +34,29 @@ class ButtonGoogleWidget extends StatelessWidget {
           // Navegación basada en si el perfil está completo
           if (profileComplete) {
             // Perfil completo → Home
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const HomeScreen(),
-              ),
-            );
+            if (authProvider.user?.role == "Admin") {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HomeScreenAdmin(),
+                ),
+              );
+            } else if (authProvider.user?.role == "Migrante") {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HomeScreenAdmin(),
+                ),
+              );
+            } else {
+              
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AuthPage(),
+                ),
+              );
+            }
           } else {
             // Perfil incompleto → Completar información
             Navigator.pushReplacement(

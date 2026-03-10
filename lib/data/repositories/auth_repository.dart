@@ -1,15 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:migra_ayuda/data/models/user_model.dart';
 
 abstract class AuthRepository {
   Future<void> register(
+    String name,
+    String lasname,
     String email,
     String password,
-    String nombre,
-    String apellido,
-    String paisOrigen,
-    String paisDestino,
-    int edad,
-    bool aceptaTerminos,
+    String originCountry,
+    String destinationCountry,
+    int age,
   );
   Future<UserCredential> login(String email, String password);
   Future<void> logout();
@@ -22,9 +22,10 @@ abstract class AuthRepository {
   Future<UserCredential?> signInWithGoogle();
   Future<bool> isProfileComplete();
   Future<void> completeGoogleProfile({
-    required String paisOrigen,
-    required String paisDestino,
-    required int edad,
+    required String originCountry,
+    required String destinationCountry,
+    required int age,
     required bool aceptaTerminos,
   });
+  Future<UserModel?> getUsuarioActual();
 }

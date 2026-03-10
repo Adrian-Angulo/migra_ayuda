@@ -239,14 +239,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   // 3. Llamar al provider (él maneja isLoading y error)
                   final authProvider = context.read<AuthProvider>();
                   await authProvider.register(
+                    _nombreController.text.trim(),
+                    _apellidoController.text.trim(),
                     _correoController.text,
                     _passwordController.text,
-                    _nombreController.text,
-                    _apellidoController.text,
                     selectedOriginCountry ?? 'No especificado',
                     selectedDestinationCountry ?? 'No especificado',
                     int.tryParse(_edadController.text) ?? 0,
-                    acceptTerms,
+                    
                   );
 
                   if (!context.mounted) return;

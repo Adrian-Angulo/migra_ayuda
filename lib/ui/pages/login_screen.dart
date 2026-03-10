@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/provider/auth_provider.dart';
 import 'package:migra_ayuda/ui/pages/HomeScreen/home_screen.dart';
+import 'package:migra_ayuda/ui/pages/admin/home_screen_admin.dart';
+import 'package:migra_ayuda/ui/pages/auth_page.dart';
 
 import 'package:migra_ayuda/ui/pages/widget/button_google_widget.dart';
 import 'package:migra_ayuda/ui/pages/widget/text_fiel_pasword_widget.dart';
@@ -68,20 +70,44 @@ class _LoginScreenState extends State<LoginScreen> {
             onPressed: () async {
               if (formKey.currentState!.validate()) {
                 await autProvider.logout();
-                // ✅ Esperas que termine el login
                 await autProvider.login(
                     emailController.text, passController.text);
-
                 if (!context.mounted) return;
 
-                // ✅ Verificas DESPUÉS de que terminó
                 if (autProvider.error == null) {
                   emailController.clear();
                   passController.clear();
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                  );
+
+                  switch (autProvider.user?.role) {
+                    case "Admin":
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const HomeScreenAdmin()));
+                      break;
+                    case 'Migrante':
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const HomeScreen()));
+                      break;
+                    default:
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("error"),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      const Duration(seconds: 3);
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Scaffold(
+                                    body: Center(
+                                      child: Text("algo salio mal"),
+                                    ),
+                                  )));
+                  }
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
