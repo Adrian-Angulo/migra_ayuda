@@ -16,56 +16,61 @@ class ButtonGoogleWidget extends StatelessWidget {
     return ElevatedButton.icon(
       onPressed: () async {
         final authProvider = context.read<AuthProvider>();
-        await authProvider.logout();
-        final profileComplete = await authProvider.handleGoogleLogin();
 
-        if (!context.mounted) return;
+        try {
+          await authProvider.logout();
+          final profileComplete = await authProvider.handleGoogleLogin();
 
-        if (authProvider.error != null) {
-          // Error en la autenticación
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  authProvider.error ?? 'Error al iniciar sesión con Google'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        } else if (profileComplete != null) {
-          // Navegación basada en si el perfil está completo
-          if (profileComplete) {
-            // Perfil completo → Home
-            if (authProvider.user?.role == "Admin") {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const HomeScreenAdmin(),
-                ),
-              );
-            } else if (authProvider.user?.role == "Migrante") {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const HomeScreenAdmin(),
-                ),
-              );
-            } else {
-              
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AuthPage(),
-                ),
-              );
-            }
-          } else {
-            // Perfil incompleto → Completar información
+          if (!context.mounted) return;
+
+          if (authProvider.error != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(authProvider.error!),
+                backgroundColor: Colors.red,
+              ),
+            );
+            return;
+          }
+
+          if (profileComplete == null) return;
+
+          if (!profileComplete) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (context) => const CompleteInfoScreen(),
               ),
             );
+            return;
           }
+
+          final userRole = authProvider.user?.role;
+          Widget destinationScreen;
+
+          switch (userRole) {
+            case "Admin":
+              destinationScreen = const HomeScreenAdmin();
+              break;
+            case "Migrante":
+              destinationScreen = const HomeScreen();
+              break;
+            default:
+              destinationScreen = const AuthPage();
+          }
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => destinationScreen),
+          );
+        } catch (e) {
+          if (!context.mounted) return;
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error inesperado: ${e.toString()}'),
+              backgroundColor: Colors.red,
+            ),
+          );
         }
       },
       icon: Image.asset(

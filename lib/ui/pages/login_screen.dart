@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:migra_ayuda/provider/auth_provider.dart';
 import 'package:migra_ayuda/ui/pages/HomeScreen/home_screen.dart';
 import 'package:migra_ayuda/ui/pages/admin/home_screen_admin.dart';
-import 'package:migra_ayuda/ui/pages/auth_page.dart';
-
 import 'package:migra_ayuda/ui/pages/widget/button_google_widget.dart';
 import 'package:migra_ayuda/ui/pages/widget/text_fiel_pasword_widget.dart';
 import 'package:migra_ayuda/ui/pages/widget/text_fiel_widget.dart';
