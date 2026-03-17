@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/provider/auth_provider.dart';
-import 'package:migra_ayuda/ui/screen/recuperar_contrase%C3%B1a/success_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/screen/recuperar_contrase%C3%B1a/success_screen.dart';
 import 'package:provider/provider.dart';
 
 class SendEmailScreen extends StatefulWidget {

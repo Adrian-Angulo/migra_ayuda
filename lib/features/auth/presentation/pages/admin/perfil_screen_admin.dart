@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/provider/auth_provider.dart';
-import 'package:migra_ayuda/ui/pages/auth_page.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/auth_page.dart';
 import 'package:provider/provider.dart';
 
-class PerfilScreen extends StatefulWidget {
-  const PerfilScreen({super.key});
+class PerfilScreenAdmin extends StatefulWidget {
+  const PerfilScreenAdmin({super.key});
 
   @override
-  State<PerfilScreen> createState() => _PerfilScreenState();
+  State<PerfilScreenAdmin> createState() => _PerfilScreenAdminState();
 }
 
-class _PerfilScreenState extends State<PerfilScreen> {
+class _PerfilScreenAdminState extends State<PerfilScreenAdmin> {
   @override
   Widget build(BuildContext context) {
     final user = context.read<AuthProvider>().currentUser;
@@ -65,9 +65,10 @@ class _PerfilScreenState extends State<PerfilScreen> {
                     color: Colors.grey,
                   ),
                 ),
+
                 const SizedBox(height: 5),
                 const Text(
-                  "Migrante",
+                  "Administrador",
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
@@ -75,18 +76,6 @@ class _PerfilScreenState extends State<PerfilScreen> {
                 ),
 
                 const SizedBox(height: 20),
-
-                // Chips de información
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _InfoChip(label: "Origen", value: "Venezuela"),
-                    SizedBox(width: 10),
-                    _InfoChip(label: "Destino", value: "Perú"),
-                    SizedBox(width: 10),
-                    _InfoChip(label: "Edad", value: "24"),
-                  ],
-                ),
 
                 const SizedBox(height: 40),
 

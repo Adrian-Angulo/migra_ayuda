@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/ui/pages/admin/perfil_screen_admin.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/admin/perfil_screen_admin.dart';
 
 class HomeScreenAdmin extends StatefulWidget {
   const HomeScreenAdmin({super.key});

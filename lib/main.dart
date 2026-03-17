@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/data/repositories/auth_repository_impl.dart';
-import 'package:migra_ayuda/ui/pages/HomeScreen/home_screen.dart';
-import 'package:migra_ayuda/ui/pages/admin/home_screen_admin.dart';
-import 'package:migra_ayuda/ui/pages/auth_page.dart';
+import 'package:migra_ayuda/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/admin/home_screen_admin.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/auth_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:migra_ayuda/provider/auth_provider.dart';

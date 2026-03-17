@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/ui/pages/auth_page.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/auth_page.dart';
 
 class SuccessScreen extends StatelessWidget {
   const SuccessScreen({super.key});

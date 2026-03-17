@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/provider/auth_provider.dart';
-import 'package:migra_ayuda/ui/pages/HomeScreen/home_screen.dart';
-import 'package:migra_ayuda/ui/pages/admin/home_screen_admin.dart';
-import 'package:migra_ayuda/ui/pages/widget/button_google_widget.dart';
-import 'package:migra_ayuda/ui/pages/widget/text_fiel_pasword_widget.dart';
-import 'package:migra_ayuda/ui/pages/widget/text_fiel_widget.dart';
-import 'package:migra_ayuda/ui/screen/recuperar_contrase%C3%B1a/send_email_screen.dart';
-import 'package:migra_ayuda/ui/widgets/button_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/admin/home_screen_admin.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/widget/button_google_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/widget/text_fiel_pasword_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/widget/text_fiel_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/screen/recuperar_contrase%C3%B1a/send_email_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/widgets/button_widget.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {

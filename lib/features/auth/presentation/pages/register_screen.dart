@@ -4,11 +4,11 @@ import 'package:migra_ayuda/core/utils/constants.dart';
 import 'package:migra_ayuda/core/utils/validation/email_validator.dart';
 import 'package:migra_ayuda/provider/auth_provider.dart';
 
-import 'package:migra_ayuda/ui/pages/widget/dropdown_field_widget.dart';
-import 'package:migra_ayuda/ui/pages/widget/text_fiel_pasword_widget.dart';
-import 'package:migra_ayuda/ui/pages/widget/text_fiel_widget.dart';
-import 'package:migra_ayuda/ui/pages/widget/text_field_numeric_widget.dart';
-import 'package:migra_ayuda/ui/widgets/button_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/widget/dropdown_field_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/widget/text_fiel_pasword_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/widget/text_fiel_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/widget/text_field_numeric_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/widgets/button_widget.dart';
 import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatefulWidget {
