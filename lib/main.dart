@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/pages/admin/home_screen_admin.dart';
@@ -13,7 +14,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MainApp());
+  runApp(const ProviderScope(child: MainApp()));
 }
 
 class MainApp extends StatelessWidget {
@@ -27,13 +28,15 @@ class MainApp extends StatelessWidget {
             create: (context) => AuthProvider(AuthRepositoryImpl()))
       ],
       child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-          fontFamily: 'Inter',
-        ),
-        home: Consumer<AuthProvider>(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+            visualDensity: VisualDensity.adaptivePlatformDensity,
+            fontFamily: 'Inter',
+          ),
+          home: const AuthPage()
+
+          /* Consumer<AuthProvider>(
           builder: (context, authProvider, child) {
             if (authProvider.currentUser != null &&
                 authProvider.currentUser!.emailVerified) {
@@ -48,8 +51,8 @@ class MainApp extends StatelessWidget {
               return const AuthPage();
             }
           },
-        ),
-      ),
+        ), */
+          ),
     );
   }
 }

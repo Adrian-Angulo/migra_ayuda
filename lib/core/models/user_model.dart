@@ -58,11 +58,7 @@ class UserModel {
 
   static DateTime _parseDate(dynamic value) {
     if (value == null) return DateTime.now();
-
-    // Firestore Timestamp
     if (value is Timestamp) return value.toDate();
-
-    // String
     if (value is String) return DateTime.tryParse(value) ?? DateTime.now();
 
     return DateTime.now();

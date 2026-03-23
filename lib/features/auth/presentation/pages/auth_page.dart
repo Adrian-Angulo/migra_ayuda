@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/core/utils/constants.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/login_screen.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/register_screen.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/widget/login_register_switcher.dart';
+import 'package:migra_ayuda/features/auth/presentation/screen/login_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/screen/register_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/widgets/login_register_switcher.dart';
 import 'package:migra_ayuda/provider/auth_provider.dart';
 import 'package:provider/provider.dart';
 

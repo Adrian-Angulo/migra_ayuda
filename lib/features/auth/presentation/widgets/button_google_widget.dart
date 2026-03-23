@@ -3,7 +3,7 @@ import 'package:migra_ayuda/provider/auth_provider.dart';
 import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/pages/admin/home_screen_admin.dart';
 import 'package:migra_ayuda/features/auth/presentation/pages/auth_page.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/complete_info_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/screen/complete_info_screen.dart';
 import 'package:provider/provider.dart';
 
 class ButtonGoogleWidget extends StatelessWidget {

@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
-import 'auth_repository.dart';
+import 'package:migra_ayuda/core/models/user_model.dart';
+import '../../domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -12,7 +12,7 @@ class AuthRepositoryImpl implements AuthRepository {
   // ─────────────────────────────────────────────────────────────
   // GOOGLE SIGN IN
   // Inicia sesión con Google y detecta si es usuario nuevo
-  // ─────────────────────────────────────────────────────────────
+  // ────────────────────────────────────────────────────────────---
   @override
   Future<UserCredential?> signInWithGoogle() async {
     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
@@ -30,8 +30,6 @@ class AuthRepositoryImpl implements AuthRepository {
     final UserCredential userCredential =
         await FirebaseAuth.instance.signInWithCredential(credential);
 
-    // 👇 Si es la primera vez que entra, creamos su documento base
-    // con los datos que Google nos dio, los campos que faltan van null
     final bool isNewUser =
         userCredential.additionalUserInfo?.isNewUser ?? false;
 

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:migra_ayuda/provider/auth_provider.dart';
 import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/widget/dropdown_field_widget.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/widget/text_field_numeric_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/widgets/dropdown_field_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/widgets/text_field_numeric_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/button_widget.dart';
 import 'package:provider/provider.dart';
 
