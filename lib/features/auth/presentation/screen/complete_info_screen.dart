@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:migra_ayuda/provider/auth_provider.dart';
+
 import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/dropdown_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/text_field_numeric_widget.dart';
@@ -52,7 +52,7 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authProviderRead = context.read<AuthProvider>();
+    
 
     return Scaffold(
       appBar: AppBar(
@@ -144,30 +144,7 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
                     onPressed: () async {
                       if (!_formKey.currentState!.validate()) return;
 
-                      await authProviderRead.completedPerfil(
-                          originCountry: originCountry ?? "No definido",
-                          destinationCountry: destinationCountry ?? "No definido",
-                          age: int.parse(_edadController.text),
-                          aceptaTerminos: acceptTerms);
-
-                      if (!context.mounted) return;
-
-                      if (authProviderRead.error != null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(authProviderRead.error!),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      } else {
-                        _clearControllers();
-
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const HomeScreen(),
-                            ));
-                      }
+                      
                     },
                   ),
                   const SizedBox(height: 16),

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/provider/auth_provider.dart';
-import 'package:migra_ayuda/features/auth/presentation/screen/recuperar_contrase%C3%B1a/success_screen.dart';
-import 'package:provider/provider.dart';
+
 
 class SendEmailScreen extends StatefulWidget {
   const SendEmailScreen({super.key});
@@ -35,24 +33,8 @@ class _SendEmailScreenState extends State<SendEmailScreen> {
   Widget build(
     BuildContext context,
   ) {
-    final autProviderRead = context.read<AuthProvider>();
-    final autProviderWatch = context.watch<AuthProvider>();
     void handleSubmit() async {
       if (!_formKey.currentState!.validate()) return;
-
-      await autProviderRead.resetPassword(_emailController.text.trim());
-
-      if (!mounted) return;
-
-      final error = autProviderRead.error;
-
-      if (error != null) {
-        _showSnackBar(error, isError: true);
-      } else {
-        if (!mounted) return;
-        Navigator.push(
-            context, MaterialPageRoute(builder: (_) => const SuccessScreen()));
-      }
     }
 
     return Scaffold(
@@ -130,10 +112,10 @@ class _SendEmailScreenState extends State<SendEmailScreen> {
                     decoration: InputDecoration(
                       hintText: "migraAyuda@correo.com",
                       filled: true,
-                      fillColor: Color(0xFFFFFFFF),
+                      fillColor: const Color(0xFFFFFFFF),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: Colors.grey, width: 1.5),
+                        borderSide: const BorderSide(color: Colors.grey, width: 1.5),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -173,16 +155,14 @@ class _SendEmailScreenState extends State<SendEmailScreen> {
                       ),
                     ),
                     onPressed: handleSubmit,
-                    child: autProviderWatch.isLoading
-                        ? const CircularProgressIndicator()
-                        : const Text(
-                            "Enviar código",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
+                    child: const Text(
+                      "Enviar código",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
 
                   const SizedBox(height: 20),

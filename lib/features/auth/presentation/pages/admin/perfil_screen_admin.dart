@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/provider/auth_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:migra_ayuda/features/auth/presentation/pages/auth_page.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 import 'package:provider/provider.dart';
 
-class PerfilScreenAdmin extends StatefulWidget {
+class PerfilScreenAdmin extends ConsumerWidget {
   const PerfilScreenAdmin({super.key});
 
   @override
-  State<PerfilScreenAdmin> createState() => _PerfilScreenAdminState();
-}
-
-class _PerfilScreenAdminState extends State<PerfilScreenAdmin> {
-  @override
-  Widget build(BuildContext context) {
-    final user = context.read<AuthProvider>().currentUser;
-
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F7),
       body: SafeArea(
@@ -48,9 +43,9 @@ class _PerfilScreenAdminState extends State<PerfilScreenAdmin> {
                 const SizedBox(height: 20),
 
                 // Nombre
-                Text(
-                  "${user?.displayName}",
-                  style: const TextStyle(
+                const Text(
+                  "Nombre",
+                  style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
@@ -58,9 +53,9 @@ class _PerfilScreenAdminState extends State<PerfilScreenAdmin> {
 
                 const SizedBox(height: 5),
 
-                Text(
-                  "${user?.email}",
-                  style: const TextStyle(
+                const Text(
+                  "Corro",
+                  style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
                   ),
@@ -96,9 +91,7 @@ class _PerfilScreenAdminState extends State<PerfilScreenAdmin> {
                   icon: Icons.logout,
                   text: "Cerrar Sesión",
                   onTap: () async {
-                    final authProvider = context.read<AuthProvider>();
-                    await authProvider.logout();
-
+                    ref.read(logoutProvider).call();
                     if (!context.mounted) return;
 
                     Navigator.pushReplacement(

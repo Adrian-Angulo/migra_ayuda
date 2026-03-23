@@ -2,14 +2,14 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/core/utils/constants.dart';
 import 'package:migra_ayuda/core/utils/validation/email_validator.dart';
-import 'package:migra_ayuda/provider/auth_provider.dart';
+
 
 import 'package:migra_ayuda/features/auth/presentation/widgets/dropdown_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/text_fiel_pasword_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/text_fiel_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/text_field_numeric_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/button_widget.dart';
-import 'package:provider/provider.dart';
+
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -70,7 +70,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final error = context.watch<AuthProvider>().error;
+    
     return Padding(
       padding: const EdgeInsets.only(bottom: UIConstants.spacingL),
       child: Form(
@@ -219,7 +219,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ButtonWidget(
                 formKey: _formKey,
                 text: 'Registrarse',
-                loading: context.watch<AuthProvider>().isLoading,
+                
                 onPressed: () async {
                   // 1. Validar formulario
                   if (!_formKey.currentState!.validate()) return;
@@ -236,38 +236,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return;
                   }
 
-                  // 3. Llamar al provider (él maneja isLoading y error)
-                  final authProvider = context.read<AuthProvider>();
-                  await authProvider.register(
-                    _nombreController.text.trim(),
-                    _apellidoController.text.trim(),
-                    _correoController.text,
-                    _passwordController.text,
-                    selectedOriginCountry ?? 'No especificado',
-                    selectedDestinationCountry ?? 'No especificado',
-                    int.tryParse(_edadController.text) ?? 0,
-                    
-                  );
-
-                  if (!context.mounted) return;
-
-                  // 4. Revisar resultado DESPUÉS del registro
-                  if (authProvider.error == null) {
-                    _clearControllers(); // ✅ limpias solo si fue exitoso
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('¡Registro completado exitosamente!'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(authProvider.error!),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
+                  
                 }),
             const SizedBox(height: UIConstants.spacingM),
           ],

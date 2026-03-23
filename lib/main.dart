@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/admin/home_screen_admin.dart';
+
 import 'package:migra_ayuda/features/auth/presentation/pages/auth_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:migra_ayuda/provider/auth_provider.dart';
-import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,37 +18,13 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-            create: (context) => AuthProvider(AuthRepositoryImpl()))
-      ],
-      child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-            visualDensity: VisualDensity.adaptivePlatformDensity,
-            fontFamily: 'Inter',
-          ),
-          home: const AuthPage()
-
-          /* Consumer<AuthProvider>(
-          builder: (context, authProvider, child) {
-            if (authProvider.currentUser != null &&
-                authProvider.currentUser!.emailVerified) {
-              if (authProvider.user?.role == "Admin") {
-                return const HomeScreenAdmin();
-              } else if (authProvider.user?.role == "Migrante") {
-                return const HomeScreen();
-              } else {
-                return const AuthPage();
-              }
-            } else {
-              return const AuthPage();
-            }
-          },
-        ), */
-          ),
-    );
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          fontFamily: 'Inter',
+        ),
+        home: const AuthPage());
   }
 }

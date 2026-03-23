@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/provider/auth_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/admin/home_screen_admin.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
+import 'package:migra_ayuda/features/auth/presentation/screen/recuperar_contrase%C3%B1a/send_email_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/button_google_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/widgets/button_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/text_fiel_pasword_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/text_fiel_widget.dart';
-import 'package:migra_ayuda/features/auth/presentation/screen/recuperar_contrase%C3%B1a/send_email_screen.dart';
-import 'package:migra_ayuda/features/auth/presentation/widgets/button_widget.dart';
-import 'package:provider/provider.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final formKey = GlobalKey<FormState>();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passController = TextEditingController();
+  final emailController = TextEditingController();
+  final passController = TextEditingController();
 
   @override
   void dispose() {
@@ -29,8 +28,31 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final autProvider = context.read<AuthProvider>();
+  Widget build(
+    BuildContext context,
+  ) {
+    final authState = ref.watch(authProvider);
+    final auth = ref.read(authProvider.notifier);
+
+    ref.listen(
+      authProvider,
+      (previous, next) {
+        next.whenOrNull(data: (user) {
+          if (user != null) {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HomeScreen(),
+                ));
+          }
+        }, error: (error, stackTrace) {
+          ScaffoldMessenger.of(context)
+            ..clearSnackBars()
+            ..showSnackBar(SnackBar(content: Text("$error")));
+        });
+      },
+    );
+
     return Form(
       key: formKey,
       child: Column(
@@ -63,66 +85,22 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           ButtonWidget(
             formKey: formKey,
+            loading: authState.isLoading,
             text: 'Iniciar Sesión',
-            loading: context.watch<AuthProvider>().isLoading,
             onPressed: () async {
               if (formKey.currentState!.validate()) {
-                await autProvider.logout();
-                await autProvider.login(
-                    emailController.text, passController.text);
-                if (!context.mounted) return;
-
-                if (autProvider.error == null) {
-                  emailController.clear();
-                  passController.clear();
-
-                  switch (autProvider.user?.role) {
-                    case "Admin":
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const HomeScreenAdmin()));
-                      break;
-                    case 'Migrante':
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const HomeScreen()));
-                      break;
-                    default:
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("error"),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                      const Duration(seconds: 3);
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const Scaffold(
-                                    body: Center(
-                                      child: Text("algo salio mal"),
-                                    ),
-                                  )));
-                  }
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(autProvider.error!),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
+                await auth.login(emailController.text, passController.text);
               }
             },
           ),
           const SizedBox(height: 16),
           const Row(
-            spacing: 20,
             children: [
               Expanded(child: Divider(height: 2)),
-              Text("O"),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: Text("O"),
+              ),
               Expanded(child: Divider(height: 2)),
             ],
           ),

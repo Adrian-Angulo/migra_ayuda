@@ -2,9 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:migra_ayuda/core/models/user_model.dart';
-import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository2.dart';
+import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
 
-class AuthRepositoryImple2 implements AuthRepository2 {
+class AuthRepositoryImple2 implements AuthRepository {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();

@@ -1,19 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/provider/auth_provider.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/auth_page.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class PerfilScreen extends StatefulWidget {
+import 'package:migra_ayuda/features/auth/presentation/pages/auth_page.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
+
+class PerfilScreen extends ConsumerWidget {
   const PerfilScreen({super.key});
 
   @override
-  State<PerfilScreen> createState() => _PerfilScreenState();
-}
-
-class _PerfilScreenState extends State<PerfilScreen> {
-  @override
-  Widget build(BuildContext context) {
-    final user = context.read<AuthProvider>().currentUser;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authProvider).value;
+    ref.listen(
+      authProvider,
+      (previous, next) {
+        next.whenOrNull(
+          data: (user) {
+            if (user == null) {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AuthPage(),
+                  ));
+            }
+          },
+          error: (error, stackTrace) => ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text("$error"))),
+        );
+      },
+    );
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F7),
@@ -49,7 +63,7 @@ class _PerfilScreenState extends State<PerfilScreen> {
 
                 // Nombre
                 Text(
-                  "${user?.displayName}",
+                  "${user?.name}",
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -107,16 +121,8 @@ class _PerfilScreenState extends State<PerfilScreen> {
                   icon: Icons.logout,
                   text: "Cerrar Sesión",
                   onTap: () async {
-                    final authProvider = context.read<AuthProvider>();
-                    await authProvider.logout();
-
+                    await ref.read(authProvider.notifier).logout();
                     if (!context.mounted) return;
-
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AuthPage(),
-                        ));
                   },
                 ),
               ],
