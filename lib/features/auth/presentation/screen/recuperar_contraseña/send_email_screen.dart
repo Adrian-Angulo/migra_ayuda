@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/reset_password_notifier.dart';
+import 'package:migra_ayuda/features/auth/presentation/screen/recuperar_contraseña/success_screen.dart';
 
-
-class SendEmailScreen extends StatefulWidget {
+class SendEmailScreen extends ConsumerStatefulWidget {
   const SendEmailScreen({super.key});
 
   @override
-  State<SendEmailScreen> createState() => _SendEmailScreenState();
+  ConsumerState<SendEmailScreen> createState() => _SendEmailScreenState();
 }
 
-class _SendEmailScreenState extends State<SendEmailScreen> {
+class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
 
@@ -18,24 +20,42 @@ class _SendEmailScreenState extends State<SendEmailScreen> {
     super.dispose();
   }
 
-  void _showSnackBar(String message, {bool isError = false}) {
+  void handleSubmit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    // Enviar email de reset
+    await ref
+        .read(resetPasswordNotifierProvider.notifier)
+        .sendResetEmail(_emailController.text.trim());
+
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red : Colors.green,
-        duration: const Duration(seconds: 3),
-      ),
-    );
+
+    // Verificar resultado
+    final state = ref.read(resetPasswordNotifierProvider);
+
+    if (state.isSuccess) {
+      // Navegar a pantalla de éxito
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const SuccessScreen(),
+        ),
+      );
+    } else if (state.error != null) {
+      // Mostrar error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(state.error!),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+    }
   }
 
   @override
-  Widget build(
-    BuildContext context,
-  ) {
-    void handleSubmit() async {
-      if (!_formKey.currentState!.validate()) return;
-    }
+  Widget build(BuildContext context) {
+    final resetState = ref.watch(resetPasswordNotifierProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
@@ -48,16 +68,17 @@ class _SendEmailScreenState extends State<SendEmailScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  const SizedBox(height: 60),
                   // Logo
                   Image.asset(
-                    'assets/Logo.png',
+                    'assets/logo_login.png',
                     height: 100,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
                         height: 100,
                         width: 100,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF6FA3A1).withOpacity(0.2),
+                          color: const Color(0xFF6FA3A1).withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
@@ -83,7 +104,7 @@ class _SendEmailScreenState extends State<SendEmailScreen> {
                   const SizedBox(height: 15),
 
                   const Text(
-                    "Introduce tu correo para recibir el código para restablecer tu contraseña",
+                    "Introduce tu correo para recibir un enlace y restablecer tu contraseña",
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.grey),
                   ),
@@ -109,13 +130,27 @@ class _SendEmailScreenState extends State<SendEmailScreen> {
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
+                    enabled: !resetState.isLoading,
                     decoration: InputDecoration(
                       hintText: "migraAyuda@correo.com",
                       filled: true,
                       fillColor: const Color(0xFFFFFFFF),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Colors.grey, width: 1.5),
+                        borderSide:
+                            const BorderSide(color: Colors.grey, width: 1.5),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide:
+                            const BorderSide(color: Colors.grey, width: 1.5),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(
+                          color: Color(0xFF6FA3A1),
+                          width: 2,
+                        ),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -132,13 +167,16 @@ class _SendEmailScreenState extends State<SendEmailScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Por favor ingresa tu correo electrónico';
                       }
-                      if (!value.contains('@')) {
-                        return 'Ingresa un correo válido';
-                      }
-                      if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                          .hasMatch(value)) {
+
+                      // Validación de formato mejorada
+                      final emailRegex = RegExp(
+                        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                      );
+
+                      if (!emailRegex.hasMatch(value)) {
                         return 'Formato de correo inválido';
                       }
+
                       return null;
                     },
                   ),
@@ -154,23 +192,35 @@ class _SendEmailScreenState extends State<SendEmailScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onPressed: handleSubmit,
-                    child: const Text(
-                      "Enviar código",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
+                    onPressed: resetState.isLoading ? null : handleSubmit,
+                    child: resetState.isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Text(
+                            "Enviar enlace",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
                   ),
 
                   const SizedBox(height: 20),
 
                   // Volver al inicio de sesión con flecha
                   TextButton.icon(
-                    onPressed: () =>
-                        Navigator.popUntil(context, (route) => route.isFirst),
+                    onPressed: resetState.isLoading
+                        ? null
+                        : () => Navigator.popUntil(
+                            context, (route) => route.isFirst),
                     icon: const Icon(
                       Icons.arrow_back,
                       size: 18,

@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-
-import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:migra_ayuda/core/services/navigation_service.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/dropdown_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/text_field_numeric_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/button_widget.dart';
-import 'package:provider/provider.dart';
 
-class CompleteInfoScreen extends StatefulWidget {
+class CompleteInfoScreen extends ConsumerStatefulWidget {
   const CompleteInfoScreen({super.key});
 
   @override
-  State<CompleteInfoScreen> createState() => _CompleteInfoScreenState();
+  ConsumerState<CompleteInfoScreen> createState() => _CompleteInfoScreenState();
 }
 
-class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
+class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
   final _formKey = GlobalKey<FormState>();
   final _edadController = TextEditingController();
 
   String? originCountry;
   String? destinationCountry;
   bool acceptTerms = false;
-  bool isLoading = false;
 
   final List<String> countries = [
     'México',
@@ -34,16 +34,6 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
     'Panamá',
   ];
 
-  void _clearControllers() {
-    _edadController.clear();
-
-    setState(() {
-      originCountry = null;
-      destinationCountry = null;
-      acceptTerms = false;
-    });
-  }
-
   @override
   void dispose() {
     _edadController.dispose();
@@ -52,12 +42,35 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
+    final authState = ref.watch(authProvider);
+
+    // Listener para navegar según rol después de completar perfil
+    ref.listen(
+      authProvider,
+      (previous, next) {
+        next.whenOrNull(
+          data: (user) {
+            if (user != null && user.profileComplete && context.mounted) {
+              NavigationService.navigateByRole(context, user);
+            }
+          },
+          error: (error, stackTrace) {
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(SnackBar(
+                content: Text('Error: $error'),
+                backgroundColor: Colors.red,
+              ));
+          },
+        );
+      },
+    );
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Completar información'),
         centerTitle: true,
+        automaticallyImplyLeading: false,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -139,12 +152,51 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
                   const SizedBox(height: 16),
                   ButtonWidget(
                     formKey: _formKey,
-                    text: 'Completar Informacíon',
-                    loading: isLoading,
+                    text: 'Completar Información',
+                    loading: authState.isLoading,
                     onPressed: () async {
                       if (!_formKey.currentState!.validate()) return;
 
-                      
+                      if (!acceptTerms) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Debes aceptar los términos y condiciones'),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                        return;
+                      }
+
+                      if (originCountry == null || destinationCountry == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Debes seleccionar ambos países'),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                        return;
+                      }
+
+                      final userId = FirebaseAuth.instance.currentUser?.uid;
+                      if (userId == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Error: Usuario no encontrado'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      await ref
+                          .read(authProvider.notifier)
+                          .completeGoogleProfile(
+                            userId: userId,
+                            originCountry: originCountry!,
+                            destinationCountry: destinationCountry!,
+                            age: int.tryParse(_edadController.text) ?? 0,
+                          );
                     },
                   ),
                   const SizedBox(height: 16),

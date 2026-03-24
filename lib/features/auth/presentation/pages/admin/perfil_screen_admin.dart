@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:migra_ayuda/features/auth/presentation/pages/auth_page.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
-import 'package:provider/provider.dart';
 
 class PerfilScreenAdmin extends ConsumerWidget {
   const PerfilScreenAdmin({super.key});

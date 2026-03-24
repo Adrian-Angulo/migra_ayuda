@@ -1,24 +1,23 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/utils/constants.dart';
 import 'package:migra_ayuda/core/utils/validation/email_validator.dart';
-
-
+import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/dropdown_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/text_fiel_pasword_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/text_fiel_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/text_field_numeric_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/button_widget.dart';
 
-
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nombreController = TextEditingController();
   final _apellidoController = TextEditingController();
@@ -30,7 +29,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? selectedOriginCountry;
   String? selectedDestinationCountry;
   bool acceptTerms = false;
-  bool isLoading = false;
 
   final List<String> countries = [
     'México',
@@ -70,7 +68,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
+    final authState = ref.watch(authProvider);
+
     return Padding(
       padding: const EdgeInsets.only(bottom: UIConstants.spacingL),
       child: Form(
@@ -219,7 +218,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ButtonWidget(
                 formKey: _formKey,
                 text: 'Registrarse',
-                
+                loading: authState.isLoading,
                 onPressed: () async {
                   // 1. Validar formulario
                   if (!_formKey.currentState!.validate()) return;
@@ -236,7 +235,40 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return;
                   }
 
-                  
+                  // 3. Llamar al provider para registrar
+                  await ref.read(authProvider.notifier).register(
+                        name: _nombreController.text.trim(),
+                        lasname: _apellidoController.text.trim(),
+                        email: _correoController.text.trim(),
+                        password: _passwordController.text,
+                        originCountry:
+                            selectedOriginCountry ?? 'No especificado',
+                        destinationCountry:
+                            selectedDestinationCountry ?? 'No especificado',
+                        age: int.tryParse(_edadController.text) ?? 0,
+                      );
+
+                  if (!context.mounted) return;
+
+                  // 4. Revisar resultado DESPUÉS del registro
+                  final state = ref.read(authProvider);
+                  if (state.hasError) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.error.toString()),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  } else {
+                    _clearControllers();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            '¡Registro completado exitosamente! Verifica tu correo.'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
                 }),
             const SizedBox(height: UIConstants.spacingM),
           ],

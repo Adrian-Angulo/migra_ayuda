@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
+import 'package:migra_ayuda/core/services/navigation_service.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 import 'package:migra_ayuda/features/auth/presentation/screen/recuperar_contrase%C3%B1a/send_email_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/button_google_widget.dart';
@@ -27,6 +27,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
+  void cleanControllar() {
+    emailController.clear();
+    passController.clear();
+  }
+
   @override
   Widget build(
     BuildContext context,
@@ -37,19 +42,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     ref.listen(
       authProvider,
       (previous, next) {
-        next.whenOrNull(data: (user) {
-          if (user != null) {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const HomeScreen(),
-                ));
-          }
-        }, error: (error, stackTrace) {
-          ScaffoldMessenger.of(context)
-            ..clearSnackBars()
-            ..showSnackBar(SnackBar(content: Text("$error")));
-        });
+        next.whenOrNull(
+          data: (user) {
+            if (user != null && context.mounted) {
+              NavigationService.navigateByRole(context, user);
+            }
+          },
+          error: (error, stackTrace) {
+            ScaffoldMessenger.of(context)
+              ..clearSnackBars()
+              ..showSnackBar(SnackBar(content: Text("$error")));
+          },
+        );
       },
     );
 
@@ -90,6 +94,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             onPressed: () async {
               if (formKey.currentState!.validate()) {
                 await auth.login(emailController.text, passController.text);
+                cleanControllar();
               }
             },
           ),

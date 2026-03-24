@@ -10,6 +10,7 @@ class UserModel {
   final int age;
   final String password;
   final String role;
+  final bool profileComplete;
   final DateTime createdAt;
 
   UserModel({
@@ -22,6 +23,7 @@ class UserModel {
     required this.age,
     required this.password,
     required this.role,
+    required this.profileComplete,
     required this.createdAt,
   });
 
@@ -35,6 +37,7 @@ class UserModel {
       'age': age,
       'password': password,
       'role': role,
+      'profileComplete': profileComplete,
       'createdAt': createdAt.toIso8601String(),
     };
   }
@@ -52,6 +55,7 @@ class UserModel {
       age: data['age'] != null ? int.parse(data['age'].toString()) : 0,
       password: data['password'] ?? '',
       role: data['role'] ?? 'Migrante',
+      profileComplete: data['profileComplete'] ?? true,
       createdAt: _parseDate(data['registrationDate']),
     );
   }
