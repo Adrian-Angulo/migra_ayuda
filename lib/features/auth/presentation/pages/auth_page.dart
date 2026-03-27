@@ -1,25 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/utils/constants.dart';
+import 'package:migra_ayuda/core/utils/widgets/mensajesWidget.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screen/login_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screen/register_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/switch_button.dart';
 
-
 enum AuthMode { login, register }
 
-class AuthPage extends StatefulWidget {
+class AuthPage extends ConsumerStatefulWidget {
   const AuthPage({super.key});
 
   @override
-  State<AuthPage> createState() => _AuthPageState();
+  ConsumerState<AuthPage> createState() => _AuthPageState();
 }
 
-class _AuthPageState extends State<AuthPage> {
+class _AuthPageState extends ConsumerState<AuthPage> {
   String? selectedCountry;
   AuthMode mode = AuthMode.login;
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(
+      authNotifierProvider,
+      (previous, next) {
+        next.whenOrNull(data: (data) {
+          if (data != null) {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HomeScreen(),
+                ));
+          }
+        }, error: (error, stackTrace) {
+          Mensajeswidget.mostrarError(context, error.toString());
+        });
+      },
+    );
+
     return Scaffold(
       body: SafeArea(
         child: Padding(

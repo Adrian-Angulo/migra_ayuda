@@ -10,6 +10,7 @@ class RegistrarUsuarioUseCase {
   Future<void> call(Usuario usu) async {
     try {
       await _repository.registrarUsuario(usu);
+      
     } on FirebaseAuthException catch (e) {
       throw Exception(_mapFirebaseAuthError(e.code));
     } catch (e) {

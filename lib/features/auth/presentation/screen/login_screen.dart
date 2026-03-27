@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 
 import 'package:migra_ayuda/features/auth/presentation/screen/recuperar_contrase%C3%B1a/send_email_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/button_google_widget.dart';
@@ -6,18 +9,17 @@ import 'package:migra_ayuda/features/auth/presentation/widgets/button_widget.dar
 import 'package:migra_ayuda/features/auth/presentation/widgets/text_fiel_pasword_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/text_fiel_widget.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passController = TextEditingController();
-  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -35,6 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(
     BuildContext context,
   ) {
+    final authState = ref.watch(authNotifierProvider);
     return Form(
       key: formKey,
       child: Column(
@@ -87,25 +90,13 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           ButtonWidget(
             formKey: formKey,
-            loading: _isLoading,
+            loading: authState.isLoading,
             text: 'Iniciar Sesión',
             onPressed: () async {
               if (formKey.currentState!.validate()) {
-                setState(() => _isLoading = true);
-                try {
-                  ScaffoldMessenger.of(context)
-                    ..clearSnackBars()
-                    ..showSnackBar(
-                        const SnackBar(content: Text("Ha iniciado session")));
-                } catch (error) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context)
-                      ..clearSnackBars()
-                      ..showSnackBar(SnackBar(content: Text("$error")));
-                  }
-                } finally {
-                  setState(() => _isLoading = false);
-                }
+                await ref
+                    .read(authNotifierProvider.notifier)
+                    .iniciarSesion(emailController.text, passController.text);
                 cleanControllar();
               }
             },

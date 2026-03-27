@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/auth_page.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 
-class PerfilScreen extends StatelessWidget {
+class PerfilScreen extends ConsumerWidget {
   const PerfilScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final Usuario? usu = ref.read(authNotifierProvider).value;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F7),
       body: SafeArea(
@@ -38,9 +43,9 @@ class PerfilScreen extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 // Nombre
-                const Text(
-                  "Carlos Martínez",
-                  style: TextStyle(
+                Text(
+                  usu?.name ?? "No data",
+                  style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
@@ -48,9 +53,9 @@ class PerfilScreen extends StatelessWidget {
 
                 const SizedBox(height: 5),
 
-                const Text(
-                  "carlos.martinez@email.com",
-                  style: TextStyle(
+                Text(
+                  usu?.email ?? "No data",
+                  style: const TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
                   ),
@@ -96,7 +101,11 @@ class PerfilScreen extends StatelessWidget {
                 _ProfileOption(
                   icon: Icons.logout,
                   text: "Cerrar Sesión",
-                  onTap: () {},
+                  onTap: () async {
+                    await ref
+                        .read(authNotifierProvider.notifier)
+                        .cerrarSesion();
+                  },
                 ),
               ],
             ),

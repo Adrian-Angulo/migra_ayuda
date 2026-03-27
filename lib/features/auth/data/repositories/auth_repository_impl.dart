@@ -15,9 +15,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> cerrarSesion() {
-    // TODO: implement cerrarSesion
-    throw UnimplementedError();
+  Future<void> cerrarSesion() async {
+    await _auth.signOut();
   }
 
   @override
@@ -31,25 +30,25 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<DocumentSnapshot<Map<String, dynamic>>> datosDeUsuario(String uid) {
-    // TODO: implement datosDeUsuario
-    throw UnimplementedError();
+  Future<Usuario> datosDeUsuario(String uid) async {
+    final doc = await _firestore.collection('users').doc(uid).get();
+    return Usuario.fromMap(doc);
   }
 
   @override
-  Future<User?> iniciarSesion(String email, String password) {
-    // TODO: implement iniciarSesion
-    throw UnimplementedError();
+  Future<User?> iniciarSesion(String email, String password) async {
+    final credential = await _auth.signInWithEmailAndPassword(
+        email: email, password: password);
+    return credential.user;
   }
 
   @override
   Future<void> registrarUsuario(Usuario user) async {
-    
-
     final credential = await _auth.createUserWithEmailAndPassword(
       email: user.email,
       password: user.password,
     );
+    credential.user?.sendEmailVerification();
     await _firestore
         .collection('users')
         .doc(credential.user!.uid)
@@ -63,8 +62,9 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  User? usuarioAutenticado() {
-    // TODO: implement usuarioAutenticado
-    throw UnimplementedError();
+  Future<User?> usuarioAutenticado() async {
+    return _auth.currentUser;
+    /* if (id == null) return null;
+    return await datosDeUsuario(id); */
   }
 }

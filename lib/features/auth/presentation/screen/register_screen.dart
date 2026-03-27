@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/utils/constants.dart';
 import 'package:migra_ayuda/core/utils/validation/email_validator.dart';
+import 'package:migra_ayuda/core/utils/widgets/mensajesWidget.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/register_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/dropdown_field_widget.dart';
@@ -79,45 +80,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       (previous, next) {
         next.whenOrNull(
           data: (_) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Row(
-                  children: [
-                    Icon(Icons.check_circle, color: Colors.white),
-                    SizedBox(width: 8),
-                    Text("¡Registro exitoso! Bienvenido a MigraAyuda"),
-                  ],
-                ),
-                backgroundColor: Colors.green.shade600,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                duration: const Duration(seconds: 3),
-              ),
-            );
+            _clearControllers();
+            Mensajeswidget.mostrarExito(context,
+                "¡Registro exitoso! Verifica tu correo para iniciar sesión. Si no lo encuentras, revisa tu carpeta de spam.");
           },
           error: (error, stackTrace) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    const Icon(Icons.error, color: Colors.white),
-                    const SizedBox(width: 8),
-                    Text(
-                      error.toString(),
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                backgroundColor: Colors.red.shade600,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                duration: const Duration(seconds: 3),
-              ),
-            );
-
-            print(error.toString());
+            Mensajeswidget.mostrarError(context, error.toString());
           },
         );
       },
