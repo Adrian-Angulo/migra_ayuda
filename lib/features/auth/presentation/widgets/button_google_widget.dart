@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 
-
-class ButtonGoogleWidget extends StatelessWidget {
+class ButtonGoogleWidget extends ConsumerWidget {
   const ButtonGoogleWidget({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ElevatedButton.icon(
       onPressed: () async {
-        
+        ref.read(authNotifierProvider.notifier).authConGoogle();
       },
       icon: Image.asset(
         'assets/icons/google.png',

@@ -10,7 +10,10 @@ class IniciarSesionUseCase {
     try {
       final user = await _repository.iniciarSesion(email, password);
       if (user == null) throw "El usuario no se encuentra registrado";
-      if (!user.emailVerified) throw "Debes verificar tu correo para iniciar sesión";
+      if (!user.emailVerified) {
+        throw "Debes verificar tu correo para iniciar sesión";
+      }
+      
     } on FirebaseAuthException catch (e) {
       throw _mapFirebaseAuthError(e.code);
     } catch (e) {

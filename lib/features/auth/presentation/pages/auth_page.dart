@@ -4,6 +4,7 @@ import 'package:migra_ayuda/core/utils/constants.dart';
 import 'package:migra_ayuda/core/utils/widgets/mensajesWidget.dart';
 import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:migra_ayuda/features/auth/presentation/screen/complete_info_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screen/login_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screen/register_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/switch_button.dart';
@@ -28,11 +29,19 @@ class _AuthPageState extends ConsumerState<AuthPage> {
       (previous, next) {
         next.whenOrNull(data: (data) {
           if (data != null) {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const HomeScreen(),
-                ));
+            if (data.profileComplete == false) {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CompleteInfoScreen(),
+                  ));
+            } else {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HomeScreen(),
+                  ));
+            }
           }
         }, error: (error, stackTrace) {
           Mensajeswidget.mostrarError(context, error.toString());

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
+
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 
 import 'package:migra_ayuda/features/auth/presentation/screen/recuperar_contrase%C3%B1a/send_email_screen.dart';

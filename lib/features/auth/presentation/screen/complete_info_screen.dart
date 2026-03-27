@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/auth_page.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/dropdown_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/text_field_numeric_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/button_widget.dart';
 
-class CompleteInfoScreen extends StatefulWidget {
+class CompleteInfoScreen extends ConsumerStatefulWidget {
   const CompleteInfoScreen({super.key});
 
   @override
-  State<CompleteInfoScreen> createState() => _CompleteInfoScreenState();
+  ConsumerState<CompleteInfoScreen> createState() => _CompleteInfoScreenState();
 }
 
-class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
+class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
   final _formKey = GlobalKey<FormState>();
   final _edadController = TextEditingController();
 
@@ -40,6 +43,30 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(
+      authNotifierProvider,
+      (previous, next) {
+        next.whenData(
+          (usu) {
+            if (usu == null) {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AuthPage(),
+                  ));
+            }
+            if (usu!.profileComplete) {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HomeScreen(),
+                  ));
+            }
+          },
+        );
+      },
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Completar información'),
@@ -142,30 +169,15 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
                         return;
                       }
 
-                      if (originCountry == null || destinationCountry == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Debes seleccionar ambos países'),
-                            backgroundColor: Colors.orange,
-                          ),
-                        );
-                        return;
-                      }
-
-                      final userId = FirebaseAuth.instance.currentUser?.uid;
-                      if (userId == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Error: Usuario no encontrado'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                        return;
-                      }
-
                       setState(() => _loading = true);
                       try {
-                        // TODO: implement completeGoogleProfile without Riverpod
+                        await ref
+                            .read(authNotifierProvider.notifier)
+                            .completarPerfil(
+                              originCountry: originCountry!,
+                              destinationCountry: destinationCountry!,
+                              age: int.parse(_edadController.text),
+                            );
                       } catch (e) {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context)
@@ -181,6 +193,13 @@ class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
+                  TextButton(
+                      onPressed: () async {
+                        await ref
+                            .read(authNotifierProvider.notifier)
+                            .cerrarSesion();
+                      },
+                      child: const Text("Cancelar"))
                 ],
               ),
             ),
