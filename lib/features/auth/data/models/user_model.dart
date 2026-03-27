@@ -1,33 +1,32 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class UserModel {
+class Usuario {
   final String id;
   final String name;
   final String lastname;
-  final String originCountry;
-  final String destinationCountry;
+  final String? originCountry;
+  final String? destinationCountry;
   final String email;
-  final int age;
+  final String? age;
   final String password;
   final String role;
   final bool profileComplete;
   final DateTime createdAt;
 
-  UserModel({
-    required this.id,
+  Usuario({
+    this.id = '',
     required this.name,
     required this.lastname,
-    required this.originCountry,
-    required this.destinationCountry,
+    this.originCountry,
+    this.destinationCountry,
     required this.email,
-    required this.age,
+    this.age,
     required this.password,
-    required this.role,
-    required this.profileComplete,
-    required this.createdAt,
-  });
-
-  Map<String, dynamic> toFirestore() {
+    this.role = 'Migrante',
+    this.profileComplete = false,
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
+  Map<String, dynamic> toMap() {
     return {
       'name': name,
       'lastname': lastname,
@@ -35,27 +34,25 @@ class UserModel {
       'destinationCountry': destinationCountry,
       'email': email,
       'age': age,
-      'password': password,
       'role': role,
       'profileComplete': profileComplete,
       'createdAt': createdAt.toIso8601String(),
     };
   }
 
-  factory UserModel.fromFirestore(DocumentSnapshot doc) {
+  factory Usuario.fromMap(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-
-    return UserModel(
+    return Usuario(
       id: doc.id,
       name: data['name'] ?? 'No data',
-      lastname: data['lastname'] ?? "No data",
-      originCountry: data['originCountry'] ?? "No data",
-      destinationCountry: data['destinationCountry'] ?? "No data",
-      email: data['email'] ?? "No data",
-      age: data['age'] != null ? int.parse(data['age'].toString()) : 0,
+      lastname: data['lastname'] ?? 'No data',
+      originCountry: data['originCountry'],
+      destinationCountry: data['destinationCountry'],
+      email: data['email'] ?? 'No data',
+      age: data['age'] ?? "No data",
       password: data['password'] ?? '',
       role: data['role'] ?? 'Migrante',
-      profileComplete: data['profileComplete'] ?? true,
+      profileComplete: data['profileComplete'] ?? false,
       createdAt: _parseDate(data['registrationDate']),
     );
   }

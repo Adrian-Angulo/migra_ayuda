@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/core/services/navigation_service.dart';
-import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
+
 import 'package:migra_ayuda/features/auth/presentation/screen/recuperar_contrase%C3%B1a/send_email_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/button_google_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/button_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/text_fiel_pasword_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/text_fiel_widget.dart';
 
-class LoginScreen extends ConsumerStatefulWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   final formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -36,27 +35,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(
     BuildContext context,
   ) {
-    final authState = ref.watch(authProvider);
-    final auth = ref.read(authProvider.notifier);
-
-    ref.listen(
-      authProvider,
-      (previous, next) {
-        next.whenOrNull(
-          data: (user) {
-            if (user != null && context.mounted) {
-              NavigationService.navigateByRole(context, user);
-            }
-          },
-          error: (error, stackTrace) {
-            ScaffoldMessenger.of(context)
-              ..clearSnackBars()
-              ..showSnackBar(SnackBar(content: Text("$error")));
-          },
-        );
-      },
-    );
-
     return Form(
       key: formKey,
       child: Column(
@@ -66,11 +44,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             title: "Correo electronico",
             hintText: "Ej. usuario@gmail.com",
             controller: emailController,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'El correo es obligatorio';
+              }
+              final emailRegex = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$');
+              if (!emailRegex.hasMatch(value.trim())) {
+                return 'Ingresa un correo válido';
+              }
+              return null;
+            },
           ),
           const SizedBox(height: 16),
           TextFieldPaswordWidget(
             title: "Contraseña",
             controller: passController,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'La contraseña es obligatoria';
+              }
+              if (value.length < 8) {
+                return 'La contraseña debe tener al menos 8 caracteres';
+              }
+
+              return null;
+            },
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -89,11 +87,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
           ButtonWidget(
             formKey: formKey,
-            loading: authState.isLoading,
+            loading: _isLoading,
             text: 'Iniciar Sesión',
             onPressed: () async {
               if (formKey.currentState!.validate()) {
-                await auth.login(emailController.text, passController.text);
+                setState(() => _isLoading = true);
+                try {
+                  ScaffoldMessenger.of(context)
+                    ..clearSnackBars()
+                    ..showSnackBar(
+                        const SnackBar(content: Text("Ha iniciado session")));
+                } catch (error) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context)
+                      ..clearSnackBars()
+                      ..showSnackBar(SnackBar(content: Text("$error")));
+                  }
+                } finally {
+                  setState(() => _isLoading = false);
+                }
                 cleanControllar();
               }
             },

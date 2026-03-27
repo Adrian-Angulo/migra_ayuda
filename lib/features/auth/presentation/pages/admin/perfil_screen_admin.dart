@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:migra_ayuda/features/auth/presentation/pages/auth_page.dart';
-import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 
-class PerfilScreenAdmin extends ConsumerWidget {
+class PerfilScreenAdmin extends StatelessWidget {
   const PerfilScreenAdmin({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F7),
       body: SafeArea(
@@ -43,7 +40,7 @@ class PerfilScreenAdmin extends ConsumerWidget {
 
                 // Nombre
                 const Text(
-                  "Nombre",
+                  "Carlos Martínez",
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -53,7 +50,7 @@ class PerfilScreenAdmin extends ConsumerWidget {
                 const SizedBox(height: 5),
 
                 const Text(
-                  "Corro",
+                  "carlos@example.com",
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
@@ -89,10 +86,7 @@ class PerfilScreenAdmin extends ConsumerWidget {
                 _ProfileOption(
                   icon: Icons.logout,
                   text: "Cerrar Sesión",
-                  onTap: () async {
-                    ref.read(logoutProvider).call();
-                    if (!context.mounted) return;
-
+                  onTap: () {
                     Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(

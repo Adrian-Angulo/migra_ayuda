@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/features/auth/presentation/providers/reset_password_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screen/recuperar_contraseña/success_screen.dart';
 
-class SendEmailScreen extends ConsumerStatefulWidget {
+class SendEmailScreen extends StatefulWidget {
   const SendEmailScreen({super.key});
 
   @override
-  ConsumerState<SendEmailScreen> createState() => _SendEmailScreenState();
+  State<SendEmailScreen> createState() => _SendEmailScreenState();
 }
 
-class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
+class _SendEmailScreenState extends State<SendEmailScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -23,40 +22,23 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
   void handleSubmit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    // Enviar email de reset
-    await ref
-        .read(resetPasswordNotifierProvider.notifier)
-        .sendResetEmail(_emailController.text.trim());
+    setState(() => _isLoading = true);
 
+    // Simular envío de email
+    await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
-    // Verificar resultado
-    final state = ref.read(resetPasswordNotifierProvider);
-
-    if (state.isSuccess) {
-      // Navegar a pantalla de éxito
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const SuccessScreen(),
-        ),
-      );
-    } else if (state.error != null) {
-      // Mostrar error
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(state.error!),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 4),
-        ),
-      );
-    }
+    setState(() => _isLoading = false);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SuccessScreen(),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final resetState = ref.watch(resetPasswordNotifierProvider);
-
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
       body: SafeArea(
@@ -130,7 +112,7 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
-                    enabled: !resetState.isLoading,
+                    enabled: !_isLoading,
                     decoration: InputDecoration(
                       hintText: "migraAyuda@correo.com",
                       filled: true,
@@ -192,8 +174,8 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onPressed: resetState.isLoading ? null : handleSubmit,
-                    child: resetState.isLoading
+                    onPressed: _isLoading ? null : handleSubmit,
+                    child: _isLoading
                         ? const SizedBox(
                             height: 20,
                             width: 20,
@@ -217,7 +199,7 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
 
                   // Volver al inicio de sesión con flecha
                   TextButton.icon(
-                    onPressed: resetState.isLoading
+                    onPressed: _isLoading
                         ? null
                         : () => Navigator.popUntil(
                             context, (route) => route.isFirst),

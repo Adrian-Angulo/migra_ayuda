@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/utils/constants.dart';
 import 'package:migra_ayuda/core/utils/validation/email_validator.dart';
-import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
+import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/register_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/dropdown_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/text_fiel_pasword_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/text_fiel_widget.dart';
@@ -67,8 +68,62 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
+    ref.listen(
+      registrarProvider,
+      (previous, next) {
+        next.whenOrNull(
+          data: (_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Row(
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.white),
+                    SizedBox(width: 8),
+                    Text("¡Registro exitoso! Bienvenido a MigraAyuda"),
+                  ],
+                ),
+                backgroundColor: Colors.green.shade600,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          },
+          error: (error, stackTrace) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(Icons.error, color: Colors.white),
+                    const SizedBox(width: 8),
+                    Text(
+                      error.toString(),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                backgroundColor: Colors.red.shade600,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                duration: const Duration(seconds: 3),
+              ),
+            );
+
+            print(error.toString());
+          },
+        );
+      },
+    );
+
+    final registerState = ref.watch(registrarProvider);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: UIConstants.spacingL),
@@ -218,12 +273,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             ButtonWidget(
                 formKey: _formKey,
                 text: 'Registrarse',
-                loading: authState.isLoading,
+                loading: registerState.isLoading,
                 onPressed: () async {
-                  // 1. Validar formulario
                   if (!_formKey.currentState!.validate()) return;
 
-                  // 2. Validar términos
                   if (!acceptTerms) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -235,40 +288,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     return;
                   }
 
-                  // 3. Llamar al provider para registrar
-                  await ref.read(authProvider.notifier).register(
-                        name: _nombreController.text.trim(),
-                        lasname: _apellidoController.text.trim(),
-                        email: _correoController.text.trim(),
-                        password: _passwordController.text,
-                        originCountry:
-                            selectedOriginCountry ?? 'No especificado',
-                        destinationCountry:
-                            selectedDestinationCountry ?? 'No especificado',
-                        age: int.tryParse(_edadController.text) ?? 0,
-                      );
+                  await ref.read(registrarProvider.notifier).registrarUsuario(
+                      Usuario(
+                          name: _nombreController.text,
+                          lastname: _apellidoController.text,
+                          email: _correoController.text,
+                          password: _passwordController.text,
+                          age: _edadController.text,
+                          originCountry: selectedOriginCountry,
+                          destinationCountry: selectedDestinationCountry,
+                          profileComplete: true));
 
                   if (!context.mounted) return;
-
-                  // 4. Revisar resultado DESPUÉS del registro
-                  final state = ref.read(authProvider);
-                  if (state.hasError) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(state.error.toString()),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  } else {
-                    _clearControllers();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                            '¡Registro completado exitosamente! Verifica tu correo.'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-                  }
                 }),
             const SizedBox(height: UIConstants.spacingM),
           ],

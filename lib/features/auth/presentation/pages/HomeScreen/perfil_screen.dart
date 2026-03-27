@@ -1,34 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:migra_ayuda/features/auth/presentation/pages/auth_page.dart';
-import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
-
-class PerfilScreen extends ConsumerWidget {
+class PerfilScreen extends StatelessWidget {
   const PerfilScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authProvider).value;
-    ref.listen(
-      authProvider,
-      (previous, next) {
-        next.whenOrNull(
-          data: (user) {
-            if (user == null) {
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AuthPage(),
-                  ));
-            }
-          },
-          error: (error, stackTrace) => ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text("$error"))),
-        );
-      },
-    );
-
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F7),
       body: SafeArea(
@@ -62,9 +38,9 @@ class PerfilScreen extends ConsumerWidget {
                 const SizedBox(height: 20),
 
                 // Nombre
-                Text(
-                  "${user?.name}",
-                  style: const TextStyle(
+                const Text(
+                  "Carlos Martínez",
+                  style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
@@ -72,9 +48,9 @@ class PerfilScreen extends ConsumerWidget {
 
                 const SizedBox(height: 5),
 
-                Text(
-                  "${user?.email}",
-                  style: const TextStyle(
+                const Text(
+                  "carlos.martinez@email.com",
+                  style: TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
                   ),
@@ -120,10 +96,7 @@ class PerfilScreen extends ConsumerWidget {
                 _ProfileOption(
                   icon: Icons.logout,
                   text: "Cerrar Sesión",
-                  onTap: () async {
-                    await ref.read(authProvider.notifier).logout();
-                    if (!context.mounted) return;
-                  },
+                  onTap: () {},
                 ),
               ],
             ),

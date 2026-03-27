@@ -1,27 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:migra_ayuda/core/services/navigation_service.dart';
-import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/dropdown_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/text_field_numeric_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/button_widget.dart';
 
-class CompleteInfoScreen extends ConsumerStatefulWidget {
+class CompleteInfoScreen extends StatefulWidget {
   const CompleteInfoScreen({super.key});
 
   @override
-  ConsumerState<CompleteInfoScreen> createState() => _CompleteInfoScreenState();
+  State<CompleteInfoScreen> createState() => _CompleteInfoScreenState();
 }
 
-class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
+class _CompleteInfoScreenState extends State<CompleteInfoScreen> {
   final _formKey = GlobalKey<FormState>();
   final _edadController = TextEditingController();
 
   String? originCountry;
   String? destinationCountry;
   bool acceptTerms = false;
+  bool _loading = false;
 
   final List<String> countries = [
     'México',
@@ -42,30 +40,6 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
-
-    // Listener para navegar según rol después de completar perfil
-    ref.listen(
-      authProvider,
-      (previous, next) {
-        next.whenOrNull(
-          data: (user) {
-            if (user != null && user.profileComplete && context.mounted) {
-              NavigationService.navigateByRole(context, user);
-            }
-          },
-          error: (error, stackTrace) {
-            ScaffoldMessenger.of(context)
-              ..clearSnackBars()
-              ..showSnackBar(SnackBar(
-                content: Text('Error: $error'),
-                backgroundColor: Colors.red,
-              ));
-          },
-        );
-      },
-    );
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Completar información'),
@@ -153,7 +127,7 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
                   ButtonWidget(
                     formKey: _formKey,
                     text: 'Completar Información',
-                    loading: authState.isLoading,
+                    loading: _loading,
                     onPressed: () async {
                       if (!_formKey.currentState!.validate()) return;
 
@@ -189,14 +163,21 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
                         return;
                       }
 
-                      await ref
-                          .read(authProvider.notifier)
-                          .completeGoogleProfile(
-                            userId: userId,
-                            originCountry: originCountry!,
-                            destinationCountry: destinationCountry!,
-                            age: int.tryParse(_edadController.text) ?? 0,
-                          );
+                      setState(() => _loading = true);
+                      try {
+                        // TODO: implement completeGoogleProfile without Riverpod
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context)
+                            ..clearSnackBars()
+                            ..showSnackBar(SnackBar(
+                              content: Text('Error: $e'),
+                              backgroundColor: Colors.red,
+                            ));
+                        }
+                      } finally {
+                        if (mounted) setState(() => _loading = false);
+                      }
                     },
                   ),
                   const SizedBox(height: 16),
