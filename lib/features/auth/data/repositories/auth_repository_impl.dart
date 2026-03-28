@@ -96,9 +96,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> restablecerContrasena(String email) {
-    // TODO: implement restablecerContrasena
-    throw UnimplementedError();
+  Future<void> restablecerContrasena(String email) async {
+    await _auth.sendPasswordResetEmail(email: email);
   }
 
   @override

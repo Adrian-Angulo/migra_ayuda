@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/auth/presentation/pages/auth_page.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 
-class PerfilScreenAdmin extends StatelessWidget {
+class PerfilScreenAdmin extends ConsumerWidget {
   const PerfilScreenAdmin({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F7),
       body: SafeArea(
@@ -86,7 +88,10 @@ class PerfilScreenAdmin extends StatelessWidget {
                 _ProfileOption(
                   icon: Icons.logout,
                   text: "Cerrar Sesión",
-                  onTap: () {
+                  onTap: () async {
+                    await ref
+                        .read(authNotifierProvider.notifier)
+                        .cerrarSesion();
                     Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(

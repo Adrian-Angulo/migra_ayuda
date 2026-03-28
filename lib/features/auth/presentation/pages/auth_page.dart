@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/utils/constants.dart';
 import 'package:migra_ayuda/core/utils/widgets/mensajesWidget.dart';
 import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/admin/home_screen_admin.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screen/complete_info_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screen/login_screen.dart';
@@ -34,6 +35,12 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const CompleteInfoScreen(),
+                  ));
+            } else if (data.role == 'Admin') {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const HomeScreenAdmin(),
                   ));
             } else {
               Navigator.pushReplacement(

@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/utils/widgets/mensajesWidget.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/reset_password_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screen/recuperar_contraseña/success_screen.dart';
 
-class SendEmailScreen extends StatefulWidget {
+class SendEmailScreen extends ConsumerStatefulWidget {
   const SendEmailScreen({super.key});
 
   @override
-  State<SendEmailScreen> createState() => _SendEmailScreenState();
+  ConsumerState<SendEmailScreen> createState() => _SendEmailScreenState();
 }
 
-class _SendEmailScreenState extends State<SendEmailScreen> {
+class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   bool _isLoading = false;
@@ -23,22 +26,41 @@ class _SendEmailScreenState extends State<SendEmailScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
-
-    // Simular envío de email
-    await Future.delayed(const Duration(seconds: 2));
-    if (!mounted) return;
+    await ref
+        .read(resetPasswordProvider.notifier)
+        .restablecerContrasena(_emailController.text);
 
     setState(() => _isLoading = false);
-    Navigator.pushReplacement(
+/*     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (context) => const SuccessScreen(),
       ),
-    );
+    ); */
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(
+      resetPasswordProvider,
+      (previous, next) {
+        next.whenOrNull(
+          data: (data) {
+            Mensajeswidget.mostrarExito(context, "Enlace enviado");
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SuccessScreen(),
+              ),
+            );
+          },
+          error: (error, stackTrace) {
+            Mensajeswidget.mostrarError(context, error.toString());
+          },
+        );
+      },
+    );
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFFFFF),
       body: SafeArea(

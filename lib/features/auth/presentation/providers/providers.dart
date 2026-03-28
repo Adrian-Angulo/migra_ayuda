@@ -6,6 +6,7 @@ import 'package:migra_ayuda/features/auth/domain/useCases/cerrar_sesion_use_case
 import 'package:migra_ayuda/features/auth/domain/useCases/completar_perfil_use_case.dart';
 import 'package:migra_ayuda/features/auth/domain/useCases/iniciar_sesion_use_case.dart';
 import 'package:migra_ayuda/features/auth/domain/useCases/registrar_usuario_use_case.dart';
+import 'package:migra_ayuda/features/auth/domain/useCases/restablecer_contrasena_use_case.dart';
 import 'package:migra_ayuda/features/auth/domain/useCases/usuario_autenticado_use_case.dart';
 
 final repositoryProvider = Provider<AuthRepository>(
@@ -51,5 +52,13 @@ final completarPerfilProvider = Provider<CompletarPerfilUseCase>(
   (ref) {
     final repo = ref.read(repositoryProvider);
     return CompletarPerfilUseCase(repo);
+  },
+);
+
+final restablecerContrasenaProviderUseCase =
+    Provider<RestablecerContrasenaUseCase>(
+  (ref) {
+    final repo = ref.read(repositoryProvider);
+    return RestablecerContrasenaUseCase(repo);
   },
 );
