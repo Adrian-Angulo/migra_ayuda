@@ -9,9 +9,15 @@ class ResetPasswordNotifier extends AsyncNotifier<void> {
 
   Future<void> resetPassword(String email) async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(
-      () async {
-        await ref.read(resetPasswordProviderUseCase).call(email);
+
+    final result = await ref.read(resetPasswordProviderUseCase).call(email);
+
+    result.fold(
+      (failure) {
+        state = AsyncValue.error(failure.message, StackTrace.current);
+      },
+      (_) {
+        state = const AsyncValue.data(null);
       },
     );
   }

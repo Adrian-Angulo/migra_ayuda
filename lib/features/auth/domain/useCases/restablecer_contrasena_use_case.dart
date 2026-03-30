@@ -1,3 +1,5 @@
+import 'package:dartz/dartz.dart';
+import 'package:migra_ayuda/core/errors/failures.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
 
 class ResetPasswordUseCase {
@@ -5,11 +7,7 @@ class ResetPasswordUseCase {
 
   ResetPasswordUseCase(this._repository);
 
-  Future<void> call(String email) async {
-    try {
-      await _repository.resetPassword(email);
-    } catch (e) {
-      throw "Error al restablecer contraseña ${e.toString()}";
-    }
+  Future<Either<Failure, void>> call(String email) async {
+    return await _repository.resetPassword(email);
   }
 }

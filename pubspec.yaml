@@ -8,6 +8,8 @@ environment:
 
 dependencies:
   cloud_firestore: ^6.1.2
+  dartz: ^0.10.1
+  equatable: ^2.0.8
   firebase_auth: ^6.1.4
   firebase_core: ^4.4.0
   flutter:

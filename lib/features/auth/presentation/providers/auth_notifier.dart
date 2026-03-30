@@ -7,34 +7,61 @@ import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart'
 class AuthNotifier extends AsyncNotifier<UserModel?> {
   @override
   Future<UserModel?> build() async {
-    return await ref.read(getAuthenticatedUserProvider).call();
+    final result = await ref.read(getAuthenticatedUserProvider).call();
+
+    return result.fold(
+      (failure) => null,
+      (user) => user,
+    );
   }
 
   Future<void> login(String email, String password) async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(
-      () async {
-        await ref.read(loginProvider).call(email, password);
-        return ref.read(getAuthenticatedUserProvider).call();
+
+    final loginResult = await ref.read(loginProvider).call(email, password);
+
+    loginResult.fold(
+      (failure) {
+        state = AsyncValue.error(failure.message, StackTrace.current);
+      },
+      
+      (_) async {
+        final userResult = await ref.read(getAuthenticatedUserProvider).call();
+        userResult.fold(
+          (failure) =>
+              state = AsyncValue.error(failure.message, StackTrace.current),
+          (user) => state = AsyncValue.data(user),
+        );
       },
     );
   }
 
   Future<void> logout() async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(
-      () async {
-        await ref.read(logoutProvider).call();
-        return ref.read(getAuthenticatedUserProvider).call();
+
+    final result = await ref.read(logoutProvider).call();
+
+    result.fold(
+      (failure) {
+        state = AsyncValue.error(failure.message, StackTrace.current);
+      },
+      (_) {
+        state = const AsyncValue.data(null);
       },
     );
   }
 
   Future<void> authWithGoogle() async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(
-      () async {
-        return await ref.read(authWithGoogleProvider).call();
+
+    final result = await ref.read(authWithGoogleProvider).call();
+
+    result.fold(
+      (failure) {
+        state = AsyncValue.error(failure.message, StackTrace.current);
+      },
+      (user) {
+        state = AsyncValue.data(user);
       },
     );
   }
@@ -45,14 +72,24 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
     required int age,
   }) async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(
-      () async {
-        await ref.read(completeProfileProvider).call(
-              originCountry: originCountry,
-              destinationCountry: destinationCountry,
-              age: age,
-            );
-        return ref.read(getAuthenticatedUserProvider).call();
+
+    final completeResult = await ref.read(completeProfileProvider).call(
+          originCountry: originCountry,
+          destinationCountry: destinationCountry,
+          age: age,
+        );
+
+    completeResult.fold(
+      (failure) {
+        state = AsyncValue.error(failure.message, StackTrace.current);
+      },
+      (_) async {
+        final userResult = await ref.read(getAuthenticatedUserProvider).call();
+        userResult.fold(
+          (failure) =>
+              state = AsyncValue.error(failure.message, StackTrace.current),
+          (user) => state = AsyncValue.data(user),
+        );
       },
     );
   }

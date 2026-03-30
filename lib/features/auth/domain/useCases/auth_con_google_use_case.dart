@@ -1,3 +1,5 @@
+import 'package:dartz/dartz.dart';
+import 'package:migra_ayuda/core/errors/failures.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
 
@@ -6,15 +8,14 @@ class AuthWithGoogleUseCase {
 
   AuthWithGoogleUseCase(this._repository);
 
-  Future<UserModel?> call() async {
-    try {
-      final credential = await _repository.authWithGoogle();
-      if (credential == null) throw "Se canceló la operación";
+  Future<Either<Failure, UserModel>> call() async {
+    final credentialResult = await _repository.authWithGoogle();
 
-      final user = await _repository.verifyOrCreateGoogleUser(credential);
-      return user;
-    } catch (e) {
-      throw e.toString();
-    }
+    return credentialResult.fold(
+      (failure) => Left(failure),
+      (credential) async {
+        return await _repository.verifyOrCreateGoogleUser(credential);
+      },
+    );
   }
 }

@@ -1,3 +1,5 @@
+import 'package:dartz/dartz.dart';
+import 'package:migra_ayuda/core/errors/failures.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
 
 class LogoutUseCase {
@@ -5,11 +7,7 @@ class LogoutUseCase {
 
   LogoutUseCase(this._repository);
 
-  Future<void> call() async {
-    try {
-      await _repository.logout();
-    } catch (e) {
-      throw Exception(e.toString());
-    }
+  Future<Either<Failure, void>> call() async {
+    return await _repository.logout();
   }
 }

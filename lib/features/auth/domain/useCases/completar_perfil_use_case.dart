@@ -1,3 +1,5 @@
+import 'package:dartz/dartz.dart';
+import 'package:migra_ayuda/core/errors/failures.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
 
 class CompleteProfileUseCase {
@@ -5,19 +7,15 @@ class CompleteProfileUseCase {
 
   CompleteProfileUseCase(this._repository);
 
-  Future<void> call({
+  Future<Either<Failure, void>> call({
     required String originCountry,
     required String destinationCountry,
     required int age,
   }) async {
-    try {
-      await _repository.completeProfile(
-        originCountry: originCountry,
-        destinationCountry: destinationCountry,
-        age: age,
-      );
-    } catch (e) {
-      throw e.toString();
-    }
+    return await _repository.completeProfile(
+      originCountry: originCountry,
+      destinationCountry: destinationCountry,
+      age: age,
+    );
   }
 }

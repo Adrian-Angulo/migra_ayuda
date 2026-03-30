@@ -10,9 +10,15 @@ class RegisterNotifier extends AsyncNotifier<void> {
 
   Future<void> registerUser(UserModel user) async {
     state = const AsyncValue.loading();
-    state = await AsyncValue.guard(
-      () async {
-        await ref.read(registerUserUseCaseProvider).call(user);
+
+    final result = await ref.read(registerUserUseCaseProvider).call(user);
+
+    result.fold(
+      (failure) {
+        state = AsyncValue.error(failure.message, StackTrace.current);
+      },
+      (_) {
+        state = const AsyncValue.data(null);
       },
     );
   }
