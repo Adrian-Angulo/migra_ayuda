@@ -96,7 +96,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               if (formKey.currentState!.validate()) {
                 await ref
                     .read(authNotifierProvider.notifier)
-                    .iniciarSesion(emailController.text, passController.text);
+                    .login(emailController.text, passController.text);
                 cleanControllar();
               }
             },

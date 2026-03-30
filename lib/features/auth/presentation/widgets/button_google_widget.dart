@@ -11,7 +11,7 @@ class ButtonGoogleWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return ElevatedButton.icon(
       onPressed: () async {
-        ref.read(authNotifierProvider.notifier).authConGoogle();
+        ref.read(authNotifierProvider.notifier).authWithGoogle();
       },
       icon: Image.asset(
         'assets/icons/google.png',

@@ -2,18 +2,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
 
-class IniciarSesionUseCase {
+class LoginUseCase {
   final AuthRepository _repository;
-  IniciarSesionUseCase(this._repository);
+  LoginUseCase(this._repository);
 
   Future<void> call(String email, String password) async {
     try {
-      final user = await _repository.iniciarSesion(email, password);
+      final user = await _repository.login(email, password);
       if (user == null) throw "El usuario no se encuentra registrado";
       if (!user.emailVerified) {
         throw "Debes verificar tu correo para iniciar sesión";
       }
-      
     } on FirebaseAuthException catch (e) {
       throw _mapFirebaseAuthError(e.code);
     } catch (e) {
@@ -27,7 +26,7 @@ class IniciarSesionUseCase {
         return 'Este correo ya está registrado';
 
       case 'invalid-credential':
-        return 'correo o contraseña incorrecta';
+        return 'Correo o contraseña incorrecta';
 
       case 'weak-password':
         return 'La contraseña es demasiado débil';
@@ -39,7 +38,7 @@ class IniciarSesionUseCase {
         return 'Error de conexión a internet';
 
       default:
-        return "Ocurrio un erro inesperado";
+        return "Ocurrió un error inesperado";
     }
   }
 }

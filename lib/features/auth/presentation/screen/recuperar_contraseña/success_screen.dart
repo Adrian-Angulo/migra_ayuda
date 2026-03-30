@@ -41,7 +41,7 @@ class SuccessScreen extends StatelessWidget {
               const SizedBox(height: 20),
 
               const Text(
-                "Te hemos enviado un enlace para restablecer tu contraseña. Revisa tu bandeja de entrada y también tu carpeta de spam.",
+                "Te hemos enviado un enlace para restablecer tu contraseña. Revisa tu bandeja de entrada y también tu carpeta de spam. Recuerda que el correo debe estar registrado en el sistema",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.grey,

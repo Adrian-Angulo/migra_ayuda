@@ -28,7 +28,7 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
     setState(() => _isLoading = true);
     await ref
         .read(resetPasswordProvider.notifier)
-        .restablecerContrasena(_emailController.text);
+        .resetPassword(_emailController.text);
 
     setState(() => _isLoading = false);
 /*     Navigator.pushReplacement(
@@ -46,7 +46,6 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
       (previous, next) {
         next.whenOrNull(
           data: (data) {
-            Mensajeswidget.mostrarExito(context, "Enlace enviado");
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(

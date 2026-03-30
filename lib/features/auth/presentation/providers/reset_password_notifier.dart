@@ -7,11 +7,11 @@ class ResetPasswordNotifier extends AsyncNotifier<void> {
   @override
   FutureOr<dynamic> build() {}
 
-  Future<void> restablecerContrasena(String email) async {
+  Future<void> resetPassword(String email) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(
       () async {
-        await ref.read(restablecerContrasenaProviderUseCase).call(email);
+        await ref.read(resetPasswordProviderUseCase).call(email);
       },
     );
   }

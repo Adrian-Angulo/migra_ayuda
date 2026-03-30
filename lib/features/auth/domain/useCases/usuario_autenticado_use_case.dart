@@ -1,21 +1,20 @@
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
 
-class UsuarioAutenticadoUseCase {
+class GetAuthenticatedUserUseCase {
   final AuthRepository _repository;
 
-  UsuarioAutenticadoUseCase(this._repository);
+  GetAuthenticatedUserUseCase(this._repository);
 
-  Future<Usuario?> call() async {
+  Future<UserModel?> call() async {
     try {
-      final usu = await _repository.usuarioAutenticado();
-      if (usu == null) return null;
-      if (!usu.emailVerified) {
-        await _repository.cerrarSesion();
+      final user = await _repository.getAuthenticatedUser();
+      if (user == null) return null;
+      if (!user.emailVerified) {
+        await _repository.logout();
         return null;
       }
-      ;
-      return await _repository.datosDeUsuario(usu.uid);
+      return await _repository.getUserData(user.uid);
     } catch (e) {
       throw Exception(e.toString());
     }

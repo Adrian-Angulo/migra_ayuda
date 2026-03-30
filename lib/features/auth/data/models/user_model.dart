@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Usuario {
+class UserModel {
   final String id;
   final String name;
   final String lastname;
@@ -13,7 +13,7 @@ class Usuario {
   final bool profileComplete;
   final DateTime createdAt;
 
-  Usuario({
+  UserModel({
     this.id = '',
     required this.name,
     required this.lastname,
@@ -40,9 +40,9 @@ class Usuario {
     };
   }
 
-  factory Usuario.fromMap(DocumentSnapshot doc) {
+  factory UserModel.fromMap(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    return Usuario(
+    return UserModel(
       id: doc.id,
       name: data['name'] ?? 'No data',
       lastname: data['lastname'] ?? 'No data',

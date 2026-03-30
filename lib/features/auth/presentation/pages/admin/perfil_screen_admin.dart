@@ -89,9 +89,7 @@ class PerfilScreenAdmin extends ConsumerWidget {
                   icon: Icons.logout,
                   text: "Cerrar Sesión",
                   onTap: () async {
-                    await ref
-                        .read(authNotifierProvider.notifier)
-                        .cerrarSesion();
+                    await ref.read(authNotifierProvider.notifier).logout();
                     Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(

@@ -4,43 +4,42 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 
-class AuthNotifier extends AsyncNotifier<Usuario?> {
+class AuthNotifier extends AsyncNotifier<UserModel?> {
   @override
-  Future<Usuario?> build() async {
-    return await ref.read(usuarioAutenticadoProvider).call();
+  Future<UserModel?> build() async {
+    return await ref.read(getAuthenticatedUserProvider).call();
   }
 
-  Future<void> iniciarSesion(String correo, String contrasena) async {
+  Future<void> login(String email, String password) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(
       () async {
-        await ref.read(iniciarSesionProvider).call(correo, contrasena);
-        return ref.read(usuarioAutenticadoProvider).call();
+        await ref.read(loginProvider).call(email, password);
+        return ref.read(getAuthenticatedUserProvider).call();
       },
     );
   }
 
-  Future<void> cerrarSesion() async {
+  Future<void> logout() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(
       () async {
-        await ref.read(cerrarSesionProvider).call();
-        return ref.read(usuarioAutenticadoProvider).call();
+        await ref.read(logoutProvider).call();
+        return ref.read(getAuthenticatedUserProvider).call();
       },
     );
   }
 
-  Future<void> authConGoogle() async {
+  Future<void> authWithGoogle() async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(
       () async {
-        return await ref.read(authConGoogleProvider).call();
+        return await ref.read(authWithGoogleProvider).call();
       },
     );
   }
 
-  Future<void> completarPerfil({
-    
+  Future<void> completeProfile({
     required String originCountry,
     required String destinationCountry,
     required int age,
@@ -48,16 +47,16 @@ class AuthNotifier extends AsyncNotifier<Usuario?> {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(
       () async {
-        await ref.read(completarPerfilProvider).call(
+        await ref.read(completeProfileProvider).call(
               originCountry: originCountry,
               destinationCountry: destinationCountry,
               age: age,
             );
-        return ref.read(usuarioAutenticadoProvider).call();
+        return ref.read(getAuthenticatedUserProvider).call();
       },
     );
   }
 }
 
 final authNotifierProvider =
-    AsyncNotifierProvider<AuthNotifier, Usuario?>(AuthNotifier.new);
+    AsyncNotifierProvider<AuthNotifier, UserModel?>(AuthNotifier.new);

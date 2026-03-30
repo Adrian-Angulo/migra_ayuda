@@ -1,37 +1,46 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final GoogleSignIn googleSignIn = GoogleSignIn();
+  final firebase_auth.FirebaseAuth _auth;
+  final FirebaseFirestore _firestore;
+  final GoogleSignIn googleSignIn;
+
+  AuthRepositoryImpl({
+    required firebase_auth.FirebaseAuth auth,
+    required FirebaseFirestore firestore,
+    required this.googleSignIn,
+  })  : _auth = auth,
+        _firestore = firestore;
 
   @override
-  Future<UserCredential?> authConGoogle() async {
+  Future<firebase_auth.UserCredential?> authWithGoogle() async {
     final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
     if (googleUser == null) return null;
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
 
-    final OAuthCredential credential = GoogleAuthProvider.credential(
+    final firebase_auth.OAuthCredential credential =
+        firebase_auth.GoogleAuthProvider.credential(
       idToken: googleAuth.idToken,
       accessToken: googleAuth.accessToken,
     );
 
-    return await FirebaseAuth.instance.signInWithCredential(credential);
+    return await firebase_auth.FirebaseAuth.instance
+        .signInWithCredential(credential);
   }
 
   @override
-  Future<void> cerrarSesion() async {
+  Future<void> logout() async {
     await _auth.signOut();
     await googleSignIn.signOut();
   }
 
   @override
-  Future<void> completarPerfil(
+  Future<void> completeProfile(
       {required String originCountry,
       required String destinationCountry,
       required int age}) async {
@@ -44,18 +53,16 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Usuario> verificarOCrearUsuarioGoogle(
-      UserCredential credential) async {
+  Future<UserModel> verifyOrCreateGoogleUser(
+      firebase_auth.UserCredential credential) async {
     final uid = credential.user!.uid;
     final docRef = _firestore.collection('users').doc(uid);
     final doc = await docRef.get();
 
     if (doc.exists) {
-      // Usuario ya existe, retornar sus datos
-      return Usuario.fromMap(doc);
+      return UserModel.fromMap(doc);
     } else {
-      // Usuario nuevo, crear en Firestore
-      final nuevoUsuario = Usuario(
+      final newUser = UserModel(
         id: uid,
         name: credential.user!.displayName ?? 'Usuario',
         lastname: '',
@@ -64,26 +71,26 @@ class AuthRepositoryImpl implements AuthRepository {
         profileComplete: false,
       );
 
-      await docRef.set(nuevoUsuario.toMap());
-      return nuevoUsuario;
+      await docRef.set(newUser.toMap());
+      return newUser;
     }
   }
 
   @override
-  Future<Usuario> datosDeUsuario(String uid) async {
+  Future<UserModel> getUserData(String uid) async {
     final doc = await _firestore.collection('users').doc(uid).get();
-    return Usuario.fromMap(doc);
+    return UserModel.fromMap(doc);
   }
 
   @override
-  Future<User?> iniciarSesion(String email, String password) async {
+  Future<firebase_auth.User?> login(String email, String password) async {
     final credential = await _auth.signInWithEmailAndPassword(
         email: email, password: password);
     return credential.user;
   }
 
   @override
-  Future<void> registrarUsuario(Usuario user) async {
+  Future<void> registerUser(UserModel user) async {
     final credential = await _auth.createUserWithEmailAndPassword(
       email: user.email,
       password: user.password,
@@ -96,12 +103,12 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> restablecerContrasena(String email) async {
+  Future<void> resetPassword(String email) async {
     await _auth.sendPasswordResetEmail(email: email);
   }
 
   @override
-  Future<User?> usuarioAutenticado() async {
+  Future<firebase_auth.User?> getAuthenticatedUser() async {
     return _auth.currentUser;
   }
 }

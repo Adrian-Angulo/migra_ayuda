@@ -173,7 +173,7 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
                       try {
                         await ref
                             .read(authNotifierProvider.notifier)
-                            .completarPerfil(
+                            .completeProfile(
                               originCountry: originCountry!,
                               destinationCountry: destinationCountry!,
                               age: int.parse(_edadController.text),
@@ -195,9 +195,7 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
                   const SizedBox(height: 16),
                   TextButton(
                       onPressed: () async {
-                        await ref
-                            .read(authNotifierProvider.notifier)
-                            .cerrarSesion();
+                        await ref.read(authNotifierProvider.notifier).logout();
                       },
                       child: const Text("Cancelar"))
                 ],

@@ -76,7 +76,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     ref.listen(
-      registrarProvider,
+      registerProvider,
       (previous, next) {
         next.whenOrNull(
           data: (_) {
@@ -91,7 +91,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       },
     );
 
-    final registerState = ref.watch(registrarProvider);
+    final registerState = ref.watch(registerProvider);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: UIConstants.spacingL),
@@ -256,8 +256,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     return;
                   }
 
-                  await ref.read(registrarProvider.notifier).registrarUsuario(
-                      Usuario(
+                  await ref.read(registerProvider.notifier).registerUser(
+                      UserModel(
                           name: _nombreController.text,
                           lastname: _apellidoController.text,
                           email: _correoController.text,

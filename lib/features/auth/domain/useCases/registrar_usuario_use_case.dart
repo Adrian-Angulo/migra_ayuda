@@ -2,15 +2,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
 
-class RegistrarUsuarioUseCase {
+class RegisterUserUseCase {
   AuthRepository _repository;
 
-  RegistrarUsuarioUseCase(this._repository);
+  RegisterUserUseCase(this._repository);
 
-  Future<void> call(Usuario usu) async {
+  Future<void> call(UserModel user) async {
     try {
-      await _repository.registrarUsuario(usu);
-      
+      await _repository.registerUser(user);
     } on FirebaseAuthException catch (e) {
       throw Exception(_mapFirebaseAuthError(e.code));
     } catch (e) {

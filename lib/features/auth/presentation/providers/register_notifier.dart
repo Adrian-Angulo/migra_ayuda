@@ -8,15 +8,15 @@ class RegisterNotifier extends AsyncNotifier<void> {
   @override
   FutureOr<void> build() {}
 
-  Future<void> registrarUsuario(Usuario usu) async {
+  Future<void> registerUser(UserModel user) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(
       () async {
-        await ref.read(registrarUseCaseProvider).call(usu);
+        await ref.read(registerUserUseCaseProvider).call(user);
       },
     );
   }
 }
 
-final registrarProvider =
+final registerProvider =
     AsyncNotifierProvider<RegisterNotifier, void>(RegisterNotifier.new);

@@ -9,7 +9,7 @@ class PerfilScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final Usuario? usu = ref.read(authNotifierProvider).value;
+    final UserModel? usu = ref.read(authNotifierProvider).value;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F7),
       body: SafeArea(
@@ -102,9 +102,7 @@ class PerfilScreen extends ConsumerWidget {
                   icon: Icons.logout,
                   text: "Cerrar Sesión",
                   onTap: () async {
-                    await ref
-                        .read(authNotifierProvider.notifier)
-                        .cerrarSesion();
+                    await ref.read(authNotifierProvider.notifier).logout();
                   },
                 ),
               ],
