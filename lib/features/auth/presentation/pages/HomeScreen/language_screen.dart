@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/language_provider.dart';
-import 'login_screen.dart';
+import 'package:migra_ayuda/providers/language_provider.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/auth_page.dart';
 
 class LanguageScreen extends ConsumerWidget {
   const LanguageScreen({super.key});
@@ -59,8 +59,7 @@ class LanguageScreen extends ConsumerWidget {
                 subtitle: 'Spanish',
                 isSelected: selectedLanguage == 'es',
                 onTap: () {
-                  // Actualizamos el provider con el nuevo valor
-                  ref.read(languageProvider.notifier).state = 'es';
+                  ref.read(languageProvider.notifier).setLanguage('es');
                 },
               ),
               const SizedBox(height: 12),
@@ -72,7 +71,7 @@ class LanguageScreen extends ConsumerWidget {
                 subtitle: 'Inglés',
                 isSelected: selectedLanguage == 'en',
                 onTap: () {
-                  ref.read(languageProvider.notifier).state = 'en';
+                  ref.read(languageProvider.notifier).setLanguage('en');
                 },
               ),
               const SizedBox(height: 48),
@@ -84,7 +83,7 @@ class LanguageScreen extends ConsumerWidget {
                   onPressed: () {
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
-                        builder: (_) => const LoginScreen(),
+                        builder: (_) => const AuthPage(),
                       ),
                     );
                   },
