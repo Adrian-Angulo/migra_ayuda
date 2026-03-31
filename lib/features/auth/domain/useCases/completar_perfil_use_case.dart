@@ -7,7 +7,7 @@ class CompleteProfileUseCase {
 
   CompleteProfileUseCase(this._repository);
 
-  Future<Either<Failure, void>> call({
+  Future<Either<Failure, Unit>> call({
     required String originCountry,
     required String destinationCountry,
     required int age,

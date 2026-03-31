@@ -8,7 +8,7 @@ class RegisterUserUseCase {
 
   RegisterUserUseCase(this._repository);
 
-  Future<Either<Failure, void>> call(UserModel user) async {
+  Future<Either<Failure, Unit>> call(UserModel user) async {
     return await _repository.registerUser(user);
   }
 }
