@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
-import 'screen/home_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'screen/language_screen.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(
+    // ProviderScope es obligatorio para que Riverpod funcione
+    const ProviderScope(
+      child: MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {
@@ -16,7 +22,7 @@ class MainApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
         useMaterial3: true,
       ),
-      home: const HomeScreen(),
+      home: const LanguageScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
