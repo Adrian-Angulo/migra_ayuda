@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:migra_ayuda/core/errors/auth_failures.dart';
 import 'package:migra_ayuda/core/errors/failures.dart';
@@ -8,19 +8,19 @@ import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  final firebase_auth.FirebaseAuth _auth;
+  final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
   final GoogleSignIn googleSignIn;
 
   AuthRepositoryImpl({
-    required firebase_auth.FirebaseAuth auth,
+    required FirebaseAuth auth,
     required FirebaseFirestore firestore,
     required this.googleSignIn,
   })  : _auth = auth,
         _firestore = firestore;
 
   @override
-  Future<Either<Failure, firebase_auth.UserCredential>> authWithGoogle() async {
+  Future<Either<Failure, UserCredential>> authWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
 
@@ -31,17 +31,16 @@ class AuthRepositoryImpl implements AuthRepository {
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
 
-      final firebase_auth.OAuthCredential credential =
-          firebase_auth.GoogleAuthProvider.credential(
+      final credential = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
         accessToken: googleAuth.accessToken,
       );
 
-      final userCredential = await firebase_auth.FirebaseAuth.instance
-          .signInWithCredential(credential);
+      final userCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
 
       return Right(userCredential);
-    } on firebase_auth.FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e) {
       return Left(_mapFirebaseAuthError(e.code));
     } on FirebaseException catch (e) {
       return Left(ServerFailure(e.message ?? 'Error del servidor'));
@@ -91,7 +90,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, UserModel>> verifyOrCreateGoogleUser(
-      firebase_auth.UserCredential credential) async {
+      UserCredential credential) async {
     try {
       final uid = credential.user?.uid;
 
@@ -142,8 +141,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, firebase_auth.User>> login(
-      String email, String password) async {
+  Future<Either<Failure, User>> login(String email, String password) async {
     try {
       final credential = await _auth.signInWithEmailAndPassword(
         email: email,
@@ -159,7 +157,7 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       return Right(credential.user!);
-    } on firebase_auth.FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e) {
       return Left(_mapFirebaseAuthError(e.code));
     } catch (e) {
       return const Left(UnexpectedFailure());
@@ -182,7 +180,7 @@ class AuthRepositoryImpl implements AuthRepository {
           .set(user.toMap());
 
       return const Right(unit);
-    } on firebase_auth.FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e) {
       return Left(_mapFirebaseAuthError(e.code));
     } on FirebaseException catch (e) {
       return Left(ServerFailure(e.message ?? 'Error al registrar usuario'));
@@ -196,7 +194,7 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       await _auth.sendPasswordResetEmail(email: email);
       return const Right(unit);
-    } on firebase_auth.FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e) {
       return Left(_mapFirebaseAuthError(e.code));
     } catch (e) {
       return const Left(UnexpectedFailure());
@@ -204,7 +202,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, firebase_auth.User>> getAuthenticatedUser() async {
+  Future<Either<Failure, User>> getAuthenticatedUser() async {
     try {
       final user = _auth.currentUser;
 

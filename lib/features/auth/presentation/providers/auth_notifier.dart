@@ -8,7 +8,6 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
   @override
   Future<UserModel?> build() async {
     final result = await ref.read(getAuthenticatedUserProvider).call();
-
     return result.fold(
       (failure) => null,
       (user) => user,
