@@ -1,0 +1,11 @@
+{
+  "@@locale": "en",
+
+  "appTitle": "Start now",
+  "welcomeMessage": "Welcome!",
+  "changeLanguageButton": "Change language",
+  "currentLanguage": "Current language: English",
+  "gretting": "Hello user",
+  "exitButton": "Exit"
+  
+}

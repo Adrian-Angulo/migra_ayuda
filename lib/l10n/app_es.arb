@@ -1,0 +1,29 @@
+{
+    "@@locale": "es",
+    "appTitle": "Comenzar ahora",
+    "@appTitle": {
+        "description": "El título principal de la aplicación"
+    },
+    "welcomeMessage": "¡Bienvenido!",
+    "@welcomeMessage": {
+        "description": "Mensaje de bienvenida en la pantalla principal"
+    },
+    "changeLanguageButton": "Cambiar idioma",
+    "@changeLanguageButton": {
+        "description": "Texto del botón para cambiar el idioma"
+    },
+    "currentLanguage": "Idioma actual: Español",
+    "@currentLanguage": {
+        "description": "Muestra el idioma activo"
+    },
+    "gretting": "Hola usuario",
+    "@gretting":{
+        "description": "un parrafo corto describiendo la app"
+    },
+    "exitButton": "Salir",
+    "@exitButton":{
+        "description": "Salir"
+    }
+
+
+}

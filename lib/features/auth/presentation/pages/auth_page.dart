@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/providers/locale_provider.dart';
 import 'package:migra_ayuda/core/utils/constants.dart';
 import 'package:migra_ayuda/core/utils/widgets/mensajesWidget.dart';
 import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
@@ -9,6 +10,7 @@ import 'package:migra_ayuda/features/auth/presentation/screen/complete_info_scre
 import 'package:migra_ayuda/features/auth/presentation/screen/login_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screen/register_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/switch_button.dart';
+import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 enum AuthMode { login, register }
 
@@ -25,6 +27,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     ref.listen(
       authNotifierProvider,
       (previous, next) {
@@ -78,12 +81,30 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                           fit: BoxFit.cover,
                         ),
                       ),
-                      const Text(
-                        "Comenzar ahora",
-                        style: TextStyle(
+                      Text(
+                        l10n.gretting,
+                        style: const TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.bold,
                         ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        spacing: 16,
+                        children: [
+                          ElevatedButton(
+                              onPressed: () {
+                                ref.read(localeProvider.notifier).state =
+                                    const Locale('en');
+                              },
+                              child: const Text("Seleccionar ingles")),
+                          ElevatedButton(
+                              onPressed: () {
+                                ref.read(localeProvider.notifier).state =
+                                    const Locale('es');
+                              },
+                              child: const Text("Seleccionar español")),
+                        ],
                       ),
                       const Text(
                         "Completa tus datos para crear una cuenta",

@@ -1,0 +1,3 @@
+arb-dir: lib/l10n          # Carpeta donde vivirán tus archivos .arb
+template-arb-file: app_es.arb   # El archivo "base" (tu idioma principal)
+output-localization-file: app_localizations.dart  # El archivo que Flutter generará
