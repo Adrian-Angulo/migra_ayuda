@@ -23,13 +23,7 @@ class MainApp extends ConsumerStatefulWidget {
 }
 
 class _MainAppState extends ConsumerState<MainApp> {
-/*   Locale _locale = const Locale('en');
 
-  void changeLocale(Locale newLocale) {
-    setState(() {
-      _locale = newLocale;
-    });
-  } */
 
   @override
   Widget build(BuildContext context) {
