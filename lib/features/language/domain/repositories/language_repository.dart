@@ -1,7 +1,6 @@
-import 'package:dartz/dartz.dart';
+import 'package:flutter/material.dart';
 
 abstract class LanguageRepository {
-  Future<Either<String, Unit>> saveLanguage();
-  Future<Either<String, String?>> readLanguage();
-  Future<Either<String, Unit>> deleteLanguage();
+  Future<Locale> loadLanguage();
+  Future<void> saveLanguage(String languageCode);
 }
