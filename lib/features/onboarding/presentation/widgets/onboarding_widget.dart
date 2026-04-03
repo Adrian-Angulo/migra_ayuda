@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/features/onboarding/domain/entities/onboarding_entity.dart';
 
@@ -19,7 +18,7 @@ class OnboardingWidget extends StatelessWidget {
             data.title,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 26,
+              fontSize: 32,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
@@ -28,7 +27,7 @@ class OnboardingWidget extends StatelessWidget {
           Text(
             data.subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14, color: Colors.grey),
+            style: const TextStyle(fontSize: 16, color: Colors.grey),
           ),
         ],
       ),

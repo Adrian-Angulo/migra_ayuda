@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/features/language/presentation/screens/language_screen.dart';
 import 'package:migra_ayuda/features/onboarding/domain/entities/onboarding_entity.dart';
 import 'package:migra_ayuda/features/onboarding/presentation/providers/onboarding_provider.dart';
 import 'package:migra_ayuda/features/onboarding/presentation/widgets/onboarding_widget.dart';
@@ -18,30 +17,26 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   static const _pages = [
     OnboardingEntity(
-      imagePath: 'assets/logo/Logo.png',
-      title: '¡Bienvenido a\nMigraAyuda!',
+      imagePath: 'assets/onboarding/onboardingOne.png',
+      title: '¡Bienvenido a MigraAyuda!',
       subtitle:
           'Estamos aquí para apoyarte en tu camino.\nEncuentra la ayuda que necesitas.',
     ),
     OnboardingEntity(
-      imagePath: 'assets/logo/Logo.png',
-      title: 'Encuentra ayuda\ncerca de ti',
+      imagePath: 'assets/onboarding/onboardingTwo.png',
+      title: 'Encuentra ayuda cerca de ti',
       subtitle:
           'Localiza comedores, refugios y centros de salud en tiempo real usando tu ubicación GPS.',
     ),
     OnboardingEntity(
-      imagePath: 'assets/logo/Logo.png',
+      imagePath: 'assets/onboarding/onbardingThree.png',
       title: 'Estamos contigo',
       subtitle:
           'Puedes ver los comentarios de otros para que ingreses seguro y mires la experiencia.',
     ),
   ];
 
-  void _goToLanguage() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const LanguageScreen()),
-    );
-  }
+  void _goToLanguage() {}
 
   @override
   void dispose() {
@@ -126,11 +121,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                         curve: Curves.easeInOut,
                       );
                     } else {
+                      // Completar onboarding y dejar que StartPage maneje la navegación
                       await ref
                           .read(onboardingProvider.notifier)
                           .completeOnboarding();
-
-                      _goToLanguage();
                     }
                   },
                   style: ElevatedButton.styleFrom(

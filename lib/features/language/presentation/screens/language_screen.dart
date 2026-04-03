@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/auth_page.dart';
 import 'package:migra_ayuda/features/language/presentation/providers/language_provider.dart';
 import 'package:migra_ayuda/features/language/presentation/widgets/language_option.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/auth_page.dart';
 
-class LanguageScreen extends ConsumerWidget {
+class LanguageScreen extends ConsumerStatefulWidget {
   const LanguageScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentLocale = ref.watch(languageProvider);
+  ConsumerState<LanguageScreen> createState() => _LanguageScreenState();
+}
 
+class _LanguageScreenState extends ConsumerState<LanguageScreen> {
+  String selected = "es";
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -52,9 +57,11 @@ class LanguageScreen extends ConsumerWidget {
                 flag: '🇪🇸',
                 name: 'Español',
                 subtitle: 'Spanish',
-                isSelected: currentLocale.languageCode == 'es',
+                isSelected: selected == 'es',
                 onTap: () {
-                  ref.read(languageProvider.notifier).changeLanguage('es');
+                  setState(() {
+                    selected = 'es';
+                  });
                 },
               ),
               const SizedBox(height: 12),
@@ -62,21 +69,25 @@ class LanguageScreen extends ConsumerWidget {
                 flag: '🇬🇧',
                 name: 'English',
                 subtitle: 'Inglés',
-                isSelected: currentLocale.languageCode == 'en',
+                isSelected: selected == 'en',
                 onTap: () {
-                  ref.read(languageProvider.notifier).changeLanguage('en');
+                  setState(() {
+                    selected = 'en';
+                  });
                 },
               ),
               const SizedBox(height: 48),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: (_) => const AuthPage(),
-                      ),
-                    );
+                  onPressed: () async {
+                    // Guardar idioma seleccionado y marcar como completado
+                    await ref
+                        .read(languageProvider.notifier)
+                        .changeLanguage(selected);
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => const AuthPage(),
+                    ));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF64999A),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/core/providers/locale_provider.dart';
+
 import 'package:migra_ayuda/core/utils/constants.dart';
 import 'package:migra_ayuda/core/utils/widgets/mensajesWidget.dart';
 import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
@@ -72,44 +72,27 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                 children: [
                   Column(
                     children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(30),
-                        child: Image.asset(
-                          'assets/logo/Logo.png',
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
+                      const SizedBox(
+                        height: 16,
                       ),
-                      Text(
-                        l10n.gretting,
-                        style: const TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Image.asset(
+                        'assets/logo/Logo.png',
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        spacing: 16,
-                        children: [
-                          ElevatedButton(
-                              onPressed: () {
-                                ref.read(localeProvider.notifier).state =
-                                    const Locale('en');
-                              },
-                              child: const Text("Seleccionar ingles")),
-                          ElevatedButton(
-                              onPressed: () {
-                                ref.read(localeProvider.notifier).state =
-                                    const Locale('es');
-                              },
-                              child: const Text("Seleccionar español")),
-                        ],
+                      Image.asset(
+                        "assets/logo/MigraAyuda.png",
+                        width: 200,
+                      ),
+                      const SizedBox(
+                        height: 16,
                       ),
                       const Text(
-                        "Completa tus datos para crear una cuenta",
+                        textAlign: TextAlign.center,
+                        "Crea una cuenta o inicia sesión para explorar nuestra aplicación",
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           color: Color.fromRGBO(108, 114, 120, 1),
                         ),
                       ),
@@ -148,9 +131,10 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  mode == AuthMode.login
-                      ? const LoginScreen()
-                      : const RegisterScreen(),
+                  if (mode == AuthMode.login)
+                    const LoginScreen()
+                  else
+                    const RegisterScreen(),
                 ],
               ),
             ),
