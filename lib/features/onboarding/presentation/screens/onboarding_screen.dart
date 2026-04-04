@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/onboarding/domain/entities/onboarding_entity.dart';
 import 'package:migra_ayuda/features/onboarding/presentation/providers/onboarding_provider.dart';
 import 'package:migra_ayuda/features/onboarding/presentation/widgets/onboarding_widget.dart';
+import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -15,29 +16,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final PageController _controller = PageController();
   int _currentPage = 0;
 
-  static const _pages = [
-    OnboardingEntity(
-      imagePath: 'assets/onboarding/onboardingOne.png',
-      title: '¡Bienvenido a MigraAyuda!',
-      subtitle:
-          'Estamos aquí para apoyarte en tu camino.\nEncuentra la ayuda que necesitas.',
-    ),
-    OnboardingEntity(
-      imagePath: 'assets/onboarding/onboardingTwo.png',
-      title: 'Encuentra ayuda cerca de ti',
-      subtitle:
-          'Localiza comedores, refugios y centros de salud en tiempo real usando tu ubicación GPS.',
-    ),
-    OnboardingEntity(
-      imagePath: 'assets/onboarding/onbardingThree.png',
-      title: 'Estamos contigo',
-      subtitle:
-          'Puedes ver los comentarios de otros para que ingreses seguro y mires la experiencia.',
-    ),
-  ];
-
-  void _goToLanguage() {}
-
   @override
   void dispose() {
     _controller.dispose();
@@ -46,7 +24,26 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isLast = _currentPage == _pages.length - 1;
+    final l10n = AppLocalizations.of(context)!;
+    final isLast = _currentPage == 2;
+
+    final pages = [
+      OnboardingEntity(
+        imagePath: 'assets/onboarding/onboardingOne.png',
+        title: l10n.onboardingTitle1,
+        subtitle: l10n.onboardingSubtitle1,
+      ),
+      OnboardingEntity(
+        imagePath: 'assets/onboarding/onboardingTwo.png',
+        title: l10n.onboardingTitle2,
+        subtitle: l10n.onboardingSubtitle2,
+      ),
+      OnboardingEntity(
+        imagePath: 'assets/onboarding/onbardingThree.png',
+        title: l10n.onboardingTitle3,
+        subtitle: l10n.onboardingSubtitle3,
+      ),
+    ];
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -59,7 +56,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               child: Padding(
                 padding: const EdgeInsets.only(top: 12, right: 16),
                 child: TextButton(
-                  onPressed: _goToLanguage,
+                  onPressed: () async {
+                    await ref
+                        .read(onboardingProvider.notifier)
+                        .completeOnboarding();
+                  },
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.grey.shade100,
                     shape: RoundedRectangleBorder(
@@ -68,9 +69,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   ),
-                  child: const Text(
-                    'Omitir',
-                    style: TextStyle(color: Colors.black87, fontSize: 13),
+                  child: Text(
+                    l10n.skipButton,
+                    style: const TextStyle(color: Colors.black87, fontSize: 13),
                   ),
                 ),
               ),
@@ -80,9 +81,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             Expanded(
               child: PageView.builder(
                 controller: _controller,
-                itemCount: _pages.length,
+                itemCount: pages.length,
                 onPageChanged: (i) => setState(() => _currentPage = i),
-                itemBuilder: (_, i) => OnboardingWidget(data: _pages[i]),
+                itemBuilder: (_, i) => OnboardingWidget(data: pages[i]),
               ),
             ),
 
@@ -90,7 +91,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
-                _pages.length,
+                pages.length,
                 (i) => AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -115,7 +116,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () async {
-                    if (_currentPage < _pages.length - 1) {
+                    if (_currentPage < pages.length - 1) {
                       _controller.nextPage(
                         duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut,
@@ -136,7 +137,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     ),
                   ),
                   child: Text(
-                    isLast ? 'Empezar' : 'Siguiente',
+                    isLast ? l10n.startButton : l10n.nextButton,
                     style: const TextStyle(fontSize: 16),
                   ),
                 ),

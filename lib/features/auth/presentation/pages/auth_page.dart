@@ -88,10 +88,10 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                       const SizedBox(
                         height: 16,
                       ),
-                      const Text(
+                      Text(
                         textAlign: TextAlign.center,
-                        "Crea una cuenta o inicia sesión para explorar nuestra aplicación",
-                        style: TextStyle(
+                        l10n.authWelcomeText,
+                        style: const TextStyle(
                           fontSize: 16,
                           color: Color.fromRGBO(108, 114, 120, 1),
                         ),
@@ -112,7 +112,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                       children: [
                         Expanded(
                           child: SwitchButton(
-                            text: "Iniciar sesión",
+                            text: l10n.loginTab,
                             isActive: mode == AuthMode.login,
                             onTap: () => setState(() {
                               mode = AuthMode.login;
@@ -121,7 +121,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                         ),
                         Expanded(
                           child: SwitchButton(
-                              text: "Registrarse",
+                              text: l10n.registerTab,
                               isActive: mode == AuthMode.register,
                               onTap: () => setState(() {
                                     mode = AuthMode.register;

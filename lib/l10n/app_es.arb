@@ -17,13 +17,169 @@
         "description": "Muestra el idioma activo"
     },
     "gretting": "Hola usuario",
-    "@gretting":{
+    "@gretting": {
         "description": "un parrafo corto describiendo la app"
     },
     "exitButton": "Salir",
-    "@exitButton":{
+    "@exitButton": {
         "description": "Salir"
+    },
+    "onboardingTitle1": "¡Bienvenido a MigraAyuda!",
+    "@onboardingTitle1": {
+        "description": "Título de la primera página de onboarding"
+    },
+    "onboardingSubtitle1": "Estamos aquí para apoyarte en tu camino.\nEncuentra la ayuda que necesitas.",
+    "@onboardingSubtitle1": {
+        "description": "Subtítulo de la primera página de onboarding"
+    },
+    "onboardingTitle2": "Encuentra ayuda cerca de ti",
+    "@onboardingTitle2": {
+        "description": "Título de la segunda página de onboarding"
+    },
+    "onboardingSubtitle2": "Localiza comedores, refugios y centros de salud en tiempo real usando tu ubicación GPS.",
+    "@onboardingSubtitle2": {
+        "description": "Subtítulo de la segunda página de onboarding"
+    },
+    "onboardingTitle3": "Estamos contigo",
+    "@onboardingTitle3": {
+        "description": "Título de la tercera página de onboarding"
+    },
+    "onboardingSubtitle3": "Puedes ver los comentarios de otros para que ingreses seguro y mires la experiencia.",
+    "@onboardingSubtitle3": {
+        "description": "Subtítulo de la tercera página de onboarding"
+    },
+    "skipButton": "Omitir",
+    "@skipButton": {
+        "description": "Botón para omitir el onboarding"
+    },
+    "nextButton": "Siguiente",
+    "@nextButton": {
+        "description": "Botón para ir a la siguiente página"
+    },
+    "startButton": "Empezar",
+    "@startButton": {
+        "description": "Botón para empezar a usar la aplicación"
+    },
+    "selectLanguageTitle": "Seleccionar Idioma",
+    "@selectLanguageTitle": {
+        "description": "Título de la pantalla de selección de idioma"
+    },
+    "selectLanguageSubtitle": "Select Language",
+    "@selectLanguageSubtitle": {
+        "description": "Subtítulo en inglés de la pantalla de selección de idioma"
+    },
+    "chooseLanguageHint": "Elige tu idioma para continuar\nChoose your language to continue",
+    "@chooseLanguageHint": {
+        "description": "Texto de ayuda para elegir idioma"
+    },
+    "continueButton": "Continuar / Continue",
+    "@continueButton": {
+        "description": "Botón para continuar"
+    },
+    "spanish": "Español",
+    "@spanish": {
+        "description": "Nombre del idioma español"
+    },
+    "english": "English",
+    "@english": {
+        "description": "Nombre del idioma inglés"
+    },
+    "authWelcomeText": "Crea una cuenta o inicia sesión para explorar nuestra aplicación",
+    "@authWelcomeText": {
+        "description": "Texto de bienvenida en la página de autenticación"
+    },
+    "loginTab": "Iniciar sesión",
+    "@loginTab": {
+        "description": "Pestaña de inicio de sesión"
+    },
+    "registerTab": "Registrarse",
+    "@registerTab": {
+        "description": "Pestaña de registro"
+    },
+    "emailText": "Correo electronico",
+    "@emailText": {
+        "description": "label correo electronico"
+    },
+    "password": "Contraseña",
+    "@password": {
+        "description": "label para contraseña"
+    },
+    "resetPassword": "Olvidaste tu contraseña",
+    "@resetPassword": {
+        "description": "label olvidades tu contraseña"
+    },
+    "googleText": "Continuar con Google",
+    "@googleText": {
+        "description": "texto para boton continuar con google"
+    },
+    "firstName": "Nombre",
+    "@firstName": {
+        "description": "label para nombre"
+    },
+    "lastName": "Apellido",
+    "@lastName": {
+        "description": "label para apellido"
+    },
+    "originCountry": "País de origen",
+    "@originCountry": {
+        "description": "label para país de origen"
+    },
+    "chooseAnOption": "Elegir una opción",
+    "@chooseAnOption": {
+        "description": "label para elegir una opción"
+    },
+    "destinationCountry": "País de destino",
+    "@destinationCountry": {
+        "description": "label para país de destino"
+    },
+    "age": "Edad",
+    "@age": {
+        "description": "label para edad"
+    },
+    "confirmPassword": "Confirmación de contraseña",
+    "@confirmPassword": {
+        "description": "label para confirmación de contraseña"
+    },
+    "iAccept": "Acepto los",
+    "@iAccept": {
+        "description": "texto previo a los enlaces de términos y política"
+    },
+    "termsAndConditions": "Términos y condiciones de uso",
+    "@termsAndConditions": {
+        "description": "enlace a términos y condiciones de uso"
+    },
+    "and": "y la",
+    "@and": {
+        "description": "conector entre términos y política de privacidad"
+    },
+    "privacyPolicy": "Política de privacidad",
+    "@privacyPolicy": {
+        "description": "enlace a política de privacidad"
     }
-
-
+    
+,
+    "resetPasswordEmailHint": "Introduce tu correo para recibir un enlace y restablecer tu contraseña",
+    "@resetPasswordEmailHint": {
+        "description": "Texto de ayuda para ingresar el correo en la pantalla de restablecimiento de contraseña"
+    },
+    "sendLinkButton": "Enviar enlace",
+    "@sendLinkButton": {
+        "description": "Botón para enviar el enlace de restablecimiento de contraseña"
+    },
+    "backToLoginButton": "Volver al inicio",
+    "@backToLoginButton": {
+        "description": "Botón para volver a la pantalla de inicio de sesión"
+    },
+    "linkSentTitle": "Enlace enviado",
+    "@linkSentTitle": {
+        "description": "Título que indica que el enlace fue enviado"
+    },
+    "linkSentMessage": "Te hemos enviado un enlace para restablecer tu contraseña. Revisa tu bandeja de entrada y también tu carpeta de spam. Recuerda que el correo debe estar registrado en el sistema.",
+    "@linkSentMessage": {
+        "description": "Mensaje informativo tras enviar el enlace de restablecimiento"
+    },
+    "spamReminder": "Si no encuentras el correo, revisa tu carpeta de spam o correo no deseado",
+    "@spamReminder": {
+        "description": "Recordatorio para revisar la carpeta de spam si no se encuentra el correo"
+    }
 }

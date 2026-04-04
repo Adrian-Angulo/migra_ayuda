@@ -133,6 +133,114 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Salir'**
   String get exitButton;
+
+  /// Título de la primera página de onboarding
+  ///
+  /// In es, this message translates to:
+  /// **'¡Bienvenido a MigraAyuda!'**
+  String get onboardingTitle1;
+
+  /// Subtítulo de la primera página de onboarding
+  ///
+  /// In es, this message translates to:
+  /// **'Estamos aquí para apoyarte en tu camino.\nEncuentra la ayuda que necesitas.'**
+  String get onboardingSubtitle1;
+
+  /// Título de la segunda página de onboarding
+  ///
+  /// In es, this message translates to:
+  /// **'Encuentra ayuda cerca de ti'**
+  String get onboardingTitle2;
+
+  /// Subtítulo de la segunda página de onboarding
+  ///
+  /// In es, this message translates to:
+  /// **'Localiza comedores, refugios y centros de salud en tiempo real usando tu ubicación GPS.'**
+  String get onboardingSubtitle2;
+
+  /// Título de la tercera página de onboarding
+  ///
+  /// In es, this message translates to:
+  /// **'Estamos contigo'**
+  String get onboardingTitle3;
+
+  /// Subtítulo de la tercera página de onboarding
+  ///
+  /// In es, this message translates to:
+  /// **'Puedes ver los comentarios de otros para que ingreses seguro y mires la experiencia.'**
+  String get onboardingSubtitle3;
+
+  /// Botón para omitir el onboarding
+  ///
+  /// In es, this message translates to:
+  /// **'Omitir'**
+  String get skipButton;
+
+  /// Botón para ir a la siguiente página
+  ///
+  /// In es, this message translates to:
+  /// **'Siguiente'**
+  String get nextButton;
+
+  /// Botón para empezar a usar la aplicación
+  ///
+  /// In es, this message translates to:
+  /// **'Empezar'**
+  String get startButton;
+
+  /// Título de la pantalla de selección de idioma
+  ///
+  /// In es, this message translates to:
+  /// **'Seleccionar Idioma'**
+  String get selectLanguageTitle;
+
+  /// Subtítulo en inglés de la pantalla de selección de idioma
+  ///
+  /// In es, this message translates to:
+  /// **'Select Language'**
+  String get selectLanguageSubtitle;
+
+  /// Texto de ayuda para elegir idioma
+  ///
+  /// In es, this message translates to:
+  /// **'Elige tu idioma para continuar\nChoose your language to continue'**
+  String get chooseLanguageHint;
+
+  /// Botón para continuar
+  ///
+  /// In es, this message translates to:
+  /// **'Continuar / Continue'**
+  String get continueButton;
+
+  /// Nombre del idioma español
+  ///
+  /// In es, this message translates to:
+  /// **'Español'**
+  String get spanish;
+
+  /// Nombre del idioma inglés
+  ///
+  /// In es, this message translates to:
+  /// **'English'**
+  String get english;
+
+  /// Texto de bienvenida en la página de autenticación
+  ///
+  /// In es, this message translates to:
+  /// **'Crea una cuenta o inicia sesión para explorar nuestra aplicación'**
+  String get authWelcomeText;
+
+  /// Pestaña de inicio de sesión
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciar sesión'**
+  String get loginTab;
+
+  /// Pestaña de registro
+  ///
+  /// In es, this message translates to:
+  /// **'Registrarse'**
+  String get registerTab;
 }
 
 class _AppLocalizationsDelegate
