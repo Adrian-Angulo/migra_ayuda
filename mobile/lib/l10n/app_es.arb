@@ -1,0 +1,403 @@
+{
+    "@@locale": "es",
+    "appTitle": "Comenzar ahora",
+    "@appTitle": {
+        "description": "El título principal de la aplicación"
+    },
+    "welcomeMessage": "¡Bienvenido!",
+    "@welcomeMessage": {
+        "description": "Mensaje de bienvenida en la pantalla principal"
+    },
+    "changeLanguageButton": "Cambiar idioma",
+    "@changeLanguageButton": {
+        "description": "Texto del botón para cambiar el idioma"
+    },
+    "currentLanguage": "Idioma actual: Español",
+    "@currentLanguage": {
+        "description": "Muestra el idioma activo"
+    },
+    "gretting": "Hola usuario",
+    "@gretting": {
+        "description": "un parrafo corto describiendo la app"
+    },
+    "exitButton": "Salir",
+    "@exitButton": {
+        "description": "Salir"
+    },
+    "onboardingTitle1": "¡Bienvenido a MigraAyuda!",
+    "@onboardingTitle1": {
+        "description": "Título de la primera página de onboarding"
+    },
+    "onboardingSubtitle1": "Estamos aquí para apoyarte en tu camino.\nEncuentra la ayuda que necesitas.",
+    "@onboardingSubtitle1": {
+        "description": "Subtítulo de la primera página de onboarding"
+    },
+    "onboardingTitle2": "Encuentra ayuda cerca de ti",
+    "@onboardingTitle2": {
+        "description": "Título de la segunda página de onboarding"
+    },
+    "onboardingSubtitle2": "Localiza comedores, refugios y centros de salud en tiempo real usando tu ubicación GPS.",
+    "@onboardingSubtitle2": {
+        "description": "Subtítulo de la segunda página de onboarding"
+    },
+    "onboardingTitle3": "Estamos contigo",
+    "@onboardingTitle3": {
+        "description": "Título de la tercera página de onboarding"
+    },
+    "onboardingSubtitle3": "Puedes ver los comentarios de otros para que ingreses seguro y mires la experiencia.",
+    "@onboardingSubtitle3": {
+        "description": "Subtítulo de la tercera página de onboarding"
+    },
+    "skipButton": "Omitir",
+    "@skipButton": {
+        "description": "Botón para omitir el onboarding"
+    },
+    "nextButton": "Siguiente",
+    "@nextButton": {
+        "description": "Botón para ir a la siguiente página"
+    },
+    "startButton": "Empezar",
+    "@startButton": {
+        "description": "Botón para empezar a usar la aplicación"
+    },
+    "selectLanguageTitle": "Seleccionar Idioma",
+    "@selectLanguageTitle": {
+        "description": "Título de la pantalla de selección de idioma"
+    },
+    "selectLanguageSubtitle": "Select Language",
+    "@selectLanguageSubtitle": {
+        "description": "Subtítulo en inglés de la pantalla de selección de idioma"
+    },
+    "chooseLanguageHint": "Elige tu idioma para continuar\nChoose your language to continue",
+    "@chooseLanguageHint": {
+        "description": "Texto de ayuda para elegir idioma"
+    },
+    "continueButton": "Continuar / Continue",
+    "@continueButton": {
+        "description": "Botón para continuar"
+    },
+    "spanish": "Español",
+    "@spanish": {
+        "description": "Nombre del idioma español"
+    },
+    "english": "English",
+    "@english": {
+        "description": "Nombre del idioma inglés"
+    },
+    "authWelcomeText": "Crea una cuenta o inicia sesión para explorar nuestra aplicación",
+    "@authWelcomeText": {
+        "description": "Texto de bienvenida en la página de autenticación"
+    },
+    "loginTab": "Iniciar sesión",
+    "@loginTab": {
+        "description": "Pestaña de inicio de sesión"
+    },
+    "registerTab": "Registrarse",
+    "@registerTab": {
+        "description": "Pestaña de registro"
+    },
+    "emailText": "Correo electrónico",
+    "@emailText": {
+        "description": "label correo electronico"
+    },
+    "password": "Contraseña",
+    "@password": {
+        "description": "label para contraseña"
+    },
+    "resetPassword": "¿Olvidaste tu contraseña?",
+    "@resetPassword": {
+        "description": "label olvidades tu contraseña"
+    },
+    "googleText": "Continuar con Google",
+    "@googleText": {
+        "description": "texto para boton continuar con google"
+    },
+    "firstName": "Nombre",
+    "@firstName": {
+        "description": "label para nombre"
+    },
+    "lastName": "Apellido",
+    "@lastName": {
+        "description": "label para apellido"
+    },
+    "originCountry": "País de origen",
+    "@originCountry": {
+        "description": "label para país de origen"
+    },
+    "chooseAnOption": "Elige una opción",
+    "@chooseAnOption": {
+        "description": "label para elegir una opción"
+    },
+    "destinationCountry": "País de destino",
+    "@destinationCountry": {
+        "description": "label para país de destino"
+    },
+    "age": "Edad",
+    "@age": {
+        "description": "label para edad"
+    },
+    "confirmPassword": "Confirmar contraseña",
+    "@confirmPassword": {
+        "description": "label para confirmación de contraseña"
+    },
+    "iAccept": "Acepto los",
+    "@iAccept": {
+        "description": "texto previo a los enlaces de términos y política"
+    },
+    "termsAndConditions": "términos y condiciones de uso",
+    "@termsAndConditions": {
+        "description": "enlace a términos y condiciones de uso"
+    },
+    "and": "y la",
+    "@and": {
+        "description": "conector entre términos y política de privacidad"
+    },
+    "privacyPolicy": "política de privacidad",
+    "@privacyPolicy": {
+        "description": "enlace a política de privacidad"
+    },
+    "resetPasswordTitle": "¿Olvidaste tu contraseña?",
+    "@resetPasswordTitle": {
+        "description": "Título de la pantalla de restablecimiento de contraseña"
+    },
+    "resetPasswordEmailHint": "Introduce tu correo para recibir un enlace y restablecer tu contraseña",
+    "@resetPasswordEmailHint": {
+        "description": "Texto de ayuda para ingresar el correo en la pantalla de restablecimiento de contraseña"
+    },
+    "sendLinkButton": "Enviar enlace",
+    "@sendLinkButton": {
+        "description": "Botón para enviar el enlace de restablecimiento de contraseña"
+    },
+    "backToLoginButton": "Volver al inicio de sesión",
+    "@backToLoginButton": {
+        "description": "Botón para volver a la pantalla de inicio de sesión"
+    },
+    "linkSentTitle": "¡Enlace enviado!",
+    "@linkSentTitle": {
+        "description": "Título que indica que el enlace fue enviado"
+    },
+    "linkSentMessage": "Te hemos enviado un enlace para restablecer tu contraseña. Revisa tu bandeja de entrada y también tu carpeta de spam. Recuerda que el correo debe estar registrado en el sistema",
+    "@linkSentMessage": {
+        "description": "Mensaje informativo tras enviar el enlace de restablecimiento"
+    },
+    "spamReminder": "Si no encuentras el correo, revisa tu carpeta de spam o correo no deseado.",
+    "@spamReminder": {
+        "description": "Recordatorio para revisar la carpeta de spam si no se encuentra el correo"
+    },
+    "emailHint": "Ej. usuario@gmail.com",
+    "@emailHint": {
+        "description": "Hint para el campo de correo electrónico"
+    },
+    "firstNameHint": "Juan",
+    "@firstNameHint": {
+        "description": "Hint para el campo de nombre"
+    },
+    "lastNameHint": "Castillo",
+    "@lastNameHint": {
+        "description": "Hint para el campo de apellido"
+    },
+    "ageHint": "Ej. 24",
+    "@ageHint": {
+        "description": "Hint para el campo de edad"
+    },
+    "passwordHint": "••••••••",
+    "@passwordHint": {
+        "description": "Hint para el campo de contraseña"
+    },
+    "emailResetHint": "migraAyuda@correo.com",
+    "@emailResetHint": {
+        "description": "Hint para el campo de correo en reset password"
+    },
+    "orDivider": "O",
+    "@orDivider": {
+        "description": "Texto divisor entre opciones de autenticación"
+    },
+    "loginButton": "Iniciar Sesión",
+    "@loginButton": {
+        "description": "Botón para iniciar sesión"
+    },
+    "completeInfoTitle": "Completar información",
+    "@completeInfoTitle": {
+        "description": "Título de la pantalla de completar información"
+    },
+    "completeInfoButton": "Completar Información",
+    "@completeInfoButton": {
+        "description": "Botón para completar información"
+    },
+    "cancelButton": "Cancelar",
+    "@cancelButton": {
+        "description": "Botón para cancelar"
+    },
+    "homeTab": "Inicio",
+    "@homeTab": {
+        "description": "Tab de inicio en navegación"
+    },
+    "exploreTab": "Explorar",
+    "@exploreTab": {
+        "description": "Tab de explorar en navegación"
+    },
+    "profileTab": "Perfil",
+    "@profileTab": {
+        "description": "Tab de perfil en navegación"
+    },
+    "entitiesTab": "Entidades",
+    "@entitiesTab": {
+        "description": "Tab de entidades en navegación admin"
+    },
+    "servicesTab": "Servicios",
+    "@servicesTab": {
+        "description": "Tab de servicios en navegación admin"
+    },
+    "usersTab": "Usuarios",
+    "@usersTab": {
+        "description": "Tab de usuarios en navegación admin"
+    },
+    "editProfile": "Editar Perfil",
+    "@editProfile": {
+        "description": "Opción para editar perfil"
+    },
+    "changeLanguage": "Cambiar Idioma",
+    "@changeLanguage": {
+        "description": "Opción para cambiar idioma"
+    },
+    "logout": "Cerrar Sesión",
+    "@logout": {
+        "description": "Opción para cerrar sesión"
+    },
+    "migrantRole": "Migrante",
+    "@migrantRole": {
+        "description": "Rol de migrante"
+    },
+    "adminRole": "Administrador",
+    "@adminRole": {
+        "description": "Rol de administrador"
+    },
+    "originLabel": "Origen",
+    "@originLabel": {
+        "description": "Label para país de origen en perfil"
+    },
+    "destinationLabel": "Destino",
+    "@destinationLabel": {
+        "description": "Label para país de destino en perfil"
+    },
+    "welcomeToExplore": "Bienvenido a explorar",
+    "@welcomeToExplore": {
+        "description": "Mensaje de bienvenida en pantalla explorar"
+    },
+    "welcomeToHome": "Bienvenido al inicio",
+    "@welcomeToHome": {
+        "description": "Mensaje de bienvenida en pantalla inicio"
+    },
+    "noData": "No data",
+    "@noData": {
+        "description": "Texto cuando no hay datos disponibles"
+    },
+    "errorEmailRequired": "El correo es obligatorio",
+    "@errorEmailRequired": {
+        "description": "Error de validación: correo requerido"
+    },
+    "errorEmailInvalid": "Ingresa un correo válido",
+    "@errorEmailInvalid": {
+        "description": "Error de validación: formato de correo inválido"
+    },
+    "errorPasswordRequired": "La contraseña es obligatoria",
+    "@errorPasswordRequired": {
+        "description": "Error de validación: contraseña requerida"
+    },
+    "errorPasswordMinLength": "La contraseña debe tener al menos 8 caracteres",
+    "@errorPasswordMinLength": {
+        "description": "Error de validación: contraseña muy corta"
+    },
+    "errorPasswordMinLength2": "Debe tener mínimo 8 caracteres",
+    "@errorPasswordMinLength2": {
+        "description": "Error de validación: contraseña muy corta (versión corta)"
+    },
+    "errorFirstNameRequired": "Por favor ingresa tu nombre",
+    "@errorFirstNameRequired": {
+        "description": "Error de validación: nombre requerido"
+    },
+    "errorLastNameRequired": "Por favor ingresa tu apellido",
+    "@errorLastNameRequired": {
+        "description": "Error de validación: apellido requerido"
+    },
+    "errorConfirmPasswordRequired": "Por favor confirma tu contraseña",
+    "@errorConfirmPasswordRequired": {
+        "description": "Error de validación: confirmación de contraseña requerida"
+    },
+    "errorPasswordsNotMatch": "Las contraseñas no coinciden",
+    "@errorPasswordsNotMatch": {
+        "description": "Error de validación: contraseñas no coinciden"
+    },
+    "errorSelectOption": "Por favor selecciona una opción",
+    "@errorSelectOption": {
+        "description": "Error de validación: opción no seleccionada"
+    },
+    "errorAgeRequired": "Por favor ingresa tu edad",
+    "@errorAgeRequired": {
+        "description": "Error de validación: edad requerida"
+    },
+    "errorAgeRange": "Edad debe ser entre 18 y 100 años",
+    "@errorAgeRange": {
+        "description": "Error de validación: edad fuera de rango"
+    },
+    "errorEmailFormat": "Formato de correo inválido",
+    "@errorEmailFormat": {
+        "description": "Error de validación: formato de correo inválido"
+    },
+    "errorEnterEmail": "Por favor ingresa tu correo electrónico",
+    "@errorEnterEmail": {
+        "description": "Error de validación: correo electrónico requerido"
+    },
+    "errorAcceptTerms": "Debes aceptar los términos y condiciones",
+    "@errorAcceptTerms": {
+        "description": "Error: términos y condiciones no aceptados"
+    },
+    "successRegistration": "¡Registro exitoso! Verifica tu correo para iniciar sesión. Si no lo encuentras, revisa tu carpeta de spam.",
+    "@successRegistration": {
+        "description": "Mensaje de éxito tras registro"
+    },
+    "authErrorEmailInUse": "Este correo ya está registrado",
+    "@authErrorEmailInUse": {
+        "description": "Error: correo ya registrado"
+    },
+    "authErrorInvalidCredential": "Correo o contraseña incorrecta",
+    "@authErrorInvalidCredential": {
+        "description": "Error: credenciales inválidas"
+    },
+    "authErrorInvalidEmail": "El correo no es válido",
+    "@authErrorInvalidEmail": {
+        "description": "Error: correo no válido"
+    },
+    "authErrorWeakPassword": "La contraseña es demasiado débil",
+    "@authErrorWeakPassword": {
+        "description": "Error: contraseña débil"
+    },
+    "authErrorEmailNotVerified": "Debes verificar tu correo para iniciar sesión",
+    "@authErrorEmailNotVerified": {
+        "description": "Error: correo no verificado"
+    },
+    "authErrorUserNotFound": "El usuario no se encuentra registrado",
+    "@authErrorUserNotFound": {
+        "description": "Error: usuario no encontrado"
+    },
+    "authErrorOperationCancelled": "Se canceló la operación",
+    "@authErrorOperationCancelled": {
+        "description": "Error: operación cancelada"
+    },
+    "authErrorOperationNotAllowed": "Operación no permitida",
+    "@authErrorOperationNotAllowed": {
+        "description": "Error: operación no permitida"
+    },
+    "authErrorNetwork": "Error de conexión a internet",
+    "@authErrorNetwork": {
+        "description": "Error: sin conexión"
+    },
+    "authErrorUnexpected": "Ocurrió un error inesperado",
+    "@authErrorUnexpected": {
+        "description": "Error: error inesperado"
+    },
+    "authErrorUserDataNotFound": "No se encontraron datos del usuario",
+    "@authErrorUserDataNotFound": {
+        "description": "Error: datos de usuario no encontrados"
+    }
+}

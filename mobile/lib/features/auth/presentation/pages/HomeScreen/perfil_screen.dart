@@ -1,0 +1,186 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:migra_ayuda/l10n/app_localizations.dart';
+
+class PerfilScreen extends ConsumerWidget {
+  const PerfilScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final UserModel? usu = ref.read(authNotifierProvider).value;
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F6F7),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 30),
+
+                // Avatar
+                Container(
+                  width: 90,
+                  height: 90,
+                  decoration: BoxDecoration(
+                    color: Colors.orange.shade100,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Center(
+                    child: Text(
+                      "CM",
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orange.shade700,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Nombre
+                Text(
+                  usu?.name ?? l10n.noData,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 5),
+
+                Text(
+                  usu?.email ?? l10n.noData,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  l10n.migrantRole,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Chips de información
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _InfoChip(label: l10n.originLabel, value: "Venezuela"),
+                    const SizedBox(width: 10),
+                    _InfoChip(label: l10n.destinationLabel, value: "Perú"),
+                    const SizedBox(width: 10),
+                    _InfoChip(label: l10n.age, value: "24"),
+                  ],
+                ),
+
+                const SizedBox(height: 40),
+
+                // Opciones
+                _ProfileOption(
+                  icon: Icons.edit_outlined,
+                  text: l10n.editProfile,
+                  onTap: () {},
+                ),
+
+                _ProfileOption(
+                  icon: Icons.language_outlined,
+                  text: l10n.changeLanguage,
+                  onTap: () {},
+                ),
+
+                _ProfileOption(
+                  icon: Icons.logout,
+                  text: l10n.logout,
+                  onTap: () async {
+                    await ref.read(authNotifierProvider.notifier).logout();
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+//widget
+class _InfoChip extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _InfoChip({
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProfileOption extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final VoidCallback onTap;
+
+  const _ProfileOption({
+    required this.icon,
+    required this.text,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        ListTile(
+          leading: Icon(icon, color: Colors.grey.shade700),
+          title: Text(
+            text,
+            style: const TextStyle(fontWeight: FontWeight.w500),
+          ),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: onTap,
+        ),
+        const Divider(),
+      ],
+    );
+  }
+}
