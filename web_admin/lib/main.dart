@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:migra_ayuda_administracion/features/auth/presentation/screens/home_screen.dart';
 import 'package:migra_ayuda_administracion/features/auth/presentation/screens/login_screen.dart';
 
 void main() {
@@ -10,7 +11,6 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -18,7 +18,7 @@ class MainApp extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: const Scaffold(body: LoginScreen()),
+      home: const HomeScreen(),
     );
   }
 }
