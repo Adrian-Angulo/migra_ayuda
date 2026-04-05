@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda_administracion/features/auth/presentation/screens/recuperar_contrase%C3%B1a/send_email_screen.dart';
-import 'package:migra_ayuda_administracion/features/auth/presentation/widgets/button_google_widget.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda_administracion/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:migra_ayuda_administracion/features/auth/presentation/screens/recuperar_contraseña/send_email_screen.dart';
+
 import 'package:migra_ayuda_administracion/features/auth/presentation/widgets/button_widget.dart';
 import 'package:migra_ayuda_administracion/features/auth/presentation/widgets/text_fiel_pasword_widget.dart';
 import 'package:migra_ayuda_administracion/features/auth/presentation/widgets/text_fiel_widget.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passController = TextEditingController();
@@ -35,6 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
     final isWide = screenWidth > 600;
     final isDesktop = screenWidth > 1024;
+    final authState = ref.watch(authNotifierProvider);
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       body: Row(
@@ -220,40 +223,22 @@ class _LoginScreenState extends State<LoginScreen> {
                                 const SizedBox(height: 4),
                                 ButtonWidget(
                                   formKey: formKey,
-                                  loading: false,
+                                  loading: authState.isLoading,
                                   text: "Iniciar sesión",
                                   onPressed: () async {
                                     if (formKey.currentState!.validate()) {
+                                      
+                                      ref
+                                          .read(authNotifierProvider.notifier)
+                                          .login(
+                                            emailController.text,
+                                            passController.text,
+                                          );
                                       cleanControllar();
                                     }
                                   },
                                 ),
                                 const SizedBox(height: 24),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Divider(color: Colors.grey[300]),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                      ),
-                                      child: Text(
-                                        "o continúa con",
-                                        style: TextStyle(
-                                          color: Colors.grey[500],
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Divider(color: Colors.grey[300]),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 20),
-                                ButtonGoogleWidget(onPressed: () {}),
-                                const SizedBox(height: 4),
                               ],
                             ),
                           ),

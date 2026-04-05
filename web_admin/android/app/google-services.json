@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "230355024122",
+    "project_id": "migraayuda-fb971",
+    "storage_bucket": "migraayuda-fb971.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230355024122:android:529414eae9fb827a57f143",
+        "android_client_info": {
+          "package_name": "com.example.migra_ayuda"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "230355024122-vgfmmnk914sf8no6p65knai3ji763k9h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.migra_ayuda",
+            "certificate_hash": "0fcc40a32b40675d4c3cae7016395b4180a29c58"
+          }
+        },
+        {
+          "client_id": "230355024122-1dn13j2cddcva1gq52gr69gsml8t0r6c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCS9dWZSewXldqcf4jWbNCKzzP_OsjG6zw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "230355024122-1dn13j2cddcva1gq52gr69gsml8t0r6c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "230355024122-gd5qc6uh8cp9hjpbmu3tmehbb7b5p7nn.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.migraAyuda"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230355024122:android:b53b8fd978d3d7df57f143",
+        "android_client_info": {
+          "package_name": "com.example.migra_ayuda_administracion"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "230355024122-1dn13j2cddcva1gq52gr69gsml8t0r6c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCS9dWZSewXldqcf4jWbNCKzzP_OsjG6zw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "230355024122-1dn13j2cddcva1gq52gr69gsml8t0r6c.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "230355024122-gd5qc6uh8cp9hjpbmu3tmehbb7b5p7nn.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.migraAyuda"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
