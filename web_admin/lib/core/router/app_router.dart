@@ -5,6 +5,9 @@ import 'package:migra_ayuda_administracion/core/router/router_notifier.dart';
 import 'package:migra_ayuda_administracion/core/router/routes.dart';
 import 'package:migra_ayuda_administracion/features/auth/presentation/screens/home_screen.dart';
 import 'package:migra_ayuda_administracion/features/auth/presentation/screens/login_screen.dart';
+import 'package:migra_ayuda_administracion/features/dashboard/presentation/screens/dashboard_home_screen.dart';
+import 'package:migra_ayuda_administracion/features/dashboard/presentation/screens/users_screen.dart';
+import 'package:migra_ayuda_administracion/features/entities/presentation/screens/entities_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final notifier = ref.read(routerNotifierProvider.notifier);
@@ -21,25 +24,27 @@ final routerProvider = Provider<GoRouter>((ref) {
       ShellRoute(
         builder: (context, state, child) => HomeScreen(child: child),
         routes: [
+          GoRoute(path: '/dashboard', redirect: (_, __) => '/dashboard/home'),
           GoRoute(
-            path: '/dashboard',
-            redirect: (_, __) => '/dashboard/home', // redirección por defecto
-          ),
-          GoRoute(
-            path: '/dashboard/home', // ← esta faltaba
-            builder: (context, state) => const Center(child: Text("home")),
+            path: '/dashboard/home',
+            builder: (context, state) => const DashboardHomeScreen(),
           ),
           GoRoute(
             path: '/dashboard/users',
-            builder: (context, state) => const Center(child: Text("Usuarios")),
+            builder: (context, state) => const UsersScreen(),
           ),
           GoRoute(
             path: '/dashboard/services',
-            builder: (context, state) => const Center(child: Text("Servicios")),
+            builder: (context, state) => const Center(
+              child: Text(
+                "Servicios",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+            ),
           ),
           GoRoute(
             path: '/dashboard/entities',
-            builder: (context, state) => const Center(child: Text("Entidades")),
+            builder: (context, state) => const EntitiesScreen(),
           ),
         ],
       ),
