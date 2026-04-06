@@ -1,8 +1,5 @@
 import 'dart:async';
-
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:migra_ayuda_administracion/features/auth/domain/entities/admin_entity.dart';
 import 'package:migra_ayuda_administracion/features/auth/presentation/providers/providers.dart';
 
@@ -35,18 +32,15 @@ class AuthNotifier extends AsyncNotifier<AdminEntity?> {
   }
 
   Future<void> logout() async {
-    debugPrint('🔓 Iniciando logout...');
     state = const AsyncValue.loading();
 
     final result = await ref.read(logoutProvider).call();
 
     result.fold(
       (failure) {
-        debugPrint('❌ Error en logout: ${failure.message}');
         state = AsyncValue.error(failure.message, StackTrace.current);
       },
       (_) {
-        debugPrint('✅ Logout exitoso, estableciendo estado a null');
         state = const AsyncValue.data(null);
       },
     );

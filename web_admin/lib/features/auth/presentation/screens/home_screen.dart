@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:migra_ayuda_administracion/features/auth/presentation/providers/auth_notifier.dart';
 
 class HomeScreen extends StatelessWidget {
   final Widget child;
@@ -12,162 +10,104 @@ class HomeScreen extends StatelessWidget {
     final location = GoRouterState.of(context).matchedLocation;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
       body: Row(
         children: [
-          _Sidebar(location: location),
-          Expanded(child: child),
-        ],
-      ),
-    );
-  }
-}
-
-class _Sidebar extends StatelessWidget {
-  final String location;
-
-  const _Sidebar({required this.location});
-
-  static const _navItems = [
-    (icon: Icons.dashboard_rounded, label: 'Home', route: '/dashboard/home'),
-    (
-      icon: Icons.people_alt_rounded,
-      label: 'Usuarios',
-      route: '/dashboard/users',
-    ),
-    (
-      icon: Icons.miscellaneous_services_rounded,
-      label: 'Servicios',
-      route: '/dashboard/services',
-    ),
-  ];
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 220,
-      child: Material(
-        color: const Color(0xFF1A1D2E),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _SidebarHeader(),
-            const SizedBox(height: 8),
-            /* ..._navItems.map(
-              (item) => _SidebarItem(
-                icon: item.icon,
-                label: item.label,
-                isActive: location.startsWith(item.route),
-                onTap: () => context.go(item.route),
-              ),
-            ), */
-            Expanded(
-              child: ListView.builder(
-                itemCount: _navItems.length,
-                itemBuilder: (context, index) {
-                  final item = _navItems[index];
-                  return _SidebarItem(
-                    icon: item.icon,
-                    label: item.label,
-                    isActive: location.startsWith(item.route),
-                    onTap: () => context.go(item.route),
-                  );
-                },
-              ),
-            ),
-            const Spacer(),
-            _SidebarFooter(),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SidebarHeader extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(20, 28, 20, 20),
-      child: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: Colors.blue.shade600,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Icon(Icons.public, color: Colors.white, size: 18),
-          ),
-          const SizedBox(width: 10),
-          const Text(
-            'MigraAyuda',
-            style: TextStyle(
+          SizedBox(
+            width: 200,
+            child: Material(
               color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.3,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SidebarFooter extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: Colors.blue.shade700,
-                  child: const Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                const Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
                     children: [
-                      Text(
-                        'Administrador',
+                      const SizedBox(height: 32),
+                      const Text(
+                        'Dashboard',
                         style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
+                          fontSize: 16,
                           fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
+                          color: Color(0xFF1A1A1A),
                         ),
-                        overflow: TextOverflow.ellipsis,
                       ),
-                      Text(
-                        'Admin',
-                        style: TextStyle(color: Colors.white38, fontSize: 11),
+                      const SizedBox(height: 32),
+                      _SidebarItem(
+                        icon: Icons.home_outlined,
+                        label: 'Home',
+                        isActive: location.startsWith('/dashboard/home'),
+                        onTap: () => context.go('/dashboard/home'),
+                      ),
+                      _SidebarItem(
+                        icon: Icons.people_outline,
+                        label: 'Usuarios',
+                        isActive: location.startsWith('/dashboard/users'),
+                        onTap: () => context.go('/dashboard/users'),
+                      ),
+                      _SidebarItem(
+                        icon: Icons.grid_view_outlined,
+                        label: 'Servicios',
+                        isActive: location.startsWith('/dashboard/services'),
+                        onTap: () => context.go('/dashboard/services'),
+                      ),
+                      _SidebarItem(
+                        icon: Icons.business_outlined,
+                        label: 'Entidades',
+                        isActive: location.startsWith('/dashboard/entities'),
+                        onTap: () => context.go('/dashboard/entities'),
                       ),
                     ],
                   ),
-                ),
-              ],
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'usuario@correo.com',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFFAAAAAA),
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton.icon(
+                          onPressed: () {
+                            // cerrar sesion
+                          },
+                          icon: const Icon(
+                            Icons.logout,
+                            size: 14,
+                            color: Color(0xFFAAAAAA),
+                          ),
+                          label: const Text(
+                            'Cerrar sesión',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFFAAAAAA),
+                            ),
+                          ),
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          TextButton(
-            child: const Text("Cerrar sesion"),
-            onPressed: () async {
-              await ref.read(authNotifierProvider.notifier).logout();
-            },
-          ),
+
+          Container(width: 1, color: const Color(0xFFEEEEEE)),
+          Expanded(child: child),
         ],
       ),
     );
@@ -189,35 +129,31 @@ class _SidebarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+    final color = isActive ? const Color(0xFF1A1A1A) : const Color(0xFFAAAAAA);
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
-          color: isActive
-              ? Colors.blue.withValues(alpha: 0.15)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
+          border: isActive
+              ? const Border(
+                  left: BorderSide(color: Color(0xFF1A1A1A), width: 2),
+                )
+              : null,
         ),
-        child: ListTile(
-          dense: true,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          leading: Icon(
-            icon,
-            size: 20,
-            color: isActive ? Colors.blue.shade300 : Colors.white38,
-          ),
-          title: Text(
-            label,
-            style: TextStyle(
-              color: isActive ? Colors.blue.shade300 : Colors.white54,
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-              fontSize: 14,
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: color),
+            const SizedBox(width: 12),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                color: color,
+                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+              ),
             ),
-          ),
-          onTap: onTap,
+          ],
         ),
       ),
     );

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda_administracion/features/auth/presentation/providers/providers.dart';
 
+
 class ResetPasswordNotifier extends AsyncNotifier<void> {
   @override
   FutureOr<dynamic> build() {}
@@ -25,5 +26,4 @@ class ResetPasswordNotifier extends AsyncNotifier<void> {
 
 final resetPasswordProvider =
     AsyncNotifierProvider<ResetPasswordNotifier, void>(
-      ResetPasswordNotifier.new,
-    );
+        ResetPasswordNotifier.new);

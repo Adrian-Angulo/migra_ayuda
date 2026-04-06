@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:migra_ayuda_administracion/core/errors/auth_failures.dart';
 import 'package:migra_ayuda_administracion/core/errors/failures.dart';
 import 'package:migra_ayuda_administracion/features/auth/data/models/admin_model.dart';
@@ -11,84 +10,22 @@ import 'package:migra_ayuda_administracion/features/auth/domain/repositories/aut
 class AuthRepositoryImpl implements AuthRepository {
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
-  final GoogleSignIn googleSignIn;
 
   AuthRepositoryImpl({
     required FirebaseAuth auth,
     required FirebaseFirestore firestore,
-    required this.googleSignIn,
   }) : _auth = auth,
        _firestore = firestore;
-
-  /*   @override
-  Future<Either<Failure, UserCredential>> authWithGoogle() async {
-    try {
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-
-      if (googleUser == null) {
-        return const Left(OperationCancelledFailure());
-      }
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      final credential = GoogleAuthProvider.credential(
-        idToken: googleAuth.idToken,
-        accessToken: googleAuth.accessToken,
-      );
-
-      final userCredential =
-          await FirebaseAuth.instance.signInWithCredential(credential);
-
-      return Right(userCredential);
-    } on FirebaseAuthException catch (e) {
-      return Left(_mapFirebaseAuthError(e.code));
-    } on FirebaseException catch (e) {
-      return Left(ServerFailure(e.message ?? 'Error del servidor'));
-    } catch (e) {
-      return const Left(UnexpectedFailure());
-    }
-  } */
 
   @override
   Future<Either<Failure, Unit>> logout() async {
     try {
       await _auth.signOut();
-      await googleSignIn.signOut();
       return const Right(unit);
     } catch (e) {
       return const Left(UnexpectedFailure());
     }
   }
-
-  /*   @override
-  Future<Either<Failure, AdminEntity>> verifyOrCreateGoogleUser(
-      UserCredential credential) async {
-    try {
-      final uid = credential.user?.uid;
-      if (uid == null) {
-        return const Left(UserNotFoundFailure());
-      }
-      final docRef = _firestore.collection('users').doc(uid);
-      final doc = await docRef.get();
-      if (doc.exists) {
-        return Right(AdminModel.fromMap(doc));
-      } else {
-        final newUser = AdminModel(
-          id: uid,
-          
-          email: credential.user!.email ?? '',
-          role: "Admin"
-        );
-        await docRef.set(newUser.toMap());
-        return Right(newUser);
-      }
-    } on FirebaseException catch (e) {
-      return Left(ServerFailure(e.message ?? 'Error al crear usuario'));
-    } catch (e) {
-      return const Left(UnexpectedFailure());
-    }
-  } */
 
   @override
   Future<Either<Failure, AdminEntity>> getUserData(String uid) async {
