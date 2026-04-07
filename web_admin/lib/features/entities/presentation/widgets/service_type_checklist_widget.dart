@@ -11,11 +11,14 @@ class ServiceTypeChecklistWidget extends StatelessWidget {
   });
 
   static const List<Map<String, dynamic>> serviceTypes = [
-    {'name': 'Salud', 'icon': Icons.local_hospital, 'color': Color(0xFFEF4444)},
-    {'name': 'Educación', 'icon': Icons.school, 'color': Color(0xFF3B82F6)},
-    {'name': 'Vivienda', 'icon': Icons.home, 'color': Color(0xFF8B5CF6)},
-    {'name': 'Empleo', 'icon': Icons.work, 'color': Color(0xFF10B981)},
-    {'name': 'Legal', 'icon': Icons.gavel, 'color': Color(0xFFF59E0B)},
+    {
+      'name': 'Asistencia medica',
+      'icon': Icons.local_hospital,
+      'color': Color(0xFFEF4444),
+    },
+
+    {'name': 'Alojamiento', 'icon': Icons.home, 'color': Color(0xFF8B5CF6)},
+    {'name': 'Empleo temporal', 'icon': Icons.work, 'color': Color(0xFF10B981)},
     {
       'name': 'Alimentación',
       'icon': Icons.restaurant,
@@ -39,8 +42,8 @@ class ServiceTypeChecklistWidget extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 4,
-        crossAxisSpacing: 12,
+        crossAxisCount: 3,
+        crossAxisSpacing: 30,
         mainAxisSpacing: 12,
         childAspectRatio: 1.2,
       ),
@@ -62,7 +65,7 @@ class ServiceTypeChecklistWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: isSelected
                   ? (service['color'] as Color).withOpacity(0.1)

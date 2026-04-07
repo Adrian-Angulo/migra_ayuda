@@ -32,8 +32,8 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
       onTap: _elegirImagen,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        width: 180,
-        height: 180,
+        width: 400,
+        height: 300,
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade300, width: 2),
           borderRadius: BorderRadius.circular(12),
@@ -61,9 +61,8 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
             : ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.memory(
-                  // ✅ funciona en web
                   imagenBytes!,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.fill,
                   width: 180,
                   height: 180,
                 ),
