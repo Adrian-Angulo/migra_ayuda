@@ -83,6 +83,51 @@ class EntityRemoteDatasource {
     }
   }
 
+  Future<void> updateEntity({
+    required EntityModels entityModel,
+    Uint8List? imageBytes,
+    String? fileName,
+  }) async {
+    try {
+      print('🔄 Iniciando actualización de entidad: ${entityModel.name}');
+
+      String imagenUrl = entityModel.imageUrl;
+
+      // Solo subir nueva imagen si se proporcionó
+      if (imageBytes != null && fileName != null) {
+        print('📸 Subiendo nueva imagen...');
+        imagenUrl = await _subirImagenCloudinary(
+          bytes: imageBytes,
+          fileName: fileName,
+        );
+      }
+
+      final entidadActualizada = EntityModels(
+        id: entityModel.id,
+        name: entityModel.name,
+        description: entityModel.description,
+        services: entityModel.services,
+        address: entityModel.address,
+        latitude: entityModel.latitude,
+        longitude: entityModel.longitude,
+        phone: entityModel.phone,
+        serviceHours: entityModel.serviceHours,
+        imageUrl: imagenUrl,
+      );
+
+      print('💾 Actualizando en Firestore...');
+      await _firestore
+          .collection('entities')
+          .doc(entityModel.id)
+          .update(entidadActualizada.toMap());
+      print('✅ Entidad actualizada con ID: ${entityModel.id}');
+    } catch (e, stackTrace) {
+      print('❌ Error en updateEntity: $e');
+      print('Stack trace: $stackTrace');
+      rethrow;
+    }
+  }
+
   Future<List<EntityModels>> getAllEntities() async {
     try {
       print('📥 Obteniendo todas las entidades...');

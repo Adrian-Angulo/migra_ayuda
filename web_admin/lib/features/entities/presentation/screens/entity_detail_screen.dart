@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/providers/entity_detail_notifier.dart';
+import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/edit_entity_modal.dart';
 
 class EntityDetailScreen extends ConsumerStatefulWidget {
   final String entityId;
@@ -54,6 +55,34 @@ class _EntityDetailScreenState extends ConsumerState<EntityDetailScreen> {
                 ),
               ),
               actions: [
+                // Botón de editar
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.white.withValues(alpha: 0.15),
+                    child: IconButton(
+                      onPressed: () async {
+                        final result = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => EditEntityModal(entity: entity),
+                        );
+
+                        // Si se editó exitosamente, recargar los datos
+                        if (result == true && context.mounted) {
+                          ref
+                              .read(entityDetailNotifierProvider.notifier)
+                              .recargar();
+                        }
+                      },
+                      icon: const Icon(
+                        Icons.edit_outlined,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                      padding: EdgeInsets.zero,
+                    ),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(8),
                   child: CircleAvatar(

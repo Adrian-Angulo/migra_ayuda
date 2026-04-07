@@ -47,6 +47,38 @@ class EntityRepositoryImpl implements EntityRepository {
   }
 
   @override
+  Future<Either<String, Unit>> updateEntity({
+    required EntityEntity entity,
+    Uint8List? imagenBytes,
+    String? fileName,
+  }) async {
+    try {
+      final modelo = EntityModels(
+        id: entity.id,
+        name: entity.name,
+        description: entity.description,
+        services: entity.services,
+        address: entity.address,
+        latitude: entity.latitude,
+        longitude: entity.longitude,
+        phone: entity.phone,
+        serviceHours: entity.serviceHours,
+        imageUrl: entity.imageUrl,
+      );
+
+      await _datasource.updateEntity(
+        entityModel: modelo,
+        imageBytes: imagenBytes,
+        fileName: fileName,
+      );
+
+      return right(unit);
+    } catch (e) {
+      return left('Error al actualizar la entidad: ${e.toString()}');
+    }
+  }
+
+  @override
   Future<Either<String, List<EntityEntity>>> getAllEntities() async {
     try {
       final models = await _datasource.getAllEntities();

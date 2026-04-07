@@ -10,6 +10,12 @@ abstract class EntityRepository {
     required String fileName,
   });
 
+  Future<Either<String, Unit>> updateEntity({
+    required EntityEntity entity,
+    Uint8List? imagenBytes,
+    String? fileName,
+  });
+
   Future<Either<String, List<EntityEntity>>> getAllEntities();
 
   Future<Either<String, EntityEntity>> getEntityById(String id);

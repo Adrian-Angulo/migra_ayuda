@@ -5,12 +5,14 @@ import 'dart:typed_data';
 class ImagePickerWidget extends StatefulWidget {
   final XFile? imagen;
   final Uint8List? imagenBytes;
+  final String? existingImageUrl;
   final Function(XFile imagen, Uint8List bytes)? onImageSelected;
 
   const ImagePickerWidget({
     super.key,
     this.imagen,
     this.imagenBytes,
+    this.existingImageUrl,
     this.onImageSelected,
   });
 
@@ -59,36 +61,50 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
           border: Border.all(color: Colors.grey.shade300, width: 2),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: _imagenBytes == null
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.image_outlined,
-                    size: 48,
-                    color: Colors.grey.shade400,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Agregar Foto',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey.shade600,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              )
-            : ClipRRect(
+        child: _imagenBytes != null
+            ? ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.memory(
                   _imagenBytes!,
-                  fit: BoxFit.fill,
-                  width: 180,
-                  height: 180,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
                 ),
-              ),
+              )
+            : widget.existingImageUrl != null &&
+                  widget.existingImageUrl!.isNotEmpty
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.network(
+                  widget.existingImageUrl!,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                  errorBuilder: (context, error, stackTrace) {
+                    return _buildPlaceholder();
+                  },
+                ),
+              )
+            : _buildPlaceholder(),
       ),
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.image_outlined, size: 48, color: Colors.grey.shade400),
+        const SizedBox(height: 12),
+        Text(
+          'Agregar Foto',
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey.shade600,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 }

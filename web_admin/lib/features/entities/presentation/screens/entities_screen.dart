@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:migra_ayuda_administracion/features/entities/presentation/providers/entity_detail_notifier.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/providers/get_all_entites_notifier.dart';
+import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/edit_entity_modal.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/search_bar_widget.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/entity_card_widget.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/add_button_widget.dart';
@@ -138,11 +140,18 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
                     onTap: () {
                       context.go('/dashboard/entities/${entity.id}');
                     },
-                    onEdit: () {
-                      // TODO: Abrir modal para editar
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Editar: ${entity.name}')),
+                    onEdit: () async {
+                      final result = await showDialog<bool>(
+                        context: context,
+                        builder: (context) => EditEntityModal(entity: entity),
                       );
+
+                      // Si se editó exitosamente, recargar los datos
+                      if (result == true && context.mounted) {
+                        ref
+                            .read(entityDetailNotifierProvider.notifier)
+                            .recargar();
+                      }
                     },
                     onDelete: () {
                       _showDeleteDialog(context, entity.name, entity.id);
