@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:migra_ayuda_administracion/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/providers/entity_detail_notifier.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/providers/get_all_entites_notifier.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/providers/delete_entity_notifier.dart';
@@ -20,11 +21,40 @@ class EntitiesScreen extends ConsumerStatefulWidget {
 
 class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
   final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() {
+      setState(() {
+        _searchQuery = _searchController.text;
+      });
+    });
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  List<EntityEntity> _filterEntities(List<EntityEntity> entities) {
+    if (_searchQuery.trim().isEmpty) {
+      return entities;
+    }
+
+    final query = _searchQuery.toLowerCase().trim();
+
+    return entities.where((entity) {
+      final nameMatch = entity.name.toLowerCase().contains(query);
+      final addressMatch = entity.address.toLowerCase().contains(query);
+      final servicesMatch = entity.services.any(
+        (service) => service.toLowerCase().contains(query),
+      );
+
+      return nameMatch || addressMatch || servicesMatch;
+    }).toList();
   }
 
   void _showAddEntityModal() {
@@ -126,19 +156,41 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
           const SizedBox(height: 32),
 
           // Barra de búsqueda
-          SearchBarWidget(
-            hintText: 'Buscar entidades...',
-            controller: _searchController,
-            onChanged: (value) {
-              // TODO: Implementar búsqueda
-            },
+          Row(
+            children: [
+              Expanded(
+                child: SearchBarWidget(
+                  hintText: 'Buscar por nombre, dirección o servicio...',
+                  controller: _searchController,
+                  onChanged: (value) {
+                    // El setState se maneja en el listener del controller
+                  },
+                ),
+              ),
+            ],
           ),
+
+          const SizedBox(height: 16),
+          Text(
+            asyncEntities.when(
+              data: (entities) {
+                final filtered = _filterEntities(entities);
+                return 'Total: ${filtered.length} entidad${filtered.length != 1 ? 'es' : ''}';
+              },
+              loading: () => 'Buscando...',
+              error: (_, __) => 'Error',
+            ),
+            style: const TextStyle(fontSize: 14, color: Color(0xFF2D5F4F)),
+          ),
+
           const SizedBox(height: 24),
 
           // Lista de entidades
           asyncEntities.when(
-            data: (entities) {
-              if (entities.isEmpty) {
+            data: (allEntities) {
+              final entities = _filterEntities(allEntities);
+
+              if (allEntities.isEmpty) {
                 return Center(
                   child: Padding(
                     padding: const EdgeInsets.all(64),
@@ -165,6 +217,71 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey.shade400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              if (entities.isEmpty && _searchQuery.isNotEmpty) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(64),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.search_off,
+                          size: 64,
+                          color: Colors.grey.shade400,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No se encontraron resultados',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey.shade400,
+                            ),
+                            children: [
+                              const TextSpan(
+                                text: 'No hay entidades que coincidan con ',
+                              ),
+                              TextSpan(
+                                text: '"$_searchQuery"',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF2D5F4F),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        OutlinedButton.icon(
+                          onPressed: () {
+                            _searchController.clear();
+                          },
+                          icon: const Icon(Icons.clear),
+                          label: const Text('Limpiar búsqueda'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF2D5F4F),
+                            side: const BorderSide(color: Color(0xFF2D5F4F)),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
                           ),
                         ),
                       ],
