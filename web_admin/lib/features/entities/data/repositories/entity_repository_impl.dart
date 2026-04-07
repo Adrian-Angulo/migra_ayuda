@@ -55,4 +55,14 @@ class EntityRepositoryImpl implements EntityRepository {
       return left('Error al obtener las entidades: ${e.toString()}');
     }
   }
+
+  @override
+  Future<Either<String, EntityEntity>> getEntityById(String id) async {
+    try {
+      final model = await _datasource.getEntityById(id);
+      return right(model);
+    } catch (e) {
+      return left('Error al obtener la entidad: ${e.toString()}');
+    }
+  }
 }

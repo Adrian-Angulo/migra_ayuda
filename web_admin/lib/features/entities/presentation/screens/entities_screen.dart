@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/providers/get_all_entites_notifier.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/search_bar_widget.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/entity_card_widget.dart';
@@ -134,6 +135,9 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
                         ? entity.services.first
                         : 'Sin categoría',
                     status: 'Verificada',
+                    onTap: () {
+                      context.go('/dashboard/entities/${entity.id}');
+                    },
                     onEdit: () {
                       // TODO: Abrir modal para editar
                       ScaffoldMessenger.of(context).showSnackBar(

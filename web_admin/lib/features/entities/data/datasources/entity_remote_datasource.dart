@@ -103,4 +103,23 @@ class EntityRemoteDatasource {
       rethrow;
     }
   }
+
+  Future<EntityModels> getEntityById(String id) async {
+    try {
+      print('📥 Obteniendo entidad con ID: $id');
+      final doc = await _firestore.collection('entities').doc(id).get();
+
+      if (!doc.exists) {
+        throw Exception('Entidad no encontrada');
+      }
+
+      final entity = EntityModels.fromMap(doc);
+      print('✅ Entidad obtenida: ${entity.name}');
+      return entity;
+    } catch (e, stackTrace) {
+      print('❌ Error al obtener entidad: $e');
+      print('Stack trace: $stackTrace');
+      rethrow;
+    }
+  }
 }

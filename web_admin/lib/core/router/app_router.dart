@@ -8,6 +8,7 @@ import 'package:migra_ayuda_administracion/features/auth/presentation/screens/lo
 import 'package:migra_ayuda_administracion/features/dashboard/presentation/screens/dashboard_home_screen.dart';
 import 'package:migra_ayuda_administracion/features/dashboard/presentation/screens/users_screen.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/screens/entities_screen.dart';
+import 'package:migra_ayuda_administracion/features/entities/presentation/screens/entity_detail_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final notifier = ref.read(routerNotifierProvider.notifier);
@@ -45,6 +46,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/dashboard/entities',
             builder: (context, state) => const EntitiesScreen(),
+          ),
+          GoRoute(
+            path: '/dashboard/entities/:id',
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return EntityDetailScreen(entityId: id);
+            },
           ),
         ],
       ),

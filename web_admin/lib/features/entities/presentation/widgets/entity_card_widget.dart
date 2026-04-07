@@ -6,6 +6,7 @@ class EntityCardWidget extends StatelessWidget {
   final String phone;
   final String category;
   final String status;
+  final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
@@ -16,112 +17,117 @@ class EntityCardWidget extends StatelessWidget {
     required this.phone,
     required this.category,
     required this.status,
+    this.onTap,
     this.onEdit,
     this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
-      ),
-      child: Row(
-        children: [
-          // Icono
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: const Color(0xFF2D5F4F),
-              borderRadius: BorderRadius.circular(12),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade200, width: 1),
+        ),
+        child: Row(
+          children: [
+            // Icono
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: const Color(0xFF2D5F4F),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.business, color: Colors.white, size: 24),
             ),
-            child: const Icon(Icons.business, color: Colors.white, size: 24),
-          ),
-          const SizedBox(width: 16),
-          // Información
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(width: 16),
+            // Información
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF1A1A1A),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      _StatusBadge(status: category),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        address,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Icon(
+                        Icons.phone_outlined,
+                        size: 14,
+                        color: Colors.grey.shade600,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        phone,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            // Acciones
+            Row(
               children: [
-                Row(
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF1A1A1A),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    _StatusBadge(status: category),
-                  ],
+                IconButton(
+                  onPressed: onEdit,
+                  icon: Icon(
+                    Icons.edit_outlined,
+                    size: 20,
+                    color: Colors.grey.shade600,
+                  ),
+                  tooltip: 'Editar',
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.location_on_outlined,
-                      size: 14,
-                      color: Colors.grey.shade600,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      address,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Icon(
-                      Icons.phone_outlined,
-                      size: 14,
-                      color: Colors.grey.shade600,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      phone,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                  ],
+                IconButton(
+                  onPressed: onDelete,
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    size: 20,
+                    color: Colors.red,
+                  ),
+                  tooltip: 'Eliminar',
                 ),
               ],
             ),
-          ),
-          // Acciones
-          Row(
-            children: [
-              IconButton(
-                onPressed: onEdit,
-                icon: Icon(
-                  Icons.edit_outlined,
-                  size: 20,
-                  color: Colors.grey.shade600,
-                ),
-                tooltip: 'Editar',
-              ),
-              IconButton(
-                onPressed: onDelete,
-                icon: const Icon(
-                  Icons.delete_outline,
-                  size: 20,
-                  color: Colors.red,
-                ),
-                tooltip: 'Eliminar',
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
