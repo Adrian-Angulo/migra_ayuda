@@ -52,12 +52,12 @@ class _EntityDetailScreenState extends ConsumerState<EntityDetailScreen> {
               behavior: SnackBarBehavior.floating,
             ),
           );
-          // Navegar de vuelta al listado
+          
           context.go('/dashboard/entities');
         },
-        loading: () {}, // No hacer nada mientras carga
+        loading: () {}, 
         error: (error, stack) {
-          // Error - mostrar mensaje
+          
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Row(
@@ -157,21 +157,7 @@ class _EntityDetailScreenState extends ConsumerState<EntityDetailScreen> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.white.withValues(alpha: 0.15),
-                    child: IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.share_outlined,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                      padding: EdgeInsets.zero,
-                    ),
-                  ),
-                ),
+                
                 const SizedBox(width: 8),
               ],
               flexibleSpace: FlexibleSpaceBar(

@@ -20,7 +20,7 @@ class EntityRepositoryImpl implements EntityRepository {
     required String fileName,
   }) async {
     try {
-      // convierte la entidad del dominio a modelo
+      
       final modelo = EntityModels(
         id: '',
         name: entity.name,

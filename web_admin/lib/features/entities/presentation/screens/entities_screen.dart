@@ -71,7 +71,7 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
   Widget build(BuildContext context) {
     final asyncEntities = ref.watch(getAllEntitiesNotifierProvider);
 
-    // Escuchar cambios en el estado de eliminación
+    
     ref.listen<AsyncValue<void>>(deleteEntityNotifierProvider, (
       previous,
       next,

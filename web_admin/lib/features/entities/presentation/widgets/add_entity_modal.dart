@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
 import 'package:migra_ayuda_administracion/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/providers/register_entity_notifier.dart';
+import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/button_save_widget.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/image_picker_widget.dart';
 
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/time_input_widget.dart';
@@ -396,102 +397,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                   const SizedBox(width: 12),
                   Expanded(
                     flex: 2,
-                    child: ElevatedButton.icon(
-                      onPressed: registerState.isLoading
-                          ? null
-                          : () {
-                              if (_formKey.currentState!.validate()) {
-                                if (_selectedImageBytes == null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'Por favor seleccione una imagen',
-                                      ),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                  return;
-                                }
-
-                                if (selectedServices.isEmpty) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'Por favor seleccione al menos un servicio',
-                                      ),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                  return;
-                                }
-
-                                // Crear entidad con los valores del formulario
-                                final entity = EntityEntity(
-                                  id: '',
-                                  name: _nameController.text.trim(),
-                                  description: _descriptionController.text
-                                      .trim(),
-                                  services: selectedServices,
-                                  address: _addressController.text.trim(),
-                                  latitude:
-                                      double.tryParse(
-                                        _latitudController.text.trim(),
-                                      ) ??
-                                      0.0,
-                                  longitude:
-                                      double.tryParse(
-                                        _longitudController.text.trim(),
-                                      ) ??
-                                      0.0,
-                                  phone: _phoneController.text.trim(),
-                                  serviceHours: _scheduleController.text.trim(),
-                                  imageUrl: "",
-                                );
-
-                                // Llamar al notifier (el listener manejará el resultado)
-                                ref
-                                    .read(
-                                      registerEntityNotifierProvider.notifier,
-                                    )
-                                    .registrar(
-                                      entity: entity,
-                                      imagenBytes: _selectedImageBytes!,
-                                      fileName: _selectedImage!.name,
-                                    );
-                              }
-                            },
-                      icon: registerState.isLoading
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.white,
-                                ),
-                              ),
-                            )
-                          : const Icon(Icons.save, size: 20),
-                      label: Text(
-                        registerState.isLoading
-                            ? 'Guardando...'
-                            : 'Guardar Entidad',
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF10B981),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        elevation: 0,
-                        disabledBackgroundColor: Colors.grey.shade400,
-                      ),
-                    ),
+                    child: ButtonSaveWidget(registerState: registerState, formKey: _formKey, selectedImageBytes: _selectedImageBytes, selectedServices: selectedServices, nameController: _nameController, descriptionController: _descriptionController, addressController: _addressController, latitudController: _latitudController, longitudController: _longitudController, phoneController: _phoneController, scheduleController: _scheduleController, ref: ref, selectedImage: _selectedImage),
                   ),
                 ],
               ),
