@@ -9,4 +9,6 @@ abstract class EntityRepository {
     required Uint8List imagenBytes,
     required String fileName,
   });
+
+  Future<Either<String, List<EntityEntity>>> getAllEntities(); 
 }

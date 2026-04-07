@@ -45,6 +45,14 @@ class EntityRepositoryImpl implements EntityRepository {
       return left('Error al registrar la entidad: ${e.toString()}');
     }
   }
-}
 
-class EntidadRepository {}
+  @override
+  Future<Either<String, List<EntityEntity>>> getAllEntities() async {
+    try {
+      final models = await _datasource.getAllEntities();
+      return right(models);
+    } catch (e) {
+      return left('Error al obtener las entidades: ${e.toString()}');
+    }
+  }
+}

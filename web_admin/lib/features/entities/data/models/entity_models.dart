@@ -35,10 +35,14 @@ class EntityModels extends EntityEntity {
       id: doc.id,
       name: data['name'] ?? '',
       description: data['description'] ?? '',
-      services: data['services'] ?? [],
+      services:
+          (data['services'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
       address: data['address'] ?? '',
-      latitude: data['latitude'] ?? 0.0,
-      longitude: data['longitude'] ?? 0.0,
+      latitude: (data['latitude'] ?? 0.0).toDouble(),
+      longitude: (data['longitude'] ?? 0.0).toDouble(),
       phone: data['phone'] ?? '',
       serviceHours: data['service_hours'] ?? '',
       imageUrl: data['image_url'] ?? '',

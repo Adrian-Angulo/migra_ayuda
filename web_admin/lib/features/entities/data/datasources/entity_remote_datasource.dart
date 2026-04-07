@@ -82,4 +82,25 @@ class EntityRemoteDatasource {
       rethrow;
     }
   }
+
+  Future<List<EntityModels>> getAllEntities() async {
+    try {
+      print('📥 Obteniendo todas las entidades...');
+      final snapshot = await _firestore
+          .collection('entities')
+          .orderBy('name')
+          .get();
+
+      final entities = snapshot.docs
+          .map((doc) => EntityModels.fromMap(doc))
+          .toList();
+
+      print('✅ ${entities.length} entidades obtenidas');
+      return entities;
+    } catch (e, stackTrace) {
+      print('❌ Error al obtener entidades: $e');
+      print('Stack trace: $stackTrace');
+      rethrow;
+    }
+  }
 }
