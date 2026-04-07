@@ -16,7 +16,10 @@ class _AddEntityModalState extends State<AddEntityModal> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _addressController = TextEditingController();
+  final _latitudController = TextEditingController();
+  final _longitudController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _scheduleController = TextEditingController();
   final _openingTime1Controller = TextEditingController(text: '08:00');
   final _closingTime1Controller = TextEditingController(text: '12:00');
   final _openingTime2Controller = TextEditingController(text: '14:00');
@@ -132,7 +135,6 @@ class _AddEntityModalState extends State<AddEntityModal> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Image Picker mejorado
                       Center(
                         child: Column(
                           children: [
@@ -150,7 +152,6 @@ class _AddEntityModalState extends State<AddEntityModal> {
                       ),
                       const SizedBox(height: 32),
 
-                      // Descripción Section con diseño mejorado
                       _buildSectionTitle(
                         'Información Básica',
                         Icons.info_outline,
@@ -174,7 +175,7 @@ class _AddEntityModalState extends State<AddEntityModal> {
                         label: 'Descripción',
                         hint:
                             'Describa brevemente los servicios que ofrece esta entidad',
-                        icon: Icons.description_outlined,
+                        icon: null,
                         maxLines: 4,
                       ),
                       const SizedBox(height: 32),
@@ -209,83 +210,55 @@ class _AddEntityModalState extends State<AddEntityModal> {
                         Icons.location_on_outlined,
                       ),
                       const SizedBox(height: 20),
-                      _buildTextField(
-                        controller: _addressController,
-                        label: 'Dirección',
-                        hint: 'Buscar dirección...',
-                        icon: Icons.search,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'La dirección es requerida';
-                          }
-                          return null;
-                        },
+                      Row(
+                        spacing: 16,
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: _buildTextField(
+                              controller: _addressController,
+                              label: 'Dirección',
+                              hint: 'Ej. Calle 123 #45-67, Pasto',
+                              icon: Icons.location_on_outlined,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'La dirección es requerida';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          Expanded(
+                            child: _buildTextField(
+                              controller: _latitudController,
+                              label: 'Latitud',
+                              hint: 'Ej. 1.21456',
+                              icon: Icons.location_on_outlined,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'La Logitud es requerida';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          Expanded(
+                            child: _buildTextField(
+                              controller: _longitudController,
+                              label: 'Logitud',
+                              hint: 'Ej. -77.27846',
+                              icon: Icons.location_on_outlined,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'La Latitud es requerida';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 16),
 
-                      // Map Placeholder mejorado
-                      Container(
-                        height: 180,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              const Color(0xFF2D5F4F).withOpacity(0.1),
-                              const Color(0xFF10B981).withOpacity(0.1),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: Colors.grey.shade200,
-                            width: 2,
-                          ),
-                        ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      blurRadius: 10,
-                                    ),
-                                  ],
-                                ),
-                                child: const Icon(
-                                  Icons.map_outlined,
-                                  size: 32,
-                                  color: Color(0xFF2D5F4F),
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              ElevatedButton.icon(
-                                onPressed: () {
-                                  // TODO: Abrir mapa
-                                },
-                                icon: const Icon(Icons.location_on, size: 18),
-                                label: const Text('Seleccionar en el mapa'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF2D5F4F),
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 24,
-                                    vertical: 12,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
                       const SizedBox(height: 20),
                       _buildTextField(
                         controller: _phoneController,
@@ -306,47 +279,19 @@ class _AddEntityModalState extends State<AddEntityModal> {
                         'Horario de Atención',
                         Icons.access_time,
                       ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Días de atención',
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey.shade600,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      DaySelectorWidget(
-                        selectedDays: selectedDays,
-                        onDaysChanged: (days) {
-                          setState(() {
-                            selectedDays = days;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 24),
 
-                      // Horarios en cards
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildScheduleCard(
-                              'Primer Horario',
-                              _openingTime1Controller,
-                              _closingTime1Controller,
-                              const Color(0xFF3B82F6),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildScheduleCard(
-                              'Segundo Horario',
-                              _openingTime2Controller,
-                              _closingTime2Controller,
-                              const Color(0xFF8B5CF6),
-                            ),
-                          ),
-                        ],
+                      _buildTextField(
+                        controller: _scheduleController,
+                        label: '',
+                        hint: 'Ej. Lunes a viernes 8:30 AM a 12:00 PM',
+                        icon: null,
+                        maxLines: 4,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'El horario es requerido';
+                          }
+                          return null;
+                        },
                       ),
                     ],
                   ),
@@ -466,7 +411,7 @@ class _AddEntityModalState extends State<AddEntityModal> {
     required TextEditingController controller,
     required String label,
     required String hint,
-    required IconData icon,
+    required IconData? icon,
     int maxLines = 1,
     String? Function(String?)? validator,
   }) {
@@ -488,7 +433,9 @@ class _AddEntityModalState extends State<AddEntityModal> {
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-            prefixIcon: Icon(icon, color: Colors.grey.shade400, size: 20),
+            prefixIcon: icon != null
+                ? Icon(icon, color: Colors.grey.shade400, size: 20)
+                : null,
             filled: true,
             fillColor: Colors.grey.shade50,
             border: OutlineInputBorder(

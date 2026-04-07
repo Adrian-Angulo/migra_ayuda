@@ -8,7 +8,6 @@ class SidebarFooterWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authState = ref.watch(authNotifierProvider);
-    final user = authState.value;
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -24,40 +23,18 @@ class SidebarFooterWidget extends ConsumerWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            'Sistema',
+            authState.when(
+              data: (user) => user?.email ?? 'Sin correo',
+              loading: () => 'Cargando...',
+              error: (_, __) => 'Error al cargar',
+            ),
             style: TextStyle(
               color: Colors.white.withOpacity(0.6),
               fontSize: 12,
               fontWeight: FontWeight.w400,
             ),
           ),
-          const SizedBox(height: 16),
-          // Avatar con iniciales
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: const Color(0xFF7FD4A8),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Center(
-              child: Text(
-                _getInitials(user?.email ?? 'AD'),
-                style: const TextStyle(
-                  color: Color(0xFF1E4438),
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
+
           const SizedBox(height: 16),
           // Botón de logout (opcional, puede ser un menú)
           TextButton.icon(
@@ -83,16 +60,5 @@ class SidebarFooterWidget extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  String _getInitials(String email) {
-    if (email.isEmpty) return 'AD';
-    final parts = email.split('@');
-    if (parts.isEmpty) return 'AD';
-    final name = parts[0];
-    if (name.length >= 2) {
-      return name.substring(0, 2).toUpperCase();
-    }
-    return name.toUpperCase();
   }
 }
