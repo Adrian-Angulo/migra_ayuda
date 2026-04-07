@@ -3,7 +3,16 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
 
 class ImagePickerWidget extends StatefulWidget {
-  const ImagePickerWidget({super.key});
+  final XFile? imagen;
+  final Uint8List? imagenBytes;
+  final Function(XFile imagen, Uint8List bytes)? onImageSelected;
+
+  const ImagePickerWidget({
+    super.key,
+    this.imagen,
+    this.imagenBytes,
+    this.onImageSelected,
+  });
 
   @override
   State<ImagePickerWidget> createState() => _ImagePickerWidgetState();
@@ -11,8 +20,15 @@ class ImagePickerWidget extends StatefulWidget {
 
 class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   final picker = ImagePicker();
-  XFile? imagen;
-  Uint8List? imagenBytes;
+  XFile? _imagen;
+  Uint8List? _imagenBytes;
+
+  @override
+  void initState() {
+    super.initState();
+    _imagen = widget.imagen;
+    _imagenBytes = widget.imagenBytes;
+  }
 
   Future<void> _elegirImagen() async {
     final resultado = await picker.pickImage(source: ImageSource.gallery);
@@ -21,9 +37,14 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
     final bytes = await resultado.readAsBytes();
 
     setState(() {
-      imagen = resultado;
-      imagenBytes = bytes;
+      _imagen = resultado;
+      _imagenBytes = bytes;
     });
+
+    // Notificar al padre
+    if (widget.onImageSelected != null) {
+      widget.onImageSelected!(resultado, bytes);
+    }
   }
 
   @override
@@ -38,7 +59,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
           border: Border.all(color: Colors.grey.shade300, width: 2),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: imagenBytes == null
+        child: _imagenBytes == null
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -61,7 +82,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
             : ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.memory(
-                  imagenBytes!,
+                  _imagenBytes!,
                   fit: BoxFit.fill,
                   width: 180,
                   height: 180,

@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:typed_data';
+import 'package:migra_ayuda_administracion/features/entities/domain/entities/entity_entity.dart';
+import 'package:migra_ayuda_administracion/features/entities/presentation/providers/register_entity_notifier.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/image_picker_widget.dart';
-import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/day_selector_widget.dart';
+
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/time_input_widget.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/service_type_checklist_widget.dart';
 
-class AddEntityModal extends StatefulWidget {
+class AddEntityModal extends ConsumerStatefulWidget {
   const AddEntityModal({super.key});
 
   @override
-  State<AddEntityModal> createState() => _AddEntityModalState();
+  ConsumerState<AddEntityModal> createState() => _AddEntityModalState();
 }
 
-class _AddEntityModalState extends State<AddEntityModal> {
+class _AddEntityModalState extends ConsumerState<AddEntityModal> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -27,6 +32,8 @@ class _AddEntityModalState extends State<AddEntityModal> {
 
   List<String> selectedDays = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi'];
   List<String> selectedServices = [];
+  XFile? _selectedImage;
+  Uint8List? _selectedImageBytes;
 
   @override
   void dispose() {
@@ -43,6 +50,51 @@ class _AddEntityModalState extends State<AddEntityModal> {
 
   @override
   Widget build(BuildContext context) {
+    final registerState = ref.watch(registerEntityNotifierProvider);
+
+    // Escuchar cambios en el estado del registro
+    ref.listen<AsyncValue<void>>(registerEntityNotifierProvider, (
+      previous,
+      next,
+    ) {
+      next.when(
+        data: (_) {
+          // Éxito - cerrar modal y mostrar mensaje
+          Navigator.of(context).pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.white),
+                  SizedBox(width: 12),
+                  Text('Entidad registrada exitosamente'),
+                ],
+              ),
+              backgroundColor: Color(0xFF10B981),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        },
+        loading: () {}, // No hacer nada mientras carga
+        error: (error, stack) {
+          // Error - mostrar mensaje
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.error, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text('Error: ${error.toString()}')),
+                ],
+              ),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        },
+      );
+    });
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
@@ -138,7 +190,16 @@ class _AddEntityModalState extends State<AddEntityModal> {
                       Center(
                         child: Column(
                           children: [
-                            const ImagePickerWidget(),
+                            ImagePickerWidget(
+                              imagen: _selectedImage,
+                              imagenBytes: _selectedImageBytes,
+                              onImageSelected: (imagen, bytes) {
+                                setState(() {
+                                  _selectedImage = imagen;
+                                  _selectedImageBytes = bytes;
+                                });
+                              },
+                            ),
                             const SizedBox(height: 8),
                             Text(
                               'Tamaño recomendado: 400x400px',
@@ -336,29 +397,86 @@ class _AddEntityModalState extends State<AddEntityModal> {
                   Expanded(
                     flex: 2,
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          // TODO: Guardar entidad
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Row(
-                                children: [
-                                  Icon(Icons.check_circle, color: Colors.white),
-                                  SizedBox(width: 12),
-                                  Text('Entidad guardada exitosamente'),
-                                ],
+                      onPressed: registerState.isLoading
+                          ? null
+                          : () {
+                              if (_formKey.currentState!.validate()) {
+                                if (_selectedImageBytes == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Por favor seleccione una imagen',
+                                      ),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                if (selectedServices.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Por favor seleccione al menos un servicio',
+                                      ),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                // Crear entidad con los valores del formulario
+                                final entity = EntityEntity(
+                                  id: '',
+                                  name: _nameController.text.trim(),
+                                  description: _descriptionController.text
+                                      .trim(),
+                                  services: selectedServices,
+                                  address: _addressController.text.trim(),
+                                  latitude:
+                                      double.tryParse(
+                                        _latitudController.text.trim(),
+                                      ) ??
+                                      0.0,
+                                  longitude:
+                                      double.tryParse(
+                                        _longitudController.text.trim(),
+                                      ) ??
+                                      0.0,
+                                  phone: _phoneController.text.trim(),
+                                  serviceHours: _scheduleController.text.trim(),
+                                  imageUrl: "",
+                                );
+
+                                // Llamar al notifier (el listener manejará el resultado)
+                                ref
+                                    .read(
+                                      registerEntityNotifierProvider.notifier,
+                                    )
+                                    .registrar(
+                                      entity: entity,
+                                      imagenBytes: _selectedImageBytes!,
+                                      fileName: _selectedImage!.name,
+                                    );
+                              }
+                            },
+                      icon: registerState.isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
-                              backgroundColor: Color(0xFF10B981),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        }
-                      },
-                      icon: const Icon(Icons.save, size: 20),
-                      label: const Text(
-                        'Guardar Entidad',
-                        style: TextStyle(
+                            )
+                          : const Icon(Icons.save, size: 20),
+                      label: Text(
+                        registerState.isLoading
+                            ? 'Guardando...'
+                            : 'Guardar Entidad',
+                        style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
                         ),
@@ -371,6 +489,7 @@ class _AddEntityModalState extends State<AddEntityModal> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         elevation: 0,
+                        disabledBackgroundColor: Colors.grey.shade400,
                       ),
                     ),
                   ),
