@@ -16,6 +16,8 @@ abstract class EntityRepository {
     String? fileName,
   });
 
+  Future<Either<String, Unit>> deleteEntity(String entityId);
+
   Future<Either<String, List<EntityEntity>>> getAllEntities();
 
   Future<Either<String, EntityEntity>> getEntityById(String id);

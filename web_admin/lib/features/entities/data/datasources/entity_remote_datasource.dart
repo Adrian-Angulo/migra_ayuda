@@ -128,6 +128,20 @@ class EntityRemoteDatasource {
     }
   }
 
+  Future<void> deleteEntity(String entityId) async {
+    try {
+      print('🗑️ Iniciando eliminación de entidad con ID: $entityId');
+
+      await _firestore.collection('entities').doc(entityId).delete();
+
+      print('✅ Entidad eliminada exitosamente');
+    } catch (e, stackTrace) {
+      print('❌ Error en deleteEntity: $e');
+      print('Stack trace: $stackTrace');
+      rethrow;
+    }
+  }
+
   Future<List<EntityModels>> getAllEntities() async {
     try {
       print('📥 Obteniendo todas las entidades...');

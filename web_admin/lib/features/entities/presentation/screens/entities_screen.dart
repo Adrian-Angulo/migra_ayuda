@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/providers/entity_detail_notifier.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/providers/get_all_entites_notifier.dart';
+import 'package:migra_ayuda_administracion/features/entities/presentation/providers/delete_entity_notifier.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/edit_entity_modal.dart';
+import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/delete_confirmation_dialog.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/search_bar_widget.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/entity_card_widget.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/add_button_widget.dart';
@@ -38,6 +40,50 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
   @override
   Widget build(BuildContext context) {
     final asyncEntities = ref.watch(getAllEntitiesNotifierProvider);
+
+    // Escuchar cambios en el estado de eliminación
+    ref.listen<AsyncValue<void>>(deleteEntityNotifierProvider, (
+      previous,
+      next,
+    ) {
+      next.when(
+        data: (_) {
+          // Éxito - mostrar mensaje y recargar lista
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.white),
+                  SizedBox(width: 12),
+                  Text('Entidad eliminada exitosamente'),
+                ],
+              ),
+              backgroundColor: Color(0xFF10B981),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          // Recargar la lista
+          ref.read(getAllEntitiesNotifierProvider.notifier).recargar();
+        },
+        loading: () {}, // No hacer nada mientras carga
+        error: (error, stack) {
+          // Error - mostrar mensaje
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.error, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text('Error: ${error.toString()}')),
+                ],
+              ),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        },
+      );
+    });
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(32),
@@ -243,53 +289,11 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
   ) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Icon(Icons.warning_amber_rounded, color: Colors.orange.shade700),
-            const SizedBox(width: 12),
-            const Text('Confirmar eliminación'),
-          ],
-        ),
-        content: Text(
-          '¿Estás seguro de que deseas eliminar "$entityName"?\n\nEsta acción no se puede deshacer.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Cancelar',
-              style: TextStyle(color: Colors.grey.shade700),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              // TODO: Implementar eliminación en Firestore
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Row(
-                    children: [
-                      const Icon(Icons.check_circle, color: Colors.white),
-                      const SizedBox(width: 12),
-                      Text('$entityName eliminada'),
-                    ],
-                  ),
-                  backgroundColor: Colors.red,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-              // Recargar la lista
-              ref.read(getAllEntitiesNotifierProvider.notifier).recargar();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Eliminar'),
-          ),
-        ],
+      builder: (context) => DeleteConfirmationDialog(
+        entityName: entityName,
+        onConfirm: () {
+          ref.read(deleteEntityNotifierProvider.notifier).eliminar(entityId);
+        },
       ),
     );
   }

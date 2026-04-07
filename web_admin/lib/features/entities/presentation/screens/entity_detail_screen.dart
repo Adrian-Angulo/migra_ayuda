@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/providers/entity_detail_notifier.dart';
+import 'package:migra_ayuda_administracion/features/entities/presentation/providers/delete_entity_notifier.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/edit_entity_modal.dart';
+import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/delete_confirmation_dialog.dart';
 
 class EntityDetailScreen extends ConsumerStatefulWidget {
   final String entityId;
@@ -28,6 +30,50 @@ class _EntityDetailScreenState extends ConsumerState<EntityDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final asyncEntity = ref.watch(entityDetailNotifierProvider);
+
+    // Escuchar cambios en el estado de eliminación
+    ref.listen<AsyncValue<void>>(deleteEntityNotifierProvider, (
+      previous,
+      next,
+    ) {
+      next.when(
+        data: (_) {
+          // Éxito - mostrar mensaje y volver al listado
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.white),
+                  SizedBox(width: 12),
+                  Text('Entidad eliminada exitosamente'),
+                ],
+              ),
+              backgroundColor: Color(0xFF10B981),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+          // Navegar de vuelta al listado
+          context.go('/dashboard/entities');
+        },
+        loading: () {}, // No hacer nada mientras carga
+        error: (error, stack) {
+          // Error - mostrar mensaje
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.error, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text('Error: ${error.toString()}')),
+                ],
+              ),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        },
+      );
+    });
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -55,6 +101,34 @@ class _EntityDetailScreenState extends ConsumerState<EntityDetailScreen> {
                 ),
               ),
               actions: [
+                // Botón de eliminar
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.red.shade400.withValues(alpha: 0.9),
+                    child: IconButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => DeleteConfirmationDialog(
+                            entityName: entity.name,
+                            onConfirm: () {
+                              ref
+                                  .read(deleteEntityNotifierProvider.notifier)
+                                  .eliminar(entity.id);
+                            },
+                          ),
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        color: Colors.white,
+                        size: 18,
+                      ),
+                      padding: EdgeInsets.zero,
+                    ),
+                  ),
+                ),
                 // Botón de editar
                 Padding(
                   padding: const EdgeInsets.all(8),

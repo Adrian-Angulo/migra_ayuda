@@ -79,6 +79,16 @@ class EntityRepositoryImpl implements EntityRepository {
   }
 
   @override
+  Future<Either<String, Unit>> deleteEntity(String entityId) async {
+    try {
+      await _datasource.deleteEntity(entityId);
+      return right(unit);
+    } catch (e) {
+      return left('Error al eliminar la entidad: ${e.toString()}');
+    }
+  }
+
+  @override
   Future<Either<String, List<EntityEntity>>> getAllEntities() async {
     try {
       final models = await _datasource.getAllEntities();
