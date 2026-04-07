@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda_administracion/features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'package:migra_ayuda_administracion/features/entities/presentation/screens/entities_screen.dart';
 import 'package:migra_ayuda_administracion/features/services/presentation/screens/services_screen.dart';
 import 'package:migra_ayuda_administracion/shared/widgets/sidebar_widget.dart';
 
@@ -15,7 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _screens = const [
     DashboardScreen(),
-    Center(child: Text('Entidades')),
+    EntitiesScreen(),
     ServicesScreen(),
     Center(child: Text('Usuarios')),
   ];
