@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/providers/entity_detail_notifier.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/providers/delete_entity_notifier.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/edit_entity_modal.dart';
@@ -52,12 +54,11 @@ class _EntityDetailScreenState extends ConsumerState<EntityDetailScreen> {
               behavior: SnackBarBehavior.floating,
             ),
           );
-          
+
           context.go('/dashboard/entities');
         },
-        loading: () {}, 
+        loading: () {},
         error: (error, stack) {
-          
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Row(
@@ -157,7 +158,7 @@ class _EntityDetailScreenState extends ConsumerState<EntityDetailScreen> {
                     ),
                   ),
                 ),
-                
+
                 const SizedBox(width: 8),
               ],
               flexibleSpace: FlexibleSpaceBar(
@@ -417,81 +418,44 @@ class _EntityDetailScreenState extends ConsumerState<EntityDetailScreen> {
 
                     const SizedBox(height: 32),
 
-                    // Mapa placeholder
+                    // Mapa real con ubicación
                     _buildSectionTitle('Ubicación'),
                     const SizedBox(height: 16),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(16),
-                      child: Container(
-                        height: 200,
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Color(0xFFE2E8F0), Color(0xFFCBD5E1)],
-                          ),
-                        ),
-                        child: Stack(
-                          children: [
-                            // Grid lines simulando mapa
-                            CustomPaint(
-                              size: const Size(double.infinity, 200),
-                              painter: _MapGridPainter(),
+                      child: SizedBox(
+                        height: 220,
+                        child: FlutterMap(
+                          options: MapOptions(
+                            initialCenter: LatLng(
+                              entity.localitation.latitude,
+                              entity.localitation.longitude,
                             ),
-                            Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF059669),
-                                      shape: BoxShape.circle,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: const Color(
-                                            0xFF059669,
-                                          ).withValues(alpha: 0.4),
-                                          blurRadius: 12,
-                                          spreadRadius: 2,
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Icon(
-                                      Icons.location_on,
-                                      color: Colors.white,
-                                      size: 24,
-                                    ),
+                            initialZoom: 15,
+                            interactionOptions: const InteractionOptions(
+                              flags: InteractiveFlag.none,
+                            ),
+                          ),
+                          children: [
+                            TileLayer(
+                              urlTemplate:
+                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                              userAgentPackageName: 'com.migraayuda.app',
+                            ),
+                            MarkerLayer(
+                              markers: [
+                                Marker(
+                                  point: LatLng(
+                                    entity.localitation.latitude,
+                                    entity.localitation.longitude,
                                   ),
-                                  const SizedBox(height: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 6,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(20),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withValues(
-                                            alpha: 0.1,
-                                          ),
-                                          blurRadius: 8,
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Text(
-                                      'Ver en mapa',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xFF059669),
-                                      ),
-                                    ),
+                                  child: const Icon(
+                                    Icons.location_pin,
+                                    color: Color(0xFF059669),
+                                    size: 40,
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -893,24 +857,4 @@ class _EntityDetailScreenState extends ConsumerState<EntityDetailScreen> {
       ),
     );
   }
-}
-
-class _MapGridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFFB8C4D0).withValues(alpha: 0.5)
-      ..strokeWidth = 1;
-
-    const spacing = 30.0;
-    for (double x = 0; x < size.width; x += spacing) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
-    for (double y = 0; y < size.height; y += spacing) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

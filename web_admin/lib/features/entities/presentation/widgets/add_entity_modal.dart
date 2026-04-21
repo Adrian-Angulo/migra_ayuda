@@ -98,6 +98,8 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
     });
 
     if (coords != null) {
+      _latitudController.text = coords.latitude.toString();
+      _longitudController.text = coords.longitude.toString();
       _mapController.move(coords, 15);
     }
   }
@@ -337,6 +339,13 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                               onChanged: (_) {
                                 if (_addressNotFound) {
                                   setState(() => _addressNotFound = false);
+                                }
+                                if (location != null) {
+                                  setState(() {
+                                    location = null;
+                                    _latitudController.clear();
+                                    _longitudController.clear();
+                                  });
                                 }
                               },
                               validator: (value) {

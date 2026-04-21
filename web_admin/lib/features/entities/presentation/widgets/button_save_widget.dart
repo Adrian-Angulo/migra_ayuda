@@ -77,6 +77,19 @@ class ButtonSaveWidget extends StatelessWidget {
                   return;
                 }
 
+                if (_latitudController.text.isEmpty ||
+                    _longitudController.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Debes buscar y confirmar la dirección en el mapa',
+                      ),
+                      backgroundColor: Colors.orange,
+                    ),
+                  );
+                  return;
+                }
+
                 // Crear entidad con los valores del formulario
                 final entity = EntityEntity(
                   id: '',
@@ -99,8 +112,8 @@ class ButtonSaveWidget extends StatelessWidget {
                     .read(registerEntityNotifierProvider.notifier)
                     .registrar(
                       entity: entity,
-                      imagenBytes: _selectedImageBytes!,
-                      fileName: _selectedImage!.name,
+                      imagenBytes: _selectedImageBytes,
+                      fileName: _selectedImage?.name ?? '',
                     );
               }
             },
