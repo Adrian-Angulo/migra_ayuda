@@ -464,13 +464,13 @@ class MapView extends StatelessWidget {
   Widget build(BuildContext context) {
     return FlutterMap(
       options: const MapOptions(
-        initialCenter: LatLng(6.2442, -75.5812), // Medellín
+        initialCenter: LatLng(1.2136, -77.2811), // Medellín
         initialZoom: 13,
       ),
       children: [
         TileLayer(
-          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          userAgentPackageName: 'com.example.app',
+          urlTemplate:
+              'https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=sCCRiCEG8SLjrAKmpanU',
         ),
       ],
     );
