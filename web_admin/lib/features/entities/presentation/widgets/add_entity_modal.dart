@@ -1,13 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
+import 'dart:convert';
 import 'dart:typed_data';
-import 'package:migra_ayuda_administracion/features/entities/domain/entities/entity_entity.dart';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/providers/register_entity_notifier.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/button_save_widget.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/image_picker_widget.dart';
-
-import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/time_input_widget.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/widgets/service_type_checklist_widget.dart';
 
 class AddEntityModal extends ConsumerStatefulWidget {
@@ -22,6 +24,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _addressController = TextEditingController();
+  LatLng? location;
   final _latitudController = TextEditingController();
   final _longitudController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -30,7 +33,9 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
   final _closingTime1Controller = TextEditingController(text: '12:00');
   final _openingTime2Controller = TextEditingController(text: '14:00');
   final _closingTime2Controller = TextEditingController(text: '18:00');
-
+  final _mapController = MapController();
+  bool _isSearching = false;
+  bool _addressNotFound = false;
   List<String> selectedDays = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi'];
   List<String> selectedServices = [];
   XFile? _selectedImage;
@@ -47,6 +52,54 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
     _openingTime2Controller.dispose();
     _closingTime2Controller.dispose();
     super.dispose();
+  }
+
+  Future<LatLng?> getCoordinates(String address) async {
+    final encoded = Uri.encodeComponent(address);
+    final url = Uri.parse(
+      'https://nominatim.openstreetmap.org/search'
+      '?q=$encoded&format=json&limit=1',
+    );
+
+    final response = await http.get(
+      url,
+      headers: {
+        'User-Agent': 'MigraAyuda/1.0', // Nominatim requiere esto
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final List data = jsonDecode(response.body);
+      if (data.isNotEmpty) {
+        return LatLng(
+          double.parse(data[0]['lat']),
+          double.parse(data[0]['lon']),
+        );
+      }
+    }
+    return null;
+  }
+
+  Future<void> _searchAddress() async {
+    if (_addressController.text.trim().isEmpty) return;
+    setState(() {
+      _isSearching = true;
+      _addressNotFound = false;
+    });
+
+    final coords = await getCoordinates(_addressController.text);
+
+    if (!mounted) return;
+
+    setState(() {
+      location = coords;
+      _isSearching = false;
+      _addressNotFound = coords == null;
+    });
+
+    if (coords != null) {
+      _mapController.move(coords, 15);
+    }
   }
 
   @override
@@ -106,7 +159,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -134,7 +187,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
@@ -161,7 +214,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                           'Complete los datos de la nueva entidad colaboradora',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                           ),
                         ),
                       ],
@@ -172,7 +225,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                     icon: const Icon(Icons.close),
                     color: Colors.white,
                     style: IconButton.styleFrom(
-                      backgroundColor: Colors.white.withOpacity(0.2),
+                      backgroundColor: Colors.white.withValues(alpha: 0.2),
                     ),
                   ),
                 ],
@@ -276,12 +329,16 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                         spacing: 16,
                         children: [
                           Expanded(
-                            flex: 2,
                             child: _buildTextField(
                               controller: _addressController,
                               label: 'Dirección',
                               hint: 'Ej. Calle 123 #45-67, Pasto',
                               icon: Icons.location_on_outlined,
+                              onChanged: (_) {
+                                if (_addressNotFound) {
+                                  setState(() => _addressNotFound = false);
+                                }
+                              },
                               validator: (value) {
                                 if (value == null || value.isEmpty) {
                                   return 'La dirección es requerida';
@@ -290,36 +347,103 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                               },
                             ),
                           ),
-                          Expanded(
-                            child: _buildTextField(
-                              controller: _latitudController,
-                              label: 'Latitud',
-                              hint: 'Ej. 1.21456',
-                              icon: Icons.location_on_outlined,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'La Logitud es requerida';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                          Expanded(
-                            child: _buildTextField(
-                              controller: _longitudController,
-                              label: 'Logitud',
-                              hint: 'Ej. -77.27846',
-                              icon: Icons.location_on_outlined,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'La Latitud es requerida';
-                                }
-                                return null;
-                              },
+                          Padding(
+                            padding: const EdgeInsets.only(top: 24),
+                            child: ElevatedButton(
+                              onPressed: _isSearching ? null : _searchAddress,
+                              child: _isSearching
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Text('Buscar'),
                             ),
                           ),
                         ],
                       ),
+                      if (_addressNotFound)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.error_outline,
+                                size: 14,
+                                color: Colors.red,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                'No se encontró la dirección. Intenta ser más específico.',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.red.shade700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      const SizedBox(height: 12),
+
+                      SizedBox(
+                        height: 250,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: FlutterMap(
+                            mapController: _mapController,
+                            options: const MapOptions(
+                              initialCenter: LatLng(1.2136, -77.2811),
+                              initialZoom: 15,
+                              minZoom: 5,
+                              maxZoom: 18,
+                            ),
+                            children: [
+                              TileLayer(
+                                urlTemplate:
+                                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                userAgentPackageName: 'com.migraayuda.app',
+                              ),
+                              MarkerLayer(
+                                markers: [
+                                  if (location != null)
+                                    Marker(
+                                      point: location!,
+                                      child: const Icon(
+                                        Icons.location_pin,
+                                        color: Colors.red,
+                                        size: 40,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      if (location != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.check_circle,
+                                size: 14,
+                                color: Color(0xFF2D5F4F),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                'Lat: ${location!.latitude.toStringAsFixed(5)},  Lng: ${location!.longitude.toStringAsFixed(5)}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey.shade600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
 
                       const SizedBox(height: 20),
                       _buildTextField(
@@ -397,7 +521,21 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                   const SizedBox(width: 12),
                   Expanded(
                     flex: 2,
-                    child: ButtonSaveWidget(registerState: registerState, formKey: _formKey, selectedImageBytes: _selectedImageBytes, selectedServices: selectedServices, nameController: _nameController, descriptionController: _descriptionController, addressController: _addressController, latitudController: _latitudController, longitudController: _longitudController, phoneController: _phoneController, scheduleController: _scheduleController, ref: ref, selectedImage: _selectedImage),
+                    child: ButtonSaveWidget(
+                      registerState: registerState,
+                      formKey: _formKey,
+                      selectedImageBytes: _selectedImageBytes,
+                      selectedServices: selectedServices,
+                      nameController: _nameController,
+                      descriptionController: _descriptionController,
+                      addressController: _addressController,
+                      latitudController: _latitudController,
+                      longitudController: _longitudController,
+                      phoneController: _phoneController,
+                      scheduleController: _scheduleController,
+                      ref: ref,
+                      selectedImage: _selectedImage,
+                    ),
                   ),
                 ],
               ),
@@ -414,7 +552,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: const Color(0xFF2D5F4F).withOpacity(0.1),
+            color: const Color(0xFF2D5F4F).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, size: 20, color: const Color(0xFF2D5F4F)),
@@ -438,23 +576,26 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
     required String hint,
     required IconData? icon,
     int maxLines = 1,
+    void Function(String)? onChanged,
     String? Function(String?)? validator,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF1A1A1A),
+        if (label.isNotEmpty)
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1A1A1A),
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
+        if (label.isNotEmpty) const SizedBox(height: 8),
         TextFormField(
           controller: controller,
           maxLines: maxLines,
+          onChanged: onChanged,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
@@ -487,45 +628,6 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
           validator: validator,
         ),
       ],
-    );
-  }
-
-  Widget _buildScheduleCard(
-    String title,
-    TextEditingController openingController,
-    TextEditingController closingController,
-    Color accentColor,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: accentColor.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: accentColor.withOpacity(0.2), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.schedule, size: 16, color: accentColor),
-              const SizedBox(width: 6),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: accentColor,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          TimeInputWidget(label: 'Apertura', controller: openingController),
-          const SizedBox(height: 12),
-          TimeInputWidget(label: 'Cierre', controller: closingController),
-        ],
-      ),
     );
   }
 }

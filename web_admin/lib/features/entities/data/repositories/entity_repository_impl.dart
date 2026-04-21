@@ -20,15 +20,13 @@ class EntityRepositoryImpl implements EntityRepository {
     required String fileName,
   }) async {
     try {
-      
       final modelo = EntityModels(
         id: '',
         name: entity.name,
         description: entity.description,
         services: entity.services,
         address: entity.address,
-        latitude: entity.latitude,
-        longitude: entity.longitude,
+        localitation: entity.localitation,
         phone: entity.phone,
         serviceHours: entity.serviceHours,
         imageUrl: '',
@@ -59,8 +57,7 @@ class EntityRepositoryImpl implements EntityRepository {
         description: entity.description,
         services: entity.services,
         address: entity.address,
-        latitude: entity.latitude,
-        longitude: entity.longitude,
+        localitation: entity.localitation,
         phone: entity.phone,
         serviceHours: entity.serviceHours,
         imageUrl: entity.imageUrl,

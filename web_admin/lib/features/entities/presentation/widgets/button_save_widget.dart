@@ -1,6 +1,6 @@
-
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -23,7 +23,16 @@ class ButtonSaveWidget extends StatelessWidget {
     required TextEditingController scheduleController,
     required this.ref,
     required XFile? selectedImage,
-  }) : _formKey = formKey, _selectedImageBytes = selectedImageBytes, _nameController = nameController, _descriptionController = descriptionController, _addressController = addressController, _latitudController = latitudController, _longitudController = longitudController, _phoneController = phoneController, _scheduleController = scheduleController, _selectedImage = selectedImage;
+  }) : _formKey = formKey,
+       _selectedImageBytes = selectedImageBytes,
+       _nameController = nameController,
+       _descriptionController = descriptionController,
+       _addressController = addressController,
+       _latitudController = latitudController,
+       _longitudController = longitudController,
+       _phoneController = phoneController,
+       _scheduleController = scheduleController,
+       _selectedImage = selectedImage;
 
   final AsyncValue<void> registerState;
   final GlobalKey<FormState> _formKey;
@@ -49,15 +58,13 @@ class ButtonSaveWidget extends StatelessWidget {
                 if (_selectedImageBytes == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text(
-                        'Por favor seleccione una imagen',
-                      ),
+                      content: Text('Por favor seleccione una imagen'),
                       backgroundColor: Colors.red,
                     ),
                   );
                   return;
                 }
-    
+
                 if (selectedServices.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -69,35 +76,27 @@ class ButtonSaveWidget extends StatelessWidget {
                   );
                   return;
                 }
-    
+
                 // Crear entidad con los valores del formulario
                 final entity = EntityEntity(
                   id: '',
                   name: _nameController.text.trim(),
-                  description: _descriptionController.text
-                      .trim(),
+                  description: _descriptionController.text.trim(),
                   services: selectedServices,
                   address: _addressController.text.trim(),
-                  latitude:
-                      double.tryParse(
-                        _latitudController.text.trim(),
-                      ) ??
-                      0.0,
-                  longitude:
-                      double.tryParse(
-                        _longitudController.text.trim(),
-                      ) ??
-                      0.0,
+                  localitation: GeoPoint(
+                    double.parse(_latitudController.text),
+                    double.parse(_longitudController.text),
+                  ),
+
                   phone: _phoneController.text.trim(),
                   serviceHours: _scheduleController.text.trim(),
                   imageUrl: "",
                 );
-    
+
                 // Llamar al notifier (el listener manejará el resultado)
                 ref
-                    .read(
-                      registerEntityNotifierProvider.notifier,
-                    )
+                    .read(registerEntityNotifierProvider.notifier)
                     .registrar(
                       entity: entity,
                       imagenBytes: _selectedImageBytes!,
@@ -111,28 +110,19 @@ class ButtonSaveWidget extends StatelessWidget {
               height: 20,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  Colors.white,
-                ),
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
               ),
             )
           : const Icon(Icons.save, size: 20),
       label: Text(
-        registerState.isLoading
-            ? 'Guardando...'
-            : 'Guardar Entidad',
-        style: const TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
-        ),
+        registerState.isLoading ? 'Guardando...' : 'Guardar Entidad',
+        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
       ),
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF10B981),
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         elevation: 0,
         disabledBackgroundColor: Colors.grey.shade400,
       ),

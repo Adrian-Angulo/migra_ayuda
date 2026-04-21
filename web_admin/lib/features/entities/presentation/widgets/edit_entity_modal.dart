@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -41,10 +42,10 @@ class _EditEntityModalState extends ConsumerState<EditEntityModal> {
     );
     _addressController = TextEditingController(text: widget.entity.address);
     _latitudController = TextEditingController(
-      text: widget.entity.latitude.toString(),
+      text: widget.entity.localitation.latitude.toString(),
     );
     _longitudController = TextEditingController(
-      text: widget.entity.longitude.toString(),
+      text: widget.entity.localitation.longitude.toString(),
     );
     _phoneController = TextEditingController(text: widget.entity.phone);
     _scheduleController = TextEditingController(
@@ -455,16 +456,10 @@ class _EditEntityModalState extends ConsumerState<EditEntityModal> {
                                       .trim(),
                                   services: selectedServices,
                                   address: _addressController.text.trim(),
-                                  latitude:
-                                      double.tryParse(
-                                        _latitudController.text.trim(),
-                                      ) ??
-                                      0.0,
-                                  longitude:
-                                      double.tryParse(
-                                        _longitudController.text.trim(),
-                                      ) ??
-                                      0.0,
+                                  localitation: GeoPoint(
+                                    double.parse(_latitudController.text),
+                                    double.parse(_longitudController.text),
+                                  ),
                                   phone: _phoneController.text.trim(),
                                   serviceHours: _scheduleController.text.trim(),
                                   imageUrl: widget.entity.imageUrl,

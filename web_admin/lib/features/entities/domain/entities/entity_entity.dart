@@ -1,11 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class EntityEntity {
   final String id;
   final String name;
   final String description;
   final List<String> services;
   final String address;
-  final double latitude;
-  final double longitude;
+  final GeoPoint localitation;
   final String phone;
   final String serviceHours;
   final String imageUrl;
@@ -16,8 +17,7 @@ class EntityEntity {
     required this.description,
     required this.services,
     required this.address,
-    required this.latitude,
-    required this.longitude,
+    required this.localitation,
     required this.phone,
     required this.serviceHours,
     required this.imageUrl,
