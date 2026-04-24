@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/place_details.dart';
+import 'package:migra_ayuda/features/auth/presentation/widgets/app_drawer.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 
@@ -16,8 +18,9 @@ class ExplorarScreen extends StatefulWidget {
 class _ExplorarScreenState extends State<ExplorarScreen> {
   final DraggableScrollableController _sheetController =
       DraggableScrollableController();
-
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   int _seletedFiltro = 0;
+  double _seetSize = 0.40;
 
   final filtros = [
     "Alimentacion",
@@ -87,137 +90,178 @@ class _ExplorarScreenState extends State<ExplorarScreen> {
       imageUrl: "",
     ),
   ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _sheetController.addListener(
+      () {
+        setState(() {
+          _seetSize = _sheetController.size;
+        });
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
+      key: scaffoldKey,
+      endDrawer: AppDrawer(),
       body: SafeArea(
         child: Stack(
           children: [
             MapView(),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '¿Que necesitas hoy?',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '¿Que necesitas hoy?',
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.menu,
+                          size: 30,
                         ),
+                        onPressed: () {
+                          scaffoldKey.currentState?.openEndDrawer();
+                        },
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  CategorySelector(
-                    items: filtros,
-                    selectedIndex: _seletedFiltro,
-                    onSelected: (index) {
-                      setState(() {
-                        _seletedFiltro = index;
-                      });
-                    },
+                ),
+                CategorySelector(
+                  items: filtros,
+                  selectedIndex: _seletedFiltro,
+                  onSelected: (index) {
+                    setState(() {
+                      _seletedFiltro = index;
+                    });
+                  },
+                ),
+              ],
+            ),
+            Positioned.fill(
+              child: Stack(
+                children: [
+                  DraggableScrollableSheet(
+                    controller: _sheetController,
+                    initialChildSize: 0.40,
+                    minChildSize: 0.15,
+                    maxChildSize: 0.85,
+                    expand: true,
+                    builder: (context, scrollController) => Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(16)),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onVerticalDragUpdate: (details) {
+                              final screenHeight =
+                                  MediaQuery.of(context).size.height;
+                              double delta =
+                                  details.primaryDelta! / screenHeight;
+                              double newSize = _sheetController.size - delta;
+                              newSize = newSize.clamp(0.15, 0.85);
+                              _sheetController.jumpTo(newSize);
+                            },
+                            child: Column(
+                              children: [
+                                Center(
+                                  child: Container(
+                                    width: 60,
+                                    height: 4,
+                                    margin: const EdgeInsets.only(
+                                        bottom: 12, top: 8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[400],
+                                      borderRadius: BorderRadius.circular(2),
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      const Text('Servicios cercanos'),
+                                      IconButton(
+                                        icon: const Icon(Icons.close),
+                                        onPressed: () {
+                                          _sheetController.animateTo(
+                                            0.15,
+                                            duration: const Duration(
+                                                milliseconds: 250),
+                                            curve: Curves.easeInOut,
+                                          );
+                                        },
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Expanded(
+                            child: ListView.separated(
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(height: 10),
+                              itemCount: 5,
+                              controller: scrollController,
+                              itemBuilder: (context, index) {
+                                final entity = lista[index];
+                                return PlaceCard(
+                                  entity: entity,
+                                  title: entity.name,
+                                  category: entity.services[0],
+                                  rating: 3.0,
+                                  isOpen: true,
+                                  onTap: () {},
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: MediaQuery.of(context).size.height * _seetSize + 16,
+                    right: 16,
+                    child: FloatingActionButton(
+                      backgroundColor: Colors.white,
+                      onPressed: () {},
+                      child: const Icon(Icons.my_location),
+                    ),
                   ),
                 ],
               ),
             ),
           ],
-        ),
-      ),
-      bottomSheet: DraggableScrollableSheet(
-        controller: _sheetController,
-        initialChildSize: 0.15,
-        minChildSize: 0.15,
-        maxChildSize: 0.85,
-        expand: false,
-        builder: (context, scrollController) => Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 8,
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onVerticalDragUpdate: (details) {
-                  final screenHeight = MediaQuery.of(context).size.height;
-
-                  // Movimiento proporcional al dedo
-                  double delta = details.primaryDelta! / screenHeight;
-
-                  // Restamos porque drag hacia arriba es negativo
-                  double newSize = _sheetController.size - delta;
-
-                  // Limitar rango
-                  newSize = newSize.clamp(0.15, 0.85);
-
-                  _sheetController.jumpTo(newSize);
-                },
-                child: Column(
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 60,
-                        height: 4,
-                        margin: const EdgeInsets.only(bottom: 12, top: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[400],
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text('Servicios cercanos'),
-                          IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () {
-                              _sheetController.animateTo(
-                                0.15,
-                                duration: const Duration(milliseconds: 250),
-                                curve: Curves.easeInOut,
-                              );
-                            },
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              Expanded(
-                child: ListView.separated(
-                  separatorBuilder: (context, index) => SizedBox(
-                    height: 10,
-                  ),
-                  itemCount: 5,
-                  controller: scrollController,
-                  itemBuilder: (context, index) {
-                    final entity = lista[index];
-                    return PlaceCard(
-                      title: entity.name,
-                      category: entity.services[0],
-                      rating: 3.0,
-                      isOpen: true,
-                      onTap: () {},
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -229,7 +273,7 @@ class _ExplorarScreenState extends State<ExplorarScreen> {
 class PlaceCard extends StatelessWidget {
   final String title;
   final String category;
-
+  final EntityEntity entity;
   final double rating;
   final bool isOpen;
   final String? imageUrl;
@@ -243,30 +287,40 @@ class PlaceCard extends StatelessWidget {
     required this.isOpen,
     this.imageUrl,
     this.onTap,
+    required this.entity,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.15),
-            blurRadius: 7,
-            offset: const Offset(0, 0),
-          )
-        ],
-      ),
-      child: Row(
-        children: [
-          _buildImage(),
-          const SizedBox(width: 12),
-          Expanded(child: _buildContent()),
-        ],
+    return GestureDetector(
+      onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PlaceDetails(
+              entity: entity,
+            ),
+          )),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 7,
+              offset: const Offset(0, 0),
+            )
+          ],
+        ),
+        child: Row(
+          children: [
+            _buildImage(),
+            const SizedBox(width: 12),
+            Expanded(child: _buildContent()),
+          ],
+        ),
       ),
     );
   }
@@ -464,9 +518,10 @@ class MapView extends StatelessWidget {
   Widget build(BuildContext context) {
     return FlutterMap(
       options: const MapOptions(
-        initialCenter: LatLng(1.2136, -77.2811), // Medellín
-        initialZoom: 13,
-      ),
+          initialCenter: LatLng(1.2136, -77.2811), // Medellín
+          initialZoom: 14.5,
+          minZoom: 14,
+          maxZoom: 16),
       children: [
         TileLayer(
           urlTemplate:

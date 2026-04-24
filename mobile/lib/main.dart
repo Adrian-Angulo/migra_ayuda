@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/explorar_screen.dart';
 import 'package:migra_ayuda/features/language/presentation/providers/language_provider.dart';
 import 'package:migra_ayuda/features/onboarding/presentation/screens/start_page.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
@@ -39,7 +40,8 @@ class MainApp extends ConsumerWidget {
         fontFamily: 'Inter',
         useMaterial3: true,
       ),
-      home: const StartPage(),
+      /* home: const StartPage(), */
+      home: ExplorarScreen(),
     );
   }
 }
