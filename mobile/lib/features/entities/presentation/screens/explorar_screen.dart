@@ -1,121 +1,188 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/app_drawer.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/widgets/category_selector.dart';
 import 'package:migra_ayuda/features/entities/presentation/widgets/map_view.dart';
 import 'package:migra_ayuda/features/entities/presentation/widgets/place_card.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
-
-
-class ExplorarScreen extends StatefulWidget {
+class ExplorarScreen extends ConsumerStatefulWidget {
   const ExplorarScreen({super.key});
 
   @override
-  State<ExplorarScreen> createState() => _ExplorarScreenState();
+  ConsumerState<ExplorarScreen> createState() => _ExplorarScreenState();
 }
 
-class _ExplorarScreenState extends State<ExplorarScreen> {
+class _ExplorarScreenState extends ConsumerState<ExplorarScreen>
+    with WidgetsBindingObserver {
   final DraggableScrollableController _sheetController =
       DraggableScrollableController();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  int _seletedFiltro = 0;
-  double _seetSize = 0.40;
+  int _selectedFiltro = 0;
+  double _sheetSize = 0.40;
+  bool _isControllerAttached = false;
+  bool _hasNewData = false;
+  int _currentDataCount = 0;
 
   final filtros = [
+    "Todos",
     "Alimentacion",
     "Salud",
     "Alojamiento",
     "Trabajo",
     "Transporte"
   ];
-  final lista = const <EntityEntity>[
-    EntityEntity(
-      id: "1",
-      name: "Banco de Alimentos Madrid",
-      description:
-          "Distribución de alimentos a familias en situación de vulnerabilidad.",
-      services: ["Alimentos", "Ropa", "Higiene"],
-      address: "Calle Gran Vía 45, Madrid",
-      localitation: GeoPoint(40.4200, -3.7050),
-      phone: "+34 910 123 456",
-      serviceHours: "Lun-Vie 9:00-17:00",
-      imageUrl: "",
-    ),
-    EntityEntity(
-      id: "2",
-      name: "Cruz Roja Española",
-      description:
-          "Asistencia humanitaria y apoyo a migrantes recién llegados.",
-      services: ["Asesoría legal", "Alojamiento temporal", "Idiomas"],
-      address: "Avenida Reina Victoria 26, Madrid",
-      localitation: GeoPoint(40.4200, -3.7050),
-      phone: "+34 915 222 333",
-      serviceHours: "Lun-Sáb 8:00-20:00",
-      imageUrl: "",
-    ),
-    EntityEntity(
-      id: "3",
-      name: "Centro de Acogida Esperanza",
-      description:
-          "Alojamiento y orientación para personas en tránsito migratorio.",
-      services: ["Alojamiento", "Comedor", "Orientación"],
-      address: "Calle Alcalá 120, Madrid",
-      localitation: GeoPoint(40.4200, -3.7050),
-      phone: "+34 916 444 555",
-      serviceHours: "24 horas",
-      imageUrl: "",
-    ),
-    EntityEntity(
-      id: "4",
-      name: "Médicos del Mundo",
-      description:
-          "Atención médica gratuita para personas sin acceso al sistema sanitario.",
-      services: ["Medicina general", "Salud mental", "Pediatría"],
-      address: "Calle Barquillo 8, Madrid",
-      localitation: GeoPoint(40.4200, -3.7050),
-      phone: "+34 917 666 777",
-      serviceHours: "Mar y Jue 10:00-14:00",
-      imageUrl: "",
-    ),
-    EntityEntity(
-      id: "5",
-      name: "ACCEM Asociación",
-      description: "Integración social y laboral de refugiados e inmigrantes.",
-      services: ["Empleo", "Formación", "Vivienda"],
-      address: "Calle Lope de Vega 34, Madrid",
-      localitation: GeoPoint(40.4200, -3.7050),
-      phone: "+34 918 888 999",
-      serviceHours: "Lun-Vie 9:00-18:00",
-      imageUrl: "",
-    ),
-  ];
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    _sheetController.addListener(
-      () {
+    // Agrega observer para detectar cuando la app vuelve del background
+    WidgetsBinding.instance.addObserver(this);
+
+    // Espera a que el controller esté attached antes de agregar el listener
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _sheetController.isAttached) {
         setState(() {
-          _seetSize = _sheetController.size;
+          _isControllerAttached = true;
         });
-      },
+        _sheetController.addListener(_onSheetChanged);
+      }
+
+      // Inicia la verificación periódica de nuevos datos
+      _startPeriodicCheck();
+    });
+  }
+
+  void _startPeriodicCheck() {
+    // Verifica cada 30 segundos si hay datos nuevos
+    Stream.periodic(const Duration(seconds: 30)).listen((_) async {
+      if (mounted) {
+        await _checkForNewData();
+      }
+    });
+  }
+
+  Future<void> _checkForNewData() async {
+    try {
+      final usecase = ref.read(getAllEntitiesUsecaseProvider);
+      final result = await usecase.call();
+
+      result.fold(
+        (error) {
+          // No hacer nada si hay error
+        },
+        (entities) {
+          if (mounted &&
+              _currentDataCount > 0 &&
+              entities.length > _currentDataCount) {
+            setState(() {
+              _hasNewData = true;
+            });
+          }
+        },
+      );
+    } catch (e) {
+      // Ignorar errores silenciosamente
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    // Cuando la app vuelve a estar activa, verifica si hay datos nuevos
+    if (state == AppLifecycleState.resumed) {
+      _checkForNewData();
+    }
+  }
+
+  void _onSheetChanged() {
+    if (mounted && _sheetController.isAttached) {
+      setState(() {
+        _sheetSize = _sheetController.size;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    if (_isControllerAttached && _sheetController.isAttached) {
+      _sheetController.removeListener(_onSheetChanged);
+    }
+    super.dispose();
+  }
+
+  Future<void> _refreshEntities() async {
+    ref.invalidate(entitiesStreamProvider);
+
+    // Oculta el banner de nuevos datos
+    setState(() {
+      _hasNewData = false;
+    });
+  }
+
+  Widget _buildNewDataBanner() {
+    return GestureDetector(
+      onTap: _refreshEntities,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.teal[50],
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.teal[200]!),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.info_outline, size: 20, color: Colors.teal[700]),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Nuevos servicios disponibles',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.teal[900],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: _refreshEntities,
+              style: TextButton.styleFrom(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(
+                'Actualizar',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.teal[700],
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    // Escucha el stream de entidades
+    final entitiesAsync = ref.watch(entitiesStreamProvider);
 
     return Scaffold(
       key: scaffoldKey,
-      endDrawer: AppDrawer(),
+      endDrawer: const AppDrawer(),
       body: SafeArea(
         child: Stack(
           children: [
-            MapView(),
+            const MapView(),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -124,12 +191,19 @@ class _ExplorarScreenState extends State<ExplorarScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        '¿Que necesitas hoy?',
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                      Expanded(
+                        child: Text(
+                          '¿Qué necesitas hoy?',
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.refresh, size: 24),
+                        tooltip: 'Actualizar servicios',
+                        onPressed: _refreshEntities,
                       ),
                       IconButton(
                         icon: const Icon(
@@ -145,13 +219,15 @@ class _ExplorarScreenState extends State<ExplorarScreen> {
                 ),
                 CategorySelector(
                   items: filtros,
-                  selectedIndex: _seletedFiltro,
+                  selectedIndex: _selectedFiltro,
                   onSelected: (index) {
                     setState(() {
-                      _seletedFiltro = index;
+                      _selectedFiltro = index;
                     });
                   },
                 ),
+                // Banner de nuevos datos disponibles
+                if (_hasNewData) _buildNewDataBanner(),
               ],
             ),
             Positioned.fill(
@@ -180,13 +256,16 @@ class _ExplorarScreenState extends State<ExplorarScreen> {
                           GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onVerticalDragUpdate: (details) {
-                              final screenHeight =
-                                  MediaQuery.of(context).size.height;
-                              double delta =
-                                  details.primaryDelta! / screenHeight;
-                              double newSize = _sheetController.size - delta;
-                              newSize = newSize.clamp(0.15, 0.85);
-                              _sheetController.jumpTo(newSize);
+                              if (_isControllerAttached &&
+                                  _sheetController.isAttached) {
+                                final screenHeight =
+                                    MediaQuery.of(context).size.height;
+                                double delta =
+                                    details.primaryDelta! / screenHeight;
+                                double newSize = _sheetController.size - delta;
+                                newSize = newSize.clamp(0.15, 0.85);
+                                _sheetController.jumpTo(newSize);
+                              }
                             },
                             child: Column(
                               children: [
@@ -213,12 +292,15 @@ class _ExplorarScreenState extends State<ExplorarScreen> {
                                       IconButton(
                                         icon: const Icon(Icons.close),
                                         onPressed: () {
-                                          _sheetController.animateTo(
-                                            0.15,
-                                            duration: const Duration(
-                                                milliseconds: 250),
-                                            curve: Curves.easeInOut,
-                                          );
+                                          if (_isControllerAttached &&
+                                              _sheetController.isAttached) {
+                                            _sheetController.animateTo(
+                                              0.15,
+                                              duration: const Duration(
+                                                  milliseconds: 250),
+                                              curve: Curves.easeInOut,
+                                            );
+                                          }
                                         },
                                       )
                                     ],
@@ -229,30 +311,16 @@ class _ExplorarScreenState extends State<ExplorarScreen> {
                           ),
                           const SizedBox(height: 16),
                           Expanded(
-                            child: ListView.separated(
-                              separatorBuilder: (context, index) =>
-                                  const SizedBox(height: 10),
-                              itemCount: 5,
-                              controller: scrollController,
-                              itemBuilder: (context, index) {
-                                final entity = lista[index];
-                                return PlaceCard(
-                                  entity: entity,
-                                  title: entity.name,
-                                  category: entity.services[0],
-                                  rating: 3.0,
-                                  isOpen: true,
-                                  onTap: () {},
-                                );
-                              },
-                            ),
+                            child: _buildEntitiesList(
+                                entitiesAsync, scrollController),
                           ),
                         ],
                       ),
                     ),
                   ),
                   Positioned(
-                    bottom: MediaQuery.of(context).size.height * _seetSize + 16,
+                    bottom:
+                        MediaQuery.of(context).size.height * _sheetSize + 16,
                     right: 16,
                     child: FloatingActionButton(
                       backgroundColor: Colors.white,
@@ -268,6 +336,129 @@ class _ExplorarScreenState extends State<ExplorarScreen> {
       ),
     );
   }
+
+  Widget _buildEntitiesList(AsyncValue<List<EntityEntity>> entitiesAsync,
+      ScrollController scrollController) {
+    return entitiesAsync.when(
+      data: (entities) {
+        // Actualiza el contador de datos actual
+        if (_currentDataCount != entities.length) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              setState(() {
+                _currentDataCount = entities.length;
+              });
+            }
+          });
+        }
+
+        final filteredEntities = _filterEntities(entities);
+
+        if (filteredEntities.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  _selectedFiltro == 0 ? Icons.inbox : Icons.search_off,
+                  size: 48,
+                  color: Colors.grey,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  _selectedFiltro == 0
+                      ? 'No hay entidades disponibles'
+                      : 'No hay resultados para "${filtros[_selectedFiltro]}"',
+                  style: Theme.of(context).textTheme.titleMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: _refreshEntities,
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Recargar'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: _refreshEntities,
+          child: ListView.separated(
+            separatorBuilder: (context, index) => const SizedBox(height: 10),
+            itemCount: filteredEntities.length,
+            controller: scrollController,
+            itemBuilder: (context, index) {
+              final entity = filteredEntities[index];
+              return PlaceCard(
+                entity: entity,
+                title: entity.name,
+                category: entity.services.isNotEmpty
+                    ? entity.services[0]
+                    : 'Sin categoría',
+                rating: 3.0,
+                isOpen: true,
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Ver detalles de ${entity.name}'),
+                      duration: const Duration(seconds: 1),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        );
+      },
+      loading: () => const Center(
+        child: CircularProgressIndicator(),
+      ),
+      error: (error, stack) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.cloud_off, size: 48, color: Colors.grey),
+            const SizedBox(height: 16),
+            Text(
+              'Sin conexión',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Text(
+                error.toString(),
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: _refreshEntities,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Reintentar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  List<EntityEntity> _filterEntities(List<EntityEntity> entities) {
+    // Si el filtro es "Todos" (índice 0), muestra todas las entidades
+    if (_selectedFiltro == 0) {
+      return entities;
+    }
+
+    final selectedCategory = filtros[_selectedFiltro].toLowerCase();
+
+    // Filtra por servicios que contengan la categoría seleccionada
+    return entities.where((entity) {
+      return entity.services.any(
+        (service) => service.toLowerCase().contains(selectedCategory),
+      );
+    }).toList();
+  }
 }
-
-

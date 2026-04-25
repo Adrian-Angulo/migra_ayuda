@@ -6,125 +6,184 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'package:migra_ayuda/features/entities/data/models/entity_models.dart';
 
-class EntityRemoteDatasource {
+/// Excepción personalizada para errores del servidor
+class ServerException implements Exception {
+  final String message;
+  ServerException(this.message);
+
+  @override
+  String toString() => 'ServerException: $message';
+}
+
+/// Interfaz abstracta para el datasource remoto de entidades
+abstract class EntityRemoteDataSource {
+  /// Obtiene todas las entidades de Firebase
+  Future<List<EntityModels>> getAllEntities();
+
+  /// Obtiene una entidad específica por ID
+  Future<EntityModels> getEntityById(String id);
+
+  /// Registra una nueva entidad con imagen
+  Future<void> registerEntity({
+    required EntityModels entityModel,
+    required Uint8List imageBytes,
+    required String fileName,
+  });
+
+  /// Actualiza una entidad existente
+  Future<void> updateEntity({
+    required EntityModels entityModel,
+    Uint8List? imageBytes,
+    String? fileName,
+  });
+
+  /// Elimina una entidad
+  Future<void> deleteEntity(String entityId);
+}
+
+/// Implementación del datasource remoto usando Firebase
+class EntityRemoteDataSourceImpl implements EntityRemoteDataSource {
   final FirebaseFirestore _firestore;
   static const _cloudName = "dyprnvoff";
   static const _uploadPreset = "MigraAyuda";
 
-  EntityRemoteDatasource({FirebaseFirestore? firestore})
-    : _firestore = firestore ?? FirebaseFirestore.instance;
+  EntityRemoteDataSourceImpl({FirebaseFirestore? firestore})
+      : _firestore = firestore ?? FirebaseFirestore.instance;
 
   Future<String> _uploadImage({
     required Uint8List bytes,
     required String fileName,
   }) async {
-    final url = Uri.parse(
-      'https://api.cloudinary.com/v1_1/$_cloudName/image/upload',
-    );
+    try {
+      final url = Uri.parse(
+        'https://api.cloudinary.com/v1_1/$_cloudName/image/upload',
+      );
 
-    final request = http.MultipartRequest('POST', url);
+      final request = http.MultipartRequest('POST', url);
 
-    request.fields['upload_preset'] = _uploadPreset;
-    request.fields['public_id'] =
-        '${DateTime.now().millisecondsSinceEpoch}_$fileName';
+      request.fields['upload_preset'] = _uploadPreset;
+      request.fields['public_id'] =
+          '${DateTime.now().millisecondsSinceEpoch}_$fileName';
 
-    request.files.add(
-      http.MultipartFile.fromBytes('file', bytes, filename: fileName),
-    );
+      request.files.add(
+        http.MultipartFile.fromBytes('file', bytes, filename: fileName),
+      );
 
-    final streamedResponse = await request.send();
-    final response = await http.Response.fromStream(streamedResponse);
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
 
-    if (response.statusCode != 200) {
-      throw Exception('Error al subir imagen: ${response.body}');
+      if (response.statusCode != 200) {
+        throw ServerException('Error al subir imagen: ${response.body}');
+      }
+
+      final json = jsonDecode(response.body);
+      return json['secure_url'];
+    } catch (e) {
+      throw ServerException('Error al subir imagen: $e');
     }
-
-    final json = jsonDecode(response.body);
-    return json['secure_url'];
   }
 
+  @override
   Future<void> registerEntity({
     required EntityModels entityModel,
     required Uint8List imageBytes,
     required String fileName,
   }) async {
-    final imagenUrl = await _uploadImage(bytes: imageBytes, fileName: fileName);
+    try {
+      final imagenUrl =
+          await _uploadImage(bytes: imageBytes, fileName: fileName);
 
-    final entidadConImagen = EntityModels(
-      id: '',
-      name: entityModel.name,
-      description: entityModel.description,
-      services: entityModel.services,
-      address: entityModel.address,
-      localitation: entityModel.localitation,
-      phone: entityModel.phone,
-      serviceHours: entityModel.serviceHours,
-      imageUrl: imagenUrl,
-    );
+      final entidadConImagen = EntityModels(
+        id: '',
+        name: entityModel.name,
+        description: entityModel.description,
+        services: entityModel.services,
+        address: entityModel.address,
+        localitation: entityModel.localitation,
+        phone: entityModel.phone,
+        serviceHours: entityModel.serviceHours,
+        imageUrl: imagenUrl,
+      );
 
-    await _firestore.collection('entities').add(entidadConImagen.toMap());
+      await _firestore.collection('entities').add(entidadConImagen.toMap());
+    } catch (e) {
+      throw ServerException('Error al registrar entidad: $e');
+    }
   }
 
+  @override
   Future<void> updateEntity({
     required EntityModels entityModel,
     Uint8List? imageBytes,
     String? fileName,
   }) async {
-    String imagenUrl = entityModel.imageUrl;
+    try {
+      String imagenUrl = entityModel.imageUrl;
 
-    // Solo subir nueva imagen si se proporcionó
-    if (imageBytes != null && fileName != null) {
-      imagenUrl = await _uploadImage(bytes: imageBytes, fileName: fileName);
+      // Solo subir nueva imagen si se proporcionó
+      if (imageBytes != null && fileName != null) {
+        imagenUrl = await _uploadImage(bytes: imageBytes, fileName: fileName);
+      }
+
+      final entidadActualizada = EntityModels(
+        id: entityModel.id,
+        name: entityModel.name,
+        description: entityModel.description,
+        services: entityModel.services,
+        address: entityModel.address,
+        localitation: entityModel.localitation,
+        phone: entityModel.phone,
+        serviceHours: entityModel.serviceHours,
+        imageUrl: imagenUrl,
+      );
+
+      await _firestore
+          .collection('entities')
+          .doc(entityModel.id)
+          .update(entidadActualizada.toMap());
+    } catch (e) {
+      throw ServerException('Error al actualizar entidad: $e');
     }
-
-    final entidadActualizada = EntityModels(
-      id: entityModel.id,
-      name: entityModel.name,
-      description: entityModel.description,
-      services: entityModel.services,
-      address: entityModel.address,
-      localitation: entityModel.localitation,
-      phone: entityModel.phone,
-      serviceHours: entityModel.serviceHours,
-      imageUrl: imagenUrl,
-    );
-
-    await _firestore
-        .collection('entities')
-        .doc(entityModel.id)
-        .update(entidadActualizada.toMap());
   }
 
+  @override
   Future<void> deleteEntity(String entityId) async {
     try {
       await _firestore.collection('entities').doc(entityId).delete();
-    } catch (e, stackTrace) {
-      rethrow;
+    } catch (e) {
+      throw ServerException('Error al eliminar entidad: $e');
     }
   }
 
+  @override
   Future<List<EntityModels>> getAllEntities() async {
-    final snapshot = await _firestore
-        .collection('entities')
-        .orderBy('name')
-        .get();
+    try {
+      final snapshot =
+          await _firestore.collection('entities').orderBy('name').get();
 
-    final entities = snapshot.docs
-        .map((doc) => EntityModels.fromMap(doc))
-        .toList();
+      final entities =
+          snapshot.docs.map((doc) => EntityModels.fromMap(doc)).toList();
 
-    return entities;
+      return entities;
+    } catch (e) {
+      throw ServerException('Error al obtener entidades: $e');
+    }
   }
 
+  @override
   Future<EntityModels> getEntityById(String id) async {
-    final doc = await _firestore.collection('entities').doc(id).get();
+    try {
+      final doc = await _firestore.collection('entities').doc(id).get();
 
-    if (!doc.exists) {
-      throw Exception('Entidad no encontrada');
+      if (!doc.exists) {
+        throw ServerException('Entidad no encontrada');
+      }
+
+      final entity = EntityModels.fromMap(doc);
+
+      return entity;
+    } catch (e) {
+      throw ServerException('Error al obtener entidad: $e');
     }
-
-    final entity = EntityModels.fromMap(doc);
-
-    return entity;
   }
 }
