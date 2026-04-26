@@ -7,12 +7,50 @@
 Firebase (Remoto) ←→ Sembast (Local) ←→ UI
          ↓                ↓              ↓
     Fuente remota    Caché local    Datos mostrados
+
+Cloudinary (Imágenes) ←→ Caché de Imágenes ←→ UI
+         ↓                      ↓              ↓
+    Imágenes remotas    Disco local    Imágenes mostradas
 ```
 
 ### **Estrategia: Cache-First**
-1. **Lectura**: Siempre lee primero del caché (Sembast) - INSTANTÁNEO
-2. **Actualización**: Si hay internet, actualiza desde Firebase en background
-3. **Escritura**: Guarda primero en caché, luego sincroniza con Firebase
+1. **Lectura de Datos**: Siempre lee primero del caché (Sembast) - INSTANTÁNEO
+2. **Lectura de Imágenes**: Primero busca en caché de disco, luego descarga
+3. **Actualización**: Si hay internet, actualiza desde Firebase en background
+4. **Escritura**: Guarda primero en caché, luego sincroniza con Firebase
+
+---
+
+## 🖼️ Caché de Imágenes Offline
+
+### **Implementación con CachedNetworkImage**
+- ✅ Descarga automática de imágenes
+- ✅ Almacenamiento en disco local
+- ✅ Funciona completamente offline después de la primera carga
+- ✅ Placeholder mientras carga
+- ✅ Widget de error si falla la descarga
+
+### **Configuración de Caché**
+```dart
+// Imágenes pequeñas (thumbnails en lista)
+maxHeightDiskCache: 400
+maxWidthDiskCache: 400
+
+// Imágenes grandes (detalles)
+maxHeightDiskCache: 800
+maxWidthDiskCache: 800
+```
+
+### **Ubicación del Caché de Imágenes**
+- **Android**: `/data/data/com.example.migra_ayuda/cache/libCachedImageData/`
+- **iOS**: `Library/Caches/libCachedImageData/`
+
+### **Características**
+- ✅ Caché persistente (sobrevive al cierre de la app)
+- ✅ Gestión automática de espacio
+- ✅ Limpieza automática de imágenes antiguas
+- ✅ Compresión inteligente
+- ✅ Placeholder animado mientras carga
 
 ---
 
@@ -89,10 +127,20 @@ Firebase (Remoto) ←→ Sembast (Local) ←→ UI
 ### **Modo Offline**
 ```
 1. Sin internet
-2. Lee solo del caché (Sembast)
-3. Muestra banner naranja: "Modo offline"
-4. Todas las operaciones funcionan localmente
-5. Al recuperar internet → Sincroniza automáticamente
+2. Lee datos del caché (Sembast)
+3. Lee imágenes del caché de disco
+4. Muestra banner naranja: "Modo offline"
+5. Todas las operaciones funcionan localmente
+6. Al recuperar internet → Sincroniza automáticamente
+```
+
+### **Primera Carga de Imágenes**
+```
+1. Usuario ve la lista de entidades
+2. Imágenes se descargan automáticamente
+3. Se guardan en caché de disco
+4. Próximas veces → Carga instantánea desde disco
+5. Funciona offline después de la primera carga
 ```
 
 ---
@@ -105,12 +153,18 @@ Firebase (Remoto) ←→ Sembast (Local) ←→ UI
 - `connectionStatusProvider`: Estado de conexión en tiempo real
 
 ### **Datasources**
-- `EntityLocalDataSource`: Sembast (caché local)
-- `EntityRemoteDataSource`: Firebase (fuente remota)
+- `EntityLocalDataSource`: Sembast (caché local de datos)
+- `EntityRemoteDataSource`: Firebase (fuente remota de datos)
+- `CachedNetworkImage`: Caché automático de imágenes en disco
 
 ### **Repository**
 - `EntityRepositoryImpl`: Implementa estrategia offline-first
 - Maneja sincronización entre local y remoto
+
+### **Widgets**
+- `CachedImageWidget`: Widget reutilizable para imágenes con caché
+- `PlaceCard`: Usa CachedNetworkImage para thumbnails
+- `PlaceDetails`: Usa CachedNetworkImage para imágenes grandes
 
 ### **Variables de Estado**
 - `_hasNewData`: Indica si hay datos nuevos disponibles
@@ -128,34 +182,44 @@ Firebase (Remoto) ←→ Sembast (Local) ←→ UI
 
 ### **Sin Conexión**
 1. Abre la app → Ve datos del caché
-2. Banner naranja: "Modo offline"
-3. Puede ver todos los datos guardados
-4. Al recuperar internet → Sincroniza automáticamente
+2. Ve imágenes del caché de disco
+3. Banner naranja: "Modo offline"
+4. Puede ver todos los datos guardados
+5. Imágenes cargan instantáneamente
+6. Al recuperar internet → Sincroniza automáticamente
 
-### **Admin Agrega Entidad**
-1. Admin agrega en panel web
+### **Admin Agrega Entidad con Imagen**
+1. Admin agrega en panel web con imagen
 2. Móvil detecta cambio (máx 30s)
 3. Muestra banner "Nuevos servicios disponibles"
-4. Usuario actualiza y ve la nueva entidad
+4. Usuario actualiza
+5. Nueva entidad aparece
+6. Imagen se descarga y cachea automáticamente
+7. Próximas veces → Imagen carga desde caché
 
 ---
 
 ## ⚡ Optimizaciones
 
 ### **Performance**
-- Lectura del caché es instantánea (< 50ms)
+- Lectura del caché de datos es instantánea (< 50ms)
+- Lectura del caché de imágenes es instantánea (< 100ms)
 - Actualización en background no bloquea UI
 - Stream periódico no afecta rendimiento
+- Imágenes se comprimen automáticamente
 
 ### **Batería**
 - Verificación cada 30s es eficiente
 - Solo consulta Firebase cuando hay conexión
 - Se detiene cuando la app está en background
+- Caché de imágenes reduce descargas repetidas
 
 ### **Datos**
 - Solo descarga cuando hay cambios
 - Caché reduce uso de datos móviles
 - Funciona completamente offline
+- Imágenes se descargan una sola vez
+- Gestión inteligente de espacio en disco
 
 ---
 
@@ -170,20 +234,37 @@ Los logs en consola muestran:
 - 🔄 Sincronizando entidades...
 - ✅ Entidades sincronizadas: X registros
 
-### **Verificar Caché**
-El caché se guarda en:
+### **Verificar Caché de Datos**
+El caché de datos se guarda en:
 - Android: `/data/data/com.example.migra_ayuda/files/migra_ayuda.db`
 - iOS: `Documents/migra_ayuda.db`
+
+### **Verificar Caché de Imágenes**
+El caché de imágenes se guarda en:
+- Android: `/data/data/com.example.migra_ayuda/cache/libCachedImageData/`
+- iOS: `Library/Caches/libCachedImageData/`
+
+### **Limpiar Caché**
+```dart
+// Limpiar caché de imágenes
+await DefaultCacheManager().emptyCache();
+
+// Limpiar caché de datos
+await SembastDatabase.instance.clearAll();
+```
 
 ---
 
 ## 📝 Notas Importantes
 
-1. **Primera Carga**: Requiere internet para obtener datos iniciales
+1. **Primera Carga**: Requiere internet para obtener datos e imágenes iniciales
 2. **Sincronización**: Máximo 30 segundos de delay
 3. **Banner**: Solo aparece si hay MÁS entidades que antes
 4. **Offline**: Funciona completamente sin internet después de la primera carga
 5. **Conflictos**: Usa estrategia "last-write-wins"
+6. **Imágenes**: Se cachean automáticamente en disco
+7. **Espacio**: El caché de imágenes se gestiona automáticamente
+8. **Calidad**: Las imágenes se comprimen para optimizar espacio
 
 ---
 
@@ -192,5 +273,7 @@ El caché se guarda en:
 - [ ] Sincronización en tiempo real con Firebase Realtime Database
 - [ ] Notificaciones push para nuevos servicios
 - [ ] Sincronización selectiva por categoría
-- [ ] Compresión de imágenes para caché
+- [ ] Pre-carga de imágenes en background
 - [ ] Limpieza automática de caché antiguo
+- [ ] Configuración de tamaño máximo de caché
+- [ ] Indicador de espacio usado por caché

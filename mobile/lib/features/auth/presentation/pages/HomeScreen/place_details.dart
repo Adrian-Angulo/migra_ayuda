@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
@@ -125,10 +126,25 @@ class _PlaceHeroImage extends StatelessWidget {
         width: double.infinity,
         height: 200,
         child: imageUrl.isNotEmpty
-            ? Image.network(
-                imageUrl,
+            ? CachedNetworkImage(
+                imageUrl: imageUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _placeholder(),
+                placeholder: (context, url) => Container(
+                  color: const Color(0xFFE5E7EB),
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3,
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(Color(0xFF5F9EA0)),
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) => _placeholder(),
+                // Configuración de caché para imágenes grandes
+                maxHeightDiskCache: 800,
+                maxWidthDiskCache: 800,
+                memCacheHeight: 800,
+                memCacheWidth: 800,
               )
             : _placeholder(),
       ),

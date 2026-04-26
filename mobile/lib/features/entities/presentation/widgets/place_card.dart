@@ -1,4 +1,4 @@
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/place_details.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
@@ -68,13 +68,28 @@ class PlaceCard extends StatelessWidget {
         child: imageUrl == null || imageUrl!.isEmpty
             ? const Icon(Icons.image_not_supported,
                 size: 40, color: Colors.grey)
-            : Image.network(
-                imageUrl!,
+            : CachedNetworkImage(
+                imageUrl: imageUrl!,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) {
-                  return const Icon(Icons.broken_image,
-                      size: 40, color: Colors.grey);
-                },
+                placeholder: (context, url) => Container(
+                  color: Colors.grey[200],
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.grey),
+                    ),
+                  ),
+                ),
+                errorWidget: (context, url, error) => const Icon(
+                  Icons.broken_image,
+                  size: 40,
+                  color: Colors.grey,
+                ),
+                // Configuración de caché
+                maxHeightDiskCache: 400,
+                maxWidthDiskCache: 400,
+                memCacheHeight: 400,
+                memCacheWidth: 400,
               ),
       ),
     );
