@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:migra_ayuda/core/utils/constants.dart';
-import 'package:migra_ayuda/core/utils/widgets/mensajesWidget.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/home_screen.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/admin/home_screen_admin.dart';
+import 'package:migra_ayuda/core/constants/app_constants.dart';
+import 'package:migra_ayuda/features/home/presentation/screens/home_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/admin/home_screen_admin.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screen/complete_info_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screen/login_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screen/register_screen.dart';
-import 'package:migra_ayuda/features/auth/presentation/widgets/switch_button.dart';
+import 'package:migra_ayuda/features/auth/presentation/widgets/inputs/switch_button.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 enum AuthMode { login, register }
@@ -54,7 +53,9 @@ class _AuthPageState extends ConsumerState<AuthPage> {
             }
           }
         }, error: (error, stackTrace) {
-          Mensajeswidget.mostrarError(context, error.toString());
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error.toString())),
+          );
         });
       },
     );

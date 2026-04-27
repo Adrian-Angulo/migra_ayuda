@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/AdminHomeScreen/admin_dashboard_screen.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/AdminHomeScreen/admin_users_screen.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/AdminHomeScreen/admin_profile_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/admin/admin_dashboard_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/admin/admin_users_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/admin/admin_profile_screen.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});

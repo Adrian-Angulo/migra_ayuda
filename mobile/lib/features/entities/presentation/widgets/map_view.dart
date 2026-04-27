@@ -92,11 +92,12 @@ class MapView extends StatelessWidget {
             height: 60,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
+              color: color.withOpacity(0.3),
               boxShadow: [
                 BoxShadow(
                   color: color.withOpacity(0.4),
-                  blurRadius: 12,
-                  spreadRadius: 4,
+                  blurRadius: 16,
+                  spreadRadius: 6,
                 ),
               ],
             ),

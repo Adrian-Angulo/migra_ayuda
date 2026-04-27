@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/auth_page.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/auth_page.dart';
 import 'package:migra_ayuda/features/language/presentation/providers/language_provider.dart';
 import 'package:migra_ayuda/features/language/presentation/screens/language_screen.dart';
 import 'package:migra_ayuda/features/onboarding/presentation/providers/onboarding_provider.dart';

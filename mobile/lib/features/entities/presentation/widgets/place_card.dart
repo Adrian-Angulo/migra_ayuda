@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/HomeScreen/place_details.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/place_details_screen.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 
 class PlaceCard extends StatelessWidget {

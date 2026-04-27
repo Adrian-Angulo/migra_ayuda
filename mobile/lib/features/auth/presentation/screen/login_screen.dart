@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 
-import 'package:migra_ayuda/features/auth/presentation/screen/recuperar_contraseña/send_email_screen.dart';
-import 'package:migra_ayuda/features/auth/presentation/widgets/button_google_widget.dart';
-import 'package:migra_ayuda/features/auth/presentation/widgets/button_widget.dart';
-import 'package:migra_ayuda/features/auth/presentation/widgets/text_fiel_pasword_widget.dart';
-import 'package:migra_ayuda/features/auth/presentation/widgets/text_fiel_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/reset_password/send_email_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/widgets/inputs/button_google_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/widgets/inputs/button_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/widgets/inputs/text_field_password_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/widgets/inputs/text_field_widget.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/features/auth/presentation/pages/admin/perfil_screen_admin.dart';
+import 'package:migra_ayuda/features/home/presentation/screens/perfil_screen_admin.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class HomeScreenAdmin extends StatefulWidget {

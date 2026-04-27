@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
-import 'package:migra_ayuda/features/auth/presentation/widgets/dropdown_field_widget.dart';
-import 'package:migra_ayuda/features/auth/presentation/widgets/text_field_numeric_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/widgets/inputs/dropdown_field_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/widgets/inputs/text_field_numeric_widget.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 const _countries = [

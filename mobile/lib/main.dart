@@ -8,7 +8,7 @@ import 'package:migra_ayuda/features/entities/presentation/providers/entity_sync
 import 'package:migra_ayuda/features/language/presentation/providers/language_provider.dart';
 import 'package:migra_ayuda/features/onboarding/presentation/screens/start_page.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
-import 'firebase_options.dart';
+import 'core/config/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
