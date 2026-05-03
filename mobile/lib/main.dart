@@ -3,8 +3,10 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:migra_ayuda/core/database/sembast_database.dart';
+import 'package:migra_ayuda/core/providers/location_provider.dart';
 import 'package:migra_ayuda/core/sync/sync_provider.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_sync_provider.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/explorar_screen.dart';
 import 'package:migra_ayuda/features/language/presentation/providers/language_provider.dart';
 import 'package:migra_ayuda/features/onboarding/presentation/screens/start_page.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
@@ -30,11 +32,21 @@ void main() async {
   runApp(const ProviderScope(child: MainApp()));
 }
 
-class MainApp extends ConsumerWidget {
+class MainApp extends ConsumerStatefulWidget {
   const MainApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends ConsumerState<MainApp> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final locale = ref.watch(languageProvider);
 
     // Inicializa el SyncService cuando la app arranca
@@ -81,8 +93,8 @@ class MainApp extends ConsumerWidget {
         fontFamily: 'Inter',
         useMaterial3: true,
       ),
-      home: const StartPage(),
-      /* home: ExplorarScreen(), */
+      /* home: const StartPage(), */
+      home: ExplorarScreen(),
     );
   }
 }

@@ -149,16 +149,6 @@ class _PlaceHeaderInfo extends StatelessWidget {
               ),
               const SizedBox(width: 10),
             ],
-            if (distanceKm != null)
-              PlaceInfoChip(
-                icon: Icons.near_me_outlined,
-                label: '${distanceKm!.toStringAsFixed(1)} km',
-              ),
-            if (distanceKm == null)
-              const PlaceInfoChip(
-                icon: Icons.near_me_outlined,
-                label: '2.3 km',
-              ),
           ],
         ),
       ],

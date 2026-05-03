@@ -1,33 +1,13 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/features/entities/presentation/widgets/place_details/place_details_header.dart';
 import 'package:migra_ayuda/features/entities/presentation/widgets/place_details/place_details_info.dart';
 import 'package:migra_ayuda/features/entities/presentation/widgets/place_details/place_details_reviews.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 
-// Mock data para preview
-const _mockEntity = EntityEntity(
-  id: '1',
-  name: 'Fundacion Kiwanis',
-  description:
-      'Se ofrece el servicio de alimentacion para la personas que se encuentre en situacion de vulnerabilidad',
-  services: ['Comida'],
-  address: 'Calle 24 #32-12',
-  localitation: GeoPoint(1.2136, -77.2811),
-  phone: '+57 3232386890',
-  serviceHours: 'Lun-Vie 8:00 AM - 12:00 PM',
-  imageUrl: '',
-);
-
 class PlaceDetails extends StatelessWidget {
   final EntityEntity entity;
-  final double? distanceKm;
 
-  const PlaceDetails({
-    super.key,
-    this.entity = _mockEntity,
-    this.distanceKm,
-  });
+  const PlaceDetails({super.key, required this.entity});
 
   @override
   Widget build(BuildContext context) {
@@ -45,13 +25,10 @@ class PlaceDetails extends StatelessWidget {
               rating: 4.4,
               reviewCount: 20,
               service: entity.services.isNotEmpty ? entity.services.first : '',
-              distanceKm: distanceKm,
             ),
             const SizedBox(height: 16),
             PlaceDetailsInfo(
-              description: entity.description,
-              phone: entity.phone,
-              address: entity.address,
+              entity: entity,
             ),
             const SizedBox(height: 28),
             const PlaceDetailsReviews(),

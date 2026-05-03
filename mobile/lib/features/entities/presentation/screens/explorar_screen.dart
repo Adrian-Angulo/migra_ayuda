@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/providers/location_provider.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/drawer/app_drawer.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
@@ -28,6 +29,7 @@ class _ExplorarScreenState extends ConsumerState<ExplorarScreen>
   int _currentDataCount = 0;
   EntityEntity? _selectedEntity;
   bool _showDetailCard = false;
+  bool _isLoadingLocation = false; // Nuevo estado para loading
 
   final filtros = [
     "Todos",
@@ -43,12 +45,39 @@ class _ExplorarScreenState extends ConsumerState<ExplorarScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _requestLocationPermissionOnStartup(ref);
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _sheetController.isAttached) {
         setState(() => _isControllerAttached = true);
         _sheetController.addListener(_onSheetChanged);
       }
       _startPeriodicCheck();
+      // Centra el mapa automáticamente en la ubicación del usuario
+      _centerMapOnUserLocationOnInit();
     });
+  }
+
+  /// Centra el mapa automáticamente en la ubicación del usuario al abrir la pantalla
+  Future<void> _centerMapOnUserLocationOnInit() async {
+    try {
+      // Espera un momento para que el mapa esté completamente renderizado
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      if (!mounted) return;
+
+      // Verifica si hay ubicación disponible
+      final userLocationAsync = ref.read(userLocationStreamProvider);
+      final position = userLocationAsync.value;
+
+      if (position != null) {
+        // Activa el flag para centrar el mapa
+        ref.read(centerOnUserLocationProvider.notifier).trigger();
+      }
+    } catch (e) {
+      // Falla silenciosamente - no es crítico
+      print('⚠️ No se pudo centrar el mapa automáticamente: $e');
+    }
   }
 
   @override
@@ -146,6 +175,134 @@ class _ExplorarScreenState extends ConsumerState<ExplorarScreen>
         .toList();
   }
 
+  /// Solicita permisos de ubicación al iniciar la app
+  Future<void> _requestLocationPermissionOnStartup(WidgetRef ref) async {
+    try {
+      // Verifica si ya se solicitaron permisos anteriormente
+      final alreadyRequested = ref.read(locationPermissionRequestedProvider);
+      if (alreadyRequested) {
+        print('ℹ️ Permisos ya solicitados anteriormente');
+        return;
+      }
+
+      final locationService = ref.read(locationServiceProvider);
+
+      // Verifica si ya tiene permisos
+      final hasPermission = await locationService.hasPermission();
+      if (hasPermission) {
+        print('✅ Permisos de ubicación ya otorgados');
+        ref
+            .read(locationPermissionRequestedProvider.notifier)
+            .markAsRequested();
+        return;
+      }
+
+      // Verifica si el GPS está habilitado
+      final serviceEnabled = await locationService.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        print('⚠️ GPS desactivado - No se solicitarán permisos');
+        ref
+            .read(locationPermissionRequestedProvider.notifier)
+            .markAsRequested();
+        return;
+      }
+
+      // Solicita permisos
+      print('📍 Solicitando permisos de ubicación...');
+      final granted = await locationService.requestPermission();
+
+      if (granted) {
+        print('✅ Permisos de ubicación otorgados');
+      } else {
+        print('❌ Permisos de ubicación denegados');
+      }
+
+      // Marca que ya se solicitaron permisos
+      ref.read(locationPermissionRequestedProvider.notifier).markAsRequested();
+    } catch (e) {
+      print('❌ Error al solicitar permisos de ubicación: $e');
+    }
+  }
+
+  Future<void> _centerOnUserLocation() async {
+    if (_isLoadingLocation) return; // Evita múltiples llamadas
+
+    setState(() => _isLoadingLocation = true);
+
+    try {
+      final locationService = ref.read(locationServiceProvider);
+
+      // 1. Verifica si el GPS está habilitado
+      final serviceEnabled = await locationService.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Por favor activa el GPS en la configuración'),
+              backgroundColor: Colors.orange,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+        return;
+      }
+
+      // 2. Verifica permisos
+      final hasPermission = await locationService.hasPermission();
+      if (!hasPermission) {
+        // Solicita permisos
+        final granted = await locationService.requestPermission();
+        if (!granted) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                    'Se requieren permisos de ubicación para usar esta función'),
+                backgroundColor: Colors.red,
+                duration: Duration(seconds: 3),
+              ),
+            );
+          }
+          return;
+        }
+      }
+
+      // 3. Obtiene la ubicación actual
+      final position = await locationService.getCurrentLocation();
+      if (position == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content:
+                  Text('No se pudo obtener tu ubicación. Intenta de nuevo'),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+        return;
+      }
+
+      // 4. Activa el flag para centrar el mapa
+      ref.read(centerOnUserLocationProvider.notifier).trigger();
+
+      // 5. Muestra mensaje de éxito
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('📍 Ubicación encontrada'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoadingLocation = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final entitiesAsync = ref.watch(entitiesStreamProvider);
@@ -235,8 +392,17 @@ class _ExplorarScreenState extends ConsumerState<ExplorarScreen>
           right: 16,
           child: FloatingActionButton(
             backgroundColor: Colors.white,
-            onPressed: () {},
-            child: const Icon(Icons.my_location),
+            onPressed: _isLoadingLocation ? null : _centerOnUserLocation,
+            child: _isLoadingLocation
+                ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                    ),
+                  )
+                : const Icon(Icons.my_location, color: Colors.blue),
           ),
         ),
       ],
