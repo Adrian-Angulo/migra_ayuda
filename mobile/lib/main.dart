@@ -3,10 +3,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:migra_ayuda/core/database/sembast_database.dart';
-import 'package:migra_ayuda/core/providers/location_provider.dart';
 import 'package:migra_ayuda/core/sync/sync_provider.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_sync_provider.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/explorar_screen.dart';
+import 'package:migra_ayuda/features/reviews/presentation/providers/review_sync_provider.dart';
 import 'package:migra_ayuda/features/language/presentation/providers/language_provider.dart';
 import 'package:migra_ayuda/features/onboarding/presentation/screens/start_page.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
@@ -61,6 +60,9 @@ class _MainAppState extends ConsumerState<MainApp> {
     // Inicializa la sincronización automática de entidades
     ref.watch(entitySyncInitializerProvider);
 
+    // Inicializa la sincronización automática de reviews
+    ref.watch(reviewSyncInitializerProvider);
+
     // Escucha cambios de conectividad para mostrar feedback al usuario
     ref.listen(connectionStatusProvider, (previous, next) {
       next.when(
@@ -93,8 +95,8 @@ class _MainAppState extends ConsumerState<MainApp> {
         fontFamily: 'Inter',
         useMaterial3: true,
       ),
-      /* home: const StartPage(), */
-      home: ExplorarScreen(),
+      home: const StartPage(),
+      /* home: ExplorarScreen(), */
     );
   }
 }

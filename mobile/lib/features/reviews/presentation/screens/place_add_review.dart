@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/widgets/app_bar_widget.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/widgets/floating_main_button.dart';
+import 'package:migra_ayuda/features/reviews/presentation/providers/add_review_provider.dart';
 
-class PlaceAddReview extends StatefulWidget {
+class PlaceAddReview extends ConsumerStatefulWidget {
   final EntityEntity entity;
   final UserModel? user;
   const PlaceAddReview({
@@ -15,22 +17,68 @@ class PlaceAddReview extends StatefulWidget {
   });
 
   @override
-  State<PlaceAddReview> createState() => _PlaceAddReviewState();
+  ConsumerState<PlaceAddReview> createState() => _PlaceAddReviewState();
 }
 
-class _PlaceAddReviewState extends State<PlaceAddReview> {
+class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
   double rating = 1;
   final formkey = GlobalKey<FormState>();
   final commetController = TextEditingController();
+
+  @override
+  void dispose() {
+    commetController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Escucha el estado de creación de review
+    ref.listen(addReviewProvider, (previous, next) {
+      if (next.isSucces) {
+        // Muestra mensaje de éxito
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Comentario publicado exitosamente'),
+            backgroundColor: const Color(0xFF059669),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+
+        // Resetea el estado y cierra la pantalla
+        Future.delayed(const Duration(seconds: 1), () {
+          ref.read(addReviewProvider.notifier).reset();
+          if (context.mounted) Navigator.pop(context);
+        });
+      } else if (next.errorMensaje != null) {
+        // Muestra mensaje de error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.errorMensaje!),
+            backgroundColor: const Color(0xFFEF4444),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      }
+    });
+
+    final state = ref.watch(addReviewProvider);
+
     return Scaffold(
+        resizeToAvoidBottomInset: true,
         appBar: AppBarWidget(title: widget.entity.name),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
           child: Form(
             key: formkey,
             child: SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -106,7 +154,7 @@ class _PlaceAddReviewState extends State<PlaceAddReview> {
                   ),
                   Center(
                     child: RatingBar.builder(
-                      initialRating: 3,
+                      initialRating: rating,
                       maxRating: 5,
                       minRating: 1,
                       direction: Axis.horizontal,
@@ -140,11 +188,18 @@ class _PlaceAddReviewState extends State<PlaceAddReview> {
                       if (value == null || value.trim().isEmpty) {
                         return 'Por favor escribe un comentario';
                       }
+                      if (value.trim().length < 10) {
+                        return 'El comentario debe tener al menos 10 caracteres';
+                      }
+                      if (value.trim().length > 500) {
+                        return 'El comentario no puede exceder 500 caracteres';
+                      }
                       return null;
                     },
                     controller: commetController,
                     maxLines: 5,
                     minLines: 5,
+                    maxLength: 500,
                     keyboardType: TextInputType.multiline,
                     style: const TextStyle(
                       fontSize: 14,
@@ -198,22 +253,43 @@ class _PlaceAddReviewState extends State<PlaceAddReview> {
                   ),
                   const SizedBox(height: 24),
                   FloatingMainButton(
-                    onTap: () {
-                      if (formkey.currentState?.validate() ?? false) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content:
-                                const Text('Comentario publicado exitosamente'),
-                            backgroundColor: const Color(0xFF059669),
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                    text: 'Publicar Comentario',
+                    onTap: state.isLoading
+                        ? () {} // Función vacía cuando está cargando
+                        : () async {
+                            if (formkey.currentState?.validate() ?? false) {
+                              // Valida que haya usuario
+                              if (widget.user == null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text(
+                                        'Debes iniciar sesión para publicar una review'),
+                                    backgroundColor: const Color(0xFFEF4444),
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              // Crea la review
+                              await ref
+                                  .read(addReviewProvider.notifier)
+                                  .createReview(
+                                    idMigrante: widget.user!.id,
+                                    idEntity: widget.entity.id,
+                                    userName: widget.user!.name,
+                                    userCountry: widget.user!.originCountry ??
+                                        'No especificado',
+                                    rating: rating,
+                                    comment: commetController.text.trim(),
+                                  );
+                            }
+                          },
+                    text: state.isLoading
+                        ? 'Publicando...'
+                        : 'Publicar Comentario',
                   )
                 ],
               ),

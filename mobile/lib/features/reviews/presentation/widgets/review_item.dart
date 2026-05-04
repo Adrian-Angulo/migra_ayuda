@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/core/utils/format/time_formatter.dart';
-import 'package:migra_ayuda/features/reviews/domain/review_entity.dart';
+import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
 
 class ReviewItem extends StatelessWidget {
   final ReviewEntity review;
 
-  const ReviewItem({required this.review});
+  const ReviewItem({super.key, required this.review});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +31,7 @@ class ReviewItem extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      review.userContry,
+                      review.userCountry,
                       style: const TextStyle(
                         fontSize: 12,
                         color: Color(0xFF9CA3AF),
@@ -41,7 +41,7 @@ class ReviewItem extends StatelessWidget {
                 ),
               ),
               Text(
-                TimeFormatter.formatDate(review.createdAt.toDateTime()),
+                TimeFormatter.formatDate(review.createdAt),
                 style: const TextStyle(
                   fontSize: 11,
                   color: Color(0xFFB0B7C3),
