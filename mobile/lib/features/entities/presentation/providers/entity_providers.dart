@@ -11,6 +11,7 @@ import 'package:migra_ayuda/features/entities/domain/usecases/delete_entity_usec
 import 'package:migra_ayuda/features/entities/domain/usecases/get_all_entities_usecase.dart';
 import 'package:migra_ayuda/features/entities/domain/usecases/get_entity_by_id_usecase.dart';
 import 'package:migra_ayuda/features/entities/domain/usecases/register_entity_usecase.dart';
+import 'package:migra_ayuda/features/entities/domain/usecases/sync_all_entities_usecase.dart';
 import 'package:migra_ayuda/features/entities/domain/usecases/update_entity_usecase.dart';
 
 // ============================================================================
@@ -77,6 +78,12 @@ final updateEntityUsecaseProvider = Provider<UpdateEntityUsecase>((ref) {
 final deleteEntityUsecaseProvider = Provider<DeleteEntityUsecase>((ref) {
   final repository = ref.watch(entityRepositoryProvider);
   return DeleteEntityUsecase(repository: repository);
+});
+
+/// Provider para el caso de uso: Sincronizar todas las entidades desde Firebase
+final syncAllEntitiesUsecaseProvider = Provider<SyncAllEntitiesUsecase>((ref) {
+  final repository = ref.watch(entityRepositoryProvider);
+  return SyncAllEntitiesUsecase(repository: repository);
 });
 
 // ============================================================================

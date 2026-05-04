@@ -384,4 +384,61 @@ class ReviewRepositoryImpl implements ReviewRepository {
       return left('Error al obtener la review del usuario: ${e.toString()}');
     }
   }
+
+  @override
+  Future<Either<String, Unit>> syncAllFromFirebase() async {
+    try {
+      // 1. Verificar conexión a internet
+      final isConnected = await networkInfo.isConnected;
+      if (!isConnected) {
+        return left('Sin conexión a internet para sincronizar');
+      }
+
+      // 2. Descargar TODAS las reviews de Firebase
+      final remoteReviews = await remoteDataSource.getAllReviews();
+
+      // 3. Obtener reviews locales pendientes de sincronización (isSynced: false)
+      final pendingLocal = await localDataSource.getPendingReviews();
+
+      // 4. Merge inteligente: combina Firebase + pendientes locales
+      final merged = _mergeReviews(remoteReviews, pendingLocal);
+
+      // 5. Limpiar caché y guardar todo
+      await localDataSource.clearCache();
+      await localDataSource.cacheReviews(merged);
+
+      return right(unit);
+    } on ServerException catch (e) {
+      return left('Error del servidor: ${e.message}');
+    } on CacheException catch (e) {
+      return left('Error de caché: ${e.message}');
+    } catch (e) {
+      return left(
+          'Error al sincronizar reviews desde Firebase: ${e.toString()}');
+    }
+  }
+
+  /// Método auxiliar para merge inteligente de reviews
+  ///
+  /// Combina reviews remotas con reviews locales pendientes.
+  /// Las reviews locales pendientes tienen prioridad (no se sobrescriben).
+  List<ReviewModel> _mergeReviews(
+    List<ReviewModel> remote,
+    List<ReviewModel> pending,
+  ) {
+    final Map<String, ReviewModel> merged = {};
+
+    // Primero agrega todas las reviews remotas
+    for (final review in remote) {
+      merged[review.id] = review;
+    }
+
+    // Luego sobrescribe con reviews locales pendientes (tienen prioridad)
+    // Esto evita perder cambios locales no sincronizados
+    for (final review in pending) {
+      merged[review.id] = review;
+    }
+
+    return merged.values.toList();
+  }
 }

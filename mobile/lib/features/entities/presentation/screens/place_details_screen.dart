@@ -77,8 +77,6 @@ class PlaceDetails extends ConsumerWidget {
                     ),
                     TextButton(
                       onPressed: () {
-                        
-
                         // Verifica si el usuario ya tiene una review
                         userReviewAsync?.when(
                           data: (existingReview) {
@@ -89,7 +87,7 @@ class PlaceDetails extends ConsumerWidget {
                                 MaterialPageRoute(
                                   builder: (context) => PlaceEditReview(
                                     entity: entity,
-                                    user: user,
+                                    
                                     existingReview: existingReview,
                                   ),
                                 ),
@@ -202,7 +200,11 @@ class PlaceDetails extends ConsumerWidget {
                         height: 1,
                         color: Color.fromARGB(255, 212, 212, 212),
                       ),
-                      itemBuilder: (_, i) => ReviewItem(review: reviews[i]),
+                      itemBuilder: (_, i) => ReviewItem(
+                        review: reviews[i],
+                        entity: entity,
+                        user: user!,
+                      ),
                     );
                   },
                   loading: () => const Center(

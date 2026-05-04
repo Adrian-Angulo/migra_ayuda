@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
+
 import 'package:migra_ayuda/features/entities/presentation/widgets/floating_main_button.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/edit_review_provider.dart';
 
 class PlaceEditReview extends ConsumerStatefulWidget {
   final EntityEntity entity;
-  final UserModel? user;
   final ReviewEntity existingReview;
 
   const PlaceEditReview({
     super.key,
-    required this.entity,
-    required this.user,
     required this.existingReview,
+    required this.entity,
   });
 
   @override
@@ -216,33 +214,17 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
                         ),
                       ),
                       alignment: Alignment.center,
-                      child: widget.user?.name != null
-                          ? Text(
-                              widget.user!.name
-                                  .trim()
-                                  .split(' ')
-                                  .take(2)
-                                  .map((w) =>
-                                      w.isNotEmpty ? w[0].toUpperCase() : '')
-                                  .join(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
-                            )
-                          : const Icon(
-                              Icons.person_rounded,
-                              color: Colors.white,
-                              size: 24,
-                            ),
+                      child: const Icon(
+                        Icons.person_rounded,
+                        color: Colors.white,
+                        size: 24,
+                      ),
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.user?.name ?? 'no data',
+                          widget.existingReview.userName,
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -250,7 +232,7 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
                           ),
                         ),
                         Text(
-                          widget.user?.originCountry ?? 'no data',
+                          widget.existingReview.userCountry,
                           style: const TextStyle(
                             fontSize: 12,
                             color: Color(0xFF9CA3AF),
@@ -307,8 +289,8 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
                     if (value == null || value.trim().isEmpty) {
                       return 'Por favor escribe un comentario';
                     }
-                    if (value.trim().length < 10) {
-                      return 'El comentario debe tener al menos 10 caracteres';
+                    if (value.trim().length < 5) {
+                      return 'El comentario debe tener al menos 5 caracteres';
                     }
                     if (value.trim().length > 500) {
                       return 'El comentario no puede exceder 500 caracteres';
@@ -378,32 +360,16 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
                       ? () {} // Función vacía cuando está cargando
                       : () async {
                           if (formkey.currentState?.validate() ?? false) {
-                            // Valida que haya usuario
-                            if (widget.user == null) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: const Text(
-                                      'Debes iniciar sesión para actualizar una review'),
-                                  backgroundColor: const Color(0xFFEF4444),
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                              );
-                              return;
-                            }
-
                             // Actualiza la review
                             await ref
                                 .read(editReviewProvider.notifier)
                                 .updateReview(
                                   reviewId: widget.existingReview.id,
-                                  idMigrante: widget.user!.id,
-                                  idEntity: widget.entity.id,
-                                  userName: widget.user!.name,
-                                  userCountry: widget.user!.originCountry ??
-                                      'No especificado',
+                                  idMigrante: widget.existingReview.idMigrante,
+                                  idEntity: widget.existingReview.idEntity,
+                                  userName: widget.existingReview.userName,
+                                  userCountry:
+                                      widget.existingReview.userCountry,
                                   rating: rating,
                                   comment: commentController.text.trim(),
                                   createdAt: widget.existingReview.createdAt,

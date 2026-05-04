@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:migra_ayuda/core/database/sembast_database.dart';
+import 'package:migra_ayuda/core/presentation/screens/splash_screen.dart';
 import 'package:migra_ayuda/core/sync/sync_provider.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_sync_provider.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_sync_provider.dart';
@@ -95,8 +96,12 @@ class _MainAppState extends ConsumerState<MainApp> {
         fontFamily: 'Inter',
         useMaterial3: true,
       ),
-      home: const StartPage(),
-      /* home: ExplorarScreen(), */
+      // Inicia en SplashScreen para sincronización inicial
+      initialRoute: '/splash',
+      routes: {
+        '/splash': (context) => const SplashScreen(),
+        '/home': (context) => const StartPage(),
+      },
     );
   }
 }

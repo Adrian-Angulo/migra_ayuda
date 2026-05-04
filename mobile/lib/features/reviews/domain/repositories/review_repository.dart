@@ -49,6 +49,14 @@ abstract class ReviewRepository {
     String entityId,
   );
 
+  /// Sincroniza todas las reviews desde Firebase a la base de datos local
+  ///
+  /// Este método descarga TODAS las reviews de Firebase y las guarda en Sembast.
+  /// Realiza un merge inteligente con reviews locales pendientes de sincronización.
+  /// Retorna [Right(Unit)] si la sincronización fue exitosa
+  /// Retorna [Left(String)] con el mensaje de error si falla
+  Future<Either<String, Unit>> syncAllFromFirebase();
+
   /// Sincroniza las reviews pendientes con el servidor
   ///
   /// Sube las reviews que tienen isSynced=false

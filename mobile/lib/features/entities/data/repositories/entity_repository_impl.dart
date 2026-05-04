@@ -248,4 +248,31 @@ class EntityRepositoryImpl implements EntityRepository {
       return left('Error al obtener la entidad: ${e.toString()}');
     }
   }
+
+  @override
+  Future<Either<String, Unit>> syncAllFromFirebase() async {
+    try {
+      // 1. Verificar conexión a internet
+      final isConnected = await networkInfo.isConnected;
+      if (!isConnected) {
+        return left('Sin conexión a internet para sincronizar');
+      }
+
+      // 2. Descargar TODAS las entidades de Firebase
+      final remoteEntities = await remoteDataSource.getAllEntities();
+
+      // 3. Limpiar caché y guardar todo
+      await localDataSource.clearCache();
+      await localDataSource.cacheEntities(remoteEntities);
+
+      return right(unit);
+    } on ServerException catch (e) {
+      return left('Error del servidor: ${e.message}');
+    } on CacheException catch (e) {
+      return left('Error de caché: ${e.message}');
+    } catch (e) {
+      return left(
+          'Error al sincronizar entidades desde Firebase: ${e.toString()}');
+    }
+  }
 }

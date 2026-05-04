@@ -12,6 +12,7 @@ import 'package:migra_ayuda/features/reviews/domain/usecases/delete_review_useca
 import 'package:migra_ayuda/features/reviews/domain/usecases/get_all_reviews_usecase.dart';
 import 'package:migra_ayuda/features/reviews/domain/usecases/get_reviews_by_entity_usecase.dart';
 import 'package:migra_ayuda/features/reviews/domain/usecases/get_user_review_by_entity_usecase.dart';
+import 'package:migra_ayuda/features/reviews/domain/usecases/sync_all_reviews_usecase.dart';
 import 'package:migra_ayuda/features/reviews/domain/usecases/update_review_usecase.dart';
 
 // ============================================================================
@@ -86,6 +87,12 @@ final getUserReviewByEntityUsecaseProvider =
     Provider<GetUserReviewByEntityUsecase>((ref) {
   final repository = ref.watch(reviewRepositoryProvider);
   return GetUserReviewByEntityUsecase(repository: repository);
+});
+
+/// Provider para el caso de uso: Sincronizar todas las reviews desde Firebase
+final syncAllReviewsUsecaseProvider = Provider<SyncAllReviewsUsecase>((ref) {
+  final repository = ref.watch(reviewRepositoryProvider);
+  return SyncAllReviewsUsecase(repository: repository);
 });
 
 // ============================================================================

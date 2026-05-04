@@ -156,7 +156,11 @@ class PlaceDetailsReviews extends ConsumerWidget {
                 thickness: 1,
               ),
               itemBuilder: (context, index) {
-                return ReviewItem(review: reviews[index]);
+                return ReviewItem(
+                  review: reviews[index],
+                  user: user!,
+                  entity: entity,
+                );
               },
             );
           },
