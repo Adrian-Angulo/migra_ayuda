@@ -8,6 +8,7 @@ import 'package:migra_ayuda/features/entities/presentation/widgets/place_details
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 import 'package:migra_ayuda/features/reviews/presentation/screens/place_add_review.dart';
+import 'package:migra_ayuda/features/reviews/presentation/screens/place_edit_review.dart';
 import 'package:migra_ayuda/features/reviews/presentation/widgets/review_item.dart';
 
 class PlaceDetails extends ConsumerWidget {
@@ -28,6 +29,12 @@ class PlaceDetails extends ConsumerWidget {
 
     // Obtiene el conteo de reviews
     final reviewCount = ref.watch(reviewCountProvider(entity.id));
+
+    // Obtiene la review del usuario actual (si existe)
+    final userReviewAsync = user != null
+        ? ref.watch(
+            userReviewByEntityProvider((userId: user.id, entityId: entity.id)))
+        : null;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
@@ -69,18 +76,76 @@ class PlaceDetails extends ConsumerWidget {
                       ),
                     ),
                     TextButton(
-                      onPressed: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PlaceAddReview(
-                            entity: entity,
-                            user: user,
-                          ),
-                        ),
-                      ),
-                      child: const Text(
-                        "Añadir comentario",
-                        style: TextStyle(
+                      onPressed: () {
+                        
+
+                        // Verifica si el usuario ya tiene una review
+                        userReviewAsync?.when(
+                          data: (existingReview) {
+                            if (existingReview != null) {
+                              // Si ya tiene review, navega a editar
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PlaceEditReview(
+                                    entity: entity,
+                                    user: user,
+                                    existingReview: existingReview,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              // Si no tiene review, navega a crear
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => PlaceAddReview(
+                                    entity: entity,
+                                    user: user,
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                          loading: () {
+                            // Mientras carga, muestra indicador
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text('Cargando...'),
+                                backgroundColor: const Color(0xFF5F9EA0),
+                                behavior: SnackBarBehavior.floating,
+                                duration: const Duration(seconds: 1),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            );
+                          },
+                          error: (_, __) {
+                            // Si hay error, permite crear (asume que no existe)
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PlaceAddReview(
+                                  entity: entity,
+                                  user: user,
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
+                      child: Text(
+                        // Cambia el texto del botón según si tiene review o no
+                        userReviewAsync?.when(
+                              data: (existingReview) => existingReview != null
+                                  ? "Editar comentario"
+                                  : "Añadir comentario",
+                              loading: () => "Añadir comentario",
+                              error: (_, __) => "Añadir comentario",
+                            ) ??
+                            "Añadir comentario",
+                        style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF059669),

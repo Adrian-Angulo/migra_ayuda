@@ -11,6 +11,7 @@ import 'package:migra_ayuda/features/reviews/domain/usecases/create_review_useca
 import 'package:migra_ayuda/features/reviews/domain/usecases/delete_review_usecase.dart';
 import 'package:migra_ayuda/features/reviews/domain/usecases/get_all_reviews_usecase.dart';
 import 'package:migra_ayuda/features/reviews/domain/usecases/get_reviews_by_entity_usecase.dart';
+import 'package:migra_ayuda/features/reviews/domain/usecases/get_user_review_by_entity_usecase.dart';
 import 'package:migra_ayuda/features/reviews/domain/usecases/update_review_usecase.dart';
 
 // ============================================================================
@@ -78,6 +79,13 @@ final updateReviewUsecaseProvider = Provider<UpdateReviewUsecase>((ref) {
 final deleteReviewUsecaseProvider = Provider<DeleteReviewUsecase>((ref) {
   final repository = ref.watch(reviewRepositoryProvider);
   return DeleteReviewUsecase(repository: repository);
+});
+
+/// Provider para el caso de uso: Obtener review de usuario por entidad
+final getUserReviewByEntityUsecaseProvider =
+    Provider<GetUserReviewByEntityUsecase>((ref) {
+  final repository = ref.watch(reviewRepositoryProvider);
+  return GetUserReviewByEntityUsecase(repository: repository);
 });
 
 // ============================================================================
@@ -199,5 +207,39 @@ final ratingDistributionProvider =
     },
     loading: () => {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
     error: (_, __) => {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
+  );
+});
+
+// ============================================================================
+// USER REVIEW PROVIDERS
+// ============================================================================
+
+/// Provider para obtener la review de un usuario específico en una entidad
+///
+/// Uso: ref.watch(userReviewByEntityProvider((userId: 'user-id', entityId: 'entity-id')))
+final userReviewByEntityProvider =
+    FutureProvider.family<ReviewEntity?, ({String userId, String entityId})>(
+        (ref, params) async {
+  final usecase = ref.watch(getUserReviewByEntityUsecaseProvider);
+
+  final result = await usecase.call(params.userId, params.entityId);
+
+  return result.fold(
+    (error) => null, // Si hay error, retorna null
+    (review) => review,
+  );
+});
+
+/// Provider para verificar si un usuario tiene una review en una entidad
+///
+/// Uso: ref.watch(userHasReviewProvider((userId: 'user-id', entityId: 'entity-id')))
+final userHasReviewProvider =
+    Provider.family<bool, ({String userId, String entityId})>((ref, params) {
+  final reviewAsync = ref.watch(userReviewByEntityProvider(params));
+
+  return reviewAsync.when(
+    data: (review) => review != null,
+    loading: () => false,
+    error: (_, __) => false,
   );
 });

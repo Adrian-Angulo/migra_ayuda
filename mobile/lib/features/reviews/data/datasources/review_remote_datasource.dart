@@ -26,6 +26,9 @@ abstract class ReviewRemoteDataSource {
 
   /// Elimina una review de Firebase
   Future<void> deleteReview(String reviewId);
+
+  /// Obtiene la review de un usuario específico en una entidad de Firebase
+  Future<ReviewModel?> getUserReviewByEntity(String userId, String entityId);
 }
 
 /// Implementación del datasource remoto usando Firebase Firestore
@@ -123,6 +126,31 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
       await _firestore.collection('reviews').doc(reviewId).delete();
     } catch (e) {
       throw ServerException('Error al eliminar review de Firebase: $e');
+    }
+  }
+
+  @override
+  Future<ReviewModel?> getUserReviewByEntity(
+      String userId, String entityId) async {
+    try {
+      // Filtra por userId (idMigrante) y entityId
+      final snapshot = await _firestore
+          .collection('reviews')
+          .where('idMigrante', isEqualTo: userId)
+          .where('idEntity', isEqualTo: entityId)
+          .limit(1)
+          .get();
+
+      // Si no hay documentos, retorna null
+      if (snapshot.docs.isEmpty) {
+        return null;
+      }
+
+      // Convierte el primer documento a ReviewModel
+      return _fromFirestore(snapshot.docs.first);
+    } catch (e) {
+      throw ServerException(
+          'Error al obtener review del usuario de Firebase: $e');
     }
   }
 

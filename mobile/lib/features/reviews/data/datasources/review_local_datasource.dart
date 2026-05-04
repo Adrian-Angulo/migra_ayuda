@@ -36,6 +36,12 @@ abstract class ReviewLocalDataSource {
 
   /// Limpia todo el caché de reviews
   Future<void> clearCache();
+
+  /// Obtiene la review de un usuario específico en una entidad
+  Future<ReviewModel?> getUserReviewByEntity(String userId, String entityId);
+
+  /// Elimina un registro local por ID (hard delete - para limpiar duplicados)
+  Future<void> deleteLocalRecord(String recordId);
 }
 
 /// Implementación del datasource local usando Sembast
@@ -55,8 +61,9 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
     try {
       final db = await _db;
 
-      // Obtiene todos los registros ordenados por fecha de creación (más recientes primero)
+      // Obtiene todos los registros no eliminados, ordenados por fecha de creación (más recientes primero)
       final finder = Finder(
+        filter: Filter.isNull('deletedAt'), // Excluye reviews eliminadas
         sortOrders: [SortOrder('createdAt', false)], // false = descendente
       );
       final records = await _store.find(db, finder: finder);
@@ -75,9 +82,12 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
     try {
       final db = await _db;
 
-      // Filtra por entityId y ordena por fecha
+      // Filtra por entityId, excluye eliminadas y ordena por fecha
       final finder = Finder(
-        filter: Filter.equals('idEntity', entityId),
+        filter: Filter.and([
+          Filter.equals('idEntity', entityId),
+          Filter.isNull('deletedAt'), // Excluye reviews eliminadas
+        ]),
         sortOrders: [SortOrder('createdAt', false)],
       );
       final records = await _store.find(db, finder: finder);
@@ -195,6 +205,49 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
       await _store.delete(db);
     } catch (e) {
       throw CacheException('Error al limpiar caché de reviews: $e');
+    }
+  }
+
+  @override
+  Future<ReviewModel?> getUserReviewByEntity(
+      String userId, String entityId) async {
+    try {
+      final db = await _db;
+
+      // Filtra por userId (idMigrante) y entityId, excluyendo eliminadas
+      final finder = Finder(
+        filter: Filter.and([
+          Filter.equals('idMigrante', userId),
+          Filter.equals('idEntity', entityId),
+          Filter.isNull('deletedAt'), // Excluye reviews eliminadas
+        ]),
+        sortOrders: [SortOrder('createdAt', false)],
+        limit: 1, // Solo necesitamos una
+      );
+
+      final records = await _store.find(db, finder: finder);
+
+      // Si no hay registros, retorna null
+      if (records.isEmpty) {
+        return null;
+      }
+
+      // Convierte el primer registro a ReviewModel
+      return _fromSembastMap(records.first.key, records.first.value);
+    } catch (e) {
+      throw CacheException('Error al obtener review del usuario en caché: $e');
+    }
+  }
+
+  @override
+  Future<void> deleteLocalRecord(String recordId) async {
+    try {
+      final db = await _db;
+
+      // Elimina el registro físicamente (hard delete)
+      await _store.record(recordId).delete(db);
+    } catch (e) {
+      throw CacheException('Error al eliminar registro local: $e');
     }
   }
 

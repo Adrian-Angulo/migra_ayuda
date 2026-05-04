@@ -38,6 +38,17 @@ abstract class ReviewRepository {
   /// Retorna [Left(String)] con el mensaje de error si falla
   Future<Either<String, Unit>> deleteReview(String reviewId);
 
+  /// Obtiene la review de un usuario específico en una entidad
+  ///
+  /// [userId] - ID del usuario (migrante)
+  /// [entityId] - ID de la entidad
+  /// Retorna [Right(ReviewEntity?)] con la review si existe, o null si no existe
+  /// Retorna [Left(String)] con el mensaje de error si falla
+  Future<Either<String, ReviewEntity?>> getUserReviewByEntity(
+    String userId,
+    String entityId,
+  );
+
   /// Sincroniza las reviews pendientes con el servidor
   ///
   /// Sube las reviews que tienen isSynced=false
