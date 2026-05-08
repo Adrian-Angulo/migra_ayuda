@@ -9,6 +9,7 @@ import 'package:migra_ayuda_administracion/features/dashboard/presentation/scree
 import 'package:migra_ayuda_administracion/features/dashboard/presentation/screens/users_screen.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/screens/entities_screen.dart';
 import 'package:migra_ayuda_administracion/features/entities/presentation/screens/entity_detail_screen.dart';
+import 'package:migra_ayuda_administracion/features/userActivity/presentation/screens/user_activity_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final notifier = ref.read(routerNotifierProvider.notifier);
@@ -29,6 +30,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/dashboard/home',
             builder: (context, state) => const DashboardHomeScreen(),
+          ),
+          GoRoute(
+            path: '/dashboard/userActivity',
+            builder: (context, state) => const UserActivityScreen(),
           ),
           GoRoute(
             path: '/dashboard/users',
@@ -59,3 +64,4 @@ final routerProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+

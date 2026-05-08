@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:migra_ayuda_administracion/core/router/routes.dart';
 import 'package:migra_ayuda_administracion/features/dashboard/presentation/widgets/sidebar_header_widget.dart';
 import 'package:migra_ayuda_administracion/features/dashboard/presentation/widgets/sidebar_menu_item_widget.dart';
 import 'package:migra_ayuda_administracion/features/dashboard/presentation/widgets/sidebar_footer_widget.dart';
@@ -38,6 +39,15 @@ class SidebarWidget extends ConsumerWidget {
                     subtitle: 'Vista general',
                     isActive: currentRoute.startsWith('/dashboard/home'),
                     onTap: () => context.go('/dashboard/home'),
+                  ),
+                  const SizedBox(height: 8),
+                  SidebarMenuItemWidget(
+                    icon: Icons.show_chart_rounded,
+                    title: 'Actividad Usuario',
+                    isActive: currentRoute.startsWith(
+                      "/dashboard/userActivity",
+                    ),
+                    onTap: () => context.go('/dashboard/userActivity'),
                   ),
                   const SizedBox(height: 8),
                   SidebarMenuItemWidget(

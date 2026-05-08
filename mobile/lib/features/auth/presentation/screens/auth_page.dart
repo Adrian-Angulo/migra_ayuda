@@ -9,6 +9,8 @@ import 'package:migra_ayuda/features/auth/presentation/screen/complete_info_scre
 import 'package:migra_ayuda/features/auth/presentation/screen/login_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screen/register_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/inputs/switch_button.dart';
+import 'package:migra_ayuda/features/userActivity/presentation/providers/create_activity_notifier.dart';
+import 'package:migra_ayuda/features/userActivity/presentation/providers/user_activity_providers.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 enum AuthMode { login, register }
@@ -30,8 +32,11 @@ class _AuthPageState extends ConsumerState<AuthPage> {
     ref.listen(
       authNotifierProvider,
       (previous, next) {
-        next.whenOrNull(data: (data) {
+        next.whenOrNull(data: (data) async {
+
           if (data != null) {
+          //auditoria inicio sesion
+          final audit = await ref.read(createActivityNotifier.notifier).createActivity(user: data.id, accion: "Iniciar seccion");
             if (data.profileComplete == false) {
               Navigator.pushReplacement(
                   context,
@@ -51,7 +56,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                     builder: (context) => const HomeScreen(),
                   ));
             }
-          }
+          } 
         }, error: (error, stackTrace) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(error.toString())),

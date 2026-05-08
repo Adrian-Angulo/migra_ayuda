@@ -101,7 +101,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
         cachedReviews = [];
       }
 
-      // 2. Verifica si hay conexión para actualizar en background
+      // 2. Verifica si hay conexión para actualizar
       final isConnected = await networkInfo.isConnected;
 
       if (isConnected) {
@@ -110,10 +110,10 @@ class ReviewRepositoryImpl implements ReviewRepository {
           final remoteReviews =
               await remoteDataSource.getReviewsByEntity(entityId);
 
-          // Actualiza el caché con los datos frescos
+          // Actualiza el caché con los datos actualizados
           await localDataSource.cacheReviews(remoteReviews);
 
-          // Retorna los datos frescos de Firebase
+          // Retorna los datos actualizado de Firebase
           return right(remoteReviews);
         } on ServerException catch (e) {
           // Si falla Firebase pero hay caché, retorna el caché
