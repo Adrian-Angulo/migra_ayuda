@@ -11,7 +11,6 @@ import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_scre
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/register_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/switch_button.dart';
 import 'package:migra_ayuda/features/userActivity/presentation/providers/create_activity_notifier.dart';
-import 'package:migra_ayuda/features/userActivity/presentation/providers/user_activity_providers.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 // Define los dos modos posibles de la pantalla: inicio de sesión o registro
@@ -41,32 +40,34 @@ class _AuthPageState extends ConsumerState<AuthPage> {
       authNotifierProvider,
       (previous, next) {
         next.whenOrNull(data: (user) async {
-          if (user != null && user.role == 'Migrante') {
-            // Registra la actividad de inicio de sesión en la auditoría
-            await ref
-                .read(createActivityNotifier.notifier)
-                .createActivity(user: user.id, accion: "Iniciar seccion");
-
-            // Redirige según el estado del perfil y el rol del usuario
-            if (user.profileComplete == false) {
-              // El usuario aún no ha completado su perfil
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CompleteInfoScreen(),
-                  ));
-            } else {
-              // Usuario regular va a la pantalla principal
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const HomeScreen(),
-                  ));
+          if (user != null) {
+            if (user.role == 'Migrante') {
+              // Registra la actividad de inicio de sesión en la auditoría
+              await ref
+                  .read(createActivityNotifier.notifier)
+                  .createActivity(user: user.id, accion: "Iniciar seccion");
+              if (!context.mounted) return;
+              // Redirige según el estado del perfil y el rol del usuario
+              if (user.profileComplete == false) {
+                // El usuario aún no ha completado su perfil
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CompleteInfoScreen(),
+                    ));
+              } else {
+                // Usuario regular va a la pantalla principal
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HomeScreen(),
+                    ));
+              }
+            } else if (user.role != "Migrante") {
+              await ref.read(authNotifierProvider.notifier).logout();
+              SnackbarWidget.info(
+                  context, "¡Eres administrador, ingresa al panel web!");
             }
-          } else if (user!.role != "Migrante") {
-            await ref.read(authNotifierProvider.notifier).logout();
-            SnackbarWidget.info(
-                context, "¡Eres administrador, ingresa al panel web!");
           }
         }, error: (error, stackTrace) {
           // Muestra el error de autenticación en un snackbar

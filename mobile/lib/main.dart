@@ -47,20 +47,7 @@ class _MainAppState extends ConsumerState<MainApp> {
   void initState() {
     super.initState();
     if (kIsWeb != true) {
-      Future.microtask(() {
-        // Inicializa el SyncService cuando la app arranca
-        ref.listen(syncServiceProvider, (previous, next) {
-          next.initialize().then((_) {
-            print('✅ SyncService inicializado correctamente');
-          }).catchError((error) {
-            print('❌ Error al inicializar SyncService: $error');
-          });
-        });
-        // Inicializa la sincronización automática de entidades
-        ref.read(entitySyncInitializerProvider);
-        // Inicializa la sincronización automática de reviews
-        ref.read(reviewSyncInitializerProvider);
-      });
+      
     }
   }
 
@@ -79,6 +66,20 @@ class _MainAppState extends ConsumerState<MainApp> {
         routerConfig: router,
       );
     } else {
+      Future.microtask(() {
+        // Inicializa el SyncService cuando la app arranca
+        ref.listen(syncServiceProvider, (previous, next) {
+          next.initialize().then((_) {
+            print('✅ SyncService inicializado correctamente');
+          }).catchError((error) {
+            print('❌ Error al inicializar SyncService: $error');
+          });
+        });
+        // Inicializa la sincronización automática de entidades
+        ref.read(entitySyncInitializerProvider);
+        // Inicializa la sincronización automática de reviews
+        ref.read(reviewSyncInitializerProvider);
+      });
       final locale = ref.watch(languageProvider);
       return MaterialApp(
         locale: locale,

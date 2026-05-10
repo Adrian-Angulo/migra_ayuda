@@ -40,26 +40,28 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
               }
             });
 
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.check_circle,
-                  color: Color(0xFF059669),
-                  size: 64,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  syncResult.message,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A1A),
+            return SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.check_circle,
+                    color: Color(0xFF059669),
+                    size: 64,
                   ),
-                ),
-                const SizedBox(height: 8),
-              ],
+                  const SizedBox(height: 16),
+                  Text(
+                    syncResult.message,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1A1A1A),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
             );
           },
           loading: () => Column(

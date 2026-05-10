@@ -3,10 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/core/widgets/snackbar_web_widget.dart';
-import 'package:migra_ayuda/core/widgets/snackbar_widget.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/mobile/reset_password/send_email_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/widgets/button_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/widgets/text_fiel_pasword_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/widgets/text_fiel_widget.dart';
@@ -33,16 +31,12 @@ class _LoginWebState extends ConsumerState<LoginWeb> {
         next.whenOrNull(
           data: (user) {
             if (previous?.value == user) return;
-
             if (user == null) return;
-
             if (!mounted) return;
-
             final role = user.role ?? '';
             if (role != "Admin") {
               SnackbarWebWidget.info(
                   context, '¡No Tienes permiso de administrador!');
-
               ref.read(authNotifierProvider.notifier).logout();
               if (!mounted) return;
               context.go(Routes.login);

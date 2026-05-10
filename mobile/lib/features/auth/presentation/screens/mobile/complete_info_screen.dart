@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/home/presentation/screens/home_screen.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/auth_page.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/mobile/auth_page.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/dropdown_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_numeric_widget.dart';
