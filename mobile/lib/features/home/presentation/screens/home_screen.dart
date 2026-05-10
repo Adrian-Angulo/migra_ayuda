@@ -4,7 +4,7 @@ import 'package:migra_ayuda/features/auth/presentation/screens/mobile/auth_page.
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 import 'inicio_screen.dart';
-import '../../../entities/presentation/screens/explorar_screen.dart';
+import '../../../entities/presentation/screens/mobile/explorar_screen.dart';
 import 'perfil_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {

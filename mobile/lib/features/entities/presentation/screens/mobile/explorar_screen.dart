@@ -4,10 +4,10 @@ import 'package:migra_ayuda/core/providers/location_provider.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/drawer/app_drawer.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
-import 'package:migra_ayuda/features/entities/presentation/widgets/entity_detail/entity_detail_card.dart';
-import 'package:migra_ayuda/features/entities/presentation/widgets/explorar/explorar_header.dart';
-import 'package:migra_ayuda/features/entities/presentation/widgets/explorar/explorar_sheet_content.dart';
-import 'package:migra_ayuda/features/entities/presentation/widgets/map_view.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/entity_detail/entity_detail_card.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/explorar/explorar_header.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/explorar/explorar_sheet_content.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/map_view.dart';
 
 class ExplorarScreen extends ConsumerStatefulWidget {
   const ExplorarScreen({super.key});

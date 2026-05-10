@@ -12,40 +12,20 @@ class CacheException implements Exception {
   String toString() => 'CacheException: $message';
 }
 
-/// Interfaz abstracta para el datasource local de entidades
-abstract class EntityLocalDataSource {
-  /// Obtiene todas las entidades del caché
-  Future<List<EntityModels>> getCachedEntities();
-
-  /// Guarda múltiples entidades en el caché
-  Future<void> cacheEntities(List<EntityModels> entities);
-
-  /// Obtiene una entidad específica por ID del caché
-  Future<EntityModels?> getEntityById(String id);
-
-  /// Guarda una entidad individual en el caché
-  Future<void> cacheEntity(EntityModels entity);
-
-  /// Elimina una entidad del caché
-  Future<void> deleteEntity(String id);
-
-  /// Limpia todo el caché de entidades
-  Future<void> clearCache();
-}
 
 /// Implementación del datasource local usando Sembast
-class EntityLocalDataSourceImpl implements EntityLocalDataSource {
+class EntityLocalDataSource{
   final SembastDatabase sembastDatabase;
 
   // Store para las entidades
   final _store = stringMapStoreFactory.store('entities');
 
-  EntityLocalDataSourceImpl({required this.sembastDatabase});
+  EntityLocalDataSource({required this.sembastDatabase});
 
   /// Obtiene la instancia de la base de datos
   Future<Database> get _db async => await sembastDatabase.database;
 
-  @override
+
   Future<List<EntityModels>> getCachedEntities() async {
     try {
       final db = await _db;
@@ -63,7 +43,6 @@ class EntityLocalDataSourceImpl implements EntityLocalDataSource {
     }
   }
 
-  @override
   Future<void> cacheEntities(List<EntityModels> entities) async {
     try {
       final db = await _db;
@@ -80,7 +59,7 @@ class EntityLocalDataSourceImpl implements EntityLocalDataSource {
     }
   }
 
-  @override
+
   Future<EntityModels?> getEntityById(String id) async {
     try {
       final db = await _db;
@@ -98,7 +77,6 @@ class EntityLocalDataSourceImpl implements EntityLocalDataSource {
     }
   }
 
-  @override
   Future<void> cacheEntity(EntityModels entity) async {
     try {
       final db = await _db;
@@ -110,7 +88,7 @@ class EntityLocalDataSourceImpl implements EntityLocalDataSource {
     }
   }
 
-  @override
+
   Future<void> deleteEntity(String id) async {
     try {
       final db = await _db;
@@ -122,7 +100,6 @@ class EntityLocalDataSourceImpl implements EntityLocalDataSource {
     }
   }
 
-  @override
   Future<void> clearCache() async {
     try {
       final db = await _db;

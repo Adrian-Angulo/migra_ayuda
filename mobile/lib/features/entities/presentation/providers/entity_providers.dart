@@ -20,13 +20,13 @@ import 'package:migra_ayuda/features/entities/domain/usecases/update_entity_usec
 
 /// Provider para el datasource remoto (Firebase)
 final entityRemoteDataSourceProvider = Provider<EntityRemoteDataSource>((ref) {
-  return EntityRemoteDataSourceImpl(firestore: FirebaseFirestore.instance);
+  return EntityRemoteDataSource(firestore: FirebaseFirestore.instance);
 });
 
 /// Provider para el datasource local (Sembast)
 final entityLocalDataSourceProvider = Provider<EntityLocalDataSource>((ref) {
   final sembastDb = SembastDatabase.instance;
-  return EntityLocalDataSourceImpl(sembastDatabase: sembastDb);
+  return EntityLocalDataSource(sembastDatabase: sembastDb);
 });
 
 // ============================================================================

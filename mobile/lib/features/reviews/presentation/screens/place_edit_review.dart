@@ -3,7 +3,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 
-import 'package:migra_ayuda/features/entities/presentation/widgets/floating_main_button.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/floating_main_button.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/edit_review_provider.dart';
 

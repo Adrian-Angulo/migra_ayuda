@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/features/entities/presentation/widgets/category_selector.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/category_selector.dart';
 
 class ExplorarHeader extends StatelessWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;

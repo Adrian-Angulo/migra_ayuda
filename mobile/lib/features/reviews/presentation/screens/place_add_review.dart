@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/widgets/app_bar_widget.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/features/entities/presentation/widgets/floating_main_button.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/floating_main_button.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/add_review_provider.dart';
 
 class PlaceAddReview extends ConsumerStatefulWidget {

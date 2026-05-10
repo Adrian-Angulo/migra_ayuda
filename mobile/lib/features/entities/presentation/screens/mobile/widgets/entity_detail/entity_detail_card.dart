@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/features/entities/presentation/widgets/entity_detail/entity_detail_image_header.dart';
-import 'package:migra_ayuda/features/entities/presentation/widgets/entity_detail/entity_detail_info.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/entity_detail/entity_detail_image_header.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/entity_detail/entity_detail_info.dart';
 
 class EntityDetailCard extends StatelessWidget {
   final EntityEntity entity;

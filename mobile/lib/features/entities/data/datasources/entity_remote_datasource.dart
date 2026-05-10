@@ -15,39 +15,13 @@ class ServerException implements Exception {
   String toString() => 'ServerException: $message';
 }
 
-/// Interfaz abstracta para el datasource remoto de entidades
-abstract class EntityRemoteDataSource {
-  /// Obtiene todas las entidades de Firebase
-  Future<List<EntityModels>> getAllEntities();
-
-  /// Obtiene una entidad específica por ID
-  Future<EntityModels> getEntityById(String id);
-
-  /// Registra una nueva entidad con imagen
-  Future<void> registerEntity({
-    required EntityModels entityModel,
-    required Uint8List imageBytes,
-    required String fileName,
-  });
-
-  /// Actualiza una entidad existente
-  Future<void> updateEntity({
-    required EntityModels entityModel,
-    Uint8List? imageBytes,
-    String? fileName,
-  });
-
-  /// Elimina una entidad
-  Future<void> deleteEntity(String entityId);
-}
-
 /// Implementación del datasource remoto usando Firebase
-class EntityRemoteDataSourceImpl implements EntityRemoteDataSource {
+class EntityRemoteDataSource {
   final FirebaseFirestore _firestore;
   static const _cloudName = "dyprnvoff";
   static const _uploadPreset = "MigraAyuda";
 
-  EntityRemoteDataSourceImpl({FirebaseFirestore? firestore})
+  EntityRemoteDataSource({FirebaseFirestore? firestore})
       : _firestore = firestore ?? FirebaseFirestore.instance;
 
   Future<String> _uploadImage({
@@ -83,7 +57,6 @@ class EntityRemoteDataSourceImpl implements EntityRemoteDataSource {
     }
   }
 
-  @override
   Future<void> registerEntity({
     required EntityModels entityModel,
     required Uint8List imageBytes,
@@ -111,7 +84,6 @@ class EntityRemoteDataSourceImpl implements EntityRemoteDataSource {
     }
   }
 
-  @override
   Future<void> updateEntity({
     required EntityModels entityModel,
     Uint8List? imageBytes,
@@ -146,7 +118,6 @@ class EntityRemoteDataSourceImpl implements EntityRemoteDataSource {
     }
   }
 
-  @override
   Future<void> deleteEntity(String entityId) async {
     try {
       await _firestore.collection('entities').doc(entityId).delete();
@@ -155,7 +126,6 @@ class EntityRemoteDataSourceImpl implements EntityRemoteDataSource {
     }
   }
 
-  @override
   Future<List<EntityModels>> getAllEntities() async {
     try {
       final snapshot =
@@ -170,7 +140,6 @@ class EntityRemoteDataSourceImpl implements EntityRemoteDataSource {
     }
   }
 
-  @override
   Future<EntityModels> getEntityById(String id) async {
     try {
       final doc = await _firestore.collection('entities').doc(id).get();

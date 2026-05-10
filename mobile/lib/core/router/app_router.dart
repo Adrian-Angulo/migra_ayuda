@@ -5,6 +5,7 @@ import 'package:migra_ayuda/core/router/router_notifier.dart';
 import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/home_admin_screen/home_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/login_web.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/entities_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final notifier = ref.read(routerNotifierProvider.notifier);
@@ -51,9 +52,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/dashboard/entities',
-            builder: (context, state) => const Center(
-              child: Text("Entidades"),
-            ),
+            builder: (context, state) => const EntitiesScreen()
           ),
           /* GoRoute(
             path: '/dashboard/entities/:id',

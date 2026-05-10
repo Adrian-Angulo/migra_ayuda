@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/features/entities/presentation/widgets/place_card.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_card.dart';
 
 class ExplorarSheetContent extends StatelessWidget {
   final List<EntityEntity> entities;
