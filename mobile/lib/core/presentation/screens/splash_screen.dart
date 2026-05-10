@@ -1,16 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/sync/sync_providers.dart';
+import 'package:migra_ayuda/features/onboarding/presentation/screens/start_page.dart';
 
 /// Pantalla de splash con sincronización inicial
 ///
 /// Muestra un loading mientras descarga todos los datos de Firebase.
 /// Una vez completada la sincronización, navega automáticamente al home.
-class SplashScreen extends ConsumerWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends ConsumerState<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final syncAsync = ref.watch(initialSyncProvider);
 
     return Scaffold(
@@ -21,7 +32,11 @@ class SplashScreen extends ConsumerWidget {
             // Sincronización completada, navegar a home
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (context.mounted) {
-                Navigator.pushReplacementNamed(context, '/home');
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const StartPage(),
+                    ));
               }
             });
 
@@ -44,13 +59,6 @@ class SplashScreen extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  'Entidades: ${syncResult.entitiesSynced} | Reviews: ${syncResult.reviewsSynced}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF9CA3AF),
-                  ),
-                ),
               ],
             );
           },

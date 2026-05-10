@@ -42,10 +42,10 @@ class _TextFieldPaswordWidgetState extends State<TextFieldPaswordWidget> {
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     return Column(
-      spacing: 5,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(widget.title),
+        const SizedBox(height: 5),
         TextFormField(
           controller: widget.controller,
           obscureText: _obscureText,

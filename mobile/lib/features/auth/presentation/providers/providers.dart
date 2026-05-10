@@ -1,7 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:migra_ayuda/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
 import 'package:migra_ayuda/features/auth/domain/useCases/auth_con_google_use_case.dart';
@@ -12,12 +9,8 @@ import 'package:migra_ayuda/features/auth/domain/useCases/registrar_usuario_use_
 import 'package:migra_ayuda/features/auth/domain/useCases/restablecer_contrasena_use_case.dart';
 import 'package:migra_ayuda/features/auth/domain/useCases/usuario_autenticado_use_case.dart';
 
-final repositoryProvider = Provider<AuthRepository>(
-  (ref) => AuthRepositoryImpl(
-      auth: FirebaseAuth.instance,
-      firestore: FirebaseFirestore.instance,
-      googleSignIn: GoogleSignIn()),
-);
+final repositoryProvider =
+    Provider<AuthRepository>((ref) => AuthRepositoryImpl());
 
 final registerUserUseCaseProvider = Provider<RegisterUserUseCase>(
   (ref) {

@@ -33,4 +33,3 @@ final createActivityUsecaseProvider = Provider<CreateActivityUsecase>(
     return CreateActivityUsecase(repository: repository);
   },
 );
-

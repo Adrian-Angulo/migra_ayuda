@@ -13,7 +13,8 @@ class ButtonGoogleWidget extends ConsumerWidget {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     return ElevatedButton.icon(
       onPressed: () async {
-        ref.read(authNotifierProvider.notifier).authWithGoogle();
+
+        await ref.read(authNotifierProvider.notifier).authWithGoogle();
       },
       icon: Image.asset(
         'assets/icons/google.png',

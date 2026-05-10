@@ -5,11 +5,11 @@ import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/utils/validators/email_validator.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/register_notifier.dart';
-import 'package:migra_ayuda/features/auth/presentation/widgets/inputs/dropdown_field_widget.dart';
-import 'package:migra_ayuda/features/auth/presentation/widgets/inputs/text_field_password_widget.dart';
-import 'package:migra_ayuda/features/auth/presentation/widgets/inputs/text_field_widget.dart';
-import 'package:migra_ayuda/features/auth/presentation/widgets/inputs/text_field_numeric_widget.dart';
-import 'package:migra_ayuda/features/auth/presentation/widgets/inputs/button_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/dropdown_field_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_password_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_numeric_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/button_widget.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {

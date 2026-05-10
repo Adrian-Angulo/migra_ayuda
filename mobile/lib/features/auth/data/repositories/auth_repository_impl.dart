@@ -8,16 +8,11 @@ import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  final FirebaseAuth _auth;
-  final FirebaseFirestore _firestore;
-  final GoogleSignIn googleSignIn;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final GoogleSignIn googleSignIn = GoogleSignIn();
 
-  AuthRepositoryImpl({
-    required FirebaseAuth auth,
-    required FirebaseFirestore firestore,
-    required this.googleSignIn,
-  })  : _auth = auth,
-        _firestore = firestore;
+  AuthRepositoryImpl() ;
 
   @override
   Future<Either<Failure, UserCredential>> authWithGoogle() async {

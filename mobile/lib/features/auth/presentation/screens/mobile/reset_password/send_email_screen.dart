@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/reset_password_notifier.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/reset_password/success_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/mobile/reset_password/success_screen.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class SendEmailScreen extends ConsumerStatefulWidget {
