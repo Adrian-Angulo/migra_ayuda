@@ -10,5 +10,5 @@ abstract class UserActivityRepository {
   Future<Either<ActivityFailure, Unit>> syncPendingActivities();
 
   /// Obtiene todas las actividades (no implementado)
-  Future<Either<ActivityFailure, Unit>> getAllActivity();
+  Future<Either<ActivityFailure, List<UserActivityEntity>>> getAllActivity();
 }

@@ -16,8 +16,11 @@ class PlaceDetails extends ConsumerWidget {
 
   const PlaceDetails({super.key, required this.entity});
 
+  
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
     final authState = ref.watch(authNotifierProvider);
     final user = authState.value;
 

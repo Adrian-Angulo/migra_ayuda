@@ -6,6 +6,8 @@ import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/home_admin_screen/home_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/login_web.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/entities_screen.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/entity_detail_screen.dart';
+import 'package:migra_ayuda/features/userActivity/presentation/screens/user_activity_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final notifier = ref.read(routerNotifierProvider.notifier);
@@ -30,11 +32,8 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
-            path: '/dashboard/userActivity',
-            builder: (context, state) => const Center(
-              child: Text("Actividades"),
-            ),
-          ),
+              path: '/dashboard/userActivity',
+              builder: (context, state) => const UserActivityScreen()),
           GoRoute(
             path: '/dashboard/users',
             builder: (context, state) => const Center(
@@ -51,16 +50,15 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
-            path: '/dashboard/entities',
-            builder: (context, state) => const EntitiesScreen()
-          ),
-          /* GoRoute(
+              path: '/dashboard/entities',
+              builder: (context, state) => const EntitiesScreen()),
+          GoRoute(
             path: '/dashboard/entities/:id',
             builder: (context, state) {
               final id = state.pathParameters['id']!;
               return EntityDetailScreen(entityId: id);
             },
-          ), */
+          ),
         ],
       ),
     ],

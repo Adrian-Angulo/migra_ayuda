@@ -1,9 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/constants/activity_actions.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/place_details_screen.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 
-class PlaceCard extends StatelessWidget {
+import 'package:migra_ayuda/features/userActivity/presentation/providers/create_activity_notifier.dart';
+
+class PlaceCard extends ConsumerWidget {
   final String title;
   final String category;
   final EntityEntity entity;
@@ -24,15 +29,26 @@ class PlaceCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authNotifierProvider).value;
     return GestureDetector(
-      onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PlaceDetails(
-              entity: entity,
-            ),
-          )),
+      onTap: () async {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PlaceDetails(
+                entity: entity,
+              ),
+            ));
+
+        await ref.read(createActivityNotifier.notifier).createActivity(
+            user: user!.id,
+            accion: ActivityActions.entityViewed(),
+            nombre: user!.name,
+            correo: user!.email,
+            pais: user!.originCountry!,
+            metadata: {"Service": category});
+      },
       child: Container(
         padding: const EdgeInsets.all(12),
         margin: const EdgeInsets.symmetric(horizontal: 16),

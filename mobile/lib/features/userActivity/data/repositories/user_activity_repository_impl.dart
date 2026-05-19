@@ -44,7 +44,10 @@ class UserActivityRepositoryImpl implements UserActivityRepository {
         idUser: activity.idUser,
         accion: activity.accion,
         createdAt: activity.createdAt,
-        isSynced: false, // Inicialmente no sincronizada
+        isSynced: false,
+         nombre: activity.nombre, 
+         correo: activity.correo, 
+         pais: activity.pais, // Inicialmente no sincronizada
       );
 
       // 3. Guarda primero en caché local (respuesta inmediata)
@@ -116,10 +119,14 @@ class UserActivityRepositoryImpl implements UserActivityRepository {
   }
 
   @override
-  Future<Either<ActivityFailure, Unit>> getAllActivity() {
-    // Este método no está implementado según los requisitos
-    // Solo se necesita crear y sincronizar
-    throw UnimplementedError(
-        'getAllActivity no es requerido para esta funcionalidad');
+  Future<Either<ActivityFailure, List<UserActivityEntity>>> getAllActivity() async {
+    try {
+      final activities = await remoteDataSource.getAllActivities();
+      return right(activities);
+    } on ServerException catch (e) {
+      return left(ServerFailure(e.message));
+    } catch (e) {
+      return left(CacheFailure('Error inesperado: ${e.toString()}'));
+    }
   }
 }

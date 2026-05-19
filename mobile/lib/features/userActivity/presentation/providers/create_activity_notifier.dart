@@ -11,13 +11,27 @@ class CreateActivityNotifier extends AsyncNotifier<void> {
   FutureOr<void> build() {}
 
   Future<void> createActivity(
-      {required String user, required String accion}) async {
+    
+      {
+      Map<String, dynamic>? metadata,  
+      required String user,
+      required String accion,
+      required String nombre,
+      required String correo,
+      required String pais}) async {
     final usecase = ref.read(createActivityUsecaseProvider);
 
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      final userActivity =
-          UserActivityEntity(id: "", idUser: user, accion: accion,);
+      final userActivity = UserActivityEntity(
+        id: "",
+        idUser: user,
+        accion: accion,
+        nombre: nombre,
+        correo: correo,
+        metadata: metadata,
+        pais: pais,
+      );
       final result = await usecase(userActivity);
       result.fold(
         (failure) {

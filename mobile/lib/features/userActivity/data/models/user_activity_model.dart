@@ -14,6 +14,10 @@ class UserActivityModel extends UserActivityEntity {
     required super.accion,
     required super.createdAt,
     required this.isSynced,
+    required super.nombre,
+    required super.correo,
+    required super.pais,
+    super.metadata
   });
 
   /// Crea un UserActivityModel desde un Map
@@ -23,9 +27,13 @@ class UserActivityModel extends UserActivityEntity {
     return UserActivityModel(
       id: map['id'] as String,
       idUser: map['idUser'] as String,
-      accion: map['accion'] as String,
+      accion:  map['accion'] as String ?? '',
       createdAt: DateTime.parse(map['createdAt'] as String),
       isSynced: map['isSynced'] as bool? ?? false,
+      nombre: map['nombre'] as String? ?? '',
+      correo: map['correo'] as String? ?? '',
+      pais: map['pais'] as String? ?? '',
+      metadata: map['metadata']
     );
   }
 
@@ -39,30 +47,43 @@ class UserActivityModel extends UserActivityEntity {
       'accion': accion,
       'createdAt': createdAt.toIso8601String(),
       'isSynced': isSynced,
+      'nombre': nombre,
+      'correo': correo,
+      'pais': pais,
+      'metadata': metadata
     };
   }
 
-    /// Convierte UserActivityModel a Map para Sembast
+  /// Convierte UserActivityModel a Map para Sembast
   Map<String, dynamic> toSembastMap() {
     return {
       'idUser': idUser,
       'accion': accion,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'isSynced': isSynced,
+      'nombre': nombre,
+      'correo': correo,
+      'pais': pais,
       'cached_at': DateTime.now().millisecondsSinceEpoch,
+      'metadata': metadata
     };
   }
 
-    /// Convierte Map de Sembast a UserActivityModel
-  factory UserActivityModel.fromSembastMap(String id, Map<String, dynamic> map) {
+  /// Convierte Map de Sembast a UserActivityModel
+  factory UserActivityModel.fromSembastMap(
+      String id, Map<String, dynamic> map) {
     return UserActivityModel(
       id: id,
       idUser: map['idUser'] ?? '',
-      accion: map['accion'] ?? '',
+      accion: map['accion'],
       createdAt: DateTime.fromMillisecondsSinceEpoch(
         map['createdAt'] ?? DateTime.now().millisecondsSinceEpoch,
       ),
       isSynced: map['isSynced'] ?? false,
+      nombre: map['nombre'] ?? '',
+      correo: map['correo'] ?? '',
+      pais: map['pais'] ?? '',
+      metadata: map['metadata']
     );
   }
 
@@ -73,6 +94,10 @@ class UserActivityModel extends UserActivityEntity {
     String? accion,
     DateTime? createdAt,
     bool? isSynced,
+    String? nombre,
+    String? correo,
+    String? pais,
+    Map<String, dynamic>? metadata
   }) {
     return UserActivityModel(
       id: id ?? this.id,
@@ -80,6 +105,10 @@ class UserActivityModel extends UserActivityEntity {
       accion: accion ?? this.accion,
       createdAt: createdAt ?? this.createdAt,
       isSynced: isSynced ?? this.isSynced,
+      nombre: nombre ?? this.nombre,
+      correo: correo ?? this.correo,
+      pais: pais ?? this.pais,
+      metadata: metadata ?? this.metadata
     );
   }
 }

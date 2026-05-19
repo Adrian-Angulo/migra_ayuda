@@ -5,6 +5,7 @@ import 'package:migra_ayuda/features/userActivity/data/datasources/user_activity
 import 'package:migra_ayuda/features/userActivity/data/repositories/user_activity_repository_impl.dart';
 import 'package:migra_ayuda/features/userActivity/domain/repositories/user_activity_repository.dart';
 import 'package:migra_ayuda/features/userActivity/domain/usecase/create_activity_usecase.dart';
+import 'package:migra_ayuda/features/userActivity/domain/usecase/get_all_activity_usecase.dart';
 
 // ============================================================================
 // REPOSITORY PROVIDER
@@ -31,5 +32,12 @@ final createActivityUsecaseProvider = Provider<CreateActivityUsecase>(
   (ref) {
     final repository = ref.watch(userActivityRProvider);
     return CreateActivityUsecase(repository: repository);
+  },
+);
+
+final getAllActivityUsecaseProvider = Provider<GetAllActivityUsecase>(
+  (ref) {
+    final rep = ref.watch(userActivityRProvider);
+    return GetAllActivityUsecase(repository: rep);
   },
 );

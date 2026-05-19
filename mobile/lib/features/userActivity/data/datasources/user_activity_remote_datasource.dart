@@ -10,13 +10,10 @@ class ServerException implements Exception {
   String toString() => 'ServerException: $message';
 }
 
-
-
 /// Implementación del datasource remoto usando Firebase Firestore
 class UserActivityRemoteDataSource {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-    
   Future<String> createActivity(UserActivityModel activity) async {
     try {
       // 1. Verificar si ya existe un documento con este localId (idempotencia)
@@ -36,8 +33,12 @@ class UserActivityRemoteDataSource {
         'localId': activity.id, // Clave de idempotencia
         'idUser': activity.idUser,
         'accion': activity.accion,
+        "nombre": activity.nombre,
+        "correo": activity.correo,
+        'pais': activity.pais,
         'createdAt': activity.createdAt.toIso8601String(),
         'isSynced': true, // En Firebase siempre está sincronizada
+        'metadata': activity.metadata
       });
 
       // Retorna el ID generado por Firebase
@@ -45,6 +46,32 @@ class UserActivityRemoteDataSource {
     } catch (e) {
       throw ServerException(
           'Error al crear actividad de usuario en Firebase: $e');
+    }
+  }
+
+  Future<List<UserActivityModel>> getAllActivities() async {
+    try {
+      final querySnapshot = await _firestore
+          .collection('user_activities')
+          .orderBy('createdAt', descending: true)
+          .get();
+
+      return querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        return UserActivityModel(
+            id: data['localId'] as String,
+            idUser: data['idUser'] as String,
+            accion: data['accion'] ?? "null",
+            createdAt: DateTime.parse(data['createdAt'] as String),
+            isSynced: data['isSynced'] as bool? ?? true,
+            nombre: data['nombre'],
+            correo: data['correo'],
+            pais: data['pais'],
+            metadata: data['metadata']);
+      }).toList();
+    } catch (e) {
+      throw ServerException(
+          'Error al obtener actividades de usuario desde Firebase: $e');
     }
   }
 }

@@ -10,12 +10,12 @@ import 'package:migra_ayuda/features/entities/data/models/entity_models.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/domain/repositories/entity_repository.dart';
 
-class EntityRepositoryImpl implements EntityRepository {
+class EntityMobilRepositoryImpl implements EntityRepository {
   final EntityRemoteDataSource remoteDataSource;
   final EntityLocalDataSource localDataSource;
   final NetworkInfo networkInfo;
 
-  EntityRepositoryImpl({
+  EntityMobilRepositoryImpl({
     required this.remoteDataSource,
     required this.localDataSource,
     required this.networkInfo,

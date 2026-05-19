@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/constants/activity_actions.dart';
 
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/widgets/snackbar_widget.dart';
@@ -10,6 +11,7 @@ import 'package:migra_ayuda/features/auth/presentation/screens/mobile/complete_i
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/register_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/switch_button.dart';
+import 'package:migra_ayuda/features/userActivity/domain/entities/user_activity_entity.dart';
 import 'package:migra_ayuda/features/userActivity/presentation/providers/create_activity_notifier.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 
@@ -43,9 +45,13 @@ class _AuthPageState extends ConsumerState<AuthPage> {
           if (user != null) {
             if (user.role == 'Migrante') {
               // Registra la actividad de inicio de sesión en la auditoría
-              await ref
-                  .read(createActivityNotifier.notifier)
-                  .createActivity(user: user.id, accion: "Iniciar seccion");
+              await ref.read(createActivityNotifier.notifier).createActivity(
+                  user: user.id,
+                  accion: ActivityActions.login(),
+                  nombre: user.name,
+                  correo: user.email,
+                  pais: user.originCountry!);
+
               if (!context.mounted) return;
               // Redirige según el estado del perfil y el rol del usuario
               if (user.profileComplete == false) {

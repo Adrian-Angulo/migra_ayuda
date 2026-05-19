@@ -286,16 +286,7 @@ class _ExplorarScreenState extends ConsumerState<ExplorarScreen>
       // 4. Activa el flag para centrar el mapa
       ref.read(centerOnUserLocationProvider.notifier).trigger();
 
-      // 5. Muestra mensaje de éxito
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('📍 Ubicación encontrada'),
-            backgroundColor: Colors.green,
-            duration: Duration(seconds: 1),
-          ),
-        );
-      }
+      
     } finally {
       if (mounted) {
         setState(() => _isLoadingLocation = false);
