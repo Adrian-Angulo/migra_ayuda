@@ -23,6 +23,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     final syncAsync = ref.watch(initialSyncProvider);
+    
 
     return Scaffold(
       backgroundColor: Colors.white,

@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -27,8 +28,43 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(path: '/dashboard', redirect: (_, __) => '/dashboard/home'),
           GoRoute(
             path: '/dashboard/home',
-            builder: (context, state) => const Center(
-              child: Text("Dasboard"),
+            builder: (context, state) => Column(
+              children: [
+                SizedBox(
+                  height: 300,
+                  child: LineChart(
+                    LineChartData(
+                      gridData: FlGridData(show: true),
+                      titlesData: FlTitlesData(
+                        leftTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: true),
+                        ),
+                        bottomTitles: AxisTitles(
+                          sideTitles: SideTitles(showTitles: true),
+                        ),
+                      ),
+                      borderData: FlBorderData(show: true),
+                      lineBarsData: [
+                        LineChartBarData(
+                          spots: [
+                            FlSpot(0, 3),
+                            FlSpot(1, 5),
+                            FlSpot(2, 4),
+                            FlSpot(3, 7),
+                            FlSpot(4, 6),
+                          ],
+                          isCurved: true,
+                          barWidth: 4,
+                          dotData: FlDotData(show: true),
+                          belowBarData: BarAreaData(
+                            show: true,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              ],
             ),
           ),
           GoRoute(

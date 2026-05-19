@@ -285,8 +285,6 @@ class _ExplorarScreenState extends ConsumerState<ExplorarScreen>
 
       // 4. Activa el flag para centrar el mapa
       ref.read(centerOnUserLocationProvider.notifier).trigger();
-
-      
     } finally {
       if (mounted) {
         setState(() => _isLoadingLocation = false);
@@ -347,7 +345,8 @@ class _ExplorarScreenState extends ConsumerState<ExplorarScreen>
             ),
           ],
         ),
-        DraggableScrollableSheet(
+
+         DraggableScrollableSheet(
           controller: _sheetController,
           initialChildSize: 0.40,
           minChildSize: 0.15,
@@ -377,9 +376,9 @@ class _ExplorarScreenState extends ConsumerState<ExplorarScreen>
                     onEntityTap: _onEntityTap,
                   ),
           ),
-        ),
+        ), 
         Positioned(
-          bottom: MediaQuery.of(context).size.height * _sheetSize + 16,
+          bottom: 150,
           right: 16,
           child: FloatingActionButton(
             backgroundColor: Colors.white,

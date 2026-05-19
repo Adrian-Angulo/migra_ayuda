@@ -45,11 +45,10 @@ class _UserActivityScreenState extends ConsumerState<UserActivityScreen> {
           children: [
             _buildHeader(),
             const SizedBox(height: 32),
-            /*
             _buildFilters(),
             const SizedBox(height: 24),
             _buildStatsCards(filteredActivities.length),
-            const SizedBox(height: 32), */
+            const SizedBox(height: 32),
             _buildTableSection(filteredActivities),
           ],
         ),

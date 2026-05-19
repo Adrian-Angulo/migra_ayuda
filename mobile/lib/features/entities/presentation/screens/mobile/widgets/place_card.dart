@@ -44,10 +44,10 @@ class PlaceCard extends ConsumerWidget {
         await ref.read(createActivityNotifier.notifier).createActivity(
             user: user!.id,
             accion: ActivityActions.entityViewed(),
-            nombre: user!.name,
-            correo: user!.email,
-            pais: user!.originCountry!,
-            metadata: {"Service": category});
+            nombre: user.name,
+            correo: user.email,
+            pais: user.originCountry!,
+            metadata: {"Service": category, "EntityName": title});
       },
       child: Container(
         padding: const EdgeInsets.all(12),

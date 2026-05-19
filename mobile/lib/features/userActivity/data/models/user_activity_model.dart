@@ -8,17 +8,16 @@ class UserActivityModel extends UserActivityEntity {
   /// Indica si la actividad está sincronizada con Firebase
   final bool isSynced;
 
-  UserActivityModel({
-    required super.id,
-    required super.idUser,
-    required super.accion,
-    required super.createdAt,
-    required this.isSynced,
-    required super.nombre,
-    required super.correo,
-    required super.pais,
-    super.metadata
-  });
+  UserActivityModel(
+      {required super.id,
+      required super.idUser,
+      required super.accion,
+      required super.createdAt,
+      required this.isSynced,
+      required super.nombre,
+      required super.correo,
+      required super.pais,
+      super.metadata});
 
   /// Crea un UserActivityModel desde un Map
   ///
@@ -27,13 +26,13 @@ class UserActivityModel extends UserActivityEntity {
     return UserActivityModel(
       id: map['id'] as String,
       idUser: map['idUser'] as String,
-      accion:  map['accion'] as String ?? '',
+      accion: map['accion'] as String? ?? '',
       createdAt: DateTime.parse(map['createdAt'] as String),
       isSynced: map['isSynced'] as bool? ?? false,
       nombre: map['nombre'] as String? ?? '',
       correo: map['correo'] as String? ?? '',
       pais: map['pais'] as String? ?? '',
-      metadata: map['metadata']
+      metadata: map['metadata'] as Map<String, dynamic>?,
     );
   }
 
@@ -73,42 +72,39 @@ class UserActivityModel extends UserActivityEntity {
   factory UserActivityModel.fromSembastMap(
       String id, Map<String, dynamic> map) {
     return UserActivityModel(
-      id: id,
-      idUser: map['idUser'] ?? '',
-      accion: map['accion'],
-      createdAt: DateTime.fromMillisecondsSinceEpoch(
-        map['createdAt'] ?? DateTime.now().millisecondsSinceEpoch,
-      ),
-      isSynced: map['isSynced'] ?? false,
-      nombre: map['nombre'] ?? '',
-      correo: map['correo'] ?? '',
-      pais: map['pais'] ?? '',
-      metadata: map['metadata']
-    );
+        id: id,
+        idUser: map['idUser'] ?? '',
+        accion: map['accion'] ?? '',
+        createdAt: DateTime.fromMillisecondsSinceEpoch(
+          map['createdAt'] ?? DateTime.now().millisecondsSinceEpoch,
+        ),
+        isSynced: map['isSynced'] ?? false,
+        nombre: map['nombre'] ?? '',
+        correo: map['correo'] ?? '',
+        pais: map['pais'] ?? '',
+        metadata: map['metadata'] as Map<String, dynamic>?);
   }
 
   /// Crea una copia del modelo con campos actualizados
-  UserActivityModel copyWith({
-    String? id,
-    String? idUser,
-    String? accion,
-    DateTime? createdAt,
-    bool? isSynced,
-    String? nombre,
-    String? correo,
-    String? pais,
-    Map<String, dynamic>? metadata
-  }) {
+  UserActivityModel copyWith(
+      {String? id,
+      String? idUser,
+      String? accion,
+      DateTime? createdAt,
+      bool? isSynced,
+      String? nombre,
+      String? correo,
+      String? pais,
+      Map<String, dynamic>? metadata}) {
     return UserActivityModel(
-      id: id ?? this.id,
-      idUser: idUser ?? this.idUser,
-      accion: accion ?? this.accion,
-      createdAt: createdAt ?? this.createdAt,
-      isSynced: isSynced ?? this.isSynced,
-      nombre: nombre ?? this.nombre,
-      correo: correo ?? this.correo,
-      pais: pais ?? this.pais,
-      metadata: metadata ?? this.metadata
-    );
+        id: id ?? this.id,
+        idUser: idUser ?? this.idUser,
+        accion: accion ?? this.accion,
+        createdAt: createdAt ?? this.createdAt,
+        isSynced: isSynced ?? this.isSynced,
+        nombre: nombre ?? this.nombre,
+        correo: correo ?? this.correo,
+        pais: pais ?? this.pais,
+        metadata: metadata ?? this.metadata);
   }
 }

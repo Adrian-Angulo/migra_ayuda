@@ -79,7 +79,6 @@ class _MainAppState extends ConsumerState<MainApp> {
         routerConfig: router,
       );
     } else {
-
       final locale = ref.watch(languageProvider);
       return MaterialApp(
         locale: locale,

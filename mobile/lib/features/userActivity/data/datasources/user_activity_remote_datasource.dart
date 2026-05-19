@@ -64,10 +64,12 @@ class UserActivityRemoteDataSource {
             accion: data['accion'] ?? "null",
             createdAt: DateTime.parse(data['createdAt'] as String),
             isSynced: data['isSynced'] as bool? ?? true,
-            nombre: data['nombre'],
-            correo: data['correo'],
-            pais: data['pais'],
-            metadata: data['metadata']);
+            nombre: data['nombre'] ?? '',
+            correo: data['correo'] ?? '',
+            pais: data['pais'] ?? '',
+            metadata: data['metadata'] != null
+                ? Map<String, dynamic>.from(data['metadata'] as Map)
+                : null);
       }).toList();
     } catch (e) {
       throw ServerException(

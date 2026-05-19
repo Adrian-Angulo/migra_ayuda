@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/auth_page.dart';
 import 'package:migra_ayuda/features/language/presentation/providers/language_provider.dart';
 import 'package:migra_ayuda/features/language/presentation/screens/language_screen.dart';
@@ -14,6 +15,7 @@ class StartPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final hasCompletedOnboarding = ref.watch(onboardingProvider);
     final hasSelectedLanguage = ref.watch(languageSelectionProvider);
+    final authUser = ref.watch(authNotifierProvider);
 
     if (!hasCompletedOnboarding) {
       return const OnboardingScreen();

@@ -28,7 +28,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     _screens = [
-      InicioScreen(userName: widget.userName),
+      InicioScreen(),
       const ExplorarScreen(),
       const PerfilScreen(),
     ];
