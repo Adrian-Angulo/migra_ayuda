@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/mobile/auth_page.dart';
+import 'package:go_router/go_router.dart';
+import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/features/language/presentation/providers/language_provider.dart';
 import 'package:migra_ayuda/features/language/presentation/widgets/language_option.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
@@ -14,6 +15,60 @@ class LanguageScreen extends ConsumerStatefulWidget {
 
 class _LanguageScreenState extends ConsumerState<LanguageScreen> {
   String selected = "es";
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Cargar idioma guardado si existe
+    _loadSavedLanguage();
+  }
+
+  Future<void> _loadSavedLanguage() async {
+    final savedLanguage = ref.read(languageProvider);
+    savedLanguage.when(
+      data: (locale) {
+        if (locale != null && mounted) {
+          setState(() {
+            selected = locale.languageCode;
+          });
+        }
+      },
+      loading: () {},
+      error: (error, stackTrace) {},
+    );
+  }
+
+  Future<void> _saveLanguage() async {
+    if (_isSaving) return;
+
+    setState(() {
+      _isSaving = true;
+    });
+
+    try {
+      await ref.read(languageProvider.notifier).changeLanguage(selected);
+      if (context.mounted) {
+        context.go(Routes.onboarding);
+      }
+    } catch (e) {
+      // Mostrar error si falla
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al guardar idioma: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,19 +139,7 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () async {
-                    // Guardar idioma seleccionado y marcar como completado
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AuthPage(),
-                        ));
-                    await ref
-                        .read(languageProvider.notifier)
-                        .changeLanguage(selected);
-
-                    // StartPage se reconstruirá automáticamente y mostrará AuthPage
-                  },
+                  onPressed: _isSaving ? null : _saveLanguage,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF64999A),
                     foregroundColor: Colors.white,
@@ -105,10 +148,19 @@ class _LanguageScreenState extends ConsumerState<LanguageScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: Text(
-                    l10n.continueButton,
-                    style: const TextStyle(fontSize: 16),
-                  ),
+                  child: _isSaving
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation(Colors.white),
+                          ),
+                        )
+                      : Text(
+                          l10n.continueButton,
+                          style: const TextStyle(fontSize: 16),
+                        ),
                 ),
               ),
             ],

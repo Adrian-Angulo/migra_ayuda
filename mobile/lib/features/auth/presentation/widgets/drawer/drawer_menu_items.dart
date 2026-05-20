@@ -36,7 +36,7 @@ class DrawerMenuItems extends ConsumerWidget {
           label: l10n.changeLanguage,
           onTap: () {
             Navigator.pop(context);
-            _showLanguagePicker(context, ref, l10n, currentLocale);
+            /* _showLanguagePicker(context, ref, l10n, currentLocale); */
           },
         ),
 

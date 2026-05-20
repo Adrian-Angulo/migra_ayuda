@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:migra_ayuda/core/router/routes.dart';
+
 import 'package:migra_ayuda/core/sync/sync_providers.dart';
-import 'package:migra_ayuda/features/onboarding/presentation/screens/start_page.dart';
+
 
 /// Pantalla de splash con sincronización inicial
-///
 /// Muestra un loading mientras descarga todos los datos de Firebase.
 /// Una vez completada la sincronización, navega automáticamente al home.
 class SplashScreen extends ConsumerStatefulWidget {
@@ -23,7 +25,6 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     final syncAsync = ref.watch(initialSyncProvider);
-    
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -33,13 +34,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
             // Sincronización completada, navegar a home
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (context.mounted) {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const StartPage(),
-                    ));
+                context.go(Routes.selectLanguaje);
               }
-            });
+            }); 
 
             return SingleChildScrollView(
               child: Column(
@@ -76,14 +73,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                   height: 120,
                 ),
                 const SizedBox(height: 32),
-            
+
                 // Indicador de carga
                 const CircularProgressIndicator(
                   color: Color(0xFF5F9EA0),
                   strokeWidth: 3,
                 ),
                 const SizedBox(height: 16),
-            
+
                 // Texto de sincronización
                 const Text(
                   'Sincronizando datos...',
@@ -117,7 +114,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                     size: 64,
                   ),
                   const SizedBox(height: 16),
-              
+
                   // Título de error
                   const Text(
                     'Error al sincronizar',
@@ -128,7 +125,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-              
+
                   // Mensaje de error
                   Text(
                     error.toString().replaceAll('Exception: ', ''),
@@ -139,7 +136,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-              
+
                   // Botón de reintentar
                   ElevatedButton.icon(
                     onPressed: () {
@@ -160,13 +157,13 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-              
+
                   // Botón de continuar sin sincronizar (si ya se sincronizó antes)
                   Consumer(
                     builder: (context, ref, child) {
                       final hasSynced = ref.watch(hasSyncedProvider);
                       if (!hasSynced) return const SizedBox.shrink();
-              
+
                       return TextButton(
                         onPressed: () {
                           Navigator.pushReplacementNamed(context, '/home');

@@ -1,59 +1,45 @@
 import 'package:flutter/material.dart';
-import 'package:riverpod/riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/features/language/data/datasources/language_local_datasource.dart';
+import 'package:migra_ayuda/features/language/data/datasources/language_local_datasource_impl.dart';
 import 'package:migra_ayuda/features/language/data/repositories/language_repository_impl.dart';
 import 'package:migra_ayuda/features/language/domain/repositories/language_repository.dart';
 
-// Repository Provider
+// DataSource Provider
+final languageLocalDataSourceProvider = Provider<LanguageLocalDataSource>(
+  (ref) => LanguageLocalDataSourceImpl(),
+);
+
+// Repository Provider (con inyección de dependencias)
 final languageRepositoryProvider = Provider<LanguageRepository>(
-  (ref) => LanguageRepositoryImpl(),
+  (ref) => LanguageRepositoryImpl(
+    ref.watch(languageLocalDataSourceProvider),
+  ),
 );
 
 // Language Notifier
-class LanguageNotifier extends Notifier<Locale?> {
+class LanguageNotifier extends AsyncNotifier<Locale?> {
   @override
-  Locale build() {
-    _loadLanguage();
-    return const Locale('es');
-  }
-
-  Future<void> _loadLanguage() async {
-    final repository = ref.read(languageRepositoryProvider);
-    final locale = await repository.loadLanguage();
-    if (locale != null) {
-      state = locale;
-    }
+  Future<Locale?> build() async {
+    final repository = ref.watch(languageRepositoryProvider);
+    return await repository.loadLanguage();
   }
 
   Future<void> changeLanguage(String languageCode) async {
     final repository = ref.read(languageRepositoryProvider);
-    await repository.saveLanguage(languageCode);
-    await repository.markLanguageAsSelected();
-    state = Locale(languageCode);
+    try {
+      await repository.saveLanguage(languageCode);
+      state = AsyncData(Locale(languageCode));
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
   }
+
+  /// Helper para obtener el código de idioma actual
+  String? get currentLanguageCode => state.value?.languageCode;
 }
 
 // Language Provider
-final languageProvider = NotifierProvider<LanguageNotifier, Locale?>(
+final languageProvider = AsyncNotifierProvider<LanguageNotifier, Locale?>(
   () => LanguageNotifier(),
-);
-
-// Language Selection Status Notifier
-class LanguageSelectionNotifier extends Notifier<bool> {
-  @override
-  bool build() {
-    _loadLanguageSelectionStatus();
-    return false;
-  }
-
-  Future<void> _loadLanguageSelectionStatus() async {
-    final repository = ref.read(languageRepositoryProvider);
-    final hasSelected = await repository.hasSelectedLanguage();
-    state = hasSelected;
-  }
-}
-
-// Language Selection Provider
-final languageSelectionProvider =
-    NotifierProvider<LanguageSelectionNotifier, bool>(
-  () => LanguageSelectionNotifier(),
 );

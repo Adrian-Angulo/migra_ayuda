@@ -12,7 +12,7 @@ class AuthRepositoryImpl implements AuthRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
-  AuthRepositoryImpl() ;
+  AuthRepositoryImpl();
 
   @override
   Future<Either<Failure, UserCredential>> authWithGoogle() async {
@@ -200,7 +200,6 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, User>> getAuthenticatedUser() async {
     try {
       final user = _auth.currentUser;
-
       if (user == null) {
         return const Left(UserNotFoundFailure());
       }
@@ -210,6 +209,7 @@ class AuthRepositoryImpl implements AuthRepository {
       return const Left(UnexpectedFailure());
     }
   }
+
 
   // Helper method para mapear errores de Firebase
   Failure _mapFirebaseAuthError(String code) {

@@ -5,15 +5,12 @@ import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/widgets/snackbar_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/explorar_screen.dart';
-import 'package:migra_ayuda/features/home/presentation/screens/home_screen.dart';
-
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/complete_info_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/register_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/switch_button.dart';
-import 'package:migra_ayuda/features/home/presentation/screens/inicio_screen.dart';
-import 'package:migra_ayuda/features/userActivity/domain/entities/user_activity_entity.dart';
+
 import 'package:migra_ayuda/features/userActivity/presentation/providers/create_activity_notifier.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 
@@ -40,7 +37,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
     // Escucha cambios en el estado de autenticación para reaccionar
     // cuando el usuario inicia sesión correctamente o hay un error
-    ref.listen(
+/*     ref.listen(
       authNotifierProvider,
       (previous, next) {
         next.whenOrNull(data: (user) async {
@@ -83,7 +80,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
         });
       },
     );
-
+ */
     return Scaffold(
       body: SafeArea(
         child: Padding(

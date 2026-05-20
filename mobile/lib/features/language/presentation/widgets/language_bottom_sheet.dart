@@ -3,18 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/language/presentation/providers/language_provider.dart';
 import 'package:migra_ayuda/features/language/presentation/widgets/language_option.dart';
 
-class LanguageBottomSheet extends ConsumerStatefulWidget {
+class LanguageBottomSheet extends ConsumerWidget {
   const LanguageBottomSheet({super.key});
 
   @override
-  ConsumerState<LanguageBottomSheet> createState() =>
-      _LanguageBottomSheetState();
-}
-
-class _LanguageBottomSheetState extends ConsumerState<LanguageBottomSheet> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final currentLanguage = ref.watch(languageProvider);
+    final currentLanguageCode =
+        ref.watch(languageProvider.notifier).currentLanguageCode;
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -55,25 +51,93 @@ class _LanguageBottomSheetState extends ConsumerState<LanguageBottomSheet> {
           const SizedBox(height: 24),
 
           // Opciones de idioma
-          LanguageOption(
-            flag: '🇪🇸',
-            name: 'Español',
-            subtitle: 'Spanish',
-            isSelected: currentLanguage == 'es',
-            onTap: () async {
-              await ref.read(languageProvider.notifier).changeLanguage('es');
-            },
-          ),
-          const SizedBox(height: 12),
+          currentLanguage.when(
+            data: (locale) {
+              final isSpanish = locale?.languageCode == 'es';
+              final isEnglish = locale?.languageCode == 'en';
 
-          LanguageOption(
-            flag: '🇬🇧',
-            name: 'English',
-            subtitle: 'Inglés',
-            isSelected: currentLanguage == 'en',
-            onTap: () async {
-              await ref.read(languageProvider.notifier).changeLanguage('en');
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  LanguageOption(
+                    flag: '🇪🇸',
+                    name: 'Español',
+                    subtitle: 'Spanish',
+                    isSelected: isSpanish,
+                    onTap: () async {
+                      await ref
+                          .read(languageProvider.notifier)
+                          .changeLanguage('es');
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  LanguageOption(
+                    flag: '🇬🇧',
+                    name: 'English',
+                    subtitle: 'Inglés',
+                    isSelected: isEnglish,
+                    onTap: () async {
+                      await ref
+                          .read(languageProvider.notifier)
+                          .changeLanguage('en');
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    },
+                  ),
+                ],
+              );
             },
+            loading: () => const Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: CircularProgressIndicator(),
+              ),
+            ),
+            error: (error, stackTrace) => Column(
+              children: [
+                const Icon(Icons.error, color: Colors.red, size: 40),
+                const SizedBox(height: 8),
+                Text(
+                  'Error al cargar idioma',
+                  style: TextStyle(color: Colors.red.shade700),
+                ),
+                const SizedBox(height: 12),
+                // Opciones de idioma con fallback
+                LanguageOption(
+                  flag: '🇪🇸',
+                  name: 'Español',
+                  subtitle: 'Spanish',
+                  isSelected: currentLanguageCode == 'es',
+                  onTap: () async {
+                    await ref
+                        .read(languageProvider.notifier)
+                        .changeLanguage('es');
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                ),
+                const SizedBox(height: 12),
+                LanguageOption(
+                  flag: '🇬🇧',
+                  name: 'English',
+                  subtitle: 'Inglés',
+                  isSelected: currentLanguageCode == 'en',
+                  onTap: () async {
+                    await ref
+                        .read(languageProvider.notifier)
+                        .changeLanguage('en');
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 24),
         ],
