@@ -697,6 +697,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'No se encontraron datos del usuario'**
   String get authErrorUserDataNotFound;
+
+  /// Mensaje para indicar que es administrador
+  ///
+  /// In es, this message translates to:
+  /// **'¡Eres administrador, ingresa al panel web!'**
+  String get alerMessageAdmin;
 }
 
 class _AppLocalizationsDelegate

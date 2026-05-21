@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
 import 'package:migra_ayuda/features/auth/domain/useCases/auth_con_google_use_case.dart';
@@ -60,3 +61,7 @@ final resetPasswordProviderUseCase = Provider<ResetPasswordUseCase>(
     return ResetPasswordUseCase(repo);
   },
 );
+
+final authStateProvider = StreamProvider<UserModel?>((ref) {
+  return ref.read(repositoryProvider).authStateChanges();
+});

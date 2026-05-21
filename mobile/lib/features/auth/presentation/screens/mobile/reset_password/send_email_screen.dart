@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/widgets/snackbar_web_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/reset_password_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/reset_password/success_screen.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
@@ -49,9 +50,7 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
             );
           },
           error: (error, stackTrace) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(error.toString())),
-            );
+            SnackbarWebWidget.error(context, error.toString());
           },
         );
       },

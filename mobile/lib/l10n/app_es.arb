@@ -399,5 +399,7 @@
     "authErrorUserDataNotFound": "No se encontraron datos del usuario",
     "@authErrorUserDataNotFound": {
         "description": "Error: datos de usuario no encontrados"
-    }
+    },
+    "alerMessageAdmin": "¡Eres administrador, ingresa al panel web!",
+    "@alerMessageAdmin": { "description": "Mensaje para indicar que es administrador"}
 }

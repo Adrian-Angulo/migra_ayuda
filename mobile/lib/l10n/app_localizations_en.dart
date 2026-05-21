@@ -317,4 +317,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authErrorUserDataNotFound => 'User data not found';
+
+  @override
+  String get alerMessageAdmin =>
+      'You are an administrator, log in to the web panel';
 }

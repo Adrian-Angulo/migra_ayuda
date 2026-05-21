@@ -40,7 +40,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   ) {
     final AppLocalizations l10n = AppLocalizations.of(context)!;
     final authState = ref.watch(authNotifierProvider);
-    
+
     return Form(
       key: formKey,
       child: Column(
@@ -100,7 +100,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 await ref
                     .read(authNotifierProvider.notifier)
                     .login(emailController.text, passController.text);
-                cleanControllar();
+                /* cleanControllar(); */
               }
             },
           ),

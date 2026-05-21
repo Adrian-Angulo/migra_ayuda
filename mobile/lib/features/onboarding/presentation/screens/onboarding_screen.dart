@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/features/onboarding/domain/entities/onboarding_entity.dart';
 import 'package:migra_ayuda/features/onboarding/presentation/providers/onboarding_provider.dart';
 import 'package:migra_ayuda/features/onboarding/presentation/widgets/onboarding_widget.dart';
@@ -61,6 +62,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     await ref
                         .read(onboardingProvider.notifier)
                         .completeOnboarding();
+                    if (context.mounted) {
+                      context.go(Routes.loginMovil);
+                    }
                   },
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.grey.shade100,
@@ -124,10 +128,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       );
                     } else {
                       // Completar onboarding y dejar que StartPage maneje la navegación
+                      context.go(Routes.loginMovil);
                       await ref
                           .read(onboardingProvider.notifier)
                           .completeOnboarding();
-                      
                     }
                   },
                   style: ElevatedButton.styleFrom(

@@ -174,6 +174,7 @@ class AuthRepositoryImpl implements AuthRepository {
           .doc(credential.user!.uid)
           .set(user.toMap());
 
+      await _auth.signOut();
       return const Right(unit);
     } on FirebaseAuthException catch (e) {
       return Left(_mapFirebaseAuthError(e.code));
@@ -210,6 +211,15 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  @override
+  Stream<UserModel?> authStateChanges() {
+    return _auth.authStateChanges().asyncMap((usu) async {
+      if (usu == null) return null;
+      final doc = await _firestore.collection('users').doc(usu.uid).get();
+      if (!doc.exists || doc.data() == null) return null;
+      return UserModel.fromMap(doc);
+    });
+  }
 
   // Helper method para mapear errores de Firebase
   Failure _mapFirebaseAuthError(String code) {

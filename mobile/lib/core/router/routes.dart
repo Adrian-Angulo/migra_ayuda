@@ -8,4 +8,5 @@ class Routes {
   static const String onboarding = "/onboarding";
   static const String selectLanguaje = "/selectLanguaje";
   static const String splash = "/splash";
+  static const String home = '/home';
 }

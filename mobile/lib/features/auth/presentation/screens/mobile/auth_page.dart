@@ -4,7 +4,6 @@ import 'package:migra_ayuda/core/constants/activity_actions.dart';
 
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/widgets/snackbar_widget.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/mobile/explorar_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/complete_info_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_screen.dart';
@@ -37,7 +36,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
     // Escucha cambios en el estado de autenticación para reaccionar
     // cuando el usuario inicia sesión correctamente o hay un error
-/*     ref.listen(
+    ref.listen(
       authNotifierProvider,
       (previous, next) {
         next.whenOrNull(data: (user) async {
@@ -60,18 +59,28 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                     MaterialPageRoute(
                       builder: (context) => const CompleteInfoScreen(),
                     ));
-              } else {
+              } /* else {
                 // Usuario regular va a la pantalla principal
                 Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) => const ExplorarScreen(),
                     ));
+              } */
+            } else {
+              // Usuario NO es Migrante (Admin u otro rol)
+              if (!context.mounted) return;
+
+              // Mostrar mensaje de error
+              SnackbarWidget.info(context, l10n.alerMessageAdmin);
+
+              // Esperar 2 segundos para que el usuario vea el mensaje
+              await Future.delayed(const Duration(seconds: 2));
+
+              // Hacer logout después de mostrar el mensaje
+              if (context.mounted) {
+                await ref.read(authNotifierProvider.notifier).logout();
               }
-            } else if (user.role != "Migrante") {
-              await ref.read(authNotifierProvider.notifier).logout();
-              SnackbarWidget.info(
-                  context, "¡Eres administrador, ingresa al panel web!");
             }
           }
         }, error: (error, stackTrace) {
@@ -80,7 +89,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
         });
       },
     );
- */
+
     return Scaffold(
       body: SafeArea(
         child: Padding(

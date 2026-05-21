@@ -33,7 +33,7 @@ class _ExplorarScreenState extends ConsumerState<ExplorarScreen>
 
   final filtros = [
     "Todos",
-    "Alimentacion",
+    "Alimentación",
     "Salud",
     "Alojamiento",
     "Trabajo",
@@ -345,8 +345,7 @@ class _ExplorarScreenState extends ConsumerState<ExplorarScreen>
             ),
           ],
         ),
-
-         DraggableScrollableSheet(
+        DraggableScrollableSheet(
           controller: _sheetController,
           initialChildSize: 0.40,
           minChildSize: 0.15,
@@ -376,7 +375,7 @@ class _ExplorarScreenState extends ConsumerState<ExplorarScreen>
                     onEntityTap: _onEntityTap,
                   ),
           ),
-        ), 
+        ),
         Positioned(
           bottom: 150,
           right: 16,

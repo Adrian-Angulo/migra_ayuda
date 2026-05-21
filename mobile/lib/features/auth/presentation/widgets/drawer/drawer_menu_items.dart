@@ -36,7 +36,7 @@ class DrawerMenuItems extends ConsumerWidget {
           label: l10n.changeLanguage,
           onTap: () {
             Navigator.pop(context);
-            /* _showLanguagePicker(context, ref, l10n, currentLocale); */
+            _showLanguagePicker(context, ref, l10n, currentLocale.value);
           },
         ),
 
@@ -64,6 +64,9 @@ class DrawerMenuItems extends ConsumerWidget {
     AppLocalizations l10n,
     Locale? currentLocale,
   ) {
+    // Capturar el notifier ANTES de mostrar el bottom sheet
+    final languageNotifier = ref.read(languageProvider.notifier);
+
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -74,7 +77,8 @@ class DrawerMenuItems extends ConsumerWidget {
         l10n: l10n,
         onLanguageSelected: (code) async {
           Navigator.pop(ctx);
-          await ref.read(languageProvider.notifier).changeLanguage(code);
+          // Usar el notifier capturado en lugar de ref
+          await languageNotifier.changeLanguage(code);
         },
       ),
     );

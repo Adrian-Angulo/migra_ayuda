@@ -99,5 +99,6 @@
   "authErrorOperationNotAllowed": "Operation not allowed",
   "authErrorNetwork": "Internet connection error",
   "authErrorUnexpected": "An unexpected error occurred",
-  "authErrorUserDataNotFound": "User data not found"
+  "authErrorUserDataNotFound": "User data not found",
+  "alerMessageAdmin": "You are an administrator, log in to the web panel"
 }

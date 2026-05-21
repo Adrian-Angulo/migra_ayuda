@@ -19,4 +19,6 @@ abstract class AuthRepository {
   });
   Future<Either<Failure, UserModel>> verifyOrCreateGoogleUser(
       firebase_auth.UserCredential credential);
+
+  Stream<UserModel?> authStateChanges();
 }
