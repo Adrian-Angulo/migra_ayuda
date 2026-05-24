@@ -23,7 +23,6 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
       (failure) {
         state = AsyncValue.error(failure.message, StackTrace.current);
       },
-      
       (_) async {
         final userResult = await ref.read(getAuthenticatedUserProvider).call();
         userResult.fold(
@@ -57,10 +56,27 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
 
     result.fold(
       (failure) {
+        print('❌ Error en authWithGoogle: ${failure.message}');
         state = AsyncValue.error(failure.message, StackTrace.current);
       },
-      (user) {
-        state = AsyncValue.data(user);
+      (user) async {
+        print('✅ Usuario de Google recibido: ${user.toMap()}');
+
+        // Obtener los datos completos del usuario desde Firestore
+        // para asegurar que todos los campos estén actualizados
+        final userResult = await ref.read(getAuthenticatedUserProvider).call();
+
+        userResult.fold(
+          (failure) {
+            print('❌ Error al obtener datos del usuario: ${failure.message}');
+            state = AsyncValue.error(failure.message, StackTrace.current);
+          },
+          (authenticatedUser) {
+            print(
+                '✅ Datos completos del usuario obtenidos: ${authenticatedUser?.toMap()}');
+            state = AsyncValue.data(authenticatedUser);
+          },
+        );
       },
     );
   }

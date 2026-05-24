@@ -31,8 +31,7 @@ class AuthRepositoryImpl implements AuthRepository {
         accessToken: googleAuth.accessToken,
       );
 
-      final userCredential =
-          await FirebaseAuth.instance.signInWithCredential(credential);
+      final userCredential = await _auth.signInWithCredential(credential);
 
       return Right(userCredential);
     } on FirebaseAuthException catch (e) {
@@ -97,23 +96,29 @@ class AuthRepositoryImpl implements AuthRepository {
       final doc = await docRef.get();
 
       if (doc.exists) {
+        print('✅ Usuario existente encontrado');
         return Right(UserModel.fromMap(doc));
       } else {
+        print('🆕 Creando nuevo usuario con Google');
         final newUser = UserModel(
           id: uid,
           name: credential.user!.displayName ?? 'Usuario',
           lastname: '',
           email: credential.user!.email ?? '',
           password: '',
+          role: 'Migrante', // Asignar rol por defecto
           profileComplete: false,
         );
 
         await docRef.set(newUser.toMap());
+        print('✅ Usuario creado: ${newUser.toMap()}');
         return Right(newUser);
       }
     } on FirebaseException catch (e) {
+      print('❌ Error de Firebase: ${e.message}');
       return Left(ServerFailure(e.message ?? 'Error al crear usuario'));
     } catch (e) {
+      print('❌ Error inesperado: $e');
       return const Left(UnexpectedFailure());
     }
   }
@@ -127,10 +132,14 @@ class AuthRepositoryImpl implements AuthRepository {
         return const Left(UserDataNotFoundFailure());
       }
 
-      return Right(UserModel.fromMap(doc));
+      final userData = UserModel.fromMap(doc);
+      print('📊 Datos del usuario obtenidos: ${userData.toMap()}');
+
+      return Right(userData);
     } on FirebaseException catch (e) {
       return Left(ServerFailure(e.message ?? 'Error al obtener datos'));
     } catch (e) {
+      print('❌ Error inesperado en getUserData: $e');
       return const Left(UnexpectedFailure());
     }
   }

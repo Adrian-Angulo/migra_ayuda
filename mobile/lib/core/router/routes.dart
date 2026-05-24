@@ -9,4 +9,5 @@ class Routes {
   static const String selectLanguaje = "/selectLanguaje";
   static const String splash = "/splash";
   static const String home = '/home';
+  static const String completeProfile = "/completeProfile";
 }

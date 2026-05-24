@@ -5,6 +5,7 @@ import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/auth_page.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/mobile/complete_info_screen.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/explore_screen.dart';
 import 'package:migra_ayuda/features/language/presentation/providers/language_provider.dart';
 import 'package:migra_ayuda/features/language/presentation/screens/language_screen.dart';
@@ -32,11 +33,13 @@ final routerMobile = Provider<GoRouter>(
         if (seeOnboarding.value == false || seeOnboarding.hasError) {
           return Routes.onboarding;
         }
-        /*    if (authAsync.isLoading) {
-          return Routes.splash;
-        } */
+
         if (authAsync.value == null) {
           return Routes.loginMovil;
+        }
+
+        if (authAsync.value!.profileComplete == false) {
+          return Routes.completeProfile;
         }
 
         if (authAsync.value?.role == "Migrante") {
@@ -65,6 +68,10 @@ final routerMobile = Provider<GoRouter>(
         GoRoute(
             path: Routes.home,
             builder: (context, state) => const ExploreScreen()),
+        GoRoute(
+          path: Routes.completeProfile,
+          builder: (context, state) => const CompleteInfoScreen(),
+        )
       ],
     );
   },
