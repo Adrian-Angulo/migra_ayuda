@@ -4,6 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/tabla_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/action_buttons.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/empty_table_state.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/id_badge.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/rating_widget.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/service_chip.dart';
 
 class Tabla extends ConsumerStatefulWidget {
   const Tabla({super.key});
@@ -45,87 +50,119 @@ class _TablaState extends ConsumerState<Tabla> {
       data: (data) {
         _dataSource.actualizarDatos(data);
         return Expanded(
-          child: PaginatedDataTable2(
-            sortColumnIndex: _columnaOrdenadaIndex,
-            sortAscending: _esAscendente,
-            rowsPerPage: 10,
-            source: _dataSource,
-            minWidth: 600,
-            wrapInCard: true,
-            empty: const Center(
-              child: Text('No se encontraron entidades en el sistema'),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            columns: [
-              DataColumn2(
-                label: const Text('ID'),
-                fixedWidth: 60,
-                onSort: _ejecutarOrdenamiento,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: PaginatedDataTable2(
+                sortColumnIndex: _columnaOrdenadaIndex,
+                sortAscending: _esAscendente,
+                rowsPerPage: 10,
+                source: _dataSource,
+                minWidth: 900,
+                dataRowHeight: 72,
+                headingRowHeight: 56,
+                horizontalMargin: 20,
+                columnSpacing: 24,
+                headingRowDecoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Colors.grey.shade200,
+                      width: 1,
+                    ),
+                  ),
+                ),
+                empty: const EmptyTableState(),
+                columns: [
+                  DataColumn2(
+                    label: _buildHeaderCell('Nombre'),
+                    size: ColumnSize.L,
+                    onSort: _ejecutarOrdenamiento,
+                  ),
+                  DataColumn2(
+                    label: _buildHeaderCell('Dirección'),
+                    size: ColumnSize.L,
+                  ),
+                  DataColumn2(
+                    label: _buildHeaderCell('Servicios'),
+                    size: ColumnSize.M,
+                  ),
+                  DataColumn2(
+                    label: _buildHeaderCell('Valoración'),
+                    fixedWidth: 100,
+                  ),
+                  DataColumn2(
+                    label: _buildHeaderCell('Acciones'),
+                    fixedWidth: 100,
+                  ),
+                ],
               ),
-              DataColumn2(
-                label: const Text('Nombre'),
-                size: ColumnSize.L,
-                onSort: _ejecutarOrdenamiento,
-              ),
-              const DataColumn2(
-                label: Text('Dirección'),
-                size: ColumnSize.L,
-              ),
-              const DataColumn2(
-                label: Text('Servicios'),
-                size: ColumnSize.M,
-              ),
-              const DataColumn2(
-                label: Text('Valoración'),
-                size: ColumnSize.S,
-              ),
-              const DataColumn2(
-                label: Text('Acciones'),
-                fixedWidth: 80,
-              ),
-            ],
+            ),
           ),
         );
       },
       error: (error, stackTrace) {
-        return Center(
-          child: Text(error.toString()),
+        return Expanded(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: Colors.red.shade300,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Error al cargar las entidades',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  error.toString(),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade500,
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
       loading: () {
-        return const SafeArea(
-            child: Center(child: CircularProgressIndicator()));
+        return const Expanded(
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
       },
     );
   }
-}
 
-// SOLID: Single Responsibility - Widget solo para mostrar rating
-class _RatingWidget extends StatelessWidget {
-  const _RatingWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.amber.shade100,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.amber.shade400),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.star, size: 12, color: Colors.amber.shade700),
-          const SizedBox(width: 4),
-          Text(
-            '4.5',
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Colors.amber.shade800,
-            ),
-          ),
-        ],
+  Widget _buildHeaderCell(String text) {
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w700,
+        color: Colors.grey.shade700,
+        letterSpacing: 0.5,
       ),
     );
   }
@@ -134,6 +171,11 @@ class _RatingWidget extends StatelessWidget {
 class EntityDataSource extends DataTableSource {
   List<EntityEntity> entities = [];
   List<EntityEntity> _entitiesFiltradas = [];
+  final Function(EntityEntity)? onRowSelected;
+
+  EntityDataSource({
+    this.onRowSelected,
+  });
 
   void aplicarFiltros(String busqueda, String? servicioSeleccionado) {
     _entitiesFiltradas = entities.where((enty) {
@@ -164,21 +206,83 @@ class EntityDataSource extends DataTableSource {
 
     return DataRow2.byIndex(
       index: index,
+      onTap: () {
+        // TODO: Implementar acción al seleccionar fila
+        onRowSelected?.call(entity);
+      },
       cells: [
-        DataCell(Text("${index + 1}")),
-        DataCell(Text(entity.name)),
-        DataCell(Text(entity.address)),
-        DataCell(Text(entity.services.join(', '))),
-        const DataCell(_RatingWidget()),
         DataCell(
-          IconButton(
-            icon: const Icon(
-              Icons.delete,
-              color: Colors.red,
-              size: 20,
-            ),
-            onPressed: () {
-              // SOLID: Open/Closed - Permite extensión sin modificar la clase
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.business,
+                  size: 20,
+                  color: Colors.blue.shade700,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  entity.name,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade900,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+        DataCell(
+          Row(
+            children: [
+              Icon(
+                Icons.location_on_outlined,
+                size: 16,
+                color: Colors.grey.shade500,
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  entity.address,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey.shade600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+        DataCell(
+          Wrap(
+            spacing: 4,
+            runSpacing: 4,
+            children: entity.services
+                .map((service) => ServiceChip(service: service))
+                .toList(),
+          ),
+        ),
+        const DataCell(
+          Center(child: RatingWidget()),
+        ),
+        DataCell(
+          ActionButtons(
+            onView: () {
+              // TODO: Implementar ver detalles
+              onRowSelected?.call(entity);
+            },
+            onDelete: () {
+              // TODO: Implementar confirmación de eliminación
               _entitiesFiltradas.remove(entity);
               notifyListeners();
             },
