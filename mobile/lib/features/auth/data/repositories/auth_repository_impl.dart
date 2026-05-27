@@ -17,21 +17,39 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, UserCredential>> authWithGoogle() async {
     try {
-      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      final googleUser = await googleSignIn.signIn();
 
       if (googleUser == null) {
         return const Left(OperationCancelledFailure());
       }
 
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      final googleAuth = await googleUser.authentication;
 
-      final credential = GoogleAuthProvider.credential(
-        idToken: googleAuth.idToken,
-        accessToken: googleAuth.accessToken,
+      final idToken = googleAuth.idToken;
+      final accessToken = googleAuth.accessToken;
+
+      if (idToken == null) {
+        return const Left(UnexpectedFailure());
+      }
+
+      final oauthCredential = GoogleAuthProvider.credential(
+        idToken: idToken,
+        accessToken: accessToken,
       );
 
-      final userCredential = await _auth.signInWithCredential(credential);
+      final userCredential = await _auth.signInWithCredential(oauthCredential);
+
+      final user = userCredential.user;
+      if (user == null) {
+        return const Left(UserNotFoundFailure());
+      }
+
+      final providers =
+          user.providerData.map((info) => info.providerId).toList();
+
+      if (providers.contains('password')) {
+        await user.unlink('password');
+      }
 
       return Right(userCredential);
     } on FirebaseAuthException catch (e) {
@@ -228,6 +246,19 @@ class AuthRepositoryImpl implements AuthRepository {
       if (!doc.exists || doc.data() == null) return null;
       return UserModel.fromMap(doc);
     });
+  }
+
+  @override
+  Future<Either<Failure, List<UserModel>>> getAllUsers() async {
+    try {
+      final snapshot = await _firestore.collection('users').get();
+      final users = snapshot.docs.map((doc) => UserModel.fromMap(doc)).toList();
+      return Right(users);
+    } on FirebaseException catch (e) {
+      return Left(ServerFailure(e.message ?? 'Error al obtener usuarios'));
+    } catch (e) {
+      return const Left(UnexpectedFailure());
+    }
   }
 
   // Helper method para mapear errores de Firebase

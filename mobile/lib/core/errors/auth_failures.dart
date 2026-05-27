@@ -22,6 +22,11 @@ class EmailAlreadyInUseFailure extends AuthFailure {
   const EmailAlreadyInUseFailure() : super('Este correo ya está registrado');
 }
 
+class EmailAuthenticatedWithGoogleFailure extends AuthFailure {
+  const EmailAuthenticatedWithGoogleFailure()
+      : super('Este correo está asociado a una cuenta de Google');
+}
+
 class InvalidCredentialFailure extends AuthFailure {
   const InvalidCredentialFailure() : super('Correo o contraseña incorrecta');
 }

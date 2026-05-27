@@ -70,10 +70,19 @@ class _MainAppState extends ConsumerState<MainApp> {
     if (kIsWeb) {
       final router = ref.watch(routerProvider);
       return MaterialApp.router(
+        locale: const Locale('es'),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('es')],
         title: 'MigraAyuda Admin',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6FA3A1)),
           useMaterial3: true,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         debugShowCheckedModeBanner: false,
         routerConfig: router,

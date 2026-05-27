@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 class AddButtonWidget extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+ 
 
   const AddButtonWidget({
     super.key,
     required this.text,
-    required this.onPressed,
+   
   });
 
   @override
@@ -15,7 +15,7 @@ class AddButtonWidget extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onPressed,
+        onTap: (){},
         borderRadius: BorderRadius.circular(12),
         child: Ink(
           decoration: BoxDecoration(

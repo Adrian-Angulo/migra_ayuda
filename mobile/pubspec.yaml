@@ -39,6 +39,7 @@ dependencies:
   image_picker: ^1.2.1
   fl_chart: ^1.2.0
   flutter_native_splash: ^2.4.7
+  data_table_2: ^2.7.2
 
 
 dev_dependencies:
