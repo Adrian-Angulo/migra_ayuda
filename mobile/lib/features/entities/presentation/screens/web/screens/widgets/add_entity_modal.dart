@@ -7,11 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:migra_ayuda/core/widgets/snackbar_web_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/register_entity_notifier.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/button_save_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/image_picker_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/service_type_checklist_widget.dart';
-
 
 class AddEntityModal extends ConsumerStatefulWidget {
   const AddEntityModal({super.key});
@@ -118,36 +118,15 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
         data: (_) {
           // Éxito - cerrar modal y mostrar mensaje
           Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Row(
-                children: [
-                  Icon(Icons.check_circle, color: Colors.white),
-                  SizedBox(width: 12),
-                  Text('Entidad registrada exitosamente'),
-                ],
-              ),
-              backgroundColor: Color(0xFF10B981),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+
+          SnackbarWebWidget.success(
+              context, 'Entidad registrada existosamente');
         },
         loading: () {}, // No hacer nada mientras carga
         error: (error, stack) {
           // Error - mostrar mensaje
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.error, color: Colors.white),
-                  const SizedBox(width: 12),
-                  Expanded(child: Text('Error: ${error.toString()}')),
-                ],
-              ),
-              backgroundColor: Colors.red,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+
+          SnackbarWebWidget.error(context, 'Error: ${error.toString()}');
         },
       );
     });
@@ -475,7 +454,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                         'Horario de Atención',
                         Icons.access_time,
                       ),
-
+                      const SizedBox(height: 12),
                       _buildTextField(
                         controller: _scheduleController,
                         label: '',

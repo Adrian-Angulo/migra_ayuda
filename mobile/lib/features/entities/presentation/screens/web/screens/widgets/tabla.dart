@@ -2,13 +2,14 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/delete_entity_notifier.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/tabla_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/action_buttons.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/empty_table_state.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/id_badge.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/rating_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/service_chip.dart';
+import 'package:path/path.dart';
 
 class Tabla extends ConsumerStatefulWidget {
   const Tabla({super.key});
@@ -47,8 +48,9 @@ class _TablaState extends ConsumerState<Tabla> {
     final asyncListEntity = ref.watch(entitiesStreamProvider);
 
     return asyncListEntity.when(
+      
       data: (data) {
-        _dataSource.actualizarDatos(data);
+         _dataSource.actualizarDatos(data);
         return Expanded(
           child: Container(
             decoration: BoxDecoration(
@@ -64,49 +66,55 @@ class _TablaState extends ConsumerState<Tabla> {
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: PaginatedDataTable2(
-                sortColumnIndex: _columnaOrdenadaIndex,
-                sortAscending: _esAscendente,
-                rowsPerPage: 10,
-                source: _dataSource,
-                minWidth: 900,
-                dataRowHeight: 72,
-                headingRowHeight: 56,
-                horizontalMargin: 20,
-                columnSpacing: 24,
-                headingRowDecoration: BoxDecoration(
-                  color: Colors.grey.shade50,
-                  border: Border(
-                    bottom: BorderSide(
-                      color: Colors.grey.shade200,
-                      width: 1,
+              child: Container(
+                decoration: BoxDecoration(
+                    border: Border.all(width: 2, color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(16)),
+                child: PaginatedDataTable2(
+                  sortColumnIndex: _columnaOrdenadaIndex,
+                  sortAscending: _esAscendente,
+                  wrapInCard: false,
+                  rowsPerPage: 10,
+                  source: _dataSource,
+                  minWidth: 900,
+                  dataRowHeight: 72,
+                  headingRowHeight: 56,
+                  horizontalMargin: 20,
+                  columnSpacing: 24,
+                  headingRowDecoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    border: Border(
+                      bottom: BorderSide(
+                        color: Colors.grey.shade200,
+                        width: 1,
+                      ),
                     ),
                   ),
+                  empty: const EmptyTableState(),
+                  columns: [
+                    DataColumn2(
+                      label: _buildHeaderCell('Nombre'),
+                      size: ColumnSize.L,
+                      onSort: _ejecutarOrdenamiento,
+                    ),
+                    DataColumn2(
+                      label: _buildHeaderCell('Dirección'),
+                      size: ColumnSize.L,
+                    ),
+                    DataColumn2(
+                      label: _buildHeaderCell('Servicios'),
+                      size: ColumnSize.M,
+                    ),
+                    DataColumn2(
+                      label: _buildHeaderCell('Valoración'),
+                      fixedWidth: 100,
+                    ),
+                    DataColumn2(
+                      label: _buildHeaderCell('Acciones'),
+                      fixedWidth: 100,
+                    ),
+                  ],
                 ),
-                empty: const EmptyTableState(),
-                columns: [
-                  DataColumn2(
-                    label: _buildHeaderCell('Nombre'),
-                    size: ColumnSize.L,
-                    onSort: _ejecutarOrdenamiento,
-                  ),
-                  DataColumn2(
-                    label: _buildHeaderCell('Dirección'),
-                    size: ColumnSize.L,
-                  ),
-                  DataColumn2(
-                    label: _buildHeaderCell('Servicios'),
-                    size: ColumnSize.M,
-                  ),
-                  DataColumn2(
-                    label: _buildHeaderCell('Valoración'),
-                    fixedWidth: 100,
-                  ),
-                  DataColumn2(
-                    label: _buildHeaderCell('Acciones'),
-                    fixedWidth: 100,
-                  ),
-                ],
               ),
             ),
           ),
@@ -198,18 +206,17 @@ class EntityDataSource extends DataTableSource {
     notifyListeners();
   }
 
+  void refrescar() {
+    _entitiesFiltradas = entities;
+    notifyListeners();
+  }
+
   @override
   DataRow? getRow(int index) {
     if (index >= _entitiesFiltradas.length) return null;
-
     final entity = _entitiesFiltradas[index];
-
     return DataRow2.byIndex(
       index: index,
-      onTap: () {
-        // TODO: Implementar acción al seleccionar fila
-        onRowSelected?.call(entity);
-      },
       cells: [
         DataCell(
           Row(
@@ -277,15 +284,7 @@ class EntityDataSource extends DataTableSource {
         ),
         DataCell(
           ActionButtons(
-            onView: () {
-              // TODO: Implementar ver detalles
-              onRowSelected?.call(entity);
-            },
-            onDelete: () {
-              // TODO: Implementar confirmación de eliminación
-              _entitiesFiltradas.remove(entity);
-              notifyListeners();
-            },
+            entity: entity,
           ),
         ),
       ],

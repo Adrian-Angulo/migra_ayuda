@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:migra_ayuda/core/widgets/snackbar_web_widget.dart';
+import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/delete_entity_notifier.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/delete_confirmation_dialog.dart';
 
 // SOLID: Single Responsibility - Widget para botones de acción de la tabla
-class ActionButtons extends StatelessWidget {
-  final VoidCallback onView;
-  final VoidCallback onDelete;
+class ActionButtons extends ConsumerWidget {
+  final EntityEntity entity;
 
   const ActionButtons({
     super.key,
-    required this.onView,
-    required this.onDelete,
+    required this.entity,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -20,14 +25,36 @@ class ActionButtons extends StatelessWidget {
           icon: Icons.visibility_outlined,
           color: Colors.blue,
           tooltip: 'Ver detalles',
-          onPressed: onView,
+          onPressed: () {
+            context.push('/dashboard/entities/${entity.id}');
+          },
         ),
         const SizedBox(width: 4),
         _ActionButton(
           icon: Icons.delete_outline,
           color: Colors.red,
           tooltip: 'Eliminar',
-          onPressed: onDelete,
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => DeleteConfirmationDialog(
+                entityName: entity.name,
+                onConfirm: () async {
+                  await ref
+                      .read(deleteEntityNotifierProvider.notifier)
+                      .eliminar(entity.id);
+
+                  // Invalidar el stream para forzar recarga
+                  ref.invalidate(entitiesStreamProvider);
+
+                  if (context.mounted) {
+                    SnackbarWebWidget.success(
+                        context, "Sea eliminado una entidad correctamente");
+                  }
+                },
+              ),
+            );
+          },
         ),
       ],
     );

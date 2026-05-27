@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:migra_ayuda/core/constants/constants.dart';
 
 class ServiceTypeChecklistWidget extends StatelessWidget {
   final List<String> selectedServices;
@@ -9,32 +10,6 @@ class ServiceTypeChecklistWidget extends StatelessWidget {
     required this.selectedServices,
     required this.onServicesChanged,
   });
-
-  static const List<Map<String, dynamic>> serviceTypes = [
-    {
-      'name': 'Asistencia medica',
-      'icon': Icons.local_hospital,
-      'color': Color(0xFFEF4444),
-    },
-
-    {'name': 'Alojamiento', 'icon': Icons.home, 'color': Color(0xFF8B5CF6)},
-    {'name': 'Empleo temporal', 'icon': Icons.work, 'color': Color(0xFF10B981)},
-    {
-      'name': 'Alimentación',
-      'icon': Icons.restaurant,
-      'color': Color(0xFFEC4899),
-    },
-    {
-      'name': 'Transporte',
-      'icon': Icons.directions_bus,
-      'color': Color(0xFF06B6D4),
-    },
-    {
-      'name': 'Documentación',
-      'icon': Icons.description,
-      'color': Color(0xFF6366F1),
-    },
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -47,33 +22,32 @@ class ServiceTypeChecklistWidget extends StatelessWidget {
         mainAxisSpacing: 12,
         childAspectRatio: 1.2,
       ),
-      itemCount: serviceTypes.length,
+      itemCount: services.length,
       itemBuilder: (context, index) {
-        final service = serviceTypes[index];
-        final isSelected = selectedServices.contains(service['name']);
+        final service = services[index];
+        final isSelected = selectedServices.contains(service);
 
         return InkWell(
           onTap: () {
             final newSelectedServices = List<String>.from(selectedServices);
             if (isSelected) {
-              newSelectedServices.remove(service['name']);
+              newSelectedServices.remove(service);
             } else {
-              newSelectedServices.add(service['name']);
+              newSelectedServices.add(service);
             }
             onServicesChanged(newSelectedServices);
           },
           borderRadius: BorderRadius.circular(12),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: isSelected
-                  ? (service['color'] as Color).withOpacity(0.1)
+                  ? (getServiceColor(service) as Color).withOpacity(0.1)
                   : Colors.grey.shade50,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isSelected
-                    ? (service['color'] as Color)
+                    ? (getServiceColor(service) as Color)
                     : Colors.grey.shade300,
                 width: isSelected ? 2 : 1,
               ),
@@ -82,20 +56,20 @@ class ServiceTypeChecklistWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  service['icon'] as IconData,
+                  getServiceIcon(service),
                   size: 32,
                   color: isSelected
-                      ? (service['color'] as Color)
+                      ? getServiceColor(service)
                       : Colors.grey.shade400,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  service['name'] as String,
+                  service,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                     color: isSelected
-                        ? (service['color'] as Color)
+                        ? getServiceColor(service)
                         : Colors.grey.shade600,
                   ),
                   textAlign: TextAlign.center,
@@ -105,7 +79,7 @@ class ServiceTypeChecklistWidget extends StatelessWidget {
                   Icon(
                     Icons.check_circle,
                     size: 16,
-                    color: service['color'] as Color,
+                    color: getServiceColor(service),
                   ),
                 ],
               ],

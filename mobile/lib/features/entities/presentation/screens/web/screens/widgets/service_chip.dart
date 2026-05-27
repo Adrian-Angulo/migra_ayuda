@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:migra_ayuda/core/constants/constants.dart';
 
 // SOLID: Single Responsibility - Widget solo para mostrar chips de servicios
 class ServiceChip extends StatelessWidget {
@@ -9,43 +10,11 @@ class ServiceChip extends StatelessWidget {
     required this.service,
   });
 
-  MaterialColor _getServiceColor(String service) {
-    switch (service.toLowerCase()) {
-      case 'legal':
-        return Colors.blue;
-      case 'salud':
-        return Colors.green;
-      case 'vivienda':
-        return Colors.orange;
-      case 'trabajo':
-        return Colors.purple;
-      case 'educación':
-        return Colors.teal;
-      default:
-        return Colors.grey;
-    }
-  }
 
-  IconData _getServiceIcon(String service) {
-    switch (service.toLowerCase()) {
-      case 'legal':
-        return Icons.gavel;
-      case 'salud':
-        return Icons.local_hospital;
-      case 'vivienda':
-        return Icons.home;
-      case 'trabajo':
-        return Icons.work;
-      case 'educación':
-        return Icons.school;
-      default:
-        return Icons.category;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    final color = _getServiceColor(service);
+    final color = getServiceColor(service);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -58,7 +27,7 @@ class ServiceChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            _getServiceIcon(service),
+            getServiceIcon(service),
             size: 12,
             color: color[700],
           ),

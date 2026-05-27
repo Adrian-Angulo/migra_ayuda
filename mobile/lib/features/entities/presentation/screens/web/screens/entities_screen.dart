@@ -76,7 +76,7 @@ class EntitiesScreen extends ConsumerWidget {
                 Row(
                   children: [
                     SizedBox(
-                      width: 120,
+                      width: 150,
                       child: FilterButton(
                         label: 'Filtrar',
                         value: seletedService,

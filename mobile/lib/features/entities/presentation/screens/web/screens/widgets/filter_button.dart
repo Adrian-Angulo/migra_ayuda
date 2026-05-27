@@ -29,17 +29,23 @@ class FilterButton extends StatelessWidget {
           child: DropdownButton<String>(
             value: value.isEmpty ? null : value,
             isExpanded: true,
-            icon: Icon(Icons.keyboard_arrow_down, size: 16, color: Colors.grey[600]),
+            icon: Icon(Icons.keyboard_arrow_down,
+                size: 16, color: Colors.grey[600]),
             hint: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   label,
-                  style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Colors.grey[600],
+                  ),
                 ),
                 Text(
                   label,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                   style: const TextStyle(
                       fontSize: 13, fontWeight: FontWeight.w500),
                 ),
@@ -57,6 +63,8 @@ class FilterButton extends StatelessWidget {
                     ),
                     Text(
                       option,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                       style: const TextStyle(
                           fontSize: 13, fontWeight: FontWeight.w500),
                     ),
@@ -67,7 +75,11 @@ class FilterButton extends StatelessWidget {
             items: options.map((option) {
               return DropdownMenuItem<String>(
                 value: option,
-                child: Text(option),
+                child: Text(
+                  option,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               );
             }).toList(),
             onChanged: onChanged,

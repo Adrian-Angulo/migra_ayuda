@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DeleteConfirmationDialog extends StatelessWidget {
+class DeleteConfirmationDialog extends ConsumerWidget {
   final String entityName;
   final VoidCallback onConfirm;
 
@@ -11,7 +12,8 @@ class DeleteConfirmationDialog extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
