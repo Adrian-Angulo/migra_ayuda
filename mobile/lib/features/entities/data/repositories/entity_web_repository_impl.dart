@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:migra_ayuda/features/entities/data/datasources/entity_remote_datasource.dart';
 import 'package:migra_ayuda/features/entities/data/models/entity_models.dart';
@@ -165,6 +166,14 @@ class EntityWebRepositoryImpl extends EntityRepository {
 
   @override
   Stream<Either<String, List<EntityEntity>>> getAllEntites2() {
-    return remoteDataSource.getAllEntities2();
+    return remoteDataSource.getAllEntities2().map((list) {
+      try {
+        return Right(list);
+      } on FirebaseException catch (e) {
+        return Left<String, List<EntityEntity>>(e.toString());
+      } catch (e) {
+        return Left<String, List<EntityEntity>>(e.toString());
+      }
+    });
   }
 }

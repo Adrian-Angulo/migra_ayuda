@@ -159,7 +159,7 @@ class EntityMobilRepositoryImpl implements EntityRepository {
         cachedEntities = await localDataSource.getCachedEntities();
       } catch (e) {
         // Si falla el caché, continúa con lista vacía
-        cachedEntities = [];
+        left("Ha ocurrdio un error: $e");
       }
 
       // 2. Verifica si hay conexión para actualizar en background
@@ -275,7 +275,7 @@ class EntityMobilRepositoryImpl implements EntityRepository {
           'Error al sincronizar entidades desde Firebase: ${e.toString()}');
     }
   }
-  
+
   @override
   Stream<Either<String, List<EntityEntity>>> getAllEntites2() {
     // TODO: implement getAllEntites2

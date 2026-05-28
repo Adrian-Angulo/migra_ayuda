@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-
 import 'package:dartz/dartz.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 
