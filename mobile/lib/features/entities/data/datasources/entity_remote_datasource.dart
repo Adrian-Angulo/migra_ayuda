@@ -3,8 +3,12 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dartz/dartz.dart';
 import 'package:http/http.dart' as http;
+import 'package:migra_ayuda/core/errors/auth_failures.dart';
+import 'package:migra_ayuda/core/errors/failures.dart';
 import 'package:migra_ayuda/features/entities/data/models/entity_models.dart';
+import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 
 /// Excepción personalizada para errores del servidor
 class ServerException implements Exception {
@@ -155,4 +159,32 @@ class EntityRemoteDataSource {
       throw ServerException('Error al obtener entidad: $e');
     }
   }
+
+  Stream<Either<String, List<EntityEntity>>> getAllEntities2() {
+    return _firestore
+        .collection('entities')
+        .orderBy('name')
+        .snapshots()
+        .map((snap) {
+      try {
+        final orgs =
+            snap.docs.map((enty) => EntityModels.fromMap(enty)).toList();
+        return Right<String, List<EntityEntity>>(orgs);
+      } on FirebaseException catch (e) {
+        return Left<String, List<EntityEntity>>(e.toString());
+      } catch (e) {
+        return Left<String, List<EntityEntity>>(e.toString());
+      }
+    });
+  }
+  /* Stream<Either<Failure,<List<EntityEntity>>> getAllEntities2() async {
+    return _firestore.collection('entities').orderBy('name').snapshots().map((snap){
+      try {
+        final orgs = snap.docs.map((enty) => EntityModels.fromMap(enty)).toList();
+        
+      } catch (e) {
+        
+      }
+    })
+  } */
 }

@@ -275,4 +275,10 @@ class EntityMobilRepositoryImpl implements EntityRepository {
           'Error al sincronizar entidades desde Firebase: ${e.toString()}');
     }
   }
+  
+  @override
+  Stream<Either<String, List<EntityEntity>>> getAllEntites2() {
+    // TODO: implement getAllEntites2
+    throw UnimplementedError();
+  }
 }

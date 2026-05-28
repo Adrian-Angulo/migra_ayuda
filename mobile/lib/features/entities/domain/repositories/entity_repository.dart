@@ -18,6 +18,8 @@ abstract class EntityRepository {
 
   Future<Either<String, Unit>> deleteEntity(String entityId);
 
+  Stream<Either<String, List<EntityEntity>>> getAllEntites2();
+
   Future<Either<String, List<EntityEntity>>> getAllEntities();
 
   Future<Either<String, EntityEntity>> getEntityById(String id);
@@ -28,4 +30,5 @@ abstract class EntityRepository {
   /// Retorna [Right(Unit)] si la sincronización fue exitosa
   /// Retorna [Left(String)] con el mensaje de error si falla
   Future<Either<String, Unit>> syncAllFromFirebase();
+  
 }

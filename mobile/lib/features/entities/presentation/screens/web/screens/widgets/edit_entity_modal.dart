@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:migra_ayuda/core/widgets/snackbar_web_widget.dart';
 import 'dart:typed_data';
 
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
@@ -81,36 +82,13 @@ class _EditEntityModalState extends ConsumerState<EditEntityModal> {
         data: (_) {
           // Éxito - cerrar modal y mostrar mensaje
           Navigator.of(context).pop(true); // Retornar true para indicar éxito
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Row(
-                children: [
-                  Icon(Icons.check_circle, color: Colors.white),
-                  SizedBox(width: 12),
-                  Text('Entidad actualizada exitosamente'),
-                ],
-              ),
-              backgroundColor: Color(0xFF10B981),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          SnackbarWebWidget.success(
+              context, "Entidad actualizada exitosamente");
         },
         loading: () {}, // No hacer nada mientras carga
         error: (error, stack) {
           // Error - mostrar mensaje
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.error, color: Colors.white),
-                  const SizedBox(width: 12),
-                  Expanded(child: Text('Error: ${error.toString()}')),
-                ],
-              ),
-              backgroundColor: Colors.red,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          SnackbarWebWidget.error(context, 'Error: ${error.toString()}');
         },
       );
     });
@@ -213,9 +191,8 @@ class _EditEntityModalState extends ConsumerState<EditEntityModal> {
                             ImagePickerWidget(
                               imagen: _selectedImage,
                               imagenBytes: _selectedImageBytes,
-                              existingImageUrl: _imageChanged
-                                  ? null
-                                  : widget.entity.imageUrl,
+                              existingImageUrl:
+                                  _imageChanged ? null : widget.entity.imageUrl,
                               onImageSelected: (imagen, bytes) {
                                 setState(() {
                                   _selectedImage = imagen;
@@ -453,8 +430,8 @@ class _EditEntityModalState extends ConsumerState<EditEntityModal> {
                                 final updatedEntity = EntityEntity(
                                   id: widget.entity.id,
                                   name: _nameController.text.trim(),
-                                  description: _descriptionController.text
-                                      .trim(),
+                                  description:
+                                      _descriptionController.text.trim(),
                                   services: selectedServices,
                                   address: _addressController.text.trim(),
                                   localitation: GeoPoint(

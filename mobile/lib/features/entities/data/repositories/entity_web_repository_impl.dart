@@ -162,4 +162,9 @@ class EntityWebRepositoryImpl extends EntityRepository {
       'En web, cada llamada a getAllEntities() ya obtiene datos frescos de Firebase.',
     );
   }
+
+  @override
+  Stream<Either<String, List<EntityEntity>>> getAllEntites2() {
+    return remoteDataSource.getAllEntities2();
+  }
 }

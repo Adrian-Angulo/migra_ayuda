@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:migra_ayuda/core/database/sembast_database.dart';
 import 'package:migra_ayuda/core/network/network_provider.dart';
 import 'package:migra_ayuda/features/entities/data/datasources/entity_local_datasource.dart';
@@ -91,7 +90,6 @@ final syncAllEntitiesUsecaseProvider = Provider<SyncAllEntitiesUsecase>((ref) {
   final repository = ref.watch(entityRepositoryProvider);
   return SyncAllEntitiesUsecase(repository: repository);
 });
-
 
 
 // ============================================================================

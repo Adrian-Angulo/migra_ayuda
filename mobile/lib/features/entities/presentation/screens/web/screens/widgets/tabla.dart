@@ -5,6 +5,7 @@ import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart
 import 'package:migra_ayuda/features/entities/presentation/providers/delete_entity_notifier.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/tabla_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/providers/entities_provider_web.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/action_buttons.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/empty_table_state.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/rating_widget.dart';
@@ -45,12 +46,11 @@ class _TablaState extends ConsumerState<Tabla> {
 
   @override
   Widget build(BuildContext context) {
-    final asyncListEntity = ref.watch(entitiesStreamProvider);
+    final asyncListEntity = ref.watch(entities2StreamProvider);
 
     return asyncListEntity.when(
-      
       data: (data) {
-         _dataSource.actualizarDatos(data);
+        _dataSource.actualizarDatos(data);
         return Expanded(
           child: Container(
             decoration: BoxDecoration(
