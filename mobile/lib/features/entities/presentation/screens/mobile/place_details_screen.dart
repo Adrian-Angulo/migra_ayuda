@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/core/services/google_maps_service.dart';
+import 'package:migra_ayuda/core/services/google_maps/google_maps_controllers.dart';
 import 'package:migra_ayuda/core/widgets/app_bar_widget.dart';
+import 'package:migra_ayuda/core/widgets/snackbar_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/floating_main_button.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/place_details_header.dart';
@@ -36,6 +37,19 @@ class PlaceDetails extends ConsumerWidget {
         ? ref.watch(
             userReviewByEntityProvider((userId: user.id, entityId: entity.id)))
         : null;
+
+    final asyncStarNavigation = ref.watch(starNavigationNotifierProvider);
+
+    //mostrar mensaje de error de google maps
+    ref.listen(
+      starNavigationNotifierProvider,
+      (previous, next) {
+        next.whenOrNull(
+          error: (error, stackTrace) =>
+              SnackbarWidget.error(context, error.toString()),
+        );
+      },
+    );
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
@@ -258,11 +272,13 @@ class PlaceDetails extends ConsumerWidget {
       floatingActionButton: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: FloatingMainButton(
-          onTap: () {
-            abrirNavegacionGoogleMaps(
-                entity.localitation.latitude, entity.localitation.longitude);
+          onTap: () async {
+            await ref
+                .read(starNavigationNotifierProvider.notifier)
+                .starNavigation(entity.localitation.latitude,
+                    entity.localitation.longitude);
           },
-          text: 'Como llegar',
+          text: asyncStarNavigation.isLoading ? 'Cargando....' : 'Como llegar',
           icon: Icons.directions,
         ),
       ),
