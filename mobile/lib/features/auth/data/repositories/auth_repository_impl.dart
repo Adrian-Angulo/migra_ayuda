@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:migra_ayuda/core/errors/auth_failures.dart';
 import 'package:migra_ayuda/core/errors/failures.dart';
@@ -53,9 +56,12 @@ class AuthRepositoryImpl implements AuthRepository {
 
       return Right(userCredential);
     } on FirebaseAuthException catch (e) {
+      print("Error: $e");
       return Left(_mapFirebaseAuthError(e.code));
     } on FirebaseException catch (e) {
       return Left(ServerFailure(e.message ?? 'Error del servidor'));
+    } on PlatformException catch (e) {
+      return const Left(NetworkFailureAuth());
     } catch (e) {
       return const Left(UnexpectedFailure());
     }

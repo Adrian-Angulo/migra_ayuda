@@ -6,7 +6,8 @@ class GoogleMapsNavigationService {
 
   Future<void> startNavigation(double latitud, double longitud) async {
     // Creamos el enlace especial de navegación de Google Maps
-    final String googleMapsUrl = 'geo:$latitud,$longitud?q=$latitud,$longitud';
+    final String googleMapsUrl =
+        'geo:$latitud,$longitud?q=$latitud,$longitud&travelmode=walking';
     final Uri uri = Uri.parse(googleMapsUrl);
 
     // 1. Verificamos si el teléfono puede abrir este tipo de enlace
