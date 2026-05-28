@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/services/google_maps_service.dart';
 import 'package:migra_ayuda/core/widgets/app_bar_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/floating_main_button.dart';
@@ -16,11 +17,8 @@ class PlaceDetails extends ConsumerWidget {
 
   const PlaceDetails({super.key, required this.entity});
 
-  
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
     final authState = ref.watch(authNotifierProvider);
     final user = authState.value;
 
@@ -90,7 +88,6 @@ class PlaceDetails extends ConsumerWidget {
                                 MaterialPageRoute(
                                   builder: (context) => PlaceEditReview(
                                     entity: entity,
-                                    
                                     existingReview: existingReview,
                                   ),
                                 ),
@@ -261,7 +258,10 @@ class PlaceDetails extends ConsumerWidget {
       floatingActionButton: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: FloatingMainButton(
-          onTap: () {},
+          onTap: () {
+            abrirNavegacionGoogleMaps(
+                entity.localitation.latitude, entity.localitation.longitude);
+          },
           text: 'Como llegar',
           icon: Icons.directions,
         ),
