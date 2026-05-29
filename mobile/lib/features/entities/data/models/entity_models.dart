@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 
-
 class EntityModels extends EntityEntity {
   EntityModels({
     required super.id,
@@ -11,8 +10,9 @@ class EntityModels extends EntityEntity {
     required super.address,
     required super.localitation,
     required super.phone,
-    required super.serviceHours,
     required super.imageUrl,
+    super.averageRating = 0,
+    super.totalReviews = 0,
   });
 
   Map<String, dynamic> toMap() {
@@ -21,10 +21,13 @@ class EntityModels extends EntityEntity {
       'description': description,
       'services': services,
       'address': address,
-      'localitation': localitation,
+      'localitation_latitude': localitation.latitude,
+      'localitation_longitude': localitation.longitude,
       'phone': phone,
-      'service_hours': serviceHours,
       'image_url': imageUrl,
+      'average_rating': averageRating,
+      'total_reviews': totalReviews,
+      'cached_at': DateTime.now().millisecondsSinceEpoch,
     };
   }
 
@@ -34,16 +37,41 @@ class EntityModels extends EntityEntity {
       id: doc.id,
       name: data['name'] ?? '',
       description: data['description'] ?? '',
-      services:
-          (data['services'] as List<dynamic>?)
+      services: (data['services'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
       address: data['address'] ?? '',
-      localitation: data['localitation'],
+      localitation: GeoPoint(
+        data['localitation_latitude'] ?? 0.0,
+        data['localitation_longitude'] ?? 0.0,
+      ),
       phone: data['phone'] ?? '',
-      serviceHours: data['service_hours'] ?? '',
       imageUrl: data['image_url'] ?? '',
+      averageRating: (data['average_rating'] as num?)?.toDouble() ?? 0,
+      totalReviews: (data['total_reviews'] as int?) ?? 0,
+    );
+  }
+
+  /// Convierte Map de Sembast a EntityModels
+  factory EntityModels.fromSembastMap(String id, Map<String, dynamic> map) {
+    return EntityModels(
+      id: id,
+      name: map['name'] ?? '',
+      description: map['description'] ?? '',
+      services: (map['services'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      address: map['address'] ?? '',
+      localitation: GeoPoint(
+        map['localitation_latitude'] ?? 0.0,
+        map['localitation_longitude'] ?? 0.0,
+      ),
+      phone: map['phone'] ?? '',
+      imageUrl: map['image_url'] ?? '',
+      averageRating: (map['average_rating'] as num?)?.toDouble() ?? 0,
+      totalReviews: (map['total_reviews'] as int?) ?? 0,
     );
   }
 }

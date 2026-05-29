@@ -3,20 +3,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dartz/dartz.dart';
-import 'package:dartz/dartz.dart';
-import 'package:migra_ayuda/core/errors/auth_failures.dart';
-import 'package:migra_ayuda/core/errors/failures.dart';
-import 'package:dartz/dartz.dart';
-import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/core/errors/auth_failures.dart';
-import 'package:migra_ayuda/core/errors/failures.dart';
 import 'package:http/http.dart' as http;
-import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/core/errors/auth_failures.dart';
-import 'package:migra_ayuda/core/errors/failures.dart';
 import 'package:migra_ayuda/features/entities/data/models/entity_models.dart';
-import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 
 /// Excepción personalizada para errores del servidor
 class ServerException implements Exception {
@@ -86,7 +74,6 @@ class EntityRemoteDataSource {
         address: entityModel.address,
         localitation: entityModel.localitation,
         phone: entityModel.phone,
-        serviceHours: entityModel.serviceHours,
         imageUrl: imagenUrl,
       );
 
@@ -117,8 +104,9 @@ class EntityRemoteDataSource {
         address: entityModel.address,
         localitation: entityModel.localitation,
         phone: entityModel.phone,
-        serviceHours: entityModel.serviceHours,
         imageUrl: imagenUrl,
+        averageRating: entityModel.averageRating,
+        totalReviews: entityModel.totalReviews,
       );
 
       await _firestore

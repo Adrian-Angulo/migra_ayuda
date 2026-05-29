@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/constants.dart';
-import 'package:migra_ayuda/core/widgets/snackbar_widget.dart';
+
 import 'package:migra_ayuda/features/auth/presentation/widgets/drawer/app_drawer.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/filter_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/get_all_entites_notifier.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/place_details_screen.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key});
@@ -143,18 +144,44 @@ class EntityCardWidget extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              //contenedor de imagen
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  width: 80,
-                  height: 80,
-                  color: Colors.grey[200],
-                  child: const Icon(
-                    Icons.business,
-                    size: 40,
-                    color: Colors.grey,
-                  ),
-                ),
+                child: entity.imageUrl != null && entity.imageUrl.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: entity.imageUrl,
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          width: 80,
+                          height: 80,
+                          color: Colors.grey[200],
+                          child: const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          width: 80,
+                          height: 80,
+                          color: Colors.grey[200],
+                          child: const Icon(
+                            Icons.business,
+                            size: 40,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      )
+                    : Container(
+                        width: 80,
+                        height: 80,
+                        color: Colors.grey[200],
+                        child: const Icon(
+                          Icons.business,
+                          size: 40,
+                          color: Colors.grey,
+                        ),
+                      ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -171,15 +198,15 @@ class EntityCardWidget extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
-                    const Row(
+                    Row(
                       children: [
-                        Icon(Icons.location_on_outlined,
+                        const Icon(Icons.location_on_outlined,
                             size: 14, color: Colors.grey),
-                        SizedBox(width: 2),
+                        const SizedBox(width: 2),
                         Expanded(
                           child: Text(
-                            'Av. Siempre Viva 123, Santiago',
-                            style: TextStyle(
+                            entity.address,
+                            style: const TextStyle(
                               fontSize: 12,
                               color: Colors.grey,
                             ),
@@ -190,24 +217,24 @@ class EntityCardWidget extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 6),
-                    const Row(
+                    Row(
                       children: [
-                        Icon(Icons.access_time,
+                        const Icon(Icons.access_time,
                             size: 14, color: Colors.blueGrey),
-                        SizedBox(width: 4),
-                        Text(
+                        const SizedBox(width: 4),
+                        const Text(
                           '15 min',
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.blueGrey,
                           ),
                         ),
-                        SizedBox(width: 12),
-                        Icon(Icons.star, size: 14, color: Colors.amber),
-                        SizedBox(width: 2),
+                        const SizedBox(width: 12),
+                        const Icon(Icons.star, size: 14, color: Colors.amber),
+                        const SizedBox(width: 2),
                         Text(
-                          '4.5',
-                          style: TextStyle(
+                          '${entity.averageRating}',
+                          style: const TextStyle(
                             fontSize: 12,
                             color: Colors.blueGrey,
                           ),
@@ -215,14 +242,12 @@ class EntityCardWidget extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    const Wrap(
+                    Wrap(
                       spacing: 6,
                       runSpacing: 4,
-                      children: [
-                        _ServiceTag(label: 'Legal'),
-                        _ServiceTag(label: 'Salud'),
-                        _ServiceTag(label: 'Alojamiento'),
-                      ],
+                      children: entity.services
+                          .map((service) => _ServiceTag(label: service))
+                          .toList(),
                     ),
                   ],
                 ),

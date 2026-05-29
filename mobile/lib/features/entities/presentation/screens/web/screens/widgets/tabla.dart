@@ -2,15 +2,12 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/delete_entity_notifier.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/tabla_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/providers/entities_provider_web.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/action_buttons.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/empty_table_state.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/rating_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/service_chip.dart';
-import 'package:path/path.dart';
 
 class Tabla extends ConsumerStatefulWidget {
   const Tabla({super.key});
@@ -279,8 +276,11 @@ class EntityDataSource extends DataTableSource {
                 .toList(),
           ),
         ),
-        const DataCell(
-          Center(child: RatingWidget()),
+        DataCell(
+          Center(
+              child: RatingWidget(
+            rating: entity.averageRating,
+          )),
         ),
         DataCell(
           ActionButtons(

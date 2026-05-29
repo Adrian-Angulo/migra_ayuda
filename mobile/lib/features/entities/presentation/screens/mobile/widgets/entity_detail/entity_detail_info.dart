@@ -32,7 +32,7 @@ class EntityDetailInfo extends StatelessWidget {
           const SizedBox(height: 12),
 
           // Estado y horarios
-          _ScheduleWidget(serviceHours: entity.serviceHours),
+          
           const SizedBox(height: 12),
 
           // Servicios

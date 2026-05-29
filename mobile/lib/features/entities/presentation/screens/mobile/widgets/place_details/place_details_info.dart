@@ -79,9 +79,9 @@ class PlaceDetailsInfo extends StatelessWidget {
               const SizedBox(height: 12),
               const Divider(height: 1, color: Color(0xFFF3F4F6)),
               const SizedBox(height: 12),
-              Text(
-                entity.serviceHours,
-                style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+              const Text(
+                'service hour',
+                style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
               ),
               const SizedBox(height: 8),
             ],

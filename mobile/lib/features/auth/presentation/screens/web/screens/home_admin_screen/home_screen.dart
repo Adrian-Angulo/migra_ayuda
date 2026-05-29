@@ -18,16 +18,14 @@ class HomeScreen extends StatelessWidget {
         children: [
           // Sidebar con el nuevo diseño
           Container(
-            width: 280,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
+            width: 250,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [Color(0xFF2D5F4F), Color(0xFF1E4438)],
               ),
-              borderRadius: BorderRadius.circular(24),
             ),
-            margin: const EdgeInsets.all(16),
             child: Column(
               children: [
                 const SidebarHeaderWidget(),
@@ -86,22 +84,8 @@ class HomeScreen extends StatelessWidget {
           // Contenido principal
           Expanded(
             child: Container(
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(24),
-                child: child,
-              ),
+              color: Colors.white,
+              child: child,
             ),
           ),
         ],

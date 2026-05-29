@@ -38,7 +38,7 @@ class EntityWebRepositoryImpl extends EntityRepository {
         address: entity.address,
         localitation: entity.localitation,
         phone: entity.phone,
-        serviceHours: entity.serviceHours,
+
         imageUrl: '', // Se actualizará después de subir la imagen
       );
 
@@ -83,7 +83,8 @@ class EntityWebRepositoryImpl extends EntityRepository {
         address: entity.address,
         localitation: entity.localitation,
         phone: entity.phone,
-        serviceHours: entity.serviceHours,
+        averageRating: entity.averageRating,
+        totalReviews: entity.totalReviews,
         imageUrl:
             entity.imageUrl, // Mantiene la URL actual si no hay nueva imagen
       );

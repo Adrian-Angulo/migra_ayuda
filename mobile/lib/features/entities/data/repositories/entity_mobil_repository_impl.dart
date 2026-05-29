@@ -36,7 +36,6 @@ class EntityMobilRepositoryImpl implements EntityRepository {
         address: entity.address,
         localitation: entity.localitation,
         phone: entity.phone,
-        serviceHours: entity.serviceHours,
         imageUrl: '',
       );
 
@@ -85,7 +84,8 @@ class EntityMobilRepositoryImpl implements EntityRepository {
         address: entity.address,
         localitation: entity.localitation,
         phone: entity.phone,
-        serviceHours: entity.serviceHours,
+        averageRating: entity.averageRating,
+        totalReviews: entity.totalReviews,
         imageUrl: entity.imageUrl,
       );
 

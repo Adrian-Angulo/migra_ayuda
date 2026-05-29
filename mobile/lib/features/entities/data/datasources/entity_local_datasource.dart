@@ -12,9 +12,8 @@ class CacheException implements Exception {
   String toString() => 'CacheException: $message';
 }
 
-
 /// Implementación del datasource local usando Sembast
-class EntityLocalDataSource{
+class EntityLocalDataSource {
   final SembastDatabase sembastDatabase;
 
   // Store para las entidades
@@ -24,7 +23,6 @@ class EntityLocalDataSource{
 
   /// Obtiene la instancia de la base de datos
   Future<Database> get _db async => await sembastDatabase.database;
-
 
   Future<List<EntityModels>> getCachedEntities() async {
     try {
@@ -36,7 +34,7 @@ class EntityLocalDataSource{
 
       // Convierte los registros a EntityModels
       return records.map((record) {
-        return _fromSembastMap(record.key, record.value);
+        return EntityModels.fromSembastMap(record.key, record.value);
       }).toList();
     } catch (e) {
       throw CacheException('Error al obtener entidades del caché: $e');
@@ -52,13 +50,12 @@ class EntityLocalDataSource{
 
       // Guarda todas las entidades
       for (final entity in entities) {
-        await _store.record(entity.id).put(db, _toSembastMap(entity));
+        await _store.record(entity.id).put(db, entity.toMap());
       }
     } catch (e) {
       throw CacheException('Error al guardar entidades en caché: $e');
     }
   }
-
 
   Future<EntityModels?> getEntityById(String id) async {
     try {
@@ -71,7 +68,7 @@ class EntityLocalDataSource{
         return null;
       }
 
-      return _fromSembastMap(id, record);
+      return EntityModels.fromSembastMap(id, record);
     } catch (e) {
       throw CacheException('Error al obtener entidad del caché: $e');
     }
@@ -82,12 +79,11 @@ class EntityLocalDataSource{
       final db = await _db;
 
       // Guarda o actualiza la entidad
-      await _store.record(entity.id).put(db, _toSembastMap(entity));
+      await _store.record(entity.id).put(db, entity.toMap());
     } catch (e) {
       throw CacheException('Error al guardar entidad en caché: $e');
     }
   }
-
 
   Future<void> deleteEntity(String id) async {
     try {
@@ -111,7 +107,7 @@ class EntityLocalDataSource{
     }
   }
 
-  /// Convierte EntityModels a Map para Sembast
+/*   /// Convierte EntityModels a Map para Sembast
   Map<String, dynamic> _toSembastMap(EntityModels entity) {
     return {
       'name': entity.name,
@@ -121,13 +117,14 @@ class EntityLocalDataSource{
       'localitation_latitude': entity.localitation.latitude,
       'localitation_longitude': entity.localitation.longitude,
       'phone': entity.phone,
-      'service_hours': entity.serviceHours,
       'image_url': entity.imageUrl,
+      'average_rating': entity.averageRating,
+      'total_reviews': entity.totalReviews,
       'cached_at': DateTime.now().millisecondsSinceEpoch,
     };
-  }
+  } */
 
-  /// Convierte Map de Sembast a EntityModels
+/*   /// Convierte Map de Sembast a EntityModels
   EntityModels _fromSembastMap(String id, Map<String, dynamic> map) {
     return EntityModels(
       id: id,
@@ -143,8 +140,9 @@ class EntityLocalDataSource{
         map['localitation_longitude'] ?? 0.0,
       ),
       phone: map['phone'] ?? '',
-      serviceHours: map['service_hours'] ?? '',
       imageUrl: map['image_url'] ?? '',
+      averageRating: (map['average_rating'] as num?)?.toDouble() ?? 0,
+      totalReviews: (map['total_reviews'] as int?) ?? 0,
     );
-  }
+  } */
 }

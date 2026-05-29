@@ -50,9 +50,7 @@ class _EditEntityModalState extends ConsumerState<EditEntityModal> {
       text: widget.entity.localitation.longitude.toString(),
     );
     _phoneController = TextEditingController(text: widget.entity.phone);
-    _scheduleController = TextEditingController(
-      text: widget.entity.serviceHours,
-    );
+    
 
     selectedServices = List.from(widget.entity.services);
   }
@@ -439,7 +437,6 @@ class _EditEntityModalState extends ConsumerState<EditEntityModal> {
                                     double.parse(_longitudController.text),
                                   ),
                                   phone: _phoneController.text.trim(),
-                                  serviceHours: _scheduleController.text.trim(),
                                   imageUrl: widget.entity.imageUrl,
                                 );
 

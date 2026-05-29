@@ -104,7 +104,6 @@ class ButtonSaveWidget extends StatelessWidget {
                   ),
 
                   phone: _phoneController.text.trim(),
-                  serviceHours: _scheduleController.text.trim(),
                   imageUrl: "",
                 );
 
