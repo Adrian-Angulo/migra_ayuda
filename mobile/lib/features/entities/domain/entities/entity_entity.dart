@@ -10,7 +10,9 @@ class EntityEntity {
   final String phone;
   final String imageUrl;
   final double averageRating;
-  final int totalReviews;
+  final int totalReviews; 
+ 
+  final String schedule;  
 
   const EntityEntity({
     required this.id,
@@ -22,7 +24,8 @@ class EntityEntity {
     required this.phone,
     required this.imageUrl,
     this.averageRating = 0,
-    this.totalReviews = 0,
+    this.totalReviews = 0, 
+    required this.schedule,
   });
 
   EntityEntity copyWith({
@@ -36,6 +39,7 @@ class EntityEntity {
     String? imageUrl,
     double? averageRating,
     int? totalReviews,
+    String? schedule
   }) {
     return EntityEntity(
       id: id ?? this.id,
@@ -48,6 +52,7 @@ class EntityEntity {
       imageUrl: imageUrl ?? this.imageUrl,
       averageRating: averageRating ?? this.averageRating,
       totalReviews: totalReviews ?? this.totalReviews,
+      schedule: schedule ?? this.schedule
     );
   }
 }

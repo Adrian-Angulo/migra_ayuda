@@ -13,6 +13,7 @@ class EntityModels extends EntityEntity {
     required super.imageUrl,
     super.averageRating = 0,
     super.totalReviews = 0,
+    required super.schedule,
   });
 
   Map<String, dynamic> toMap() {
@@ -27,6 +28,7 @@ class EntityModels extends EntityEntity {
       'image_url': imageUrl,
       'average_rating': averageRating,
       'total_reviews': totalReviews,
+      'schedule': schedule,
       'cached_at': DateTime.now().millisecondsSinceEpoch,
     };
   }
@@ -34,44 +36,44 @@ class EntityModels extends EntityEntity {
   factory EntityModels.fromMap(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return EntityModels(
-      id: doc.id,
-      name: data['name'] ?? '',
-      description: data['description'] ?? '',
-      services: (data['services'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          [],
-      address: data['address'] ?? '',
-      localitation: GeoPoint(
-        data['localitation_latitude'] ?? 0.0,
-        data['localitation_longitude'] ?? 0.0,
-      ),
-      phone: data['phone'] ?? '',
-      imageUrl: data['image_url'] ?? '',
-      averageRating: (data['average_rating'] as num?)?.toDouble() ?? 0,
-      totalReviews: (data['total_reviews'] as int?) ?? 0,
-    );
+        id: doc.id,
+        name: data['name'] ?? '',
+        description: data['description'] ?? '',
+        services: (data['services'] as List<dynamic>?)
+                ?.map((e) => e.toString())
+                .toList() ??
+            [],
+        address: data['address'] ?? '',
+        localitation: GeoPoint(
+          data['localitation_latitude'] ?? 0.0,
+          data['localitation_longitude'] ?? 0.0,
+        ),
+        phone: data['phone'] ?? '',
+        imageUrl: data['image_url'] ?? '',
+        averageRating: (data['average_rating'] as num?)?.toDouble() ?? 0,
+        totalReviews: (data['total_reviews'] as int?) ?? 0,
+        schedule: data['schedule'] ?? 'No definido');
   }
 
   /// Convierte Map de Sembast a EntityModels
   factory EntityModels.fromSembastMap(String id, Map<String, dynamic> map) {
     return EntityModels(
-      id: id,
-      name: map['name'] ?? '',
-      description: map['description'] ?? '',
-      services: (map['services'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          [],
-      address: map['address'] ?? '',
-      localitation: GeoPoint(
-        map['localitation_latitude'] ?? 0.0,
-        map['localitation_longitude'] ?? 0.0,
-      ),
-      phone: map['phone'] ?? '',
-      imageUrl: map['image_url'] ?? '',
-      averageRating: (map['average_rating'] as num?)?.toDouble() ?? 0,
-      totalReviews: (map['total_reviews'] as int?) ?? 0,
-    );
+        id: id,
+        name: map['name'] ?? '',
+        description: map['description'] ?? '',
+        services: (map['services'] as List<dynamic>?)
+                ?.map((e) => e.toString())
+                .toList() ??
+            [],
+        address: map['address'] ?? '',
+        localitation: GeoPoint(
+          map['localitation_latitude'] ?? 0.0,
+          map['localitation_longitude'] ?? 0.0,
+        ),
+        phone: map['phone'] ?? '',
+        imageUrl: map['image_url'] ?? '',
+        averageRating: (map['average_rating'] as num?)?.toDouble() ?? 0,
+        totalReviews: (map['total_reviews'] as int?) ?? 0,
+        schedule: map['schedule'] ?? 'No definido');
   }
 }

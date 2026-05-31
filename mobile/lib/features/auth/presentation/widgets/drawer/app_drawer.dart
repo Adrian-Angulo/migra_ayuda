@@ -11,6 +11,7 @@ class AppDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Drawer(
+      
       child: SafeArea(
         child: Column(
           children: [

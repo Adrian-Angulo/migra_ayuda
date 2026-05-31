@@ -438,6 +438,7 @@ class _EditEntityModalState extends ConsumerState<EditEntityModal> {
                                   ),
                                   phone: _phoneController.text.trim(),
                                   imageUrl: widget.entity.imageUrl,
+                                  schedule: _scheduleController.text.trim()
                                 );
 
                                 // Llamar al notifier

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/database/sembast_database.dart';
 import 'package:migra_ayuda/core/router/app_router.dart';
 import 'package:migra_ayuda/core/router/app_router_mobile.dart';
@@ -105,6 +106,7 @@ class _MainAppState extends ConsumerState<MainApp> {
           title: "Migra Ayuda",
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
+            scaffoldBackgroundColor: ColorConstants.background,
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
             visualDensity: VisualDensity.adaptivePlatformDensity,
             fontFamily: 'Inter',

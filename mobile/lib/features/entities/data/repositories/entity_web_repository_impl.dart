@@ -40,6 +40,7 @@ class EntityWebRepositoryImpl extends EntityRepository {
         phone: entity.phone,
 
         imageUrl: '', // Se actualizará después de subir la imagen
+        schedule: entity.schedule
       );
 
       // Registrar en Firebase (incluye subida de imagen a Cloudinary)
@@ -87,6 +88,7 @@ class EntityWebRepositoryImpl extends EntityRepository {
         totalReviews: entity.totalReviews,
         imageUrl:
             entity.imageUrl, // Mantiene la URL actual si no hay nueva imagen
+        schedule:entity.schedule
       );
 
       // Actualizar en Firebase (sube nueva imagen si se proporciona)

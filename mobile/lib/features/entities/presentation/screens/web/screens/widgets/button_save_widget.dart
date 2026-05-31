@@ -105,6 +105,7 @@ class ButtonSaveWidget extends StatelessWidget {
 
                   phone: _phoneController.text.trim(),
                   imageUrl: "",
+                  schedule: _scheduleController.text.trim()
                 );
 
                 // Llamar al notifier (el listener manejará el resultado)

@@ -75,6 +75,7 @@ class EntityRemoteDataSource {
         localitation: entityModel.localitation,
         phone: entityModel.phone,
         imageUrl: imagenUrl,
+        schedule: entityModel.schedule
       );
 
       await _firestore.collection('entities').add(entidadConImagen.toMap());
@@ -107,6 +108,7 @@ class EntityRemoteDataSource {
         imageUrl: imagenUrl,
         averageRating: entityModel.averageRating,
         totalReviews: entityModel.totalReviews,
+        schedule: entityModel.schedule
       );
 
       await _firestore

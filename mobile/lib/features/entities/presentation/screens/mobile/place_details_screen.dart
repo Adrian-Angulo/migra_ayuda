@@ -4,7 +4,7 @@ import 'package:migra_ayuda/core/services/google_maps/google_maps_controllers.da
 import 'package:migra_ayuda/core/widgets/app_bar_widget.dart';
 import 'package:migra_ayuda/core/widgets/snackbar_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/floating_main_button.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/floating_main_button.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/place_details_header.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/place_details_info.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';

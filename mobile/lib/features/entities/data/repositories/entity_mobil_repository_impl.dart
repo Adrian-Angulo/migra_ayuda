@@ -37,6 +37,7 @@ class EntityMobilRepositoryImpl implements EntityRepository {
         localitation: entity.localitation,
         phone: entity.phone,
         imageUrl: '',
+        schedule: entity.schedule
       );
 
       // Verifica si hay conexión
@@ -87,6 +88,7 @@ class EntityMobilRepositoryImpl implements EntityRepository {
         averageRating: entity.averageRating,
         totalReviews: entity.totalReviews,
         imageUrl: entity.imageUrl,
+        schedule: entity.schedule
       );
 
       // Primero actualiza en caché local

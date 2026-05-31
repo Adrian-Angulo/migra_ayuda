@@ -6,16 +6,20 @@ import 'package:latlong2/latlong.dart';
 import 'package:migra_ayuda/core/widgets/badge_widget.dart';
 import 'package:migra_ayuda/core/widgets/divider_widget.dart';
 import 'package:migra_ayuda/core/widgets/placeholder_image.dart';
+import 'package:migra_ayuda/core/widgets/web/button_web_widget.dart';
 import 'package:migra_ayuda/core/widgets/web/map_web.dart';
 import 'package:migra_ayuda/core/widgets/web/section_title.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/home_admin_screen/widgets/comment_card_widget.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/delete_entity_notifier.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_detail_notifier.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/error_screen.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/delete_confirmation_dialog.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/edit_entity_modal.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/rating_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/service_chip.dart';
+
+import 'widgets/contact_title_widget.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // RECOMENDACIONES:
@@ -181,7 +185,7 @@ class _EntityDetailScreenState extends ConsumerState<EntityDetailScreen> {
         loading: () => const Center(
           child: CircularProgressIndicator(color: Color(0xFF2D5F4F)),
         ),
-        error: (error, _) => _ErrorView(
+        error: (error, _) => ErrorScreen(
           error: error.toString(),
           onBack: () => context.go('/dashboard/entities'),
           onRetry: () =>
@@ -210,24 +214,22 @@ class DetallesEntity extends StatelessWidget {
             // ── Header ──────────────────────────────────────────────────────
             Row(
               children: [
-                _CircleIconButton(
-                  tooltip: 'Volver',
-                  onPressed: () => context.go('/dashboard/entities'),
-                  icon: Icons.arrow_back_ios_new,
-                ),
+                ButtonWebWidget.text(
+                    icon: Icons.arrow_back_ios_new,
+                    label: 'Vover',
+                    onPressed: () => context.go('/dashboard/entities')),
                 const Spacer(),
-                _CircleIconButton(
-                  tooltip: 'Eliminar entidad',
-                  onPressed: () {},
-                  icon: Icons.delete_outline,
-                  backgroundColor: Colors.red.shade400.withValues(alpha: 0.9),
+                ButtonWebWidget.danger(
+                    icon: Icons.delete_outline,
+                    label: 'Eliminar',
+                    onPressed: () {}),
+                SizedBox(
+                  width: 12,
                 ),
-                _CircleIconButton(
-                  tooltip: 'Editar entidad',
-                  onPressed: () {},
-                  icon: Icons.edit_outlined,
-                ),
-                const SizedBox(width: 8),
+                ButtonWebWidget.warning(
+                    icon: Icons.edit_outlined,
+                    label: 'Editar',
+                    onPressed: () {}),
               ],
             ),
             const SizedBox(height: 16),
@@ -307,17 +309,9 @@ class DetallesEntity extends StatelessWidget {
                               const SizedBox(height: 12),
 
                               // Contacto
-                              _ContactTile(
-                                icon: Icons.location_on_outlined,
-                                iconColor: const Color(0xFF059669),
-                                iconBg: const Color(0xFFD1FAE5),
-                                label: 'Dirección',
-                                value: entity.address.isEmpty
-                                    ? 'Dirección no disponible'
-                                    : entity.address,
-                              ),
+
                               const SizedBox(height: 8),
-                              _ContactTile(
+                              ContactTitleWidget(
                                 icon: Icons.phone_outlined,
                                 iconColor: const Color(0xFF2563EB),
                                 iconBg: const Color(0xFFDBEAFE),
@@ -327,7 +321,7 @@ class DetallesEntity extends StatelessWidget {
                                     : entity.phone,
                               ),
                               const SizedBox(height: 8),
-                              const _ContactTile(
+                              const ContactTitleWidget(
                                 icon: Icons.email_outlined,
                                 iconColor: Color(0xFF7C3AED),
                                 iconBg: Color(0xFFEDE9FE),
@@ -335,7 +329,7 @@ class DetallesEntity extends StatelessWidget {
                                 value: 'Email no disponible',
                               ),
                               const SizedBox(height: 8),
-                              const _ContactTile(
+                              const ContactTitleWidget(
                                 icon: Icons.schedule_outlined,
                                 iconColor: Color(0xFFD97706),
                                 iconBg: Color(0xFFFEF3C7),
@@ -350,7 +344,6 @@ class DetallesEntity extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 24),
 
                 // ── Columna derecha: mapa + comentarios ─────────────────────
                 Expanded(
@@ -363,7 +356,19 @@ class DetallesEntity extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SectionTitle('Ubicación'),
+                              Row(
+                                spacing: 10,
+                                children: [
+                                  const SectionTitle('Ubicación'),
+                                  Text(
+                                    '(${entity.address})',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey.shade600,
+                                    ),
+                                  ),
+                                ],
+                              ),
                               const SizedBox(height: 12),
                               MapWeb(
                                 latitude: entity.localitation.latitude,
@@ -382,7 +387,15 @@ class DetallesEntity extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SectionTitle('Comentarios', size: 16),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const SectionTitle('Comentarios', size: 16),
+                                  ButtonWebWidget.textBlack(
+                                      label: 'Ver mas', onPressed: () {})
+                                ],
+                              ),
                               const SizedBox(height: 12),
                               SizedBox(
                                 height: 300,
@@ -415,673 +428,7 @@ class DetallesEntity extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// _EntityDetailBody — contenido principal cuando los datos están disponibles
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _EntityDetailBody extends StatelessWidget {
-  final dynamic entity;
-  final VoidCallback onDelete;
-  final VoidCallback onEdit;
-  final VoidCallback onBack;
-  final VoidCallback onRetry;
-
-  const _EntityDetailBody({
-    required this.entity,
-    required this.onDelete,
-    required this.onEdit,
-    required this.onBack,
-    required this.onRetry,
-  });
-
-  static const _primaryGreen = Color(0xFF1B4332);
-  static const _accentGreen = Color(0xFF2D6A4F);
-  static const _actionGreen = Color(0xFF059669);
-  static const _lightGreen = Color(0xFFD1FAE5);
-  static const _textDark = Color(0xFF111827);
-  static const _textMid = Color(0xFF4B5563);
-  static const _textLight = Color(0xFF9CA3AF);
-  static const _dividerColor = Color(0xFFF3F4F6);
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverToBoxAdapter(child: _buildContent()),
-      ],
-    );
-  }
-
-  // ── Contenido scrollable ───────────────────────────────────────────────────
-  Widget _buildContent() {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildDescriptionAndContact(),
-          const SizedBox(height: 32),
-          _buildMapAndComments(),
-          const SizedBox(height: 32),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDescriptionAndContact() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Descripción
-        const _SectionTitle('Descripción'),
-        const SizedBox(height: 12),
-        Text(
-          entity.description.isEmpty
-              ? 'Descripción no disponible'
-              : entity.description,
-          style: const TextStyle(
-            fontSize: 15,
-            color: _textMid,
-            height: 1.7,
-          ),
-        ),
-        const SizedBox(height: 12),
-        // Contacto
-        _ContactTile(
-          icon: Icons.location_on_outlined,
-          iconColor: const Color(0xFF059669),
-          iconBg: const Color(0xFFD1FAE5),
-          label: 'Dirección',
-          value: entity.address.isEmpty
-              ? 'Dirección no disponible'
-              : entity.address,
-        ),
-        const SizedBox(
-          height: 8,
-        ),
-        _ContactTile(
-          icon: Icons.phone_outlined,
-          iconColor: const Color(0xFF2563EB),
-          iconBg: const Color(0xFFDBEAFE),
-          label: 'Teléfono',
-          value: entity.phone.isEmpty ? 'Teléfono no disponible' : entity.phone,
-        ),
-        const SizedBox(
-          height: 8,
-        ),
-        const _ContactTile(
-          icon: Icons.email_outlined,
-          iconColor: Color(0xFF7C3AED),
-          iconBg: Color(0xFFEDE9FE),
-          label: 'Correo electrónico',
-          value: 'Email no disponible',
-        ),
-        const SizedBox(
-          height: 8,
-        ),
-        const _ContactTile(
-          icon: Icons.schedule_outlined,
-          iconColor: Color(0xFFD97706),
-          iconBg: Color(0xFFFEF3C7),
-          label: 'Horario de atención',
-          value: 'Horario no disponible',
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMapAndComments() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Mapa
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _SectionTitle('Ubicación'),
-              const SizedBox(height: 16),
-              _EntityMap(
-                latitude: entity.localitation.latitude,
-                longitude: entity.localitation.longitude,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(width: 24),
-        // Comentarios
-        const Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _SectionTitle('Comentarios'),
-                  _ReviewBadge(count: 5),
-                ],
-              ),
-              SizedBox(height: 16),
-              // TODO: reemplazar con lista dinámica desde un provider
-              _CommentCard(
-                initials: 'MA',
-                name: 'María Arboleda',
-                timeAgo: 'Hace 2 días',
-                rating: 5,
-                comment:
-                    'Excelente labor. La transparencia con la que manejan los recursos y la calidad de los alimentos que entregan es realmente inspiradora para toda la comunidad.',
-                avatarColor: _lightGreen,
-                initialsColor: _actionGreen,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Widgets de apoyo — candidatos a moverse a archivos propios en widgets/
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Botón circular usado en el AppBar.
-class _CircleIconButton extends StatelessWidget {
-  final String tooltip;
-  final VoidCallback onPressed;
-  final IconData icon;
-  final Color? backgroundColor;
-
-  const _CircleIconButton({
-    required this.tooltip,
-    required this.onPressed,
-    required this.icon,
-    this.backgroundColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: CircleAvatar(
-        backgroundColor:
-            backgroundColor ?? Colors.white.withValues(alpha: 0.15),
-        child: IconButton(
-          tooltip: tooltip,
-          onPressed: onPressed,
-          icon: Icon(icon, color: Colors.white, size: 18),
-          padding: EdgeInsets.zero,
-        ),
-      ),
-    );
-  }
-}
-
 /// Fila individual dentro de _ContactCard.
-class _ContactTile extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final Color iconBg;
-  final String label;
-  final String value;
-
-  const _ContactTile({
-    required this.icon,
-    required this.iconColor,
-    required this.iconBg,
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: iconBg,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, size: 20, color: iconColor),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF9CA3AF),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF111827),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _Divider extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Divider(
-      height: 1,
-      indent: 76,
-      endIndent: 20,
-      color: Color(0xFFF3F4F6),
-    );
-  }
-}
-
-/// Mapa estático con marcador de la entidad.
-class _EntityMap extends StatefulWidget {
-  final double latitude;
-  final double longitude;
-
-  const _EntityMap({required this.latitude, required this.longitude});
-
-  @override
-  State<_EntityMap> createState() => _EntityMapState();
-}
-
-class _EntityMapState extends State<_EntityMap> {
-  final MapController _mapController = MapController();
-
-  void _zoomIn() {
-    final currentZoom = _mapController.camera.zoom;
-    _mapController.move(_mapController.camera.center, currentZoom + 1);
-  }
-
-  void _zoomOut() {
-    final currentZoom = _mapController.camera.zoom;
-    _mapController.move(_mapController.camera.center, currentZoom - 1);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final point = LatLng(widget.latitude, widget.longitude);
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: SizedBox(
-        height: 520,
-        child: Stack(
-          children: [
-            FlutterMap(
-              mapController: _mapController,
-              options: MapOptions(
-                initialCenter: point,
-                initialZoom: 14,
-                interactionOptions: const InteractionOptions(
-                  flags: InteractiveFlag.none,
-                ),
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.migraayuda.app',
-                ),
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: point,
-                      child: const Icon(
-                        Icons.location_pin,
-                        color: Color(0xFF059669),
-                        size: 40,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Positioned(
-              bottom: 16,
-              right: 16,
-              child: Column(
-                children: [
-                  _ZoomButton(
-                    tooltip: 'Acercar',
-                    icon: Icons.add,
-                    onPressed: _zoomIn,
-                  ),
-                  const SizedBox(height: 4),
-                  _ZoomButton(
-                    tooltip: 'Alejar',
-                    icon: Icons.remove,
-                    onPressed: _zoomOut,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ZoomButton extends StatelessWidget {
-  final String tooltip;
-  final IconData icon;
-  final VoidCallback onPressed;
-
-  const _ZoomButton({
-    required this.tooltip,
-    required this.icon,
-    required this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        elevation: 2,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(8),
-          child: SizedBox(
-            width: 36,
-            height: 36,
-            child: Icon(icon, size: 20, color: const Color(0xFF1B4332)),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Badge con el conteo de reseñas.
-class _ReviewBadge extends StatelessWidget {
-  final int count;
-
-  const _ReviewBadge({required this.count});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: const Color(0xFFD1FAE5),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        '$count reseñas',
-        style: const TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: Color(0xFF059669),
-        ),
-      ),
-    );
-  }
-}
-
-/// Tarjeta de comentario de usuario.
-class _CommentCard extends StatelessWidget {
-  final String initials;
-  final String name;
-  final String timeAgo;
-  final int rating;
-  final String comment;
-  final Color avatarColor;
-  final Color initialsColor;
-
-  const _CommentCard({
-    required this.initials,
-    required this.name,
-    required this.timeAgo,
-    required this.rating,
-    required this.comment,
-    required this.avatarColor,
-    required this.initialsColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _Avatar(
-              initials: initials, color: avatarColor, textColor: initialsColor),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF111827),
-                      ),
-                    ),
-                    Text(
-                      timeAgo,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF9CA3AF),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                _StarRow(rating: rating),
-                const SizedBox(height: 8),
-                Text(
-                  comment,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Color(0xFF4B5563),
-                    height: 1.6,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Avatar extends StatelessWidget {
-  final String initials;
-  final Color color;
-  final Color textColor;
-
-  const _Avatar({
-    required this.initials,
-    required this.color,
-    required this.textColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-      child: Center(
-        child: Text(
-          initials,
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-            color: textColor,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _StarRow extends StatelessWidget {
-  final int rating;
-
-  const _StarRow({required this.rating});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: List.generate(
-        5,
-        (i) => Icon(
-          i < rating ? Icons.star_rounded : Icons.star_outline_rounded,
-          size: 15,
-          color: i < rating ? const Color(0xFFFBBF24) : const Color(0xFFE5E7EB),
-        ),
-      ),
-    );
-  }
-}
-
-/// Título de sección reutilizable.
-class _SectionTitle extends StatelessWidget {
-  final String text;
-
-  const _SectionTitle(this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: const TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: Color(0xFF111827),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// _ErrorView — pantalla de error con opciones de reintento
-// ─────────────────────────────────────────────────────────────────────────────
-
-class _ErrorView extends StatelessWidget {
-  final String error;
-  final VoidCallback onBack;
-  final VoidCallback onRetry;
-
-  const _ErrorView({
-    required this.error,
-    required this.onBack,
-    required this.onRetry,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(48),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(32),
-              decoration: BoxDecoration(
-                color: Colors.red.shade50,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.error_outline,
-                size: 64,
-                color: Colors.red.shade400,
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Oops! Algo salió mal',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1A1A1A),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              error,
-              style: const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                OutlinedButton.icon(
-                  onPressed: onBack,
-                  icon: const Icon(Icons.arrow_back),
-                  label: const Text('Volver'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF2D5F4F),
-                    side: const BorderSide(color: Color(0xFF2D5F4F), width: 2),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 16,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                ElevatedButton.icon(
-                  onPressed: onRetry,
-                  icon: const Icon(Icons.refresh),
-                  label: const Text('Reintentar'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF2D5F4F),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 16,
-                    ),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

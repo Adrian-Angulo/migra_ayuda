@@ -6,7 +6,7 @@ import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.d
 import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/auth_page.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/complete_info_screen.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/mobile/explore_screen.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/home_card_screen.dart';
 import 'package:migra_ayuda/features/language/presentation/providers/language_provider.dart';
 import 'package:migra_ayuda/features/language/presentation/screens/language_screen.dart';
 import 'package:migra_ayuda/features/onboarding/presentation/providers/onboarding_provider.dart';
@@ -67,7 +67,7 @@ final routerMobile = Provider<GoRouter>(
         ),
         GoRoute(
             path: Routes.home,
-            builder: (context, state) => const ExploreScreen()),
+            builder: (context, state) => const HomeCardScreen()),
         GoRoute(
           path: Routes.completeProfile,
           builder: (context, state) => const CompleteInfoScreen(),
