@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/sync/sync_provider.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 
-/// Provider que inicializa la sincronización automática de reviews
+/* /// Provider que inicializa la sincronización automática de reviews
 /// Registra un callback en el SyncService para sincronizar cuando hay conexión
 final reviewSyncInitializerProvider = Provider<void>((ref) {
   final syncService = ref.watch(syncServiceProvider);
@@ -26,3 +26,4 @@ final reviewSyncInitializerProvider = Provider<void>((ref) {
     // No es necesario hacer nada aquí, el SyncService se limpia automáticamente
   });
 });
+ */

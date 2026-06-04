@@ -5,7 +5,6 @@ import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart
 
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/floating_main_button.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
-import 'package:migra_ayuda/features/reviews/presentation/providers/edit_review_provider.dart';
 
 class PlaceEditReview extends ConsumerStatefulWidget {
   final EntityEntity entity;
@@ -71,20 +70,20 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
       ),
     );
 
-    if (confirmed == true && mounted) {
+/*     if (confirmed == true && mounted) {
       // Elimina la review
       await ref.read(editReviewProvider.notifier).deleteReview(
             reviewId: widget.existingReview.id,
             idMigrante: widget.existingReview.idMigrante,
             idEntity: widget.existingReview.idEntity,
           );
-    }
+    } */
   }
 
   @override
   Widget build(BuildContext context) {
     // Escucha el estado de edición de review
-    ref.listen(editReviewProvider, (previous, next) {
+    /* ref.listen(editReviewProvider, (previous, next) {
       if (next.isSuccess) {
         // Muestra mensaje de éxito
         ScaffoldMessenger.of(context).showSnackBar(
@@ -118,7 +117,7 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
       }
     });
 
-    final state = ref.watch(editReviewProvider);
+    final state = ref.watch(editReviewProvider); */
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -150,7 +149,8 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
           // Botón de eliminar en el AppBar
           IconButton(
             icon: const Icon(Icons.delete_outline, color: Color(0xFFEF4444)),
-            onPressed: state.isLoading ? null : _showDeleteConfirmation,
+            onPressed:
+                () {} /* state.isLoading ? null : _showDeleteConfirmation */,
             tooltip: 'Eliminar comentario',
           ),
         ],
@@ -356,7 +356,9 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
 
                 // Botón de actualizar
                 FloatingMainButton(
-                  onTap: state.isLoading
+                  onTap: () {}
+
+                  /*  state.isLoading
                       ? () {} // Función vacía cuando está cargando
                       : () async {
                           if (formkey.currentState?.validate() ?? false) {
@@ -376,10 +378,9 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
                                   nameEntity: widget.entity.name,
                                 );
                           }
-                        },
-                  text: state.isLoading
-                      ? 'Actualizando...'
-                      : 'Actualizar Comentario',
+                        } */
+                  ,
+                  text: 'Actualizar Comentario',
                 ),
               ],
             ),

@@ -61,7 +61,7 @@ class _MainAppState extends ConsumerState<MainApp> {
 
         // Inicializar sincronización automática
         ref.read(entitySyncInitializerProvider);
-        ref.read(reviewSyncInitializerProvider);
+        /* ref.read(reviewSyncInitializerProvider); */
       });
     }
   }

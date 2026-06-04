@@ -5,7 +5,7 @@ import 'package:migra_ayuda/core/widgets/app_bar_widget.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/floating_main_button.dart';
-import 'package:migra_ayuda/features/reviews/presentation/providers/add_review_provider.dart';
+
 
 class PlaceAddReview extends ConsumerStatefulWidget {
   final EntityEntity entity;
@@ -33,7 +33,7 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
 
   @override
   Widget build(BuildContext context) {
-    // Escucha el estado de creación de review
+/*     // Escucha el estado de creación de review
     ref.listen(addReviewProvider, (previous, next) {
       if (next.isSucces) {
         // Muestra mensaje de éxito
@@ -69,7 +69,7 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
     });
 
     final state = ref.watch(addReviewProvider);
-
+ */
     return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBarWidget(title: widget.entity.name),
@@ -253,44 +253,8 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                   ),
                   const SizedBox(height: 24),
                   FloatingMainButton(
-                    onTap: state.isLoading
-                        ? () {} // Función vacía cuando está cargando
-                        : () async {
-                            if (formkey.currentState?.validate() ?? false) {
-                              // Valida que haya usuario
-                              if (widget.user == null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: const Text(
-                                        'Debes iniciar sesión para publicar una review'),
-                                    backgroundColor: const Color(0xFFEF4444),
-                                    behavior: SnackBarBehavior.floating,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                );
-                                return;
-                              }
-
-                              // Crea la review
-                              await ref
-                                  .read(addReviewProvider.notifier)
-                                  .createReview(
-                                    idMigrante: widget.user!.id,
-                                    idEntity: widget.entity.id,
-                                    userName: widget.user!.name,
-                                    userCountry: widget.user!.originCountry ??
-                                        'No especificado',
-                                    rating: rating,
-                                    comment: commetController.text.trim(), 
-                                    nameEntity: widget.entity.name,
-                                  );
-                            }
-                          },
-                    text: state.isLoading
-                        ? 'Publicando...'
-                        : 'Publicar Comentario',
+                    onTap: (){},
+                    text: 'Publicar Comentario',
                   )
                 ],
               ),

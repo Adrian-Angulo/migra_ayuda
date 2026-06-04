@@ -5,7 +5,7 @@ import 'package:migra_ayuda/core/utils/format/time_formatter.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
-import 'package:migra_ayuda/features/reviews/presentation/providers/edit_review_provider.dart';
+
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 import 'package:migra_ayuda/features/reviews/presentation/screens/place_edit_review.dart';
 
@@ -22,8 +22,8 @@ class ReviewItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userReviewAsync = ref.watch(
-        userReviewByEntityProvider((userId: user.id, entityId: entity.id)));
+/*     final userReviewAsync = ref.watch(
+        userReviewByEntityProvider((userId: user.id, entityId: entity.id))); */
 
     /// Muestra diálogo de confirmación para eliminar
     Future<void> _showDeleteConfirmation() async {
@@ -55,14 +55,14 @@ class ReviewItem extends ConsumerWidget {
         ),
       );
 
-      if (confirmed == true) {
+      /* if (confirmed == true) {
         // Elimina la review
         await ref.read(editReviewProvider.notifier).deleteReview(
               reviewId: review.id,
               idMigrante: review.idMigrante,
               idEntity: review.idEntity,
             );
-      }
+      } */
     }
 
     return Padding(
@@ -105,7 +105,7 @@ class ReviewItem extends ConsumerWidget {
                       color: Color(0xFFB0B7C3),
                     ),
                   ),
-                  if (user.id == review.idMigrante)
+                  /* if (user.id == review.idMigrante)
                     PopupMenuButton<String>(
                       onSelected: (value) {
                         if (value == 'edit') {
@@ -156,7 +156,7 @@ class ReviewItem extends ConsumerWidget {
                           ),
                         ),
                       ],
-                    )
+                    ) */
                 ],
               ),
             ],
