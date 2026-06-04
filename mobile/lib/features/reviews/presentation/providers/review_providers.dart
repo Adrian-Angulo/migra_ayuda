@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/database/sembast_database.dart';
 import 'package:migra_ayuda/core/network/network_provider.dart';
@@ -63,6 +64,18 @@ final getReviewsByEntityUsecaseProvider =
   final repository = ref.watch(reviewRepositoryProvider);
   return GetReviewsByEntityUsecase(repository: repository);
 });
+
+final obtenerlistaReviews =
+    FutureProvider.family<Either<String, List<ReviewEntity>>, String>(
+  (ref, entityId) async {
+    final usecase = ref.watch(getReviewsByEntityUsecaseProvider);
+    final result = await usecase.call(entityId);
+    return result.fold(
+      (error) => Left(error),
+      (reviews) => Right(reviews),
+    );
+  },
+);
 
 /// Provider para el caso de uso: Obtener todas las reviews
 final getAllReviewsUsecaseProvider = Provider<GetAllReviewsUsecase>((ref) {

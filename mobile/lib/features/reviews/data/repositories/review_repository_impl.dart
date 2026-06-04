@@ -28,22 +28,6 @@ class ReviewRepositoryImpl implements ReviewRepository {
       final modelo =
           ReviewModel.fromReviewEntity(review, id: const Uuid().v4());
 
-      /* // Crea el modelo con el ID local
-      final modelo = ReviewModel(
-        id: localId,
-        idMigrante: review.idMigrante,
-        idEntity: review.idEntity,
-        userName: review.userName,
-        userCountry: review.userCountry,
-        rating: review.rating,
-        comment: review.comment,
-        createdAt: review.createdAt,
-        updatedAt: review.updatedAt,
-        deletedAt: review.deletedAt,
-        isSynced: false,
-        nameEntity: review.nameEntity, // Inicialmente no sincronizada
-      ); */
-
       // 1. Guarda primero en caché local (respuesta inmediata)
       await localDataSource.cacheReview(modelo);
 
@@ -56,22 +40,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
           final firebaseId = await remoteDataSource.createReview(modelo);
 
           final reviewUpdate = modelo.copyWith(id: firebaseId, isSynced: true);
-          /*  // 4. Crea el modelo con el ID de Firebase
-          final syncedModel = ReviewModel(
-            id: firebaseId, // Usa el ID de Firebase
-            idMigrante: modelo.idMigrante,
-            idEntity: modelo.idEntity,
-            userName: modelo.userName,
-            userCountry: modelo.userCountry,
-            rating: modelo.rating,
-            comment: modelo.comment,
-            createdAt: modelo.createdAt,
-            updatedAt: modelo.updatedAt,
-            deletedAt: modelo.deletedAt,
-            isSynced: true,
-            nameEntity: modelo.nameEntity, // Marca como sincronizada
-          );
- */
+
           // 5. PRIMERO guarda con el ID de Firebase
           await localDataSource.cacheReview(reviewUpdate);
 
@@ -99,17 +68,10 @@ class ReviewRepositoryImpl implements ReviewRepository {
       // ESTRATEGIA CACHE-FIRST:
       // 1. Primero intenta obtener del caché (respuesta inmediata)
       List<ReviewModel> cachedReviews = [];
-
-      try {
-        cachedReviews = await localDataSource.getReviewsByEntity(entityId);
-      } catch (e) {
-        // Si falla el caché, continúa con lista vacía
-        cachedReviews = [];
-      }
-
+      cachedReviews = await localDataSource.getReviewsByEntity(entityId);
+      
       // 2. Verifica si hay conexión para actualizar
       final isConnected = await networkInfo.isConnected;
-
       if (isConnected) {
         try {
           // Obtiene datos frescos de Firebase
@@ -118,7 +80,6 @@ class ReviewRepositoryImpl implements ReviewRepository {
 
           // Actualiza el caché con los datos actualizados
           await localDataSource.cacheReviews(remoteReviews);
-
           // Retorna los datos actualizado de Firebase
           return right(remoteReviews);
         } on ServerException catch (e) {

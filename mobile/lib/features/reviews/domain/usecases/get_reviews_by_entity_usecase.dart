@@ -7,28 +7,10 @@ import 'package:migra_ayuda/features/reviews/domain/repositories/review_reposito
 /// Filtra las reviews por ID de entidad
 class GetReviewsByEntityUsecase {
   final ReviewRepository repository;
-
   GetReviewsByEntityUsecase({required this.repository});
 
-  /// Ejecuta el caso de uso
-  ///
-  /// [entityId] - ID de la entidad para filtrar las reviews
-  /// Retorna [Right(List<ReviewEntity>)] con las reviews encontradas
-  /// Retorna [Left(String)] con el mensaje de error si falla
   Future<Either<String, List<ReviewEntity>>> call(String entityId) async {
-   
     // Delega al repositorio
-    final result = await repository.getReviewsByEntity(entityId);
-
-    // Filtra reviews eliminadas (deletedAt != null) y ordena por fecha
-    return result.map((reviews) {
-      final activeReviews = reviews
-          .where((review) => review.deletedAt == null)
-          .toList()
-        ..sort((a, b) =>
-            b.createdAt.compareTo(a.createdAt)); // Más recientes primero
-
-      return activeReviews;
-    });
+    return await repository.getReviewsByEntity(entityId);
   }
 }

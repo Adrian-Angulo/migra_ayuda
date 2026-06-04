@@ -121,7 +121,7 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
 
       // Guarda todas las reviews (no limpia el store, solo actualiza/agrega)
       for (final review in reviews) {
-        await _store.record(review.id).put(db, _toSembastMap(review));
+        await _store.record(review.id).put(db, review.toMap());
       }
     } catch (e) {
       throw CacheException('Error al guardar reviews en caché: $e');
@@ -288,7 +288,7 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
       deletedAt: map['deletedAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['deletedAt'])
           : null,
-      isSynced: map['isSynced'] ?? false, 
+      isSynced: map['isSynced'] ?? false,
       nameEntity: map['nameEntity'],
     );
   }

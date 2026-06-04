@@ -41,19 +41,12 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
   @override
   Future<String> createReview(ReviewModel review) async {
     try {
-      // Crea el documento en Firestore
-      final docRef = await _firestore.collection('reviews').add({
-        'idMigrante': review.idMigrante,
-        'idEntity': review.idEntity,
-        'userName': review.userName,
-        'userCountry': review.userCountry,
-        'rating': review.rating,
-        'comment': review.comment,
-        'createdAt': review.createdAt.toIso8601String(),
-        'updatedAt': review.updatedAt?.toIso8601String(),
-        'deletedAt': review.deletedAt?.toIso8601String(),
-        'isSynced': true, // En Firebase siempre está sincronizada
-      });
+      // Marca la review como sincronizada antes de guardar en Firebase
+      final reviewToSave = review.copyWith(isSynced: true);
+
+      // Crea el documento en Firestore con el objeto corregido
+      final docRef =
+          await _firestore.collection('reviews').add(reviewToSave.toMap());
 
       // Retorna el ID generado por Firebase
       return docRef.id;
@@ -94,7 +87,8 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
 
       // Convierte los documentos a ReviewModel
       final reviews = snapshot.docs.map((doc) {
-        return _fromFirestore(doc);
+        /* return _fromFirestore(doc); */
+        return ReviewModel.fromMap(doc.data());
       }).toList();
 
       return reviews;
@@ -172,7 +166,7 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
           data['updatedAt'] != null ? DateTime.parse(data['updatedAt']) : null,
       deletedAt:
           data['deletedAt'] != null ? DateTime.parse(data['deletedAt']) : null,
-      isSynced: data['isSynced'] ?? true, 
+      isSynced: data['isSynced'] ?? true,
       nameEntity: data['nameEntity'],
     );
   }
