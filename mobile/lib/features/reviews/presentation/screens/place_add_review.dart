@@ -283,7 +283,8 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                                     userCountry: widget.user!.originCountry ??
                                         'No especificado',
                                     rating: rating,
-                                    comment: commetController.text.trim(),
+                                    comment: commetController.text.trim(), 
+                                    nameEntity: widget.entity.name,
                                   );
                             }
                           },

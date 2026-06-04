@@ -9,14 +9,14 @@ import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/w
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/rating_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/service_chip.dart';
 
-class Tabla extends ConsumerStatefulWidget {
-  const Tabla({super.key});
+class TableEntities extends ConsumerStatefulWidget {
+  const TableEntities({super.key});
 
   @override
-  ConsumerState<Tabla> createState() => _TablaState();
+  ConsumerState<TableEntities> createState() => _TableEntitiesState();
 }
 
-class _TablaState extends ConsumerState<Tabla> {
+class _TableEntitiesState extends ConsumerState<TableEntities> {
   // Estados para ordenamientos
   int? _columnaOrdenadaIndex;
   bool _esAscendente = true;

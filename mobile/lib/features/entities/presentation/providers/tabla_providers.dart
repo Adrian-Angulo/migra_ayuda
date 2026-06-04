@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:migra_ayuda/core/constants/constants.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/tabla.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/table_entities.dart';
 import 'package:path/path.dart';
 
 final searchControllerProvider = StateProvider<String>(

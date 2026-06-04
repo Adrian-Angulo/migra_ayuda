@@ -25,7 +25,10 @@ class ReviewRepositoryImpl implements ReviewRepository {
       // Genera un ID único local
       final localId = const Uuid().v4();
 
-      // Crea el modelo con el ID local
+      final modelo =
+          ReviewModel.fromReviewEntity(review, id: const Uuid().v4());
+
+      /* // Crea el modelo con el ID local
       final modelo = ReviewModel(
         id: localId,
         idMigrante: review.idMigrante,
@@ -37,8 +40,9 @@ class ReviewRepositoryImpl implements ReviewRepository {
         createdAt: review.createdAt,
         updatedAt: review.updatedAt,
         deletedAt: review.deletedAt,
-        isSynced: false, // Inicialmente no sincronizada
-      );
+        isSynced: false,
+        nameEntity: review.nameEntity, // Inicialmente no sincronizada
+      ); */
 
       // 1. Guarda primero en caché local (respuesta inmediata)
       await localDataSource.cacheReview(modelo);
@@ -51,7 +55,8 @@ class ReviewRepositoryImpl implements ReviewRepository {
           // 3. Si hay internet, sube a Firebase
           final firebaseId = await remoteDataSource.createReview(modelo);
 
-          // 4. Crea el modelo con el ID de Firebase
+          final reviewUpdate = modelo.copyWith(id: firebaseId, isSynced: true);
+          /*  // 4. Crea el modelo con el ID de Firebase
           final syncedModel = ReviewModel(
             id: firebaseId, // Usa el ID de Firebase
             idMigrante: modelo.idMigrante,
@@ -63,11 +68,12 @@ class ReviewRepositoryImpl implements ReviewRepository {
             createdAt: modelo.createdAt,
             updatedAt: modelo.updatedAt,
             deletedAt: modelo.deletedAt,
-            isSynced: true, // Marca como sincronizada
+            isSynced: true,
+            nameEntity: modelo.nameEntity, // Marca como sincronizada
           );
-
+ */
           // 5. PRIMERO guarda con el ID de Firebase
-          await localDataSource.cacheReview(syncedModel);
+          await localDataSource.cacheReview(reviewUpdate);
 
           // 6. DESPUÉS elimina el registro con ID local para evitar duplicados
           await localDataSource.deleteLocalRecord(localId);
@@ -191,7 +197,9 @@ class ReviewRepositoryImpl implements ReviewRepository {
   @override
   Future<Either<String, Unit>> updateReview(ReviewEntity review) async {
     try {
-      final modelo = ReviewModel(
+      final modelo = ReviewModel.fromReviewEntity(review);
+
+      /* final modelo = ReviewModel(
         id: review.id,
         idMigrante: review.idMigrante,
         idEntity: review.idEntity,
@@ -202,8 +210,9 @@ class ReviewRepositoryImpl implements ReviewRepository {
         createdAt: review.createdAt,
         updatedAt: DateTime.now(), // Actualiza timestamp
         deletedAt: review.deletedAt,
-        isSynced: false, // Marca como no sincronizada
-      );
+        isSynced: false,
+        nameEntity: review.nameEntity, // Marca como no sincronizada
+      ); */
 
       // 1. Primero actualiza en caché local (respuesta inmediata)
       await localDataSource.cacheReview(modelo);
@@ -293,7 +302,10 @@ class ReviewRepositoryImpl implements ReviewRepository {
             final firebaseId = await remoteDataSource.createReview(review);
 
             // Crea el modelo con el ID de Firebase
-            final syncedModel = ReviewModel(
+
+            final modelo = ReviewModel.fromReviewEntity(review,
+                id: firebaseId, isSynced: true);
+            /*   final syncedModel = ReviewModel(
               id: firebaseId,
               idMigrante: review.idMigrante,
               idEntity: review.idEntity,
@@ -305,10 +317,11 @@ class ReviewRepositoryImpl implements ReviewRepository {
               updatedAt: review.updatedAt,
               deletedAt: review.deletedAt,
               isSynced: true,
-            );
+              nameEntity: review.nameEntity,
+            ); */
 
             // PRIMERO guarda con el ID de Firebase
-            await localDataSource.cacheReview(syncedModel);
+            await localDataSource.cacheReview(modelo);
 
             // DESPUÉS elimina el registro con ID local para evitar duplicados
             await localDataSource.deleteLocalRecord(localId);

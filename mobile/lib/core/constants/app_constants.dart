@@ -56,7 +56,7 @@ class UIConstants {
 // Color Constants
 class ColorConstants {
   // Primary
-  static const Color primary = Color(0xFF184A6C);
+  static const Color primary = Color(0xFF2D5F4F);
   static const Color primaryVariant = Color(0xFF4C8592);
   static const Color onPrimary = Color(0xFFFFFFFF);
 

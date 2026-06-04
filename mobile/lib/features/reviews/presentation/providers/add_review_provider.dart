@@ -18,6 +18,7 @@ class AddReviewNotifier extends Notifier<CreateReviewState> {
     required String userCountry,
     required double rating,
     required String comment,
+    required String nameEntity,
   }) async {
     // Cambia a estado de carga
     state =
@@ -36,7 +37,8 @@ class AddReviewNotifier extends Notifier<CreateReviewState> {
         createdAt: DateTime.now(),
         updatedAt: null,
         deletedAt: null,
-        isSynced: false,
+        isSynced: false, 
+        nameEntity: nameEntity,
       );
 
       // Obtiene el use case

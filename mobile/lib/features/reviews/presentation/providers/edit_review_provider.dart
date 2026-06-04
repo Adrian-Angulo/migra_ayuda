@@ -20,6 +20,7 @@ class EditReviewNotifier extends Notifier<EditReviewState> {
     required double rating,
     required String comment,
     required DateTime createdAt,
+    required String nameEntity
   }) async {
     // Cambia a estado de carga
     state = state.copyWith(
@@ -41,7 +42,8 @@ class EditReviewNotifier extends Notifier<EditReviewState> {
         createdAt: createdAt,
         updatedAt: DateTime.now(),
         deletedAt: null,
-        isSynced: false,
+        isSynced: false, 
+        nameEntity: nameEntity,
       );
 
       // Obtiene el use case

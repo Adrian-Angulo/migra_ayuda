@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
-import 'package:migra_ayuda/core/constants/constants.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/tabla_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/export_button_widget.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/filter_button.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/table_entities.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/widgets.dart';
 
-class EntitiesScreen extends ConsumerWidget {
-  const EntitiesScreen({super.key});
+class ReviewsScreen extends ConsumerWidget {
+  const ReviewsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -28,16 +24,15 @@ class EntitiesScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Entidades",
+                    "Reseñas",
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text("Gestiona las entidades registradas en el sistema")
+                  Text("Gestiona las valoraciones de los usuarios")
                 ],
               ),
-              AddButtonWidget(text: "Registrar entidad"),
             ],
           ),
           const SizedBox(
@@ -50,32 +45,37 @@ class EntitiesScreen extends ConsumerWidget {
               children: [
                 SizedBox(
                   width: 400,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.grey[300]!),
-                    ),
-                    child: TextField(
-                      onChanged: (value) {
-                        ref
-                            .read(datasourceProvider)
-                            .aplicarFiltros(value, seletedService);
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Buscar por usuario, acción o recurso...',
-                        border: InputBorder.none,
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 16),
-                        hintStyle:
-                            TextStyle(color: Colors.grey[400], fontSize: 14),
+                  child: TextField(
+                    onChanged: (value) {},
+                    decoration: InputDecoration(
+                      hintText: 'Buscar reseñas...',
+                      prefixIcon: const Icon(Icons.search,
+                          size: 20, color: Colors.grey),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.grey[300]!),
                       ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.grey[300]!),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: const BorderSide(
+                            color: ColorConstants.primary, width: 1.5),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 0),
+                      hintStyle:
+                          TextStyle(color: Colors.grey[400], fontSize: 14),
                     ),
                   ),
                 ),
                 Row(
                   children: [
-                    SizedBox(
+                    /* SizedBox(
                       width: 150,
                       child: FilterButton(
                         label: 'Filtrar',
@@ -89,7 +89,7 @@ class EntitiesScreen extends ConsumerWidget {
                               .aplicarFiltros("", value);
                         },
                       ),
-                    ),
+                    ), */
                     const SizedBox(width: UIConstants.spacingM),
                     ExportButtonWidget(label: 'Exportar', onPressed: () {})
                   ],
@@ -100,7 +100,7 @@ class EntitiesScreen extends ConsumerWidget {
           const SizedBox(
             height: UIConstants.spacingM,
           ),
-          const TableEntities()
+          /* const TableEntities() */
         ],
       ),
     );

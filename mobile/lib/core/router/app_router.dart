@@ -8,6 +8,7 @@ import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/home_
 import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/login_web.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/entities_screen.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/entity_detail_screen.dart';
+import 'package:migra_ayuda/features/reviews/presentation/screens/web/reviews_screen.dart';
 import 'package:migra_ayuda/features/userActivity/presentation/screens/user_activity_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -85,6 +86,9 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ),
           ),
+          GoRoute(
+              path: '/dashboard/reviews',
+              builder: (context, state) => const ReviewsScreen()),
           GoRoute(
               path: '/dashboard/entities',
               builder: (context, state) => const EntitiesScreen()),

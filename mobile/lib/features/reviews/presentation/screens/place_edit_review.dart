@@ -373,6 +373,7 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
                                   rating: rating,
                                   comment: commentController.text.trim(),
                                   createdAt: widget.existingReview.createdAt,
+                                  nameEntity: widget.entity.name,
                                 );
                           }
                         },

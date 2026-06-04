@@ -265,6 +265,7 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
       'deletedAt': review.deletedAt?.millisecondsSinceEpoch,
       'isSynced': review.isSynced,
       'cached_at': DateTime.now().millisecondsSinceEpoch,
+      'nameEntity': review.nameEntity
     };
   }
 
@@ -287,7 +288,8 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
       deletedAt: map['deletedAt'] != null
           ? DateTime.fromMillisecondsSinceEpoch(map['deletedAt'])
           : null,
-      isSynced: map['isSynced'] ?? false,
+      isSynced: map['isSynced'] ?? false, 
+      nameEntity: map['nameEntity'],
     );
   }
 }

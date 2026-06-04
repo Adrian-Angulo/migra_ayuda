@@ -8,20 +8,11 @@ import 'package:migra_ayuda/features/reviews/domain/repositories/review_reposito
 class CreateReviewUsecase {
   final ReviewRepository repository;
 
+
   CreateReviewUsecase({required this.repository});
 
-  /// Ejecuta el caso de uso
-  ///
-  /// [review] - Review a crear
-  /// Retorna [Right(Unit)] si la creación fue exitosa
-  /// Retorna [Left(String)] con el mensaje de error si falla la validación o creación
-  Future<Either<String, Unit>> call(ReviewEntity review) async {
-    // Validación de datos
-    final validationError = _validateReview(review);
-    if (validationError != null) {
-      return left(validationError);
-    }
 
+  Future<Either<String, Unit>> call(ReviewEntity review) async {
     // Verifica si el usuario ya tiene una review en esta entidad
     final existingReviewResult = await repository.getUserReviewByEntity(
       review.idMigrante,
@@ -30,7 +21,7 @@ class CreateReviewUsecase {
 
     // Si hay error al verificar, continúa con la creación (no bloquea por error de verificación)
     final existingReview = existingReviewResult.fold(
-      (error) => null, // Si hay error, asume que no existe
+      (error) => left(error.toString()), // Si hay error, asume que no existe
       (review) => review,
     );
 
@@ -39,56 +30,7 @@ class CreateReviewUsecase {
       return left(
           'Ya has publicado una review en esta entidad. Puedes editarla o eliminarla.');
     }
-
     // Delega al repositorio
     return await repository.createReview(review);
-  }
-
-  /// Valida los datos de la review
-  ///
-  /// Retorna [null] si la validación es exitosa
-  /// Retorna [String] con el mensaje de error si falla
-  String? _validateReview(ReviewEntity review) {
-    // Valida rating (debe estar entre 1 y 5)
-    if (review.rating < 1 || review.rating > 5) {
-      return 'El rating debe estar entre 1 y 5';
-    }
-
-    // Valida comentario (no debe estar vacío)
-    if (review.comment.trim().isEmpty) {
-      return 'El comentario no puede estar vacío';
-    }
-
-    // Valida longitud del comentario (mínimo 10 caracteres)
-    if (review.comment.trim().length < 10) {
-      return 'El comentario debe tener al menos 10 caracteres';
-    }
-
-    // Valida longitud del comentario (máximo 500 caracteres)
-    if (review.comment.trim().length > 500) {
-      return 'El comentario no puede exceder 500 caracteres';
-    }
-
-    // Valida que tenga ID de entidad
-    if (review.idEntity.trim().isEmpty) {
-      return 'Debe especificar la entidad a revisar';
-    }
-
-    // Valida que tenga ID de migrante
-    if (review.idMigrante.trim().isEmpty) {
-      return 'Debe especificar el usuario que crea la review';
-    }
-
-    // Valida nombre de usuario
-    if (review.userName.trim().isEmpty) {
-      return 'El nombre de usuario no puede estar vacío';
-    }
-
-    // Valida país de usuario
-    if (review.userCountry.trim().isEmpty) {
-      return 'El país del usuario no puede estar vacío';
-    }
-
-    return null; // Validación exitosa
   }
 }

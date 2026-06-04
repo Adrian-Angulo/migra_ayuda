@@ -64,8 +64,8 @@ class PlaceDetails extends ConsumerWidget {
             PlaceDetailsHeader(
               imageUrl: entity.imageUrl,
               name: entity.name,
-              rating: averageRating,
-              reviewCount: reviewCount,
+              rating: entity.averageRating,
+              reviewCount: entity.totalReviews,
               service: entity.services.isNotEmpty ? entity.services.first : '',
             ),
             const SizedBox(height: 16),

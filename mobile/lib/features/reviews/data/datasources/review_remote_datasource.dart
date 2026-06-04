@@ -157,7 +157,6 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
   /// Convierte un documento de Firestore a ReviewModel
   ReviewModel _fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-
     return ReviewModel(
       id: doc.id,
       idMigrante: data['idMigrante'] ?? '',
@@ -173,7 +172,8 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
           data['updatedAt'] != null ? DateTime.parse(data['updatedAt']) : null,
       deletedAt:
           data['deletedAt'] != null ? DateTime.parse(data['deletedAt']) : null,
-      isSynced: data['isSynced'] ?? true,
+      isSynced: data['isSynced'] ?? true, 
+      nameEntity: data['nameEntity'],
     );
   }
 }
