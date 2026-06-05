@@ -92,11 +92,19 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
       );
       final records = await _store.find(db, finder: finder);
 
+      // 🐛 DEBUG: Log para diagnóstico
+      print(
+          '🔍 getReviewsByEntity($entityId): ${records.length} registros encontrados');
+      for (var record in records) {
+        print('- ID: ${record.key}, isSynced: ${record.value['isSynced']}');
+      }
+
       // Convierte los registros a ReviewModel
       return records.map((record) {
         return _fromSembastMap(record.key, record.value);
       }).toList();
     } catch (e) {
+      print('❌ Error en getReviewsByEntity: $e');
       throw CacheException(
           'Error al obtener reviews de la entidad del caché: $e');
     }
@@ -119,9 +127,9 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
     try {
       final db = await _db;
 
-      // Guarda todas las reviews (no limpia el store, solo actualiza/agrega)
+      // Guarda todas las reviews usando _toSembastMap para consistencia
       for (final review in reviews) {
-        await _store.record(review.id).put(db, review.toMap());
+        await _store.record(review.id).put(db, _toSembastMap(review));
       }
     } catch (e) {
       throw CacheException('Error al guardar reviews en caché: $e');
@@ -271,6 +279,26 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
 
   /// Convierte Map de Sembast a ReviewModel
   ReviewModel _fromSembastMap(String id, Map<String, dynamic> map) {
+    // 🐛 DEBUG: Ver qué tipo de dato es createdAt
+    print('🔍 Convirtiendo review $id:');
+    print('   createdAt type: ${map['createdAt'].runtimeType}');
+    print('   createdAt value: ${map['createdAt']}');
+
+    // Determina si createdAt es int (milliseconds) o String (ISO8601)
+    DateTime createdAt;
+    if (map['createdAt'] is int) {
+      // Ya está en formato correcto (milliseconds)
+      createdAt = DateTime.fromMillisecondsSinceEpoch(map['createdAt']);
+    } else if (map['createdAt'] is String) {
+      // Está en formato String ISO8601 - convertir
+      createdAt = DateTime.parse(map['createdAt']);
+      print('⚠️ createdAt estaba como String, se convirtió a DateTime');
+    } else {
+      // Fallback a fecha actual
+      createdAt = DateTime.now();
+      print('❌ createdAt en formato desconocido, usando fecha actual');
+    }
+
     return ReviewModel(
       id: id,
       idMigrante: map['idMigrante'] ?? '',
@@ -279,14 +307,16 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
       userCountry: map['userCountry'] ?? '',
       rating: (map['rating'] as num?)?.toDouble() ?? 0.0,
       comment: map['comment'] ?? '',
-      createdAt: DateTime.fromMillisecondsSinceEpoch(
-        map['createdAt'] ?? DateTime.now().millisecondsSinceEpoch,
-      ),
+      createdAt: createdAt,
       updatedAt: map['updatedAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['updatedAt'])
+          ? (map['updatedAt'] is int
+              ? DateTime.fromMillisecondsSinceEpoch(map['updatedAt'])
+              : DateTime.parse(map['updatedAt']))
           : null,
       deletedAt: map['deletedAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['deletedAt'])
+          ? (map['deletedAt'] is int
+              ? DateTime.fromMillisecondsSinceEpoch(map['deletedAt'])
+              : DateTime.parse(map['deletedAt']))
           : null,
       isSynced: map['isSynced'] ?? false,
       nameEntity: map['nameEntity'],

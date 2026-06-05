@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/database/sembast_database.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
+import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
+import 'package:migra_ayuda/features/reviews/presentation/screens/place_add_review.dart';
 
 import '../widgets/review_item.dart';
 
-class SectionReviews extends StatelessWidget {
+class SectionReviews extends ConsumerStatefulWidget {
   const SectionReviews({
     super.key,
     required this.entity,
@@ -16,61 +19,29 @@ class SectionReviews extends StatelessWidget {
   final UserModel? user;
 
   @override
+  ConsumerState<SectionReviews> createState() => _SectionReviewsState();
+}
+
+class _SectionReviewsState extends ConsumerState<SectionReviews> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    
+  }
+
+  @override
   Widget build(BuildContext context) {
-    List<ReviewEntity> listReview = [
-      ReviewEntity(
-          id: '43',
-          idMigrante: 'asdfds',
-          idEntity: 'fasdfa',
-          userName: 'Camilo',
-          userCountry: 'Venezuela',
-          rating: 3,
-          comment:
-              'Excelente servicio, me atendieron muy bien y resolvieron todas mis dudas.',
-          createdAt: DateTime.now(),
-          isSynced: true,
-          nameEntity: entity.name),
-      ReviewEntity(
-          id: '44',
-          idMigrante: 'bcdeft',
-          idEntity: 'fasdfa',
-          userName: 'María',
-          userCountry: 'Colombia',
-          rating: 5,
-          comment:
-              'Muy buen lugar, el personal es amable y el proceso fue rápido.',
-          createdAt: DateTime.now(),
-          isSynced: true,
-          nameEntity: entity.name),
-      ReviewEntity(
-          id: '45',
-          idMigrante: 'ghijkl',
-          idEntity: 'fasdfa',
-          userName: 'José',
-          userCountry: 'Perú',
-          rating: 4,
-          comment:
-              'Buena atención en general, aunque el tiempo de espera fue un poco largo.',
-          createdAt: DateTime.now(),
-          isSynced: true,
-          nameEntity: entity.name),
-      ReviewEntity(
-          id: '46',
-          idMigrante: 'mnopqr',
-          idEntity: 'fasdfa',
-          userName: 'Lucía',
-          userCountry: 'Ecuador',
-          rating: 2,
-          comment:
-              'El servicio fue regular, esperaba más información sobre los trámites.',
-          createdAt: DateTime.now(),
-          isSynced: true,
-          nameEntity: entity.name),
-    ];
+    final asyncReviews = ref.watch(getReviewsByEntity(widget.entity.id));
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        /*     ElevatedButton(
+            onPressed: () async {
+              await SembastDatabase.instance.clearAll();
+            },
+            child: const Text('Limpiar cache')), */
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -85,6 +56,16 @@ class SectionReviews extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PlaceAddReview(
+                      entity: widget.entity,
+                      user: widget.user,
+                    ),
+                  ),
+                );
+
                 /*  // Verifica si el usuario ya tiene una review
                 userReviewAsync?.when(
                   data: (existingReview) {
@@ -153,64 +134,74 @@ class SectionReviews extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-
-        // Vista de comentarios con manejo de estados
-        listReview.isEmpty ? messageEmty() : containerReviews(listReview)
-        
+        asyncReviews.when(
+          data: (reviews) {
+            return reviews.isEmpty ? messageEmty() : containerReviews(reviews);
+          },
+          error: (error, stackTrace) {
+            print("error al llamar reviews: $error");
+            return messageError();
+          },
+          loading: () {
+            return const Center(
+              child: Text("Cargando..."),
+            );
+          },
+        )
       ],
     );
   }
 
   ListView containerReviews(reviews) {
     return ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: reviews.length,
-            separatorBuilder: (_, __) => const Divider(
-              height: 1,
-              color: Color.fromARGB(255, 212, 212, 212),
-            ),
-            itemBuilder: (_, i) => ReviewItem(
-              review: reviews[i],
-              entity: entity,
-              user: user!,
-            ),
-          );
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: reviews.length,
+      separatorBuilder: (_, __) => const Divider(
+        height: 1,
+        color: Color.fromARGB(255, 212, 212, 212),
+      ),
+      itemBuilder: (_, i) => ReviewItem(
+        review: reviews[i],
+        entity: widget.entity,
+        user: widget.user!,
+      ),
+    );
   }
 
   Center messageError() {
     return Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 48,
-                  color: Colors.red[300],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  "Error al cargar comentarios",
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.red[600],
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  "Intenta de nuevo más tarde",
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey[400],
-                  ),
-                ),
-              ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 48,
+              color: Colors.red[300],
             ),
-          ),
-        );
+            const SizedBox(height: 12),
+            Text(
+              "Error al cargar comentarios",
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: Colors.red[600],
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              "Intenta de nuevo más tarde",
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey[400],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Center messageEmty() {

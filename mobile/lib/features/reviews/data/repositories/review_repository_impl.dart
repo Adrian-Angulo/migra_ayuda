@@ -24,39 +24,51 @@ class ReviewRepositoryImpl implements ReviewRepository {
     try {
       // Genera un ID único local
       final localId = const Uuid().v4();
+      print('📝 Creando review con ID local: $localId');
 
-      final modelo =
-          ReviewModel.fromReviewEntity(review, id: const Uuid().v4());
+      // Usa el localId para crear el modelo inicial
+      final modelo = ReviewModel.fromReviewEntity(review, id: localId);
 
       // 1. Guarda primero en caché local (respuesta inmediata)
       await localDataSource.cacheReview(modelo);
+      print('✅ Review guardada en caché local con ID: $localId');
 
       // 2. Verifica si hay conexión
       final isConnected = await networkInfo.isConnected;
+      print('🌐 Conexión a internet: $isConnected');
 
       if (isConnected) {
         try {
           // 3. Si hay internet, sube a Firebase
           final firebaseId = await remoteDataSource.createReview(modelo);
+          print('🔥 Review creada en Firebase con ID: $firebaseId');
 
+          // 4. Crea un nuevo modelo con el ID de Firebase y marcado como sincronizado
           final reviewUpdate = modelo.copyWith(id: firebaseId, isSynced: true);
 
           // 5. PRIMERO guarda con el ID de Firebase
           await localDataSource.cacheReview(reviewUpdate);
+          print(
+              '✅ Review actualizada en caché con ID de Firebase: $firebaseId');
 
           // 6. DESPUÉS elimina el registro con ID local para evitar duplicados
           await localDataSource.deleteLocalRecord(localId);
+          print('🗑️ Registro local eliminado: $localId');
         } catch (e) {
+          print('⚠️ Error al sincronizar con Firebase: $e');
           // Si falla Firebase, los datos ya están en caché local
           return right(unit); // Éxito parcial (guardado localmente)
         }
       }
       // Si no hay internet, queda pendiente de sincronización
 
+      print('✅ Review creada exitosamente');
       return right(unit);
     } on CacheException catch (e) {
+      print('❌ Error de caché: ${e.message}');
       return left('Error de caché: ${e.message}');
     } catch (e) {
+      print('❌ Error al crear review: ${e.toString()}');
       return left('Error al crear la review: ${e.toString()}');
     }
   }
@@ -69,7 +81,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
       // 1. Primero intenta obtener del caché (respuesta inmediata)
       List<ReviewModel> cachedReviews = [];
       cachedReviews = await localDataSource.getReviewsByEntity(entityId);
-      
+
       // 2. Verifica si hay conexión para actualizar
       final isConnected = await networkInfo.isConnected;
       if (isConnected) {

@@ -5,7 +5,8 @@ import 'package:migra_ayuda/core/widgets/app_bar_widget.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/floating_main_button.dart';
-
+import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
+import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 
 class PlaceAddReview extends ConsumerStatefulWidget {
   final EntityEntity entity;
@@ -33,9 +34,10 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
 
   @override
   Widget build(BuildContext context) {
-/*     // Escucha el estado de creación de review
-    ref.listen(addReviewProvider, (previous, next) {
-      if (next.isSucces) {
+    UserModel user = widget.user!;
+    // Escucha el estado de creación de review
+    ref.listen(reviewNotifierProvider, (previous, next) {
+      if (next.hasValue) {
         // Muestra mensaje de éxito
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -50,14 +52,13 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
 
         // Resetea el estado y cierra la pantalla
         Future.delayed(const Duration(seconds: 1), () {
-          ref.read(addReviewProvider.notifier).reset();
           if (context.mounted) Navigator.pop(context);
         });
-      } else if (next.errorMensaje != null) {
+      } else if (next.hasError) {
         // Muestra mensaje de error
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(next.errorMensaje!),
+            content: Text(next.error.toString()),
             backgroundColor: const Color(0xFFEF4444),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -68,8 +69,8 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
       }
     });
 
-    final state = ref.watch(addReviewProvider);
- */
+    final state = ref.watch(reviewNotifierProvider);
+
     return Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBarWidget(title: widget.entity.name),
@@ -253,8 +254,24 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                   ),
                   const SizedBox(height: 24),
                   FloatingMainButton(
-                    onTap: (){},
-                    text: 'Publicar Comentario',
+                    onTap: () async {
+                      final review = ReviewEntity(
+                          idMigrante: user.id,
+                          idEntity: widget.entity.id,
+                          userName: user.name,
+                          userCountry: user.originCountry!,
+                          rating: rating,
+                          comment: commetController.text,
+                          isSynced: false,
+                          nameEntity: widget.entity.name);
+
+                      await ref
+                          .read(reviewNotifierProvider.notifier)
+                          .createReview(review);
+                    },
+                    text: state.isLoading
+                        ? 'Publicando...'
+                        : 'Publicar Comentario',
                   )
                 ],
               ),

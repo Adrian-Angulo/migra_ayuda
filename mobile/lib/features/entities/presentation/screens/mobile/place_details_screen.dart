@@ -17,6 +17,8 @@ class PlaceDetails extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
+
     final authState = ref.watch(authNotifierProvider);
     final user = authState.value;
 

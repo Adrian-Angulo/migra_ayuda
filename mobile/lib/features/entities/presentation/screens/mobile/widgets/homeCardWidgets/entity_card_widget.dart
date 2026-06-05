@@ -1,12 +1,13 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/place_details_screen.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/service_tag.dart';
+import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 
-class EntityCardWidget extends StatelessWidget {
+class EntityCardWidget extends ConsumerWidget {
   const EntityCardWidget({
     super.key,
     required this.entity,
@@ -15,13 +16,17 @@ class EntityCardWidget extends StatelessWidget {
   final EntityEntity entity;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
-      onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PlaceDetails(entity: entity),
-          )),
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PlaceDetails(entity: entity),
+            ));
+
+        ref.invalidate(getReviewsByEntity);
+      },
       child: Container(
         padding: EdgeInsets.all(14),
         decoration: BoxDecoration(
@@ -155,5 +160,3 @@ class EntityCardWidget extends StatelessWidget {
     );
   }
 }
-
-

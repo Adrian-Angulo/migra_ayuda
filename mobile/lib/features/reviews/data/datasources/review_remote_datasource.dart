@@ -82,7 +82,6 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
       final snapshot = await _firestore
           .collection('reviews')
           .where('idEntity', isEqualTo: entityId)
-          .orderBy('createdAt', descending: true)
           .get();
 
       // Convierte los documentos a ReviewModel

@@ -19,24 +19,24 @@ class ReviewModel extends ReviewEntity {
     Map<String, dynamic> map,
   ) {
     return ReviewModel(
-      id: map['id'] as String,
-      idMigrante: map['idMigrante'] as String,
-      idEntity: map['idEntity'] as String,
+      id: map['id'],
+      idMigrante: map['idMigrante'],
+      idEntity: map['idEntity'],
       rating: (map['rating'] as num).toDouble(),
-      comment: map['comment'] as String,
+      comment: map['comment'],
       createdAt: DateTime.parse(map['createdAt']),
       updatedAt:
           map['updatedAt'] != null ? DateTime.parse(map['updatedAt']) : null,
       deletedAt:
           map['deletedAt'] != null ? DateTime.parse(map['deletedAt']) : null,
-      isSynced: map['isSynced'] as bool,
-      userName: map['userName'] as String,
-      userCountry: map['userCountry'] as String,
+      isSynced: map['isSynced'],
+      userName: map['userName'],
+      userCountry: map['userCountry'],
       nameEntity: map['nameEntity'],
     );
   }
 
-    factory ReviewModel.fromReviewEntity(
+  factory ReviewModel.fromReviewEntity(
     ReviewEntity review, {
     String? id,
     bool isSynced = false,
@@ -57,7 +57,6 @@ class ReviewModel extends ReviewEntity {
     );
   }
 
-
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -75,6 +74,7 @@ class ReviewModel extends ReviewEntity {
     };
   }
 
+  @override
   ReviewModel copyWith({
     String? id,
     String? idMigrante,
