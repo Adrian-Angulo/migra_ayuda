@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/widgets/app_bar_widget.dart';
+import 'package:migra_ayuda/core/widgets/snackbar_widget.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/floating_main_button.dart';
@@ -35,41 +36,29 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
   @override
   Widget build(BuildContext context) {
     UserModel user = widget.user!;
-    // Escucha el estado de creación de review
-    ref.listen(reviewNotifierProvider, (previous, next) {
-      if (next.hasValue) {
-        // Muestra mensaje de éxito
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Comentario publicado exitosamente'),
-            backgroundColor: const Color(0xFF059669),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        );
 
-        // Resetea el estado y cierra la pantalla
-        Future.delayed(const Duration(seconds: 1), () {
-          if (context.mounted) Navigator.pop(context);
-        });
-      } else if (next.hasError) {
-        // Muestra mensaje de error
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.error.toString()),
-            backgroundColor: const Color(0xFFEF4444),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        );
-      }
-    });
+    // Escucha el estado de creación de review
+    ref.listen(
+      reviewNotifierProvider,
+      (previous, next) {
+        // Solo reacciona si el estado cambió de loading a completado
+        if (previous?.isLoading == true && !next.isLoading) {
+          if (next.hasValue) {
+            SnackbarWidget.success(
+                context, 'Comentario publicado exitosamente');
+            // Cierra la pantalla después de 1 segundo
+            Future.delayed(const Duration(seconds: 1), () {
+              if (context.mounted) Navigator.pop(context);
+            });
+          } else if (next.hasError) {
+            SnackbarWidget.error(context, next.error.toString());
+          }
+        }
+      },
+    );
 
     final state = ref.watch(reviewNotifierProvider);
+    final isLoading = state.isLoading;
 
     return Scaffold(
         resizeToAvoidBottomInset: true,
@@ -269,9 +258,7 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                           .read(reviewNotifierProvider.notifier)
                           .createReview(review);
                     },
-                    text: state.isLoading
-                        ? 'Publicando...'
-                        : 'Publicar Comentario',
+                    text: isLoading ? 'Publicando...' : 'Publicar Comentario',
                   )
                 ],
               ),

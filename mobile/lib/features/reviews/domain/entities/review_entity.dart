@@ -26,8 +26,8 @@ class ReviewEntity {
     this.deletedAt,
     required this.isSynced,
     required this.nameEntity,
-  })  : id = '',
-        createdAt = DateTime.now();
+  })  : id = id ?? '',
+        createdAt = createdAt ?? DateTime.now();
 
   ReviewEntity copyWith({
     String? id,

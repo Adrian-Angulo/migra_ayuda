@@ -140,15 +140,20 @@ class _PlaceHeaderInfo extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        Row(
+        Wrap(
+          spacing: 10,
+          runSpacing: 8,
           children: [
-            if (service.isNotEmpty) ...[
+            if (service.isNotEmpty)
               PlaceInfoChip(
                 icon: Icons.restaurant_outlined,
                 label: service,
               ),
-              const SizedBox(width: 10),
-            ],
+            if (distanceKm != null)
+              PlaceInfoChip(
+                icon: Icons.near_me_outlined,
+                label: '${distanceKm!.toStringAsFixed(1)} km',
+              ),
           ],
         ),
       ],

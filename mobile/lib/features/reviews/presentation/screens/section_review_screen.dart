@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/core/database/sembast_database.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 import 'package:migra_ayuda/features/reviews/presentation/screens/place_add_review.dart';
+import 'package:migra_ayuda/features/reviews/presentation/screens/place_edit_review.dart';
 
 import '../widgets/review_item.dart';
 
@@ -24,31 +24,23 @@ class SectionReviews extends ConsumerStatefulWidget {
 
 class _SectionReviewsState extends ConsumerState<SectionReviews> {
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    
-  }
-
-  @override
   Widget build(BuildContext context) {
     final asyncReviews = ref.watch(getReviewsByEntity(widget.entity.id));
+    final countReviews = asyncReviews.value!.length;
+    final userhasReview = asyncReviews.value?.any(
+      (review) => review.idMigrante == widget.user?.id,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        /*     ElevatedButton(
-            onPressed: () async {
-              await SembastDatabase.instance.clearAll();
-            },
-            child: const Text('Limpiar cache')), */
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text(
-              'Comentarios',
-              style: TextStyle(
+            Text(
+              '$countReviews ${countReviews == 1 ? 'Comentario' : 'Comentarios'}',
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF1A1A1A),
@@ -65,61 +57,6 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
                     ),
                   ),
                 );
-
-                /*  // Verifica si el usuario ya tiene una review
-                userReviewAsync?.when(
-                  data: (existingReview) {
-                    if (existingReview != null) {
-                      // Si ya tiene review, navega a editar
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PlaceEditReview(
-                            entity: entity,
-                            existingReview: existingReview,
-                          ),
-                        ),
-                      );
-                    } else {
-                      // Si no tiene review, navega a crear
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PlaceAddReview(
-                            entity: entity,
-                            user: user,
-                          ),
-                        ),
-                      );
-                    }
-                  },
-                  loading: () {
-                    // Mientras carga, muestra indicador
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Cargando...'),
-                        backgroundColor: const Color(0xFF5F9EA0),
-                        behavior: SnackBarBehavior.floating,
-                        duration: const Duration(seconds: 1),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    );
-                  },
-                  error: (_, __) {
-                    // Si hay error, permite crear (asume que no existe)
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PlaceAddReview(
-                          entity: entity,
-                          user: user,
-                        ),
-                      ),
-                    );
-                  },
-                ); */
               },
               child: const Text(
                 // Cambia el texto del botón según si tiene review o no
@@ -133,19 +70,21 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
             )
           ],
         ),
-        const SizedBox(height: 8),
         asyncReviews.when(
           data: (reviews) {
-            return reviews.isEmpty ? messageEmty() : containerReviews(reviews);
+            final orderReviews = reviews.toList()
+              ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+            return reviews.isEmpty
+                ? messageEmty()
+                : containerReviews(orderReviews);
           },
           error: (error, stackTrace) {
             print("error al llamar reviews: $error");
             return messageError();
           },
           loading: () {
-            return const Center(
-              child: Text("Cargando..."),
-            );
+            return const SizedBox(
+                height: 300, child: Center(child: Text("Cargando...")));
           },
         )
       ],

@@ -38,6 +38,8 @@ final getReviewsByEntity =
   },
 );
 
+
+
 final reviewNotifierProvider =
     AsyncNotifierProvider<ReviewsNotifier, void>(ReviewsNotifier.new);
 

@@ -105,25 +105,18 @@ class ReviewItem extends ConsumerWidget {
                       color: Color(0xFFB0B7C3),
                     ),
                   ),
-                  /* if (user.id == review.idMigrante)
+                  if (user.id == review.idMigrante)
                     PopupMenuButton<String>(
                       onSelected: (value) {
                         if (value == 'edit') {
-                          userReviewAsync.whenData(
-                            (existingReview) {
-                              if (existingReview != null) {
-                                // Si ya tiene review, navega a editar
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => PlaceEditReview(
-                                      entity: entity,
-                                      existingReview: existingReview,
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PlaceEditReview(
+                                entity: entity,
+                                existingReview: review,
+                              ),
+                            ),
                           );
                         } else if (value == 'delete') {
                           _showDeleteConfirmation();
@@ -156,7 +149,7 @@ class ReviewItem extends ConsumerWidget {
                           ),
                         ),
                       ],
-                    ) */
+                    )
                 ],
               ),
             ],
