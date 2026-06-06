@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/constants/constants.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 
@@ -65,14 +66,15 @@ class PlaceDetailsHeader extends ConsumerWidget {
             ),
             const SizedBox(height: 12),
             Wrap(
-              spacing: 10,
-              runSpacing: 8,
+              spacing: 5,
+              runSpacing: 5,
               children: [
-                if (entity.services.isNotEmpty)
-                  PlaceInfoChip(
-                    icon: Icons.restaurant_outlined,
-                    label: entity.services[0],
+                ...entity.services.map(
+                  (service) => PlaceInfoChip(
+                    icon: getServiceIcon(service),
+                    label: service,
                   ),
+                ),
               ],
             ),
           ],

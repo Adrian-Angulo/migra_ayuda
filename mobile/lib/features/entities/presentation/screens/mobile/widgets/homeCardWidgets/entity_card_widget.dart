@@ -17,6 +17,8 @@ class EntityCardWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final asyncRating = ref.watch(meanReviewByEntity(entity.id));
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -133,9 +135,11 @@ class EntityCardWidget extends ConsumerWidget {
                       const Icon(Icons.star_rounded,
                           size: 20, color: Colors.amber),
                       Text(
-                        entity.averageRating != 0.0
-                            ? '${entity.averageRating}'
-                            : 'Sin reseñas',
+                        asyncRating.when(
+                          data: (data) => '${data['mean']}',
+                          error: (error, stackTrace) => '0.0',
+                          loading: () => '---',
+                        ),
                         style: const TextStyle(
                           fontSize: 12,
                           color: Colors.blueGrey,

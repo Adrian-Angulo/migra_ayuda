@@ -14,7 +14,7 @@ class SectionReviews extends ConsumerStatefulWidget {
   });
 
   final EntityEntity entity;
-  final UserModel? user;
+  final UserModel user;
 
   @override
   ConsumerState<SectionReviews> createState() => _SectionReviewsState();
@@ -24,6 +24,7 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
   @override
   Widget build(BuildContext context) {
     final asyncReviews = ref.watch(getReviewsByEntity(widget.entity.id));
+    
     final int countReviews = asyncReviews.value?.length ?? 0;
 
     return Column(
@@ -34,7 +35,7 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              '$countReviews ${countReviews == 1 ? 'Comentario' : 'Comentarios'}',
+              '$countReviews ${countReviews == 1 ? 'Reseña' : 'Reseñas'}',
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -54,7 +55,6 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
                 );
               },
               child: const Text(
-                // Cambia el texto del botón según si tiene review o no
                 "Añadir comentario",
                 style: TextStyle(
                   fontSize: 13,
@@ -67,11 +67,7 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
         ),
         asyncReviews.when(
           data: (reviews) {
-            final orderReviews = reviews.toList()
-              ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
-            return reviews.isEmpty
-                ? messageEmty()
-                : containerReviews(orderReviews);
+            return reviews.isEmpty ? messageEmty() : containerReviews(reviews);
           },
           error: (error, stackTrace) {
             print("error al llamar reviews: $error");
@@ -98,7 +94,7 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
       itemBuilder: (_, i) => ReviewItem(
         review: reviews[i],
         entity: widget.entity,
-        user: widget.user!,
+        user: widget.user,
       ),
     );
   }

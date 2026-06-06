@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/database/sembast_database.dart';
 import 'package:migra_ayuda/core/network/network_provider.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/reviews/data/datasources/review_local_datasource.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
 import 'package:migra_ayuda/features/reviews/domain/repositories/review_repository.dart';
@@ -33,10 +32,12 @@ final getReviewsByEntity =
 
     return result.fold(
       (error) => throw error,
-      (reviews) => reviews,
+      (reviews) =>
+          reviews.toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt)),
     );
   },
 );
+
 
 //provider para calcular promedio y cantidad de reviews
 final meanReviewByEntity =

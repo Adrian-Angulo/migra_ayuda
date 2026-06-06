@@ -55,7 +55,7 @@ class PlaceDetails extends ConsumerWidget {
             const SizedBox(height: 28),
 
             // Sección de comentarios
-            SectionReviews(entity: entity, user: user),
+            SectionReviews(entity: entity, user: user!),
             const SizedBox(height: 80),
           ],
         ),
