@@ -1,37 +1,81 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
+import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 
-class PlaceDetailsHeader extends StatelessWidget {
-  final String imageUrl;
-  final String name;
-  final double rating;
-  final int reviewCount;
-  final String service;
-  final double? distanceKm;
+class PlaceDetailsHeader extends ConsumerWidget {
+  final EntityEntity entity;
 
   const PlaceDetailsHeader({
     super.key,
-    required this.imageUrl,
-    required this.name,
-    required this.rating,
-    required this.reviewCount,
-    required this.service,
-    this.distanceKm,
+    required this.entity,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ratingMeanAndLengt = ref.watch(meanReviewByEntity(entity.id));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _PlaceHeroImage(imageUrl: imageUrl),
+        _PlaceHeroImage(imageUrl: entity.imageUrl),
         const SizedBox(height: 16),
-        _PlaceHeaderInfo(
-          name: name,
-          rating: rating,
-          reviewCount: reviewCount,
-          service: service,
-          distanceKm: distanceKm,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              entity.name,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1A1A1A),
+              ),
+            ),
+            const SizedBox(height: 6),
+            ratingMeanAndLengt.when(
+              data: (data) => Row(
+                children: [
+                  const Text(
+                    'Valoracion: ',
+                    style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                  ),
+                  Text(
+                    '${data['mean']}',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1A1A1A),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  const Icon(Icons.star_outline_rounded,
+                      size: 16, color: Color(0xFFFBBF24)),
+                  const SizedBox(width: 4),
+                  Text(
+                    '(${data['count']})',
+                    style:
+                        const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                  ),
+                ],
+              ),
+              error: (Object error, StackTrace stackTrace) =>
+                  const Text('Error'),
+              loading: () => const Text('-----'),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 10,
+              runSpacing: 8,
+              children: [
+                if (entity.services.isNotEmpty)
+                  PlaceInfoChip(
+                    icon: Icons.restaurant_outlined,
+                    label: entity.services[0],
+                  ),
+              ],
+            ),
+          ],
         ),
       ],
     );
@@ -82,81 +126,6 @@ class _PlaceHeroImage extends StatelessWidget {
         child:
             Icon(Icons.business_outlined, size: 64, color: Color(0xFF9CA3AF)),
       ),
-    );
-  }
-}
-
-class _PlaceHeaderInfo extends StatelessWidget {
-  final String name;
-  final double rating;
-  final int reviewCount;
-  final String service;
-  final double? distanceKm;
-
-  const _PlaceHeaderInfo({
-    required this.name,
-    required this.rating,
-    required this.reviewCount,
-    required this.service,
-    this.distanceKm,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          name,
-          style: const TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF1A1A1A),
-          ),
-        ),
-        const SizedBox(height: 6),
-        Row(
-          children: [
-            const Text(
-              'Valoracion: ',
-              style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
-            ),
-            Text(
-              rating.toString(),
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF1A1A1A),
-              ),
-            ),
-            const SizedBox(width: 4),
-            const Icon(Icons.star_outline_rounded,
-                size: 16, color: Color(0xFFFBBF24)),
-            const SizedBox(width: 4),
-            Text(
-              '($reviewCount)',
-              style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 10,
-          runSpacing: 8,
-          children: [
-            if (service.isNotEmpty)
-              PlaceInfoChip(
-                icon: Icons.restaurant_outlined,
-                label: service,
-              ),
-            if (distanceKm != null)
-              PlaceInfoChip(
-                icon: Icons.near_me_outlined,
-                label: '${distanceKm!.toStringAsFixed(1)} km',
-              ),
-          ],
-        ),
-      ],
     );
   }
 }

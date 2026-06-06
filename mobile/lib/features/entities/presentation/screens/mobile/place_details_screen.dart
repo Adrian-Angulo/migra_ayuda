@@ -8,6 +8,7 @@ import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widget
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/place_details_header.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/place_details_info.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
+import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 import 'package:migra_ayuda/features/reviews/presentation/screens/section_review_screen.dart';
 
 class PlaceDetails extends ConsumerWidget {
@@ -17,8 +18,7 @@ class PlaceDetails extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
-
+    final meanAndLengtReview = ref.watch(meanReviewByEntity(entity.id));
     final authState = ref.watch(authNotifierProvider);
     final user = authState.value;
 
@@ -46,11 +46,7 @@ class PlaceDetails extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             PlaceDetailsHeader(
-              imageUrl: entity.imageUrl,
-              name: entity.name,
-              rating: entity.averageRating,
-              reviewCount: entity.totalReviews,
-              service: entity.services.isNotEmpty ? entity.services.first : '',
+              entity: entity,
             ),
             const SizedBox(height: 16),
             PlaceDetailsInfo(
