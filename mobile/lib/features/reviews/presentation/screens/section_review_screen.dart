@@ -4,8 +4,6 @@ import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 import 'package:migra_ayuda/features/reviews/presentation/screens/place_add_review.dart';
-import 'package:migra_ayuda/features/reviews/presentation/screens/place_edit_review.dart';
-
 import '../widgets/review_item.dart';
 
 class SectionReviews extends ConsumerStatefulWidget {
@@ -26,10 +24,7 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
   @override
   Widget build(BuildContext context) {
     final asyncReviews = ref.watch(getReviewsByEntity(widget.entity.id));
-    final countReviews = asyncReviews.value!.length;
-    final userhasReview = asyncReviews.value?.any(
-      (review) => review.idMigrante == widget.user?.id,
-    );
+    final int countReviews = asyncReviews.value?.length ?? 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

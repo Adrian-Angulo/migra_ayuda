@@ -143,6 +143,7 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
 
       // Obtiene la review actual
       final record = await _store.record(reviewId).get(db);
+      print('record a eliminar ${record}');
 
       if (record == null) {
         throw CacheException('Review no encontrada en caché');

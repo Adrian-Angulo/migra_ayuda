@@ -101,12 +101,10 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
   Future<void> updateReview(ReviewModel review) async {
     try {
       // Actualiza el documento en Firestore
-      await _firestore.collection('reviews').doc(review.id).update({
-        'rating': review.rating,
-        'comment': review.comment,
-        'updatedAt': DateTime.now().toIso8601String(),
-        'isSynced': true,
-      });
+      await _firestore
+          .collection('reviews')
+          .doc(review.id)
+          .update(review.toMap());
     } catch (e) {
       throw ServerException('Error al actualizar review en Firebase: $e');
     }

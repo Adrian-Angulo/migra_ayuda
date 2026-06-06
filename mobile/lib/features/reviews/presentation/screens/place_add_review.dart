@@ -254,6 +254,8 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                           isSynced: false,
                           nameEntity: widget.entity.name);
 
+                    
+
                       await ref
                           .read(reviewNotifierProvider.notifier)
                           .createReview(review);

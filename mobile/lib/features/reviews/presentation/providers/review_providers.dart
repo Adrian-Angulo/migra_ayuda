@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/database/sembast_database.dart';
 import 'package:migra_ayuda/core/network/network_provider.dart';
@@ -38,8 +37,6 @@ final getReviewsByEntity =
   },
 );
 
-
-
 final reviewNotifierProvider =
     AsyncNotifierProvider<ReviewsNotifier, void>(ReviewsNotifier.new);
 
@@ -57,35 +54,49 @@ class ReviewsNotifier extends AsyncNotifier<void> {
       },
       (createdReview) {
         state = const AsyncValue.data(null);
-        ref.invalidate(getReviewsByEntity);
+        // ✅ Invalida la instancia correcta del family provider
+        ref.invalidate(getReviewsByEntity(review.idEntity));
       },
     );
   }
 
   Future<void> updateReview(ReviewEntity review) async {
+    print('🔄 ReviewsNotifier.updateReview llamado');
+    print('   Review ID: ${review.id}');
+    print('   Rating: ${review.rating}');
+    print('   Comment: ${review.comment}');
+
     state = const AsyncValue.loading();
     final repo = ref.read(reviewRepositoryProvider);
     final result = await repo.updateReview(review);
+
     result.fold(
       (failure) {
+        print('   ❌ Error: $failure');
         state = AsyncValue.error(failure, StackTrace.current);
       },
       (updatedReview) {
+        print(
+            '   ✅ Éxito, invalidando provider para entityId: ${review.idEntity}');
         state = const AsyncValue.data(null);
+        // ✅ Invalida la instancia correcta del family provider
+        ref.invalidate(getReviewsByEntity(review.idEntity));
       },
     );
   }
 
-  Future<void> deleteReview(String reviewId) async {
+  Future<void> deleteReview(ReviewEntity review) async {
     state = const AsyncValue.loading();
     final repo = ref.read(reviewRepositoryProvider);
-    final result = await repo.deleteReview(reviewId);
+    final result = await repo.deleteReview(review.id);
     result.fold(
       (failure) {
         state = AsyncValue.error(failure, StackTrace.current);
       },
       (_) {
         state = const AsyncValue.data(null);
+        // ✅ Invalida la instancia correcta del family provider
+        ref.invalidate(getReviewsByEntity(review.idEntity));
       },
     );
   }

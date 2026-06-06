@@ -5,9 +5,9 @@ import 'package:migra_ayuda/core/utils/format/time_formatter.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
-
-import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 import 'package:migra_ayuda/features/reviews/presentation/screens/place_edit_review.dart';
+
+import '../providers/review_providers.dart';
 
 class ReviewItem extends ConsumerWidget {
   final ReviewEntity review;
@@ -55,14 +55,9 @@ class ReviewItem extends ConsumerWidget {
         ),
       );
 
-      /* if (confirmed == true) {
-        // Elimina la review
-        await ref.read(editReviewProvider.notifier).deleteReview(
-              reviewId: review.id,
-              idMigrante: review.idMigrante,
-              idEntity: review.idEntity,
-            );
-      } */
+      if (confirmed == true) {
+        await ref.read(reviewNotifierProvider.notifier).deleteReview(review);
+      }
     }
 
     return Padding(

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/widgets/snackbar_widget.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/floating_main_button.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
+import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 
 class PlaceEditReview extends ConsumerStatefulWidget {
   final EntityEntity entity;
@@ -24,6 +26,7 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
   late double rating;
   final formkey = GlobalKey<FormState>();
   late TextEditingController commentController;
+  bool isloading = false;
 
   @override
   void initState() {
@@ -40,84 +43,23 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
     super.dispose();
   }
 
-  /// Muestra diálogo de confirmación para eliminar
-  Future<void> _showDeleteConfirmation() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Eliminar comentario'),
-        content: const Text(
-            '¿Estás seguro de que deseas eliminar este comentario? Esta acción no se puede deshacer.'),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text(
-              'Cancelar',
-              style: TextStyle(color: Color(0xFF6B7280)),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'Eliminar',
-              style: TextStyle(color: Color(0xFFEF4444)),
-            ),
-          ),
-        ],
-      ),
-    );
-
-/*     if (confirmed == true && mounted) {
-      // Elimina la review
-      await ref.read(editReviewProvider.notifier).deleteReview(
-            reviewId: widget.existingReview.id,
-            idMigrante: widget.existingReview.idMigrante,
-            idEntity: widget.existingReview.idEntity,
-          );
-    } */
-  }
-
   @override
   Widget build(BuildContext context) {
-    // Escucha el estado de edición de review
-    /* ref.listen(editReviewProvider, (previous, next) {
-      if (next.isSuccess) {
-        // Muestra mensaje de éxito
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Comentario actualizado exitosamente'),
-            backgroundColor: const Color(0xFF059669),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        );
-
-        // Resetea el estado y cierra la pantalla
-        Future.delayed(const Duration(seconds: 1), () {
-          ref.read(editReviewProvider.notifier).reset();
-          if (context.mounted) Navigator.pop(context);
-        });
-      } else if (next.errorMessage != null) {
-        // Muestra mensaje de error
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: const Color(0xFFEF4444),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        );
-      }
-    });
-
-    final state = ref.watch(editReviewProvider); */
+    ref.listen(
+      reviewNotifierProvider,
+      (previous, next) async {
+        // Solo reacciona cuando termina de cargar (igual que en place_add_review)
+        if (previous?.isLoading == true && !next.isLoading) {
+          if (next.hasError) {
+            SnackbarWidget.error(context, next.error.toString());
+          } else {
+            SnackbarWidget.success(context, 'Reseña actualizada exitosamente');
+            await Future.delayed(const Duration(seconds: 2));
+            if (context.mounted) Navigator.pop(context);
+          }
+        }
+      },
+    );
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -356,31 +298,38 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
 
                 // Botón de actualizar
                 FloatingMainButton(
-                  onTap: () {}
+                  onTap: () async {
+                    if (!formkey.currentState!.validate()) {
+                      print('❌ Validación falló');
+                      return;
+                    }
 
-                  /*  state.isLoading
-                      ? () {} // Función vacía cuando está cargando
-                      : () async {
-                          if (formkey.currentState?.validate() ?? false) {
-                            // Actualiza la review
-                            await ref
-                                .read(editReviewProvider.notifier)
-                                .updateReview(
-                                  reviewId: widget.existingReview.id,
-                                  idMigrante: widget.existingReview.idMigrante,
-                                  idEntity: widget.existingReview.idEntity,
-                                  userName: widget.existingReview.userName,
-                                  userCountry:
-                                      widget.existingReview.userCountry,
-                                  rating: rating,
-                                  comment: commentController.text.trim(),
-                                  createdAt: widget.existingReview.createdAt,
-                                  nameEntity: widget.entity.name,
-                                );
-                          }
-                        } */
-                  ,
-                  text: 'Actualizar Comentario',
+                    print('🎬 === INICIANDO ACTUALIZACIÓN ===');
+                    print(
+                        '   Rating original: ${widget.existingReview.rating}');
+                    print('   Rating nuevo: $rating');
+                    print(
+                        '   Comment original: ${widget.existingReview.comment}');
+                    print('   Comment nuevo: ${commentController.text.trim()}');
+
+                    // ✅ Construye la review con los datos EDITADOS
+                    final updatedReview = widget.existingReview.copyWith(
+                        rating: rating,
+                        comment: commentController.text.trim(),
+                        updatedAt: DateTime.now(),
+                        isSynced: false);
+
+                    print('   Review actualizada:');
+                    print('      ID: ${updatedReview.id}');
+                    print('      EntityID: ${updatedReview.idEntity}');
+                    print('      Rating: ${updatedReview.rating}');
+                    print('      Comment: ${updatedReview.comment}');
+
+                    await ref
+                        .read(reviewNotifierProvider.notifier)
+                        .updateReview(updatedReview);
+                  },
+                  text: isloading ? 'Actualizando...' : 'Actualizar Comentario',
                 ),
               ],
             ),
