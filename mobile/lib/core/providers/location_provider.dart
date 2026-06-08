@@ -1,71 +1,65 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:migra_ayuda/core/services/location_service.dart';
-import 'package:migra_ayuda/core/services/location_service_impl.dart';
+import 'package:migra_ayuda/core/services/locationService/location_service.dart';
+import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 
-/// Provider del servicio de ubicación
+/// Provider del servicio de ubicación.
+/// Crea y expone una instancia de [LocationService] para toda la app.
 final locationServiceProvider = Provider<LocationService>((ref) {
-  final service = LocationServiceImpl();
-  ref.onDispose(() => service.dispose());
+  // Creamos una sola instancia del servicio que se reutilizará
+  final service = LocationService();
   return service;
 });
 
-/// StreamProvider que emite la ubicación en tiempo real
-final userLocationStreamProvider = StreamProvider<Position?>((ref) async* {
-  final locationService = ref.watch(locationServiceProvider);
+/// Provider que emite la posición del usuario en tiempo real.
+/// Usa [StreamNotifierProvider] para manejar el stream de ubicación.
+final liveLocationProvider =
+    StreamNotifierProvider<LiveLocationNotifier, Position>(
+        LiveLocationNotifier.new);
 
-  // Verifica permisos y GPS
-  final serviceEnabled = await locationService.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    yield null;
-    return;
-  }
+/// Provider que calcula la distancia entre dos puntos geográficos.
+///
+/// Recibe un [map] con las siguientes claves:
+/// - `start`: posición de origen ([Position])
+/// - `endLatitude`: latitud del destino ([double])
+/// - `endLongitude`: longitud del destino ([double])
+///
+/// Retorna la distancia formateada como [String].
+final distanceProvider = Provider.family<String, EntityEntity>(
+  (ref, entity) {
+    final service = ref.watch(locationServiceProvider);
+    final locationAsync = ref.watch(liveLocationProvider);
 
-  final hasPermission = await locationService.hasPermission();
-  if (!hasPermission) {
-    final granted = await locationService.requestPermission();
-    if (!granted) {
-      yield null;
-      return;
-    }
-  }
-
-  // Obtiene ubicación inicial
-  final initialPosition = await locationService.getCurrentLocation();
-  if (initialPosition != null) {
-    yield initialPosition;
-  }
-
-  // Escucha cambios en tiempo real
-  await for (final position in locationService.locationStream) {
-    yield position;
-  }
-});
-
-/// Notifier para controlar si se debe centrar el mapa en la ubicación del usuario
-class CenterOnUserLocationNotifier extends Notifier<bool> {
-  @override
-  bool build() => false;
-
-  void trigger() => state = true;
-  void reset() => state = false;
-}
-
-final centerOnUserLocationProvider =
-    NotifierProvider<CenterOnUserLocationNotifier, bool>(
-  CenterOnUserLocationNotifier.new,
+    return locationAsync.when(
+      data: (position) => service.distance(
+        start: position,
+        endLatitude: entity.localitation.latitude,
+        endLongitude: entity.localitation.longitude,
+      ),
+      error: (error, stackTrace) => '--',
+      loading: () => '...',
+    );
+  },
 );
 
-/// Notifier para trackear si ya se solicitaron permisos de ubicación
-/// Esto evita solicitar permisos múltiples veces
-class LocationPermissionRequestedNotifier extends Notifier<bool> {
+/// Notifier que gestiona el stream de posición en vivo del usuario.
+///
+/// Se encarga de verificar los permisos de ubicación antes de
+/// comenzar a emitir posiciones actualizadas.
+class LiveLocationNotifier extends StreamNotifier<Position> {
+  /// Construye el stream de ubicación en tiempo real.
+  ///
+  /// 1. Verifica que la app tenga permisos de ubicación.
+  /// 2. Emite posiciones continuas usando [LocationService.livePosition].
   @override
-  bool build() => false;
+  Stream<Position> build() async* {
+    // Obtenemos el servicio de ubicación
+    final service = ref.watch(locationServiceProvider);
 
-  void markAsRequested() => state = true;
+    // Verificamos y solicitamos permisos antes de iniciar el stream
+    await service.checkPemission();
+
+    // Iniciamos el stream que emite la posición actual del usuario
+    yield* service.livePosition();
+  }
 }
-
-final locationPermissionRequestedProvider =
-    NotifierProvider<LocationPermissionRequestedNotifier, bool>(
-  LocationPermissionRequestedNotifier.new,
-);

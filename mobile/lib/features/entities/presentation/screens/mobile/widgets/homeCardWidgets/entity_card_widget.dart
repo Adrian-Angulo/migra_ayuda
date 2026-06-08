@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
+import 'package:migra_ayuda/core/providers/location_provider.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/place_details_screen.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/service_tag.dart';
@@ -115,37 +116,9 @@ class EntityCardWidget extends ConsumerWidget {
                     ],
                   ),
                   const SizedBox(height: 6),
-                  Row(
-                    spacing: 5,
-                    children: [
-                      const Icon(Icons.access_time,
-                          size: 20, color: Colors.blueGrey),
-                      const Text(
-                        '15 min',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.blueGrey,
-                        ),
-                      ),
-                      Container(
-                        width: 1,
-                        height: 15,
-                        color: ColorConstants.grey400,
-                      ),
-                      const Icon(Icons.star_rounded,
-                          size: 20, color: Colors.amber),
-                      Text(
-                        asyncRating.when(
-                          data: (data) => '${data['mean']}',
-                          error: (error, stackTrace) => '0.0',
-                          loading: () => '---',
-                        ),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.blueGrey,
-                        ),
-                      ),
-                    ],
+                  DistanceAndRating(
+                    asyncRating: asyncRating,
+                    entity: entity,
                   ),
                   const SizedBox(height: 8),
                   Wrap(
@@ -161,6 +134,53 @@ class EntityCardWidget extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class DistanceAndRating extends ConsumerWidget {
+  const DistanceAndRating({
+    super.key,
+    required this.asyncRating,
+    required this.entity,
+  });
+
+  final AsyncValue<Map<String, dynamic>> asyncRating;
+  final EntityEntity entity;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final distanceState = ref.watch(distanceProvider(entity));
+    return Row(
+      spacing: 5,
+      children: [
+        const Icon(Icons.location_on_outlined,
+            size: 20, color: Colors.blueGrey),
+        Text(
+          distanceState,
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.blueGrey,
+          ),
+        ),
+        Container(
+          width: 1,
+          height: 15,
+          color: ColorConstants.grey400,
+        ),
+        const Icon(Icons.star_rounded, size: 20, color: Colors.amber),
+        Text(
+          asyncRating.when(
+            data: (data) => '${data['mean']}',
+            error: (error, stackTrace) => '0.0',
+            loading: () => '---',
+          ),
+          style: const TextStyle(
+            fontSize: 12,
+            color: Colors.blueGrey,
+          ),
+        ),
+      ],
     );
   }
 }
