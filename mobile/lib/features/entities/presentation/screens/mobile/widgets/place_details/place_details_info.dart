@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/providers/location_provider.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 
-class PlaceDetailsInfo extends StatelessWidget {
+class PlaceDetailsInfo extends ConsumerWidget {
   final EntityEntity entity;
 
   const PlaceDetailsInfo({
@@ -10,7 +12,8 @@ class PlaceDetailsInfo extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final distance = ref.watch(distanceProvider(entity));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -98,25 +101,28 @@ class PlaceDetailsInfo extends StatelessWidget {
           icon: Icons.location_on_outlined,
           label: 'Dirección',
           value: entity.address,
+          subtitle: 'A $distance de tu ubicación',
         ),
       ],
     );
   }
 }
 
-class _PlaceContactCard extends StatelessWidget {
+class _PlaceContactCard extends ConsumerWidget {
   final IconData icon;
   final String label;
   final String value;
+  final String? subtitle;
 
   const _PlaceContactCard({
     required this.icon,
     required this.label,
     required this.value,
+    this.subtitle,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
@@ -163,6 +169,13 @@ class _PlaceContactCard extends StatelessWidget {
                     color: Color(0xFF1A1A1A),
                   ),
                 ),
+                const SizedBox(height: 2),
+                if (subtitle != null)
+                  Text(
+                    subtitle!,
+                    style:
+                        const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                  ),
               ],
             ),
           ),

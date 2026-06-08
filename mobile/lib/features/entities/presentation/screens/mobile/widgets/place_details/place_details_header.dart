@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/constants.dart';
+import 'package:migra_ayuda/core/providers/location_provider.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 
@@ -16,6 +17,7 @@ class PlaceDetailsHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ratingMeanAndLengt = ref.watch(meanReviewByEntity(entity.id));
+    
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,7 +41,7 @@ class PlaceDetailsHeader extends ConsumerWidget {
                 children: [
                   const Text(
                     'Valoracion: ',
-                    style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                    style: TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
                   ),
                   Text(
                     '${data['mean']}',
@@ -55,8 +57,10 @@ class PlaceDetailsHeader extends ConsumerWidget {
                   const SizedBox(width: 4),
                   Text(
                     '(${data['count']})',
-                    style:
-                        const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                    style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF6B7280),
+                        fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
@@ -64,6 +68,7 @@ class PlaceDetailsHeader extends ConsumerWidget {
                   const Text('Error'),
               loading: () => const Text('-----'),
             ),
+            
             const SizedBox(height: 12),
             Wrap(
               spacing: 5,

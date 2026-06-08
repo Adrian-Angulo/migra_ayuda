@@ -17,14 +17,15 @@ final liveLocationProvider =
     StreamNotifierProvider<LiveLocationNotifier, Position>(
         LiveLocationNotifier.new);
 
-/// Provider que calcula la distancia entre dos puntos geográficos.
+/// Provider que calcula la distancia entre la posición actual del usuario y una entidad.
 ///
-/// Recibe un [map] con las siguientes claves:
-/// - `start`: posición de origen ([Position])
-/// - `endLatitude`: latitud del destino ([double])
-/// - `endLongitude`: longitud del destino ([double])
+/// Observa [liveLocationProvider] para obtener la posición en tiempo real y
+/// usa [LocationService.distance] para calcular la distancia hasta [entity].
 ///
-/// Retorna la distancia formateada como [String].
+/// Retorna:
+/// - La distancia formateada como [String] cuando hay datos disponibles.
+/// - `'--'` si ocurre un error.
+/// - `'...'` mientras se carga la posición.
 final distanceProvider = Provider.family<String, EntityEntity>(
   (ref, entity) {
     final service = ref.watch(locationServiceProvider);

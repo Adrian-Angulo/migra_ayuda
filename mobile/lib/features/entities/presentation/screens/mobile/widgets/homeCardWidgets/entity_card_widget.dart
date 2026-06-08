@@ -102,13 +102,13 @@ class EntityCardWidget extends ConsumerWidget {
                   Row(
                     children: [
                       const Icon(Icons.location_on_outlined,
-                          size: 14, color: Colors.grey),
+                          size: 20, color: Colors.grey),
                       const SizedBox(width: 2),
                       Text(
                         entity.address,
                         style: const TextStyle(
                           fontSize: 14,
-                          color: Colors.grey,
+                          color: Color(0xFF98A2B3),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -154,13 +154,12 @@ class DistanceAndRating extends ConsumerWidget {
     return Row(
       spacing: 5,
       children: [
-        const Icon(Icons.location_on_outlined,
-            size: 20, color: Colors.blueGrey),
+        const Icon(Icons.straighten, size: 20, color: Color(0xFF667085)),
         Text(
           distanceState,
           style: const TextStyle(
             fontSize: 12,
-            color: Colors.blueGrey,
+            color: Color(0xFF667085),
           ),
         ),
         Container(
