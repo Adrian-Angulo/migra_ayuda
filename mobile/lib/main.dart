@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:migra_ayuda/core/config/loadToken.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/database/sembast_database.dart';
 import 'package:migra_ayuda/core/router/app_router.dart';
 import 'package:migra_ayuda/core/router/app_router_mobile.dart';
 import 'package:migra_ayuda/core/sync/sync_provider.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_sync_provider.dart';
-import 'package:migra_ayuda/features/reviews/presentation/providers/review_sync_provider.dart';
 import 'package:migra_ayuda/features/language/presentation/providers/language_provider.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 import 'core/config/firebase_options.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,9 +22,11 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await Loadtoken.setup(); //preparar token de mapa
 
   // Inicializa Sembast Database
   if (!kIsWeb) {
+    
     try {
       final sembastDb = SembastDatabase.instance;
       await sembastDb.database;

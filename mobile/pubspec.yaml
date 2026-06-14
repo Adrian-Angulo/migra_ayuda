@@ -41,6 +41,8 @@ dependencies:
   flutter_native_splash: ^2.4.7
   data_table_2: ^2.7.2
   fpdart: ^1.2.0
+  mapbox_maps_flutter: ^2.25.0
+  flutter_dotenv: ^6.0.1
 
 
 dev_dependencies:
@@ -55,3 +57,4 @@ flutter:
    - assets/logo/
    - assets/icons/
    - assets/onboarding/
+   - .env

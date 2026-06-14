@@ -19,7 +19,7 @@ class TextResult extends ConsumerWidget {
               color: Theme.of(context).colorScheme.primary,
             ),
             Text(
-              '${entidades.length} entidad${entidades.length > 1 ? 'es' : ''} cerca de ti',
+              '${entidades.length} ${entidades.length == 1 ? 'entidad encontrada' : 'entidades encontradas'}',
               textAlign: TextAlign.left,
             ),
           ],
