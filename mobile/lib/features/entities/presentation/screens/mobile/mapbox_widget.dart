@@ -6,8 +6,6 @@ class MapboxWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(children: [
-      const MapWidget()
-      ]);
+    return Stack(children: [const MapWidget()]);
   }
 }
