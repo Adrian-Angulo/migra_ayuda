@@ -11,19 +11,13 @@ import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widget
 
 import 'widgets/homeCardWidgets/entity_card_widget.dart';
 
-class HomeCardScreen extends ConsumerStatefulWidget {
-  const HomeCardScreen({super.key});
+class HomeCardScreen extends StatelessWidget {
+  HomeCardScreen({super.key});
 
-  @override
-  ConsumerState<HomeCardScreen> createState() => _HomeCardScreenState();
-}
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-class _HomeCardScreenState extends ConsumerState<HomeCardScreen> {
   @override
   Widget build(BuildContext context) {
-    String selectedFiltro = ref.watch(seletedFilterProvider);
-    final lista = ref.watch(listaEntidades);
-    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
         backgroundColor: ColorConstants.background,
         appBar: AppBar(
@@ -42,7 +36,16 @@ class _HomeCardScreenState extends ConsumerState<HomeCardScreen> {
         ),
         key: scaffoldKey,
         endDrawer: const AppDrawer(),
-        body: const MapboxWidget());
+        body: const Column(
+          children: [
+            FilterContainer(),
+            Expanded(
+              child: MapboxWidget(
+                key: ValueKey('mapbox_main'),
+              ),
+            ),
+          ],
+        ));
   }
 }
 

@@ -67,7 +67,7 @@ final routerMobile = Provider<GoRouter>(
         ),
         GoRoute(
             path: Routes.home,
-            builder: (context, state) => const HomeCardScreen()),
+            builder: (context, state) =>  HomeCardScreen()),
         GoRoute(
           path: Routes.completeProfile,
           builder: (context, state) => const CompleteInfoScreen(),
