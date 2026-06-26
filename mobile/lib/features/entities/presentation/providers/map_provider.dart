@@ -13,6 +13,7 @@ class MapNotifier extends StateNotifier<MapState> {
       _pointAnnotationManager; // 👈 Nuevo: gestor de marcadores
 
   void setMapController(MapboxMap? controller) {
+    
     if (controller == null) return;
     _mapboxMap = controller;
 
@@ -37,9 +38,9 @@ class MapNotifier extends StateNotifier<MapState> {
     _mapboxMap!.location.updateSettings(LocationComponentSettings(
         enabled: true, pulsingEnabled: true, puckBearingEnabled: true));
 
-    // 📍 Lista de ejemplo con 3 ubicaciones
-
-    addMarkers(listaEntityFake);
+    /* // 📍 Lista de ejemplo con 3 ubicaciones
+    
+    addMarkers(listaEntityFake); */
 
     state = state.copyWith(isMapReady: true, hasMarkers: false);
   }

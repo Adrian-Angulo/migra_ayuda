@@ -11,13 +11,15 @@ import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widget
 
 import 'widgets/homeCardWidgets/entity_card_widget.dart';
 
-class HomeCardScreen extends StatelessWidget {
+class HomeCardScreen extends ConsumerWidget {
   HomeCardScreen({super.key});
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    String selectedFiltro = ref.watch(seletedFilterProvider);
+    final lista = ref.watch(listaEntidades);
     return Scaffold(
         backgroundColor: ColorConstants.background,
         appBar: AppBar(
@@ -44,6 +46,7 @@ class HomeCardScreen extends StatelessWidget {
                 key: ValueKey('mapbox_main'),
               ),
             ),
+            
           ],
         ));
   }
@@ -68,7 +71,7 @@ class MenuCard extends StatelessWidget {
       children: [
         //filtros---------------------------------
         const FilterContainer(),
-        SizedBox(
+        const SizedBox(
           height: 8,
         ),
         //Texto cantidad de entidades----------------------
