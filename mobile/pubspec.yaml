@@ -58,3 +58,4 @@ flutter:
    - assets/icons/
    - assets/onboarding/
    - .env
+   - assets/
