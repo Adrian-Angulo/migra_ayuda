@@ -1,45 +1,22 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    // Use IntelliSense para saber los atributos posibles.
+    // Mantenga el puntero para ver las descripciones de los existentes atributos.
+    // Para más información, visite: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "mobile",
-            "cwd": "mobile",
+            "name": "migra_ayuda",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "mobile (profile mode)",
-            "cwd": "mobile",
+            "name": "migra_ayuda (profile mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "mobile (release mode)",
-            "cwd": "mobile",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
-        },
-        {
-            "name": "web_admin",
-            "cwd": "web_admin",
-            "request": "launch",
-            "type": "dart"
-        },
-        {
-            "name": "web_admin (profile mode)",
-            "cwd": "web_admin",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "profile"
-        },
-        {
-            "name": "web_admin (release mode)",
-            "cwd": "web_admin",
+            "name": "migra_ayuda (release mode)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
