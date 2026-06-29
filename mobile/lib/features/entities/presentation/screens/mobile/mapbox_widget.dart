@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:migra_ayuda/core/providers/location_provider.dart';
+import 'package:migra_ayuda/core/services/google_maps/google_maps_controllers.dart';
 import 'package:migra_ayuda/core/services/mapServices/map_services.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/filter_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/map_provider.dart';
@@ -217,7 +218,16 @@ class _ListEntitesHomeState extends ConsumerState<ListEntitesHome> {
                                 variant: FloatingMainButtonVariant.secondary,
                               ),
                               FloatingMainButton(
-                                onTap: () async {},
+                                onTap: () async {
+                                  ref
+                                      .read(starNavigationNotifierProvider
+                                          .notifier)
+                                      .starNavigation(
+                                          map.selectEntity!.localitation
+                                              .latitude,
+                                          map.selectEntity!.localitation
+                                              .longitude);
+                                },
                                 text: 'Iniciar viaje',
                                 icon: Icons.navigation,
                                 variant: FloatingMainButtonVariant.primary,
@@ -245,7 +255,7 @@ class _ListEntitesHomeState extends ConsumerState<ListEntitesHome> {
                             //volver a la altura iniciar
                             controllerD?.animateTo(
                               0.3,
-                              duration: const Duration(milliseconds: 300),
+                              duration: const Duration(milliseconds: 500),
                               curve: Curves.easeInOut,
                             );
                           },
