@@ -4,6 +4,7 @@ import 'package:migra_ayuda/core/services/google_maps/google_maps_controllers.da
 import 'package:migra_ayuda/core/widgets/app_bar_widget.dart';
 import 'package:migra_ayuda/core/widgets/snackbar_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/map_provider.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/floating_main_button.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/place_details_header.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/place_details_info.dart';
@@ -55,7 +56,7 @@ class PlaceDetails extends ConsumerWidget {
             const SizedBox(height: 28),
 
             // Sección de comentarios
-            SectionReviews(entity: entity, user: user!),
+            SectionReviews(entity: entity),
             const SizedBox(height: 80),
           ],
         ),
@@ -65,12 +66,10 @@ class PlaceDetails extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: FloatingMainButton(
           onTap: () async {
-            await ref
-                .read(starNavigationNotifierProvider.notifier)
-                .starNavigation(entity.localitation.latitude,
-                    entity.localitation.longitude);
+            ref.read(mapProvider.notifier).drawRouteToEntity(entity);
+            Navigator.pop(context);
           },
-          text: asyncStarNavigation.isLoading ? 'Cargando....' : 'Como llegar',
+          text: 'Como llegar',
           icon: Icons.directions,
         ),
       ),

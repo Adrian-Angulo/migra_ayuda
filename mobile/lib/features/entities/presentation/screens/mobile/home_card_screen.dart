@@ -18,10 +18,7 @@ class HomeCardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    String selectedFiltro = ref.watch(seletedFilterProvider);
-    final lista = ref.watch(listaEntidades);
     return Scaffold(
-        backgroundColor: ColorConstants.background,
         appBar: AppBar(
           title: const Text("Explorar servicios"),
           actions: [
@@ -46,7 +43,6 @@ class HomeCardScreen extends ConsumerWidget {
                 key: ValueKey('mapbox_main'),
               ),
             ),
-            
           ],
         ));
   }

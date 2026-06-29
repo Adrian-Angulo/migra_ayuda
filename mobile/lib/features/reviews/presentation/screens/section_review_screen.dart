@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 import 'package:migra_ayuda/features/reviews/presentation/screens/place_add_review.dart';
@@ -10,11 +11,11 @@ class SectionReviews extends ConsumerStatefulWidget {
   const SectionReviews({
     super.key,
     required this.entity,
-    required this.user,
+    
   });
 
   final EntityEntity entity;
-  final UserModel user;
+
 
   @override
   ConsumerState<SectionReviews> createState() => _SectionReviewsState();
@@ -24,7 +25,9 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
   @override
   Widget build(BuildContext context) {
     final asyncReviews = ref.watch(getReviewsByEntity(widget.entity.id));
-    
+    final authState = ref.watch(authNotifierProvider);
+    final user = authState.value;
+
     final int countReviews = asyncReviews.value?.length ?? 0;
 
     return Column(
@@ -49,7 +52,7 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
                   MaterialPageRoute(
                     builder: (context) => PlaceAddReview(
                       entity: widget.entity,
-                      user: widget.user,
+                      user: user,
                     ),
                   ),
                 );
@@ -67,7 +70,7 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
         ),
         asyncReviews.when(
           data: (reviews) {
-            return reviews.isEmpty ? messageEmty() : containerReviews(reviews);
+            return reviews.isEmpty ? messageEmty() : containerReviews(reviews, user!);
           },
           error: (error, stackTrace) {
             print("error al llamar reviews: $error");
@@ -82,7 +85,7 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
     );
   }
 
-  ListView containerReviews(reviews) {
+  ListView containerReviews(reviews, UserModel user ) {
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -94,7 +97,7 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
       itemBuilder: (_, i) => ReviewItem(
         review: reviews[i],
         entity: widget.entity,
-        user: widget.user,
+        user: user,
       ),
     );
   }

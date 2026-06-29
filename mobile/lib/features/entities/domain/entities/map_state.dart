@@ -22,12 +22,16 @@ class MapState {
     CameraState? cameraState,
     bool? hasMarkers,
     EntityEntity? selectEntity,
+    bool clearSelectEntity = false, // 🆕 Flag para limpiar la entidad
   }) =>
       MapState(
         isMapReady: isMapReady ?? this.isMapReady,
         isTracking: isTracking ?? this.isTracking,
         cameraState: cameraState ?? this.cameraState,
         hasMarkers: hasMarkers ?? this.hasMarkers,
-        selectEntity: selectEntity,
+        selectEntity: clearSelectEntity
+            ? null
+            : (selectEntity ??
+                this.selectEntity), // Si clearSelectEntity=true, poner null
       );
 }

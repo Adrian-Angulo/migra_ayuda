@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:migra_ayuda/core/constants/list_fake.dart';
+import 'package:migra_ayuda/core/services/mapServices/map_services.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/map_state.dart';
 
@@ -12,8 +14,13 @@ class MapNotifier extends StateNotifier<MapState> {
   PointAnnotationManager?
       _pointAnnotationManager; // 👈 Nuevo: gestor de marcadores
 
-  void setMapController(MapboxMap? controller) {
-    
+  PolylineAnnotationManager? _polylineAnnotationManager; // para dibujar rutas
+
+  void selectEntity(EntityEntity entity) {
+    state = state.copyWith(selectEntity: entity);
+  }
+
+  Future<void> setMapController(MapboxMap? controller) async {
     if (controller == null) return;
     _mapboxMap = controller;
 
@@ -38,9 +45,8 @@ class MapNotifier extends StateNotifier<MapState> {
     _mapboxMap!.location.updateSettings(LocationComponentSettings(
         enabled: true, pulsingEnabled: true, puckBearingEnabled: true));
 
-    /* // 📍 Lista de ejemplo con 3 ubicaciones
-    
-    addMarkers(listaEntityFake); */
+    _polylineAnnotationManager =
+        await _mapboxMap!.annotations.createPolylineAnnotationManager();
 
     state = state.copyWith(isMapReady: true, hasMarkers: false);
   }
@@ -71,6 +77,12 @@ class MapNotifier extends StateNotifier<MapState> {
     _moveCamera(gpsPosition);
   }
 
+  /// 🆕 Limpiar la entidad seleccionada (resetear a null)
+  void clearSelectEntity() {
+    state = state.copyWith(clearSelectEntity: true);
+    print("✅ Entidad deseleccionada");
+  }
+
   /// 📍 Agrega marcadores al mapa desde una lista de ubicaciones
   Future<void> addMarkers(List<EntityEntity> entities) async {
     if (_mapboxMap == null) {
@@ -98,11 +110,16 @@ class MapNotifier extends StateNotifier<MapState> {
 
       _pointAnnotationManager?.tapEvents(
         onTap: (PointAnnotation anotation) {
-          final getEntity = entities.firstWhere(
-            (entity) => entity.name == anotation.textField,
-            orElse: () => entities.first,
-          );
-          state = state.copyWith(selectEntity: getEntity);
+          // Buscar la entidad que coincida con el texto del marcador
+          try {
+            final getEntity = entities.firstWhere(
+              (entity) => entity.name == anotation.textField,
+            );
+            state = state.copyWith(selectEntity: getEntity);
+          } catch (e) {
+            print(
+                "⚠️ No se encontró la entidad para el marcador: ${anotation.textField}");
+          }
         },
       );
       _createAnnotations(entities);
@@ -122,7 +139,9 @@ class MapNotifier extends StateNotifier<MapState> {
             ),
           ),
           // 🎨 Icono del marcador (puedes cambiarlo)
-          iconImage: state.selectEntity == entity ? "pin" : "mapbox_custom_marker"  , // Icono predeterminado de Mapbox
+          iconImage: state.selectEntity == entity
+              ? "pin"
+              : "mapbox_custom_marker", // Icono predeterminado de Mapbox
           iconSize: 0.1,
           iconAnchor: IconAnchor.BOTTOM,
           // 📝 Texto opcional (aparece al hacer clic)
@@ -143,9 +162,59 @@ class MapNotifier extends StateNotifier<MapState> {
     final targetPoint = Point(coordinates: gpsPosition);
 
     _mapboxMap!.easeTo(
-      CameraOptions(center: targetPoint, zoom: 12.5),
+      CameraOptions(center: targetPoint),
       MapAnimationOptions(duration: 1500),
     );
+  }
+
+  /// 🗺️ Dibujar ruta desde ubicación actual hasta una entidad
+  Future<void> drawRouteToEntity(EntityEntity entity) async {
+    if (_mapboxMap == null ||
+        _polylineAnnotationManager == null ||
+        _lastKnownPosition == null) {
+      print("⚠️ Mapa o ubicación no disponible");
+      return;
+    }
+
+    try {
+      // Obtener puntos de la ruta usando el servicio
+      final routePoints = await MapServices.fetchRoutePoints(
+        originLng: _lastKnownPosition!.lng.toDouble(),
+        originLat: _lastKnownPosition!.lat.toDouble(),
+        destLng: entity.localitation.longitude,
+        destLat: entity.localitation.latitude,
+      );
+
+      if (routePoints.isEmpty) {
+        print("⚠️ No se encontró ruta disponible");
+        return;
+      }
+
+      // Limpiar rutas anteriores
+      await _polylineAnnotationManager!.deleteAll();
+
+      // Crear la polilínea
+      final polylineOptions = PolylineAnnotationOptions(
+        geometry: LineString(coordinates: routePoints),
+        lineColor: Colors.blueAccent.value,
+        lineWidth: 5.0,
+        lineJoin: LineJoin.ROUND,
+      );
+
+      // Dibujar en el mapa
+      await _polylineAnnotationManager!.create(polylineOptions);
+
+      print("✅ Ruta dibujada con ${routePoints.length} puntos");
+    } catch (e) {
+      print("❌ Error al trazar ruta: $e");
+    }
+  }
+
+  /// 🧹 Limpiar ruta del mapa
+  Future<void> clearRoute() async {
+    if (_polylineAnnotationManager != null) {
+      await _polylineAnnotationManager!.deleteAll();
+    }
   }
 }
 
