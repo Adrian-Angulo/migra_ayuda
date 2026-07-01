@@ -11,7 +11,6 @@ class TextFieldWidget extends StatefulWidget {
     super.key,
     required this.title,
     required this.hintText,
-
     required this.controller,
     this.validator,
   });
@@ -27,18 +26,19 @@ class _TextFieldWidgetState extends State<TextFieldWidget> {
       spacing: 5,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget.title),
+        Text(
+          widget.title,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         TextFormField(
           controller: widget.controller,
-          validator:
-              widget.validator ??
+          validator: widget.validator ??
               (value) {
                 if (value == null || value.isEmpty) {
                   return 'Este campo es requerido';
                 }
                 return null;
               },
-
           decoration: InputDecoration(
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             hintText: widget.hintText,

@@ -3,7 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:migra_ayuda/core/router/routes.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/mobile/auth_page.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/dropdown_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_numeric_widget.dart';
@@ -55,7 +55,7 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
               Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const AuthPage(),
+                    builder: (context) => const LoginScreen(),
                   ));
             }
             if (usu!.profileComplete) {

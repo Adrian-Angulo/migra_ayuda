@@ -27,7 +27,10 @@ class _TextFieldNumericWidgetState extends State<TextFieldNumericWidget> {
       spacing: 5,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget.title),
+        Text(
+          widget.title,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         TextFormField(
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],

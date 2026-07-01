@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/router/app_router_mobile.dart';
 import 'package:migra_ayuda/features/language/data/datasources/language_local_datasource.dart';
 import 'package:migra_ayuda/features/language/data/datasources/language_local_datasource_impl.dart';
 import 'package:migra_ayuda/features/language/data/repositories/language_repository_impl.dart';
@@ -30,8 +31,10 @@ class LanguageNotifier extends AsyncNotifier<Locale?> {
     try {
       await repository.saveLanguage(languageCode);
       state = AsyncData(Locale(languageCode));
+      ref.read(routerMovilNotifierProvider).refresh();
     } catch (e, st) {
       state = AsyncError(e, st);
+      ref.read(routerMovilNotifierProvider).refresh();
     }
   }
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:migra_ayuda/core/router/app_router_mobile.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:migra_ayuda/features/onboarding/data/repositories/onboarding_repository_impl.dart';
 import 'package:migra_ayuda/features/onboarding/domain/repositories/onboarding_repository.dart';
@@ -28,8 +29,10 @@ class OnboardingNotifier extends AsyncNotifier<bool> {
     try {
       await repository.completeOnboarding();
       state = const AsyncValue.data(true);
+      ref.read(routerMovilNotifierProvider).refresh();
     } catch (e, st) {
       state = AsyncValue.error(e, st);
+      ref.read(routerMovilNotifierProvider).refresh();
     }
   }
 }

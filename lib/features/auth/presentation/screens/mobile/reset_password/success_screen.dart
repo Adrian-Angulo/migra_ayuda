@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/mobile/auth_page.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_screen.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class SuccessScreen extends StatelessWidget {
@@ -99,7 +99,7 @@ class SuccessScreen extends StatelessWidget {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const AuthPage(),
+                        builder: (context) => const LoginScreen(),
                       ));
                 },
                 child: Text(

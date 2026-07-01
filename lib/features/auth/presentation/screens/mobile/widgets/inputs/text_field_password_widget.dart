@@ -44,7 +44,10 @@ class _TextFieldPaswordWidgetState extends State<TextFieldPaswordWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget.title),
+        Text(
+          widget.title,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 5),
         TextFormField(
           controller: widget.controller,

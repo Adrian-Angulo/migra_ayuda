@@ -27,13 +27,13 @@ void main() async {
   // Inicializa Sembast Database
   if (!kIsWeb) {
     
-    try {
+/*    try {
       final sembastDb = SembastDatabase.instance;
       await sembastDb.database;
       print('✅ Sembast Database inicializada correctamente');
     } catch (e) {
       print('❌ Error al inicializar Sembast Database: $e');
-    }
+    }  */
   }
 
   runApp(const ProviderScope(child: MainApp()));
@@ -50,9 +50,9 @@ class _MainAppState extends ConsumerState<MainApp> {
   @override
   void initState() {
     super.initState();
-    if (!kIsWeb) {
+/*     if (!kIsWeb) {
       // Inicializar sync después del primer frame
-      Future.microtask(() async {
+       Future.microtask(() async {
         final syncService = ref.read(syncServiceProvider);
 
         try {
@@ -65,8 +65,8 @@ class _MainAppState extends ConsumerState<MainApp> {
         // Inicializar sincronización automática
         ref.read(entitySyncInitializerProvider);
         /* ref.read(reviewSyncInitializerProvider); */
-      });
-    }
+      }); 
+    } */
   }
 
   @override
