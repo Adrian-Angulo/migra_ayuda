@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/drawer/app_drawer.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/filter_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/get_all_entites_notifier.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/mapbox_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/filter_container.dart';
@@ -20,7 +19,10 @@ class HomeCardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Explorar servicios"),
+          title: Image.asset(
+            "assets/logo/MigraAyuda.png",
+            width: 180,
+          ),
           actions: [
             IconButton(
               icon: const CircleAvatar(

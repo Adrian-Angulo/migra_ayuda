@@ -356,7 +356,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         await ref.read(registerProvider.notifier).registerUser(
                             UserModel(
                                 name: _nameController.text,
-                                lastname: "",
                                 email: _emailController.text,
                                 password: _passwordController.text,
                                 age: _ageController.text,

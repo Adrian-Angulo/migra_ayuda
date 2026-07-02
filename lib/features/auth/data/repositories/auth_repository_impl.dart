@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -127,7 +125,7 @@ class AuthRepositoryImpl implements AuthRepository {
         final newUser = UserModel(
           id: uid,
           name: credential.user!.displayName ?? 'Usuario',
-          lastname: '',
+          
           email: credential.user!.email ?? '',
           password: '',
           role: 'Migrante', // Asignar rol por defecto

@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class UserModel {
   final String id;
   final String name;
-  final String lastname;
   final String? originCountry;
   final String? destinationCountry;
   final String email;
@@ -16,7 +15,6 @@ class UserModel {
   UserModel({
     this.id = '',
     required this.name,
-    required this.lastname,
     this.originCountry,
     this.destinationCountry,
     required this.email,
@@ -29,7 +27,6 @@ class UserModel {
   Map<String, dynamic> toMap() {
     return {
       'name': name,
-      'lastname': lastname,
       'originCountry': originCountry,
       'destinationCountry': destinationCountry,
       'email': email,
@@ -45,7 +42,6 @@ class UserModel {
     return UserModel(
       id: doc.id,
       name: data['name'] ?? 'No data',
-      lastname: data['lastname'] ?? 'No data',
       originCountry: data['originCountry'],
       destinationCountry: data['destinationCountry'],
       email: data['email'] ?? 'No data',
