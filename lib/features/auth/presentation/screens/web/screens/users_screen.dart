@@ -2,8 +2,13 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
+import 'package:migra_ayuda/core/dataTable/widgets/build_header_cell.dart';
+import 'package:migra_ayuda/core/dataTable/widgets/build_table.dart';
 import 'package:migra_ayuda/features/auth/domain/entites/users_datatable.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/datatable_providers.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/button_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/web/widgets/register_admin_dialog.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/add_button_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/export_button_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/filter_button.dart';
@@ -14,7 +19,6 @@ class UsersScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final usersState = ref.watch(usersFilterProvider);
-    
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -22,23 +26,33 @@ class UsersScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
+              const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Entidades",
+                    "Usuarios",
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text("Gestiona las entidades registradas en el sistema")
+                  Text("Gestiona los usuarios registradas en el sistema")
                 ],
               ),
-              AddButtonWidget(text: "Registrar entidad"),
+              AddButtonWidget(
+                text: "Registrar Administrador",
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return const RegisterAdminDialog();
+                    },
+                  );
+                },
+              ),
             ],
           ),
           const SizedBox(
@@ -52,9 +66,11 @@ class UsersScreen extends ConsumerWidget {
                 SizedBox(
                   width: 450,
                   child: TextField(
-                    onChanged: (value) => ref.read(queryUserProvider.notifier).state = value.toLowerCase().trim(),
+                    onChanged: (value) => ref
+                        .read(queryUserProvider.notifier)
+                        .state = value.toLowerCase().trim(),
                     decoration: InputDecoration(
-                      hintText: 'Buscar entidad...',
+                      hintText: 'Usuario ...',
                       hintStyle: TextStyle(
                         color: Colors.grey.shade500,
                         fontSize: 14,
@@ -106,15 +122,14 @@ class UsersScreen extends ConsumerWidget {
                 Row(
                   children: [
                     SizedBox(
-                      width: 150,
+                      width: 200,
                       child: FilterButton(
                         label: 'Filtrar',
-                        value: 'Activo',
+                        value: 'Todos',
                         options: const [
                           'Todos',
-                          'Activo',
-                          'Inactivo',
-                          'Pendiente'
+                          'Migrante',
+                          'Administrador',
                         ],
                         onChanged: (String? value) {},
                       ),
@@ -131,53 +146,38 @@ class UsersScreen extends ConsumerWidget {
           ),
           usersState.when(
             data: (users) {
-              final datos = UsersDatatable(listUsers: users);
-              if (users.isNotEmpty) {
-                return Expanded(
-                  child: PaginatedDataTable2(
-                      border: TableBorder.all(width: 1),
-                      minWidth: 600,
-                      rowsPerPage: 10,
-                      columns: const [
-                        DataColumn2(label: Text('Nombre'), size: ColumnSize.M),
-                        DataColumn2(label: Text('Correo'), size: ColumnSize.L),
-                        DataColumn2(label: Text('Origen'), size: ColumnSize.M),
-                      ],
-                      source: datos),
-                );
-              } else {
-                return Expanded(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.inbox_rounded,
-                          size: 64,
-                          color: Colors.grey.shade400,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'No hay usuarios registrados',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey.shade600,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Aún no se han registrado usuarios en el sistema.',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey.shade500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }
+              final rows = UsersDatatable(listUsers: users);
+
+              return BuildTable(
+                rows: rows,
+                columns: [
+                  DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('ID'),
+                      fixedWidth: 30),
+                  DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('Nombre'),
+                      size: ColumnSize.M),
+                  DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('Correo'),
+                      size: ColumnSize.L),
+                  DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('Rol'),
+                      size: ColumnSize.S),
+                  DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('Edad'),
+                      size: ColumnSize.S),
+                  DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('País de origen'),
+                      size: ColumnSize.M),
+                  DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('País de destino'),
+                      size: ColumnSize.M),
+                  DataColumn2(
+                      label:
+                          DataTableUtils.buildHeaderCell('Fecha de registro'),
+                      size: ColumnSize.S),
+                ],
+              );
             },
             error: (error, stackTrace) {
               return Text('Error $error');
@@ -191,3 +191,4 @@ class UsersScreen extends ConsumerWidget {
     );
   }
 }
+

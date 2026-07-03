@@ -13,7 +13,7 @@ class ExportButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: 100,
-      height: 48,
+      height: 38,
       child: ElevatedButton.icon(
         onPressed: onPressed,
         icon: const Icon(Icons.download, size: 18),

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/widgets.dart';
+
 
 class AddButtonWidget extends StatelessWidget {
   final String text;
+  final VoidCallback onTap;
 
   const AddButtonWidget({
     super.key,
     required this.text,
+    required this.onTap,
   });
 
   @override
@@ -14,10 +16,7 @@ class AddButtonWidget extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {
-          showDialog(
-              context: context, builder: (context) => const AddEntityModal());
-        },
+        onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Ink(
           decoration: BoxDecoration(

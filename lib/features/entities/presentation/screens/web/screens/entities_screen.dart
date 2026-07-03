@@ -21,10 +21,10 @@ class EntitiesScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
+              const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -37,7 +37,14 @@ class EntitiesScreen extends ConsumerWidget {
                   Text("Gestiona las entidades registradas en el sistema")
                 ],
               ),
-              AddButtonWidget(text: "Registrar entidad"),
+              AddButtonWidget(
+                text: "Registrar entidad",
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) => const AddEntityModal());
+                },
+              ),
             ],
           ),
           const SizedBox(

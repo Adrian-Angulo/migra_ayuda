@@ -1,7 +1,6 @@
 import 'package:timeago/timeago.dart' as timeago;
 
 class TimeFormatter {
-
   TimeFormatter._();
   static String formatDate(DateTime date) {
     final now = DateTime.now();
@@ -12,5 +11,9 @@ class TimeFormatter {
     } else {
       return "${date.day}/${date.month}/${date.year}";
     }
+  }
+
+  static String formatShortDate(DateTime date) {
+    return "${date.day}/${date.month}/${date.year}";
   }
 }

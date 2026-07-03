@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/tabla_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/export_button_widget.dart';
 
 class ReviewsScreen extends ConsumerWidget {
@@ -9,7 +8,7 @@ class ReviewsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final seletedService = ref.watch(seletedServiceProvider);
+    
 
     return Padding(
       padding: const EdgeInsets.symmetric(

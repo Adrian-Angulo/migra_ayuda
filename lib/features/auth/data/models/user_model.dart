@@ -24,6 +24,7 @@ class UserModel {
     this.profileComplete = false,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
+
   Map<String, dynamic> toMap() {
     return {
       'name': name,
@@ -41,23 +42,43 @@ class UserModel {
     final data = doc.data() as Map<String, dynamic>;
     return UserModel(
       id: doc.id,
-      name: data['name'] ?? 'No data',
-      originCountry: data['originCountry'],
-      destinationCountry: data['destinationCountry'],
-      email: data['email'] ?? 'No data',
-      age: data['age'] ?? "No data",
+      name: data['name'] ?? '-',
+      originCountry: data['originCountry'] ?? '-',
+      destinationCountry: data['destinationCountry'] ?? '-',
+      email: data['email'] ?? '-',
+      age: data['age'] ?? "-",
       password: data['password'] ?? '',
       role: data['role'] ?? 'Migrante',
       profileComplete: data['profileComplete'] ?? false,
-      createdAt: _parseDate(data['registrationDate']),
+      // Intenta leer primero 'createdAt', luego 'registrationDate' como fallback
+      createdAt: _parseDate(data['createdAt']),
     );
   }
 
   static DateTime _parseDate(dynamic value) {
-    if (value == null) return DateTime.now();
-    if (value is Timestamp) return value.toDate();
-    if (value is String) return DateTime.tryParse(value) ?? DateTime.now();
+    // Si el valor es null, retornar fecha actual
+    if (value == null) {
+      print('⚠️  [UserModel] Campo de fecha es null, usando fecha actual');
+      return DateTime.now();
+    }
 
+    // Si es un Timestamp de Firestore, convertirlo a DateTime
+    if (value is Timestamp) {
+      return value.toDate();
+    }
+
+    // Si es un String ISO8601, parsearlo
+    if (value is String) {
+      final parsed = DateTime.tryParse(value);
+      if (parsed != null) {
+        return parsed;
+      } else {
+        print('⚠️  [UserModel] No se pudo parsear la fecha: $value');
+        return DateTime.now();
+      }
+    }
+
+    print('⚠️  [UserModel] Tipo de fecha desconocido: ${value.runtimeType}');
     return DateTime.now();
   }
 }

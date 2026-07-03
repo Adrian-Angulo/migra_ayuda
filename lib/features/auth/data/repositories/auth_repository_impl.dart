@@ -89,7 +89,6 @@ class AuthRepositoryImpl implements AuthRepository {
       final newUser = UserModel(
         id: uid,
         name: credential.user!.displayName ?? 'Usuario',
-
         email: credential.user!.email ?? '',
         password: '',
         role: 'Migrante', // Asignar rol por defecto
