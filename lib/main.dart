@@ -22,19 +22,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await Loadtoken.setup(); //preparar token de mapa
+  if(!kIsWeb){
 
-  // Inicializa Sembast Database
-  if (!kIsWeb) {
-    
-/*    try {
-      final sembastDb = SembastDatabase.instance;
-      await sembastDb.database;
-      print('✅ Sembast Database inicializada correctamente');
-    } catch (e) {
-      print('❌ Error al inicializar Sembast Database: $e');
-    }  */
+    await Loadtoken.setup(); //preparar token de mapa
   }
+
+
 
   runApp(const ProviderScope(child: MainApp()));
 }
@@ -47,27 +40,7 @@ class MainApp extends ConsumerStatefulWidget {
 }
 
 class _MainAppState extends ConsumerState<MainApp> {
-  @override
-  void initState() {
-    super.initState();
-/*     if (!kIsWeb) {
-      // Inicializar sync después del primer frame
-       Future.microtask(() async {
-        final syncService = ref.read(syncServiceProvider);
 
-        try {
-          await syncService.initialize();
-          print('✅ SyncService inicializado correctamente');
-        } catch (e) {
-          print('❌ Error al inicializar SyncService: $e');
-        }
-
-        // Inicializar sincronización automática
-        ref.read(entitySyncInitializerProvider);
-        /* ref.read(reviewSyncInitializerProvider); */
-      }); 
-    } */
-  }
 
   @override
   Widget build(BuildContext context) {

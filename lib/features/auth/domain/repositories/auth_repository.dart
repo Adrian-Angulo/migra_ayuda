@@ -1,24 +1,21 @@
-import 'package:dartz/dartz.dart';
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
-import 'package:migra_ayuda/core/errors/failures.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 
 abstract class AuthRepository {
-  Future<Either<Failure, Unit>> registerUser(UserModel user);
-  Future<Either<Failure, firebase_auth.UserCredential>> authWithGoogle();
-  Future<Either<Failure, firebase_auth.User>> login(
-      String email, String password);
-  Future<Either<Failure, Unit>> logout();
-  Future<Either<Failure, firebase_auth.User>> getAuthenticatedUser();
-  Future<Either<Failure, UserModel>> getUserData(String uid);
-  Future<Either<Failure, Unit>> resetPassword(String email);
-  Future<Either<Failure, Unit>> completeProfile({
+  Future<void> registerUser(UserModel user);
+  Future<UserCredential> authWithGoogle();
+  Future<User> login(String email, String password);
+  Future<void> logout();
+  Future<User?> getAuthenticatedUser();
+  Future<UserModel> getUserData(String uid);
+  Future<void> resetPassword(String email);
+  Future<void> completeProfile({
     required String originCountry,
     required String destinationCountry,
     required int age,
   });
-  Future<Either<Failure, UserModel>> verifyOrCreateGoogleUser(
-      firebase_auth.UserCredential credential);
+  Future<UserModel> verifyOrCreateGoogleUser(UserCredential credential);
 
   Stream<UserModel?> authStateChanges();
+  Future<List<UserModel>> getAllUsers();
 }

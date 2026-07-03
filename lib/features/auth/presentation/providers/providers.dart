@@ -1,67 +1,39 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
-import 'package:migra_ayuda/features/auth/domain/useCases/auth_con_google_use_case.dart';
-import 'package:migra_ayuda/features/auth/domain/useCases/cerrar_sesion_use_case.dart';
-import 'package:migra_ayuda/features/auth/domain/useCases/completar_perfil_use_case.dart';
-import 'package:migra_ayuda/features/auth/domain/useCases/iniciar_sesion_use_case.dart';
-import 'package:migra_ayuda/features/auth/domain/useCases/registrar_usuario_use_case.dart';
-import 'package:migra_ayuda/features/auth/domain/useCases/restablecer_contrasena_use_case.dart';
-import 'package:migra_ayuda/features/auth/domain/useCases/usuario_autenticado_use_case.dart';
 
+/// Provider del repositorio de autenticación
+///
+/// Este es el único provider necesario para acceder a todas las
+/// funcionalidades de autenticación.
 final repositoryProvider =
     Provider<AuthRepository>((ref) => AuthRepositoryImpl());
 
-final registerUserUseCaseProvider = Provider<RegisterUserUseCase>(
-  (ref) {
-    final repo = ref.read(repositoryProvider);
-    return RegisterUserUseCase(repo);
-  },
-);
-
-final getAuthenticatedUserProvider = Provider<GetAuthenticatedUserUseCase>(
-  (ref) {
-    final repo = ref.read(repositoryProvider);
-    return GetAuthenticatedUserUseCase(repo);
-  },
-);
-
-final loginProvider = Provider<LoginUseCase>(
-  (ref) {
-    final repo = ref.read(repositoryProvider);
-    return LoginUseCase(repo);
-  },
-);
-
-final logoutProvider = Provider<LogoutUseCase>(
-  (ref) {
-    final repo = ref.read(repositoryProvider);
-    return LogoutUseCase(repo);
-  },
-);
-
-final authWithGoogleProvider = Provider<AuthWithGoogleUseCase>(
-  (ref) {
-    final repo = ref.read(repositoryProvider);
-    return AuthWithGoogleUseCase(repo);
-  },
-);
-
-final completeProfileProvider = Provider<CompleteProfileUseCase>(
-  (ref) {
-    final repo = ref.read(repositoryProvider);
-    return CompleteProfileUseCase(repo);
-  },
-);
-
-final resetPasswordProviderUseCase = Provider<ResetPasswordUseCase>(
-  (ref) {
-    final repo = ref.read(repositoryProvider);
-    return ResetPasswordUseCase(repo);
-  },
-);
-
+/// Provider del stream de cambios de estado de autenticación
+///
+/// Este provider observa en tiempo real los cambios de sesión del usuario
+/// (login, logout, cambios en Firestore, etc.)
 final authStateProvider = StreamProvider<UserModel?>((ref) {
   return ref.read(repositoryProvider).authStateChanges();
 });
+
+class UsersNotifier extends AsyncNotifier<List<UserModel>> {
+  @override
+  Future<List<UserModel>> build() {
+    return ref.read(repositoryProvider).getAllUsers();
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(
+      () => ref.read(repositoryProvider).getAllUsers(),
+    );
+  }
+}
+
+final usersNotifierProvider =
+    AsyncNotifierProvider.autoDispose<UsersNotifier, List<UserModel>>(
+        UsersNotifier.new);

@@ -1,93 +1,86 @@
-import 'dart:async';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/core/router/app_router_mobile.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 
 class AuthNotifier extends AsyncNotifier<UserModel?> {
   @override
   Future<UserModel?> build() async {
-    final result = await ref.read(getAuthenticatedUserProvider).call();
-    return result.fold(
-      (failure) => null,
-      (user) => user,
-    );
+    try {
+      final repository = ref.read(repositoryProvider);
+      final user = await repository.getAuthenticatedUser();
+      
+      if (user == null) return null;
+      
+      // Obtener los datos completos del usuario
+      final userData = await repository.getUserData(user.uid);
+      return userData;
+    } catch (e) {
+      print('❌ Error al construir AuthNotifier: $e');
+      return null;
+    }
   }
 
   Future<void> login(String email, String password) async {
     state = const AsyncValue.loading();
-    ref.read(routerMovilNotifierProvider).refresh();
-    final loginResult = await ref.read(loginProvider).call(email, password);
-
-    loginResult.fold(
-      (failure) {
-        state = AsyncValue.error(failure.message, StackTrace.current);
-        ref.read(routerMovilNotifierProvider).refresh();
-      },
-      (_) async {
-        final userResult = await ref.read(getAuthenticatedUserProvider).call();
-        userResult.fold(
-          (failure) =>
-              state = AsyncValue.error(failure.message, StackTrace.current),
-          (user) {
-            state = AsyncValue.data(user);
-            ref.read(routerMovilNotifierProvider).refresh();
-          },
-        );
-      },
-    );
+    
+    try {
+      final repository = ref.read(repositoryProvider);
+      
+      // Ejecutar login
+      final user = await repository.login(email, password);
+      
+      // Obtener datos completos del usuario
+      final userData = await repository.getUserData(user.uid);
+      
+      state = AsyncValue.data(userData);
+      print('✅ Login exitoso: ${userData.name}');
+    } on FirebaseAuthException catch (e, stack) {
+      print('❌ Error de autenticación: ${e.message}');
+      state = AsyncValue.error(_getAuthErrorMessage(e), stack);
+    } catch (e, stack) {
+      print('❌ Error inesperado en login: $e');
+      state = AsyncValue.error('Error al iniciar sesión: $e', stack);
+    }
   }
 
   Future<void> logout() async {
     state = const AsyncValue.loading();
-    ref.read(routerMovilNotifierProvider).refresh();
-    final result = await ref.read(logoutProvider).call();
-
-    result.fold(
-      (failure) {
-        state = AsyncValue.error(failure.message, StackTrace.current);
-        ref.read(routerMovilNotifierProvider).refresh();
-      },
-      (_) {
-        state = const AsyncValue.data(null);
-        ref.read(routerMovilNotifierProvider).refresh();
-      },
-    );
+    
+    try {
+      final repository = ref.read(repositoryProvider);
+      await repository.logout();
+      
+      state = const AsyncValue.data(null);
+      print('✅ Logout exitoso');
+    } catch (e, stack) {
+      print('❌ Error en logout: $e');
+      state = AsyncValue.error('Error al cerrar sesión: $e', stack);
+    }
   }
 
   Future<void> authWithGoogle() async {
     state = const AsyncValue.loading();
-    ref.read(routerMovilNotifierProvider).refresh();
-    final result = await ref.read(authWithGoogleProvider).call();
-
-    result.fold(
-      (failure) {
-        print('❌ Error en authWithGoogle: ${failure.message}');
-        state = AsyncValue.error(failure.message, StackTrace.current);
-      },
-      (user) async {
-        print('✅ Usuario de Google recibido: ${user.toMap()}');
-
-        // Obtener los datos completos del usuario desde Firestore
-        // para asegurar que todos los campos estén actualizados
-        final userResult = await ref.read(getAuthenticatedUserProvider).call();
-
-        userResult.fold(
-          (failure) {
-            print('❌ Error al obtener datos del usuario: ${failure.message}');
-            state = AsyncValue.error(failure.message, StackTrace.current);
-            ref.read(routerMovilNotifierProvider).refresh();
-          },
-          (authenticatedUser) {
-            print(
-                '✅ Datos completos del usuario obtenidos: ${authenticatedUser?.toMap()}');
-            state = AsyncValue.data(authenticatedUser);
-            ref.read(routerMovilNotifierProvider).refresh();
-          },
-        );
-      },
-    );
+    
+    try {
+      final repository = ref.read(repositoryProvider);
+      
+      // Autenticar con Google
+      final credential = await repository.authWithGoogle();
+      print('✅ Credencial de Google obtenida');
+      
+      // Verificar o crear usuario en Firestore
+      final userData = await repository.verifyOrCreateGoogleUser(credential);
+      print('✅ Usuario de Google verificado/creado: ${userData.name}');
+      
+      state = AsyncValue.data(userData);
+    } on FirebaseAuthException catch (e, stack) {
+      print('❌ Error de autenticación con Google: ${e.message}');
+      state = AsyncValue.error(_getAuthErrorMessage(e), stack);
+    } catch (e, stack) {
+      print('❌ Error inesperado en authWithGoogle: $e');
+      state = AsyncValue.error('Error al autenticar con Google: $e', stack);
+    }
   }
 
   Future<void> completeProfile({
@@ -97,25 +90,59 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
   }) async {
     state = const AsyncValue.loading();
 
-    final completeResult = await ref.read(completeProfileProvider).call(
-          originCountry: originCountry,
-          destinationCountry: destinationCountry,
-          age: age,
-        );
+    try {
+      final repository = ref.read(repositoryProvider);
+      
+      // Completar perfil
+      await repository.completeProfile(
+        originCountry: originCountry,
+        destinationCountry: destinationCountry,
+        age: age,
+      );
+      print('✅ Perfil completado');
+      
+      // Obtener usuario actualizado
+      final user = await repository.getAuthenticatedUser();
+      if (user != null) {
+        final userData = await repository.getUserData(user.uid);
+        state = AsyncValue.data(userData);
+        print('✅ Datos de usuario actualizados: ${userData.toMap()}');
+      }
+    } on FirebaseAuthException catch (e, stack) {
+      print('❌ Error al completar perfil: ${e.message}');
+      state = AsyncValue.error(_getAuthErrorMessage(e), stack);
+    } catch (e, stack) {
+      print('❌ Error inesperado al completar perfil: $e');
+      state = AsyncValue.error('Error al completar perfil: $e', stack);
+    }
+  }
 
-    completeResult.fold(
-      (failure) {
-        state = AsyncValue.error(failure.message, StackTrace.current);
-      },
-      (_) async {
-        final userResult = await ref.read(getAuthenticatedUserProvider).call();
-        userResult.fold(
-          (failure) =>
-              state = AsyncValue.error(failure.message, StackTrace.current),
-          (user) => state = AsyncValue.data(user),
-        );
-      },
-    );
+  /// Obtener mensaje de error amigable
+  String _getAuthErrorMessage(FirebaseAuthException e) {
+    switch (e.code) {
+      case 'user-not-found':
+        return 'No existe un usuario con este correo';
+      case 'wrong-password':
+        return 'Contraseña incorrecta';
+      case 'invalid-email':
+        return 'Correo electrónico inválido';
+      case 'user-disabled':
+        return 'Esta cuenta ha sido deshabilitada';
+      case 'email-already-in-use':
+        return 'Este correo ya está en uso';
+      case 'operation-not-allowed':
+        return 'Operación no permitida';
+      case 'weak-password':
+        return 'La contraseña es muy débil';
+      case 'account-exists-with-different-credential':
+        return 'Ya existe una cuenta con este correo usando otro método';
+      case 'invalid-credential':
+        return 'Credenciales inválidas';
+      case 'network-request-failed':
+        return 'Error de conexión. Verifica tu internet';
+      default:
+        return e.message ?? 'Error de autenticación';
+    }
   }
 }
 
