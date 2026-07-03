@@ -157,7 +157,9 @@ class AuthRepositoryImpl implements AuthRepository {
         .doc(credential.user!.uid)
         .set(user.toMap());
 
-    await _auth.signOut();
+    if (user.role == 'Migrante') {
+      await _auth.signOut();
+    }
   }
 
   @override

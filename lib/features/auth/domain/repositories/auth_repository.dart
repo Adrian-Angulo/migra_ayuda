@@ -18,4 +18,5 @@ abstract class AuthRepository {
 
   Stream<UserModel?> authStateChanges();
   Future<List<UserModel>> getAllUsers();
+ 
 }

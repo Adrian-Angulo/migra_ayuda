@@ -6,8 +6,6 @@ import 'package:migra_ayuda/core/dataTable/widgets/build_header_cell.dart';
 import 'package:migra_ayuda/core/dataTable/widgets/build_table.dart';
 import 'package:migra_ayuda/features/auth/domain/entites/users_datatable.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/datatable_providers.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/button_widget.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/widgets/register_admin_dialog.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/add_button_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/export_button_widget.dart';

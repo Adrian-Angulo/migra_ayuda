@@ -17,7 +17,8 @@ final sortOrderUserProvider = StateProvider(
   (ref) => const SortState(),
 );
 
-final usersFilterProvider = StateProvider<AsyncValue<List<UserModel>>>(
+final usersFilterProvider =
+    StateProvider.autoDispose<AsyncValue<List<UserModel>>>(
   (ref) {
     final usersAsync = ref.watch(usersNotifierProvider);
     final query = ref.watch(queryUserProvider);

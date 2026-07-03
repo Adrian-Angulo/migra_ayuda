@@ -9,7 +9,7 @@ class RegisterNotifier extends AsyncNotifier<bool?> {
     return null;
   }
 
-  void registerUser(UserModel user) async {
+  Future<void> registerUser(UserModel user) async {
     state = const AsyncValue.loading();
 
     try {

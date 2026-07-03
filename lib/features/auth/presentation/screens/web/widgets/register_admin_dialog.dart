@@ -1,15 +1,21 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/datatable_providers.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/register_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/widgets/input_field_web.dart';
 
-class RegisterAdminDialog extends StatefulWidget {
+class RegisterAdminDialog extends ConsumerStatefulWidget {
   const RegisterAdminDialog({super.key});
 
   @override
-  State<RegisterAdminDialog> createState() => _RegisterAdminDialogState();
+  ConsumerState<RegisterAdminDialog> createState() =>
+      _RegisterAdminDialogState();
 }
 
-class _RegisterAdminDialogState extends State<RegisterAdminDialog> {
+class _RegisterAdminDialogState extends ConsumerState<RegisterAdminDialog> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -19,6 +25,47 @@ class _RegisterAdminDialogState extends State<RegisterAdminDialog> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final registerState = ref.watch(registerProvider);
+
+    // ✅ Escuchar cambios de estado
+    ref.listen(
+      registerProvider,
+      (previous, next) {
+        // Solo reaccionar si el estado anterior era loading
+        if (previous?.isLoading == true) {
+          next.when(
+            data: (success) {
+              if (success == true) {
+                // ✅ Registro exitoso
+                ref.read(usersNotifierProvider.notifier).refresh();
+                context.pop(); // Cerrar el diálogo
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content:
+                        Text('✅ Usuario administrador registrado exitosamente'),
+                    backgroundColor: Colors.green,
+                    duration: Duration(seconds: 3),
+                  ),
+                );
+              }
+            },
+            error: (error, stack) {
+              // ❌ Error en el registro
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('❌ Error: $error'),
+                  backgroundColor: Colors.red,
+                  duration: const Duration(seconds: 4),
+                ),
+              );
+            },
+            loading: () {
+              // No hacer nada mientras carga
+            },
+          );
+        }
+      },
+    );
 
     return Dialog(
       elevation: 0,
@@ -154,12 +201,16 @@ class _RegisterAdminDialogState extends State<RegisterAdminDialog> {
                 ),
 
                 const SizedBox(height: 32),
+                if (registerState.hasError)
+                  Text(registerState.error.toString()),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: registerState.isLoading
+                          ? null
+                          : () => Navigator.pop(context),
                       child: const Text(
                         'Cancelar',
                         style: TextStyle(fontSize: 16),
@@ -173,15 +224,33 @@ class _RegisterAdminDialogState extends State<RegisterAdminDialog> {
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      onPressed: () {
-                        if (_formkey.currentState?.validate() ?? false) {
-                          Navigator.pop(context);
-                        }
-                      },
-                      child: const Text(
-                        'Registrar',
-                        style: TextStyle(fontSize: 16),
-                      ),
+                      onPressed: registerState.isLoading
+                          ? null
+                          : () async {
+                              if (_formkey.currentState?.validate() ?? false) {
+                                await ref
+                                    .read(registerProvider.notifier)
+                                    .registerUser(UserModel(
+                                      name: _nameController.text.trim(),
+                                      email: _emailController.text.trim(),
+                                      password: _passwordController.text.trim(),
+                                      role: 'Admin',
+                                    ));
+                              }
+                            },
+                      child: registerState.isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text(
+                              'Registrar',
+                              style: TextStyle(fontSize: 16),
+                            ),
                     )
                   ],
                 )
