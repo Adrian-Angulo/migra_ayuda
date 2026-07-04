@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:migra_ayuda/core/database/sembast_database.dart';
+import 'package:migra_ayuda/core/router/app_router_mobile.dart';
 import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/core/sync/sync_provider.dart';
-import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_sync_provider.dart';
-import 'package:migra_ayuda/features/splash_init/provider_splash.dart';
 
 class SplashScreenInit extends ConsumerStatefulWidget {
   const SplashScreenInit({super.key});
@@ -36,6 +35,7 @@ class _SplashScreenInitState extends ConsumerState<SplashScreenInit> {
 
     if (!mounted) return;
     context.go(Routes.loginMovil);
+    ref.read(routerMovilNotifierProvider).refresh();
   }
 
   @override

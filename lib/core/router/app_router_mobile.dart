@@ -44,12 +44,6 @@ final routerMobile = Provider<GoRouter>(
         // Si estamos en splashInit o splash, no redirigir
         if (state.matchedLocation == Routes.splashInit) return null;
 
-        /*  // Esperar a que los providers terminen de cargar
-        final isLoading = languageAsync.isLoading ||
-            seeOnboarding.isLoading ||
-            authAsync.isLoading;
-        if (isLoading) return Routes.splash; */
-
         // Si no hay idioma seleccionado, ir a selección de idioma
         final hasNoLanguage =
             languageAsync.value == null || languageAsync.hasError;
@@ -69,7 +63,10 @@ final routerMobile = Provider<GoRouter>(
         if (!user.profileComplete) return Routes.completeProfile;
 
         // Redirigir según el rol del usuario
-        if (user.role == 'Migrante') return Routes.home;
+        if (user.role == 'Migrante' &&
+            state.matchedLocation == Routes.loginMovil) {
+          return Routes.home;
+        }
 
         return null;
       },
@@ -79,10 +76,7 @@ final routerMobile = Provider<GoRouter>(
           builder: (context, state) => const FadeIn(
               duration: Duration(seconds: 2), child: SplashScreenInit()),
         ),
-        GoRoute(
-          path: Routes.splash,
-          builder: (context, state) => const SplashScreen(),
-        ),
+        
         GoRoute(
           path: Routes.selectLanguaje,
           builder: (context, state) => const LanguageScreen(),
@@ -94,8 +88,7 @@ final routerMobile = Provider<GoRouter>(
         GoRoute(
           path: Routes.loginMovil,
           builder: (context, state) => const FadeIn(
-            duration: Duration(seconds: 2),
-            child: LoginScreen()),
+              duration: Duration(seconds: 2), child: LoginScreen()),
         ),
         GoRoute(
           path: Routes.registerMovil,

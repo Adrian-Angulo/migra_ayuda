@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/router/app_router_mobile.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 
@@ -9,9 +10,9 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
     try {
       final repository = ref.read(repositoryProvider);
       final user = await repository.getAuthenticatedUser();
-      
+
       if (user == null) return null;
-      
+
       // Obtener los datos completos del usuario
       final userData = await repository.getUserData(user.uid);
       return userData;
@@ -23,63 +24,71 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
 
   Future<void> login(String email, String password) async {
     state = const AsyncValue.loading();
-    
+
     try {
       final repository = ref.read(repositoryProvider);
-      
+
       // Ejecutar login
       final user = await repository.login(email, password);
-      
+
       // Obtener datos completos del usuario
       final userData = await repository.getUserData(user.uid);
-      
+
       state = AsyncValue.data(userData);
       print('✅ Login exitoso: ${userData.name}');
+      ref.read(routerMovilNotifierProvider).refresh();
     } on FirebaseAuthException catch (e, stack) {
       print('❌ Error de autenticación: ${e.message}');
       state = AsyncValue.error(_getAuthErrorMessage(e), stack);
+      ref.read(routerMovilNotifierProvider).refresh();
     } catch (e, stack) {
       print('❌ Error inesperado en login: $e');
       state = AsyncValue.error('Error al iniciar sesión: $e', stack);
+      ref.read(routerMovilNotifierProvider).refresh();
     }
   }
 
   Future<void> logout() async {
     state = const AsyncValue.loading();
-    
+
     try {
       final repository = ref.read(repositoryProvider);
       await repository.logout();
-      
+
       state = const AsyncValue.data(null);
+      ref.read(routerMovilNotifierProvider).refresh();
       print('✅ Logout exitoso');
     } catch (e, stack) {
       print('❌ Error en logout: $e');
       state = AsyncValue.error('Error al cerrar sesión: $e', stack);
+      ref.read(routerMovilNotifierProvider).refresh();
     }
   }
 
   Future<void> authWithGoogle() async {
     state = const AsyncValue.loading();
-    
+
     try {
       final repository = ref.read(repositoryProvider);
-      
+
       // Autenticar con Google
       final credential = await repository.authWithGoogle();
       print('✅ Credencial de Google obtenida');
-      
+
       // Verificar o crear usuario en Firestore
       final userData = await repository.verifyOrCreateGoogleUser(credential);
       print('✅ Usuario de Google verificado/creado: ${userData.name}');
-      
+
       state = AsyncValue.data(userData);
+      ref.read(routerMovilNotifierProvider).refresh();
     } on FirebaseAuthException catch (e, stack) {
       print('❌ Error de autenticación con Google: ${e.message}');
       state = AsyncValue.error(_getAuthErrorMessage(e), stack);
+      ref.read(routerMovilNotifierProvider).refresh();
     } catch (e, stack) {
       print('❌ Error inesperado en authWithGoogle: $e');
       state = AsyncValue.error('Error al autenticar con Google: $e', stack);
+      ref.read(routerMovilNotifierProvider).refresh();
     }
   }
 
@@ -92,7 +101,7 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
 
     try {
       final repository = ref.read(repositoryProvider);
-      
+
       // Completar perfil
       await repository.completeProfile(
         originCountry: originCountry,
@@ -100,20 +109,23 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
         age: age,
       );
       print('✅ Perfil completado');
-      
+
       // Obtener usuario actualizado
       final user = await repository.getAuthenticatedUser();
       if (user != null) {
         final userData = await repository.getUserData(user.uid);
         state = AsyncValue.data(userData);
+        ref.read(routerMovilNotifierProvider).refresh();
         print('✅ Datos de usuario actualizados: ${userData.toMap()}');
       }
     } on FirebaseAuthException catch (e, stack) {
       print('❌ Error al completar perfil: ${e.message}');
       state = AsyncValue.error(_getAuthErrorMessage(e), stack);
+      ref.read(routerMovilNotifierProvider).refresh();
     } catch (e, stack) {
       print('❌ Error inesperado al completar perfil: $e');
       state = AsyncValue.error('Error al completar perfil: $e', stack);
+      ref.read(routerMovilNotifierProvider).refresh();
     }
   }
 
