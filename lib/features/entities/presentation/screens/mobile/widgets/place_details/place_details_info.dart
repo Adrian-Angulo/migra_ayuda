@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/providers/location_provider.dart';
@@ -13,7 +14,7 @@ class PlaceDetailsInfo extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final distance = ref.watch(distanceProvider(entity));
+    final distance = kIsWeb ? null : ref.watch(distanceProvider(entity));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -96,12 +97,13 @@ class PlaceDetailsInfo extends ConsumerWidget {
           label: 'Teléfono',
           value: entity.phone,
         ),
+        
         const SizedBox(height: 12),
         _PlaceContactCard(
           icon: Icons.location_on_outlined,
           label: 'Dirección',
           value: entity.address,
-          subtitle: 'A $distance de tu ubicación',
+          subtitle: kIsWeb ? null : 'A $distance de tu ubicación',
         ),
       ],
     );

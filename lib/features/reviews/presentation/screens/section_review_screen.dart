@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
@@ -11,11 +12,9 @@ class SectionReviews extends ConsumerStatefulWidget {
   const SectionReviews({
     super.key,
     required this.entity,
-    
   });
 
   final EntityEntity entity;
-
 
   @override
   ConsumerState<SectionReviews> createState() => _SectionReviewsState();
@@ -45,32 +44,35 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
                 color: Color(0xFF1A1A1A),
               ),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PlaceAddReview(
-                      entity: widget.entity,
-                      user: user,
+            if (!kIsWeb)
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PlaceAddReview(
+                        entity: widget.entity,
+                        user: user,
+                      ),
                     ),
+                  );
+                },
+                child: const Text(
+                  "Añadir comentario",
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF059669),
                   ),
-                );
-              },
-              child: const Text(
-                "Añadir comentario",
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF059669),
                 ),
-              ),
-            )
+              )
           ],
         ),
         asyncReviews.when(
           data: (reviews) {
-            return reviews.isEmpty ? messageEmty() : containerReviews(reviews, user!);
+            return reviews.isEmpty
+                ? messageEmty()
+                : containerReviews(reviews, user!);
           },
           error: (error, stackTrace) {
             print("error al llamar reviews: $error");
@@ -85,7 +87,7 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
     );
   }
 
-  ListView containerReviews(reviews, UserModel user ) {
+  ListView containerReviews(reviews, UserModel user) {
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),

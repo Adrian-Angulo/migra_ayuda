@@ -3,15 +3,14 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/register_entity_notifier.dart';
-
+import 'package:migra_ayuda/features/entities/presentation/providers/v2/entity_crud_providers.dart';
 
 class ButtonSaveWidget extends StatelessWidget {
   const ButtonSaveWidget({
     super.key,
-    required this.registerState,
     required GlobalKey<FormState> formKey,
     required Uint8List? selectedImageBytes,
     required this.selectedServices,
@@ -24,18 +23,17 @@ class ButtonSaveWidget extends StatelessWidget {
     required TextEditingController scheduleController,
     required this.ref,
     required XFile? selectedImage,
-  }) : _formKey = formKey,
-       _selectedImageBytes = selectedImageBytes,
-       _nameController = nameController,
-       _descriptionController = descriptionController,
-       _addressController = addressController,
-       _latitudController = latitudController,
-       _longitudController = longitudController,
-       _phoneController = phoneController,
-       _scheduleController = scheduleController,
-       _selectedImage = selectedImage;
+  })  : _formKey = formKey,
+        _selectedImageBytes = selectedImageBytes,
+        _nameController = nameController,
+        _descriptionController = descriptionController,
+        _addressController = addressController,
+        _latitudController = latitudController,
+        _longitudController = longitudController,
+        _phoneController = phoneController,
+        _scheduleController = scheduleController,
+        _selectedImage = selectedImage;
 
-  final AsyncValue<void> registerState;
   final GlobalKey<FormState> _formKey;
   final Uint8List? _selectedImageBytes;
   final List<String> selectedServices;
@@ -51,10 +49,12 @@ class ButtonSaveWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final registerState = ref.watch(entitiesCrudProvider);
+
     return ElevatedButton.icon(
       onPressed: registerState.isLoading
           ? null
-          : () {
+          : () async {
               if (_formKey.currentState!.validate()) {
                 if (_selectedImageBytes == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -93,29 +93,30 @@ class ButtonSaveWidget extends StatelessWidget {
 
                 // Crear entidad con los valores del formulario
                 final entity = EntityEntity(
-                  id: '',
-                  name: _nameController.text.trim(),
-                  description: _descriptionController.text.trim(),
-                  services: selectedServices,
-                  address: _addressController.text.trim(),
-                  localitation: GeoPoint(
-                    double.parse(_latitudController.text),
-                    double.parse(_longitudController.text),
-                  ),
+                    id: '',
+                    name: _nameController.text.trim(),
+                    description: _descriptionController.text.trim(),
+                    services: selectedServices,
+                    address: _addressController.text.trim(),
+                    localitation: GeoPoint(
+                      double.parse(_latitudController.text),
+                      double.parse(_longitudController.text),
+                    ),
+                    phone: _phoneController.text.trim(),
+                    imageUrl: "",
+                    schedule: _scheduleController.text.trim());
 
-                  phone: _phoneController.text.trim(),
-                  imageUrl: "",
-                  schedule: _scheduleController.text.trim()
-                );
+                await ref.read(entitiesCrudProvider.notifier).registerEntity(
+                    entity: entity,
+                    imagenBytes: _selectedImageBytes!,
+                    fileName: _selectedImage?.name ?? '');
 
-                // Llamar al notifier (el listener manejará el resultado)
-                ref
-                    .read(registerEntityNotifierProvider.notifier)
-                    .registrar(
-                      entity: entity,
-                      imagenBytes: _selectedImageBytes!,
-                      fileName: _selectedImage?.name ?? '',
-                    );
+                if (context.mounted) {
+                  final state = ref.read(entitiesCrudProvider);
+                  if (state.hasValue && !state.hasError) {
+                    Navigator.pop(context);
+                  }
+                }
               }
             },
       icon: registerState.isLoading

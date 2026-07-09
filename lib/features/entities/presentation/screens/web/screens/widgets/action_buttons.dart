@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:migra_ayuda/core/widgets/snackbar_web_widget.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/delete_entity_notifier.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/v2/entity_crud_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/place_details_screen.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/delete_confirmation_dialog.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/edit_entity_modal.dart';
 
-// SOLID: Single Responsibility - Widget para botones de acción de la tabla
 class ActionButtons extends ConsumerWidget {
   final EntityEntity entity;
 
@@ -26,7 +25,40 @@ class ActionButtons extends ConsumerWidget {
           color: Colors.blue,
           tooltip: 'Ver detalles',
           onPressed: () {
-            context.push('/dashboard/entities/${entity.id}');
+            showDialog(
+              context: context,
+              builder: (context) => Dialog(
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                elevation: 8,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: 660,
+                    maxHeight: 840,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: PlaceDetails(
+                      entity: entity,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+        const SizedBox(width: 4),
+        _ActionButton(
+          icon: Icons.edit_outlined,
+          color: Colors.orange,
+          tooltip: 'Editar',
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => EditEntityModal(entity: entity),
+            );
           },
         ),
         const SizedBox(width: 4),
@@ -40,17 +72,13 @@ class ActionButtons extends ConsumerWidget {
               builder: (context) => DeleteConfirmationDialog(
                 entityName: entity.name,
                 onConfirm: () async {
+                  ref.invalidate(entitiesCrudProvider);
                   await ref
-                      .read(deleteEntityNotifierProvider.notifier)
-                      .eliminar(entity.id);
+                      .read(entitiesCrudProvider.notifier)
+                      .deleteEntity(entity.id);
 
                   // Invalidar el stream para forzar recarga
-                  ref.invalidate(entitiesStreamProvider);
-
-                  if (context.mounted) {
-                    SnackbarWebWidget.success(
-                        context, "Sea eliminado una entidad correctamente");
-                  }
+                  ref.invalidate(entities2StreamProvider);
                 },
               ),
             );

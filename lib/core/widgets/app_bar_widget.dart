@@ -1,9 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/widgets.dart';
 
 class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final String title;
+  final EntityEntity? entity;
 
-  const AppBarWidget({super.key, required this.title });
+  const AppBarWidget({super.key, required this.title, this.entity});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -14,16 +18,15 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Colors.white,
       elevation: 0,
       centerTitle: true,
-      leading: GestureDetector(
-        onTap: () => Navigator.pop(context),
-        child: Container(
-          margin: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF1F5F9),
+      leading: IconButton(
+        onPressed: () => Navigator.pop(context),
+        icon: const Icon(kIsWeb ? Icons.close : Icons.arrow_back_ios_new,
+            size: 18, color: Color(0xFF1A1A1A)),
+        style: IconButton.styleFrom(
+          backgroundColor: const Color(0xFFF1F5F9),
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          child: const Icon(Icons.arrow_back_ios_new,
-              size: 18, color: Color(0xFF1A1A1A)),
         ),
       ),
       title: Text(

@@ -2,11 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:migra_ayuda/core/widgets/snackbar_web_widget.dart';
 import 'dart:typed_data';
 
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/update_entity_notifier.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/v2/entity_crud_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/image_picker_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/service_type_checklist_widget.dart';
 
@@ -50,9 +49,8 @@ class _EditEntityModalState extends ConsumerState<EditEntityModal> {
       text: widget.entity.localitation.longitude.toString(),
     );
     _phoneController = TextEditingController(text: widget.entity.phone);
-    
-
     selectedServices = List.from(widget.entity.services);
+    _scheduleController = TextEditingController(text: widget.entity.schedule);
   }
 
   @override
@@ -69,28 +67,17 @@ class _EditEntityModalState extends ConsumerState<EditEntityModal> {
 
   @override
   Widget build(BuildContext context) {
-    final updateState = ref.watch(updateEntityNotifierProvider);
-
-    // Escuchar cambios en el estado de actualización
-    ref.listen<AsyncValue<void>>(updateEntityNotifierProvider, (
-      previous,
-      next,
-    ) {
-      next.when(
-        data: (_) {
-          // Éxito - cerrar modal y mostrar mensaje
-          Navigator.of(context).pop(true); // Retornar true para indicar éxito
-          SnackbarWebWidget.success(
-              context, "Entidad actualizada exitosamente");
-        },
-        loading: () {}, // No hacer nada mientras carga
-        error: (error, stack) {
-          // Error - mostrar mensaje
-          SnackbarWebWidget.error(context, 'Error: ${error.toString()}');
-        },
-      );
-    });
-
+    final updateState = ref.watch(entitiesCrudProvider);
+    ref.listen(
+      entitiesCrudProvider,
+      (previous, next) {
+        if (previous!.isLoading) {
+          if (next.value == CrudOperation.update) {
+            Navigator.pop(context);
+          }
+        }
+      },
+    );
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
@@ -410,7 +397,7 @@ class _EditEntityModalState extends ConsumerState<EditEntityModal> {
                     child: ElevatedButton.icon(
                       onPressed: updateState.isLoading
                           ? null
-                          : () {
+                          : () async {
                               if (_formKey.currentState!.validate()) {
                                 if (selectedServices.isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -426,25 +413,24 @@ class _EditEntityModalState extends ConsumerState<EditEntityModal> {
 
                                 // Crear entidad actualizada
                                 final updatedEntity = EntityEntity(
-                                  id: widget.entity.id,
-                                  name: _nameController.text.trim(),
-                                  description:
-                                      _descriptionController.text.trim(),
-                                  services: selectedServices,
-                                  address: _addressController.text.trim(),
-                                  localitation: GeoPoint(
-                                    double.parse(_latitudController.text),
-                                    double.parse(_longitudController.text),
-                                  ),
-                                  phone: _phoneController.text.trim(),
-                                  imageUrl: widget.entity.imageUrl,
-                                  schedule: _scheduleController.text.trim()
-                                );
+                                    id: widget.entity.id,
+                                    name: _nameController.text.trim(),
+                                    description:
+                                        _descriptionController.text.trim(),
+                                    services: selectedServices,
+                                    address: _addressController.text.trim(),
+                                    localitation: GeoPoint(
+                                      double.parse(_latitudController.text),
+                                      double.parse(_longitudController.text),
+                                    ),
+                                    phone: _phoneController.text.trim(),
+                                    imageUrl: widget.entity.imageUrl,
+                                    schedule: _scheduleController.text.trim());
 
                                 // Llamar al notifier
-                                ref
-                                    .read(updateEntityNotifierProvider.notifier)
-                                    .actualizar(
+                                await ref
+                                    .read(entitiesCrudProvider.notifier)
+                                    .updateEntity(
                                       entity: updatedEntity,
                                       imagenBytes: _selectedImageBytes,
                                       fileName: _selectedImage?.name,

@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/dataTable/widgets/build_header_cell.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entities_datasource.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/tabla_providers.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/providers/entities_provider_web.dart';
+
 class TableEntities extends ConsumerStatefulWidget {
   const TableEntities({super.key});
 
@@ -83,7 +84,10 @@ class _TableEntitiesState extends ConsumerState<TableEntities> {
                       ),
                     ),
                   ),
-                 empty: DataTableUtils.buildEmptyFrame(icon: Icons.business_outlined, title: 'No hay entidades', subtitle: 'No se encontraron entidades registradas'),
+                  empty: DataTableUtils.buildEmptyFrame(
+                      icon: Icons.business_outlined,
+                      title: 'No hay entidades',
+                      subtitle: 'No se encontraron entidades registradas'),
                   columns: [
                     DataColumn2(
                       label: DataTableUtils.buildHeaderCell('Nombre'),
@@ -104,7 +108,7 @@ class _TableEntitiesState extends ConsumerState<TableEntities> {
                     ),
                     DataColumn2(
                       label: DataTableUtils.buildHeaderCell('Acciones'),
-                      fixedWidth: 100,
+                      fixedWidth: 150,
                     ),
                   ],
                 ),
@@ -126,5 +130,3 @@ class _TableEntitiesState extends ConsumerState<TableEntities> {
     );
   }
 }
-
-

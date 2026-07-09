@@ -18,7 +18,7 @@ class FilterContainer extends ConsumerWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Wrap(
-          spacing: 8.0, // Reemplaza al separatorBuilder
+          spacing: 8.0,
           children: services.map((service) {
             final isSelected = selectedFiltro == service;
             return FilterChip(

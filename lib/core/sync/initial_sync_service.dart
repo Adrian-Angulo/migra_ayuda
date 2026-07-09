@@ -1,29 +1,23 @@
 import 'package:dartz/dartz.dart';
 import 'package:migra_ayuda/core/network/network_info.dart';
 import 'package:migra_ayuda/core/sync/sync_result.dart';
-import 'package:migra_ayuda/features/entities/domain/usecases/sync_all_entities_usecase.dart';
+import 'package:migra_ayuda/features/entities/domain/repositories/entity_repository.dart';
 import 'package:migra_ayuda/features/reviews/domain/usecases/sync_all_reviews_usecase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Servicio centralizado para sincronización inicial de TODAS las features
-///
-/// Coordina la descarga de todos los datos desde Firebase al iniciar la app:
-/// - Entidades
-/// - Reviews
-/// - (Futuro: Imágenes, usuarios, etc.)
 class InitialSyncService {
   final NetworkInfo networkInfo;
-  final SyncAllEntitiesUsecase syncEntitiesUsecase;
+  final EntityRepository entityRepository;
   final SyncAllReviewsUsecase syncReviewsUsecase;
   final SharedPreferences prefs;
 
-  // Keys para SharedPreferences
   static const String _keySyncCompleted = 'initial_sync_completed';
   static const String _keyLastSyncDate = 'last_sync_date';
 
   InitialSyncService({
     required this.networkInfo,
-    required this.syncEntitiesUsecase,
+    required this.entityRepository,
     required this.syncReviewsUsecase,
     required this.prefs,
   });
@@ -61,7 +55,7 @@ class InitialSyncService {
       int reviewsCount = 0;
 
       // 2. Sincronizar entidades
-      final entitiesResult = await syncEntitiesUsecase.call();
+      final entitiesResult = await entityRepository.syncAllFromFirebase();
       entitiesResult.fold(
         (error) => throw Exception('Error al sincronizar entidades: $error'),
         (_) => entitiesCount++,

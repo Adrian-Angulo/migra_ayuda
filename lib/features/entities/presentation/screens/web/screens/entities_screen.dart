@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/constants/constants.dart';
+import 'package:migra_ayuda/core/widgets/snackbar_web_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/tabla_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/v2/entity_crud_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/export_button_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/filter_button.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/table_entities.dart';
@@ -14,6 +16,36 @@ class EntitiesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final seletedService = ref.watch(seletedServiceProvider);
+
+    // Escuchar cambios en el estado del registro
+    ref.listen(entitiesCrudProvider, (
+      previous,
+      next,
+    ) {
+      if (previous!.isLoading) {
+        next.when(
+          data: (operation) {
+            if (operation == CrudOperation.register) {
+              SnackbarWebWidget.success(
+                  context, 'Entidad registrada existosamente');
+            }
+            if (operation == CrudOperation.update) {
+              SnackbarWebWidget.success(
+                  context, 'Entidad actualizada existosamente');
+            }
+            if (operation == CrudOperation.delete) {
+              SnackbarWebWidget.success(
+                  context, 'Entidad eliminada existosamente');
+            }
+          },
+          loading: () {}, // No hacer nada mientras carga
+          error: (error, stack) {
+            // Error - mostrar mensaje
+            SnackbarWebWidget.error(context, 'Error: ${error.toString()}');
+          },
+        );
+      }
+    });
 
     return Padding(
       padding: const EdgeInsets.symmetric(

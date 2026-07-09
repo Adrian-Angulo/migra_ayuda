@@ -9,16 +9,6 @@ import 'package:migra_ayuda/features/entities/data/repositories/entity_mobil_rep
 import 'package:migra_ayuda/features/entities/data/repositories/entity_web_repository_impl.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/domain/repositories/entity_repository.dart';
-import 'package:migra_ayuda/features/entities/domain/usecases/delete_entity_usecase.dart';
-import 'package:migra_ayuda/features/entities/domain/usecases/get_all_entities_usecase.dart';
-import 'package:migra_ayuda/features/entities/domain/usecases/get_entity_by_id_usecase.dart';
-import 'package:migra_ayuda/features/entities/domain/usecases/register_entity_usecase.dart';
-import 'package:migra_ayuda/features/entities/domain/usecases/sync_all_entities_usecase.dart';
-import 'package:migra_ayuda/features/entities/domain/usecases/update_entity_usecase.dart';
-
-// ============================================================================
-// DATASOURCES PROVIDERS
-// ============================================================================
 
 /// Provider para el datasource remoto (Firebase)
 final entityRemoteDataSourceProvider = Provider<EntityRemoteDataSource>((ref) {
@@ -31,11 +21,8 @@ final entityLocalDataSourceProvider = Provider<EntityLocalDataSource>((ref) {
   return EntityLocalDataSource(sembastDatabase: sembastDb);
 });
 
-// ============================================================================
-// REPOSITORY PROVIDER
-// ============================================================================
-
-/// Provider para el repositorio de entidades con estrategia offline-first
+/// Provider del repositorio de entidades.
+/// Usa la implementación web o mobile según la plataforma.
 final entityRepositoryProvider = Provider<EntityRepository>((ref) {
   final remoteDataSource = ref.watch(entityRemoteDataSourceProvider);
   final localDataSource = ref.watch(entityLocalDataSourceProvider);
@@ -51,69 +38,14 @@ final entityRepositoryProvider = Provider<EntityRepository>((ref) {
   );
 });
 
-// ============================================================================
-// USECASES PROVIDERS
-// ============================================================================
-
-/// Provider para el caso de uso: Obtener todas las entidades
-final getAllEntitiesUsecaseProvider = Provider<GetAllEntitiesUsecase>((ref) {
-  final repository = ref.watch(entityRepositoryProvider);
-  return GetAllEntitiesUsecase(repository: repository);
-});
-
-/// Provider para el caso de uso: Obtener entidad por ID
-final getEntityByIdUsecaseProvider = Provider<GetEntityByIdUsecase>((ref) {
-  final repository = ref.watch(entityRepositoryProvider);
-  return GetEntityByIdUsecase(repository: repository);
-});
-
-/// Provider para el caso de uso: Registrar nueva entidad
-final registerEntityUsecaseProvider = Provider<RegisterEntityUsecase>((ref) {
-  final repository = ref.watch(entityRepositoryProvider);
-  return RegisterEntityUsecase(repository: repository);
-});
-
-/// Provider para el caso de uso: Actualizar entidad
-final updateEntityUsecaseProvider = Provider<UpdateEntityUsecase>((ref) {
-  final repository = ref.watch(entityRepositoryProvider);
-  return UpdateEntityUsecase(repository: repository);
-});
-
-/// Provider para el caso de uso: Eliminar entidad
-final deleteEntityUsecaseProvider = Provider<DeleteEntityUsecase>((ref) {
-  final repository = ref.watch(entityRepositoryProvider);
-  return DeleteEntityUsecase(repository: repository);
-});
-
-/// Provider para el caso de uso: Sincronizar todas las entidades desde Firebase
-final syncAllEntitiesUsecaseProvider = Provider<SyncAllEntitiesUsecase>((ref) {
-  final repository = ref.watch(entityRepositoryProvider);
-  return SyncAllEntitiesUsecase(repository: repository);
-});
-
-
-// ============================================================================
-// STREAM PROVIDERS
-// ============================================================================
-
-/// StreamProvider que emite las entidades y se actualiza automáticamente
-/// Se actualiza cada 30 segundos para obtener nuevos datos de Firebase
-final entitiesStreamProvider = StreamProvider<List<EntityEntity>>((ref) async* {
-  final usecase = ref.watch(getAllEntitiesUsecaseProvider);
-
-  // Carga inicial
-  final result = await usecase.call();
-  yield result.fold(
-    (error) => <EntityEntity>[],
-    (entities) => entities,
-  );
-
-  // Actualización periódica cada 30 segundos
-  await for (final _ in Stream.periodic(const Duration(seconds: 30))) {
-    final newResult = await usecase.call();
-    yield newResult.fold(
-      (error) => <EntityEntity>[],
-      (entities) => entities,
-    );
-  }
-});
+/// StreamProvider que emite la lista de entidades y se actualiza cada 30s.
+final entities2StreamProvider = StreamProvider<List<EntityEntity>>(
+  (ref) {
+    final repo = ref.watch(entityRepositoryProvider);
+    final res = repo.getAllEntites2();
+    return res.map((either) => either.fold(
+          (error) => throw Exception(error),
+          (entities) => entities,
+        ));
+  },
+);

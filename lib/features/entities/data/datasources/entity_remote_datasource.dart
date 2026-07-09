@@ -135,7 +135,7 @@ class EntityRemoteDataSource {
 
       final entities =
           snapshot.docs.map((doc) => EntityModels.fromMap(doc)).toList();
-
+          
       return entities;
     } catch (e) {
       throw ServerException('Error al obtener entidades: $e');

@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:migra_ayuda/core/widgets/snackbar_web_widget.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/register_entity_notifier.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/v2/entity_crud_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/button_save_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/image_picker_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/service_type_checklist_widget.dart';
@@ -107,10 +107,10 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
 
   @override
   Widget build(BuildContext context) {
-    final registerState = ref.watch(registerEntityNotifierProvider);
+    
 
-    // Escuchar cambios en el estado del registro
-    ref.listen<AsyncValue<void>>(registerEntityNotifierProvider, (
+/*     // Escuchar cambios en el estado del registro
+    ref.listen<AsyncValue<void>>(entitiesCrudProvider, (
       previous,
       next,
     ) {
@@ -125,11 +125,10 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
         loading: () {}, // No hacer nada mientras carga
         error: (error, stack) {
           // Error - mostrar mensaje
-
           SnackbarWebWidget.error(context, 'Error: ${error.toString()}');
         },
       );
-    });
+    }); */
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -376,18 +375,18 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                           ),
                         ),
                       const SizedBox(height: 12),
-
+                      if(location != null)
                       SizedBox(
                         height: 250,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(16),
                           child: FlutterMap(
                             mapController: _mapController,
-                            options: const MapOptions(
-                              initialCenter: LatLng(1.2136, -77.2811),
-                              initialZoom: 15,
-                              minZoom: 5,
-                              maxZoom: 18,
+                            options: MapOptions(
+                              initialCenter: location!,
+                              initialZoom: 14,
+                              minZoom: 13,
+                              maxZoom: 13,
                             ),
                             children: [
                               TileLayer(
@@ -412,27 +411,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                           ),
                         ),
                       ),
-                      if (location != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.check_circle,
-                                size: 14,
-                                color: Color(0xFF2D5F4F),
-                              ),
-                              const SizedBox(width: 6),
-                              Text(
-                                'Lat: ${location!.latitude.toStringAsFixed(5)},  Lng: ${location!.longitude.toStringAsFixed(5)}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey.shade600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      
 
                       const SizedBox(height: 20),
                       _buildTextField(
@@ -511,7 +490,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                   Expanded(
                     flex: 2,
                     child: ButtonSaveWidget(
-                      registerState: registerState,
+                      
                       formKey: _formKey,
                       selectedImageBytes: _selectedImageBytes,
                       selectedServices: selectedServices,

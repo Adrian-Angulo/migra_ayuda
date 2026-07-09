@@ -112,7 +112,7 @@ class EntityDataSource extends DataTableSource {
         DataCell(
           Center(
               child: RatingWidget(
-            rating: entity.averageRating,
+            entity: entity,
           )),
         ),
         DataCell(

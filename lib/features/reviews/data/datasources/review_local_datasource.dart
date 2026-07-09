@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:sembast/sembast.dart';
 import 'package:migra_ayuda/core/database/sembast_database.dart';
 import 'package:migra_ayuda/features/reviews/data/models/review_model.dart';
@@ -44,7 +45,9 @@ abstract class ReviewLocalDataSource {
   Future<void> deleteLocalRecord(String recordId);
 }
 
-/// Implementación del datasource local usando Sembast
+/// Implementación del datasource local usando Sembast.
+/// En web, todas las operaciones de caché son no-ops o retornan vacío,
+/// ya que la web siempre usa la base de datos remota.
 class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
   final SembastDatabase sembastDatabase;
 
@@ -58,6 +61,9 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
 
   @override
   Future<List<ReviewModel>> getCachedReviews() async {
+    // En web no se usa caché local
+    if (kIsWeb) return [];
+
     try {
       final db = await _db;
 
@@ -79,6 +85,9 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
 
   @override
   Future<List<ReviewModel>> getReviewsByEntity(String entityId) async {
+    // En web no se usa caché local
+    if (kIsWeb) return [];
+
     try {
       final db = await _db;
 
@@ -92,7 +101,6 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
       );
       final records = await _store.find(db, finder: finder);
 
-      // 🐛 DEBUG: Log para diagnóstico
       print(
           '🔍 getReviewsByEntity($entityId): ${records.length} registros encontrados');
       for (var record in records) {
@@ -112,6 +120,9 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
 
   @override
   Future<void> cacheReview(ReviewModel review) async {
+    // En web no se usa caché local
+    if (kIsWeb) return;
+
     try {
       final db = await _db;
 
@@ -124,6 +135,9 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
 
   @override
   Future<void> cacheReviews(List<ReviewModel> reviews) async {
+    // En web no se usa caché local
+    if (kIsWeb) return;
+
     try {
       final db = await _db;
 
@@ -138,6 +152,9 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
 
   @override
   Future<void> deleteReview(String reviewId) async {
+    // En web no se usa caché local
+    if (kIsWeb) return;
+
     try {
       final db = await _db;
 
@@ -163,6 +180,9 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
 
   @override
   Future<List<ReviewModel>> getPendingReviews() async {
+    // En web no hay pendientes locales
+    if (kIsWeb) return [];
+
     try {
       final db = await _db;
 
@@ -184,6 +204,9 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
 
   @override
   Future<void> markAsSynced(String reviewId) async {
+    // En web no se usa caché local
+    if (kIsWeb) return;
+
     try {
       final db = await _db;
 
@@ -207,6 +230,9 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
 
   @override
   Future<void> clearCache() async {
+    // En web no se usa caché local
+    if (kIsWeb) return;
+
     try {
       final db = await _db;
 
@@ -220,6 +246,9 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
   @override
   Future<ReviewModel?> getUserReviewByEntity(
       String userId, String entityId) async {
+    // En web no se usa caché local
+    if (kIsWeb) return null;
+
     try {
       final db = await _db;
 
@@ -250,6 +279,9 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
 
   @override
   Future<void> deleteLocalRecord(String recordId) async {
+    // En web no se usa caché local
+    if (kIsWeb) return;
+
     try {
       final db = await _db;
 
@@ -280,7 +312,6 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
 
   /// Convierte Map de Sembast a ReviewModel
   ReviewModel _fromSembastMap(String id, Map<String, dynamic> map) {
-    // 🐛 DEBUG: Ver qué tipo de dato es createdAt
     print('🔍 Convirtiendo review $id:');
     print('   createdAt type: ${map['createdAt'].runtimeType}');
     print('   createdAt value: ${map['createdAt']}');
