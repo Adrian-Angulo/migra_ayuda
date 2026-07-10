@@ -52,9 +52,9 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
         if (previous?.isLoading == true && !next.isLoading) {
           if (next.hasError) {
             SnackbarWidget.error(context, next.error.toString());
-          } else {
+          } else if( next.value == ReviewState.updating) {
             SnackbarWidget.success(context, 'Reseña actualizada exitosamente');
-            await Future.delayed(const Duration(seconds: 2));
+            await Future.delayed(const Duration(seconds: 1));
             if (context.mounted) Navigator.pop(context);
           }
         }

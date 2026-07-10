@@ -1,8 +1,0 @@
-flutter_native_splash:
-  android: true
-  ios: true
-  web: false
-
-  color: "#d4e4ed"
-  image: "assets/logo/MigraAyuda.png"
-  branding: "assets/logo/MigraAyuda.png"

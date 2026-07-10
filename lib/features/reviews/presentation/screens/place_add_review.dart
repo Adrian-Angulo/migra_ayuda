@@ -41,12 +41,10 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
     ref.listen(
       reviewNotifierProvider,
       (previous, next) {
-        // Solo reacciona si el estado cambió de loading a completado
         if (previous?.isLoading == true && !next.isLoading) {
-          if (next.hasValue) {
+          if (next.value == ReviewState.creating) {
             SnackbarWidget.success(
                 context, 'Comentario publicado exitosamente');
-            // Cierra la pantalla después de 1 segundo
             Future.delayed(const Duration(seconds: 1), () {
               if (context.mounted) Navigator.pop(context);
             });
@@ -253,9 +251,6 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                           comment: commetController.text,
                           isSynced: false,
                           nameEntity: widget.entity.name);
-
-                    
-
                       await ref
                           .read(reviewNotifierProvider.notifier)
                           .createReview(review);

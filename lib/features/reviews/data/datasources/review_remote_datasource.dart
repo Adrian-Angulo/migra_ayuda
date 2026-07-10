@@ -6,39 +6,18 @@ class ServerException implements Exception {
   final String message;
   ServerException(this.message);
 
-  @override
+  
   String toString() => 'ServerException: $message';
 }
 
-/// Interfaz abstracta para el datasource remoto de reviews
-abstract class ReviewRemoteDataSource {
-  /// Crea una nueva review en Firebase
-  Future<String> createReview(ReviewModel review);
-
-  /// Obtiene todas las reviews de Firebase
-  Future<List<ReviewModel>> getAllReviews();
-
-  /// Obtiene las reviews de una entidad específica de Firebase
-  Future<List<ReviewModel>> getReviewsByEntity(String entityId);
-
-  /// Actualiza una review existente en Firebase
-  Future<void> updateReview(ReviewModel review);
-
-  /// Elimina una review de Firebase
-  Future<void> deleteReview(String reviewId);
-
-  /// Obtiene la review de un usuario específico en una entidad de Firebase
-  Future<ReviewModel?> getUserReviewByEntity(String userId, String entityId);
-}
-
 /// Implementación del datasource remoto usando Firebase Firestore
-class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
+class ReviewRemoteDataSource  {
   final FirebaseFirestore _firestore;
 
-  ReviewRemoteDataSourceImpl({FirebaseFirestore? firestore})
+  ReviewRemoteDataSource({FirebaseFirestore? firestore})
       : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  @override
+  
   Future<String> createReview(ReviewModel review) async {
     try {
       // Marca la review como sincronizada antes de guardar en Firebase
@@ -55,7 +34,7 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
     }
   }
 
-  @override
+  
   Future<List<ReviewModel>> getAllReviews() async {
     try {
       // Obtiene todas las reviews ordenadas por fecha de creación
@@ -75,7 +54,7 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
     }
   }
 
-  @override
+  
   Future<List<ReviewModel>> getReviewsByEntity(String entityId) async {
     try {
       // Filtra por entityId y ordena por fecha
@@ -97,7 +76,7 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
     }
   }
 
-  @override
+  
   Future<void> updateReview(ReviewModel review) async {
     try {
       // Actualiza el documento en Firestore
@@ -110,7 +89,7 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
     }
   }
 
-  @override
+  
   Future<void> deleteReview(String reviewId) async {
     try {
       // Elimina el documento de Firestore (hard delete)
@@ -120,7 +99,7 @@ class ReviewRemoteDataSourceImpl implements ReviewRemoteDataSource {
     }
   }
 
-  @override
+  
   Future<ReviewModel?> getUserReviewByEntity(
       String userId, String entityId) async {
     try {

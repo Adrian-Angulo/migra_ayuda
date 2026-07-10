@@ -28,7 +28,6 @@ class ReviewRepositoryImpl implements ReviewRepository {
       // Usa el localId para crear el modelo inicial
       final modelo = ReviewModel.fromReviewEntity(review, id: localId);
 
-
       // 1. Guarda primero en caché local (respuesta inmediata)
       await localDataSource.cacheReview(modelo);
 
@@ -37,32 +36,17 @@ class ReviewRepositoryImpl implements ReviewRepository {
 
       if (isConnected) {
         try {
-          // 3. Si hay internet, sube a Firebase
           final firebaseId = await remoteDataSource.createReview(modelo);
-          // 4. Crea un nuevo modelo con el ID de Firebase y marcado como sincronizado
           final reviewUpdate = modelo.copyWith(id: firebaseId, isSynced: true);
-          
-          // 5. PRIMERO guarda con el ID de Firebase
           await localDataSource.cacheReview(reviewUpdate);
-          // 6. Actuliza el id en remoto
           await remoteDataSource.updateReview(reviewUpdate);
-          
-          // 7. DESPUÉS elimina el registro con ID local para evitar duplicados
           await localDataSource.deleteLocalRecord(localId);
-       
         } catch (e) {
-          print('⚠️ Error al sincronizar con Firebase: $e');
-          // Si falla Firebase, los datos ya están en caché local
-          return right(unit); // Éxito parcial (guardado localmente)
+          return right(unit);
         }
       }
-      // Si no hay internet, queda pendiente de sincronización
       return right(unit);
-    } on CacheException catch (e) {
-      print('❌ Error de caché: ${e.message}');
-      return left('Error de caché: ${e.message}');
     } catch (e) {
-      print('❌ Error al crear review: ${e.toString()}');
       return left('Error al crear la review: ${e.toString()}');
     }
   }
@@ -104,8 +88,6 @@ class ReviewRepositoryImpl implements ReviewRepository {
 
       // 4. Sin caché y sin internet
       return left('No hay datos disponibles. Verifica tu conexión a internet.');
-    } on CacheException catch (e) {
-      return left('Error de caché: ${e.message}');
     } catch (e) {
       return left('Error al obtener las reviews: ${e.toString()}');
     }
@@ -154,8 +136,6 @@ class ReviewRepositoryImpl implements ReviewRepository {
 
       // 4. Sin caché y sin internet
       return left('No hay datos disponibles. Verifica tu conexión a internet.');
-    } on CacheException catch (e) {
-      return left('Error de caché: ${e.message}');
     } catch (e) {
       return left('Error al obtener las reviews: ${e.toString()}');
     }
@@ -164,49 +144,31 @@ class ReviewRepositoryImpl implements ReviewRepository {
   @override
   Future<Either<String, Unit>> updateReview(ReviewEntity review) async {
     try {
-
       final modelo = ReviewModel.fromReviewEntity(
         review,
         isSynced: false, // Marca como no sincronizada
       ).copyWith(
         updatedAt: DateTime.now(), // Actualiza timestamp
       );
-
-      print(
-          'Modelo creado - Rating: ${modelo.rating}, Comment: ${modelo.comment}');
-
       // 1. Primero actualiza en caché local (respuesta inmediata)
       await localDataSource.cacheReview(modelo);
-      print('   ✅ Guardado en caché local');
-
       // 2. Verifica si hay conexión
       final isConnected = await networkInfo.isConnected;
-      print('   🌐 Conexión a internet: $isConnected');
-
       if (isConnected) {
         try {
           // 3. Si hay internet, sincroniza con Firebase
           await remoteDataSource.updateReview(modelo);
-          print('   ✅ Actualizado en Firebase');
 
           // 4. Marca como sincronizada en caché
           await localDataSource.markAsSynced(review.id);
-          print('   ✅ Marcado como sincronizado');
         } catch (e) {
-          print('   ⚠️ Error al sincronizar con Firebase: $e');
           // Si falla Firebase, los datos ya están en caché
           return right(unit); // Éxito parcial (actualizado localmente)
         }
       }
       // Si no hay internet, queda pendiente de sincronización
-
-      print('   ✅ Review actualizada exitosamente');
       return right(unit);
-    } on CacheException catch (e) {
-      print('   ❌ Error de caché: ${e.message}');
-      return left('Error de caché: ${e.message}');
     } catch (e) {
-      print('   ❌ Error al actualizar la review: ${e.toString()}');
       return left('Error al actualizar la review: ${e.toString()}');
     }
   }
@@ -214,26 +176,17 @@ class ReviewRepositoryImpl implements ReviewRepository {
   @override
   Future<Either<String, Unit>> deleteReview(String reviewId) async {
     try {
-      // 1. Primero marca como eliminada en caché local (soft delete)
       await localDataSource.deleteReview(reviewId);
 
-      // 2. Verifica si hay conexión
       final isConnected = await networkInfo.isConnected;
-
       if (isConnected) {
         try {
-          // 3. Si hay internet, elimina de Firebase (hard delete)
           await remoteDataSource.deleteReview(reviewId);
         } catch (e) {
-          // Si falla Firebase, ya está marcada como eliminada localmente
-          return right(unit); // Éxito parcial (eliminada localmente)
+          return right(unit);
         }
       }
-      // Si no hay internet, queda pendiente de sincronización
-
       return right(unit);
-    } on CacheException catch (e) {
-      return left('Error de caché: ${e.message}');
     } catch (e) {
       return left('Error al eliminar la review: ${e.toString()}');
     }
@@ -242,75 +195,60 @@ class ReviewRepositoryImpl implements ReviewRepository {
   @override
   Future<Either<String, Unit>> syncPendingReviews() async {
     try {
-      // 1. Verifica si hay conexión
+      // 1. Verifica si hay conexión a internet antes de intentar sincronizar
       final isConnected = await networkInfo.isConnected;
-
       if (!isConnected) {
         return left('No hay conexión a internet para sincronizar');
       }
-
-      // 2. Obtiene las reviews pendientes de sincronización
+      // 2. Obtiene todas las reviews locales pendientes de sincronización (isSynced: false)
       final pendingReviews = await localDataSource.getPendingReviews();
-
+      // Si no hay reviews pendientes, no hay nada que sincronizar
       if (pendingReviews.isEmpty) {
-        return right(unit); // No hay nada que sincronizar
+        return right(unit);
       }
-
-      // 3. Sincroniza cada review pendiente
+      // 3. Sincroniza cada review pendiente con Firebase
       for (final review in pendingReviews) {
         try {
           if (review.deletedAt != null) {
-            // Si está marcada como eliminada, elimina de Firebase
+            // Caso A: La review fue eliminada localmente → elimina también en Firebase
             await remoteDataSource.deleteReview(review.id);
           } else if (review.updatedAt != null) {
-            // Si tiene updatedAt, es una actualización
+            // Caso B: La review fue modificada localmente → actualiza en Firebase
             await remoteDataSource.updateReview(review);
           } else {
-            // Si no tiene updatedAt, es una creación
-            final localId = review.id; // Guarda el ID local
+            // Caso C: La review fue creada localmente → crea en Firebase y reemplaza el ID local
+            final localId =
+                review.id; // Guarda el ID temporal generado localmente
+
+            // Crea la review en Firebase y obtiene el ID definitivo generado por Firestore
             final firebaseId = await remoteDataSource.createReview(review);
 
-            // Crea el modelo con el ID de Firebase
-
+            // Construye un nuevo modelo con el ID de Firebase y marcada como sincronizada
             final modelo = ReviewModel.fromReviewEntity(review,
                 id: firebaseId, isSynced: true);
-            /*   final syncedModel = ReviewModel(
-              id: firebaseId,
-              idMigrante: review.idMigrante,
-              idEntity: review.idEntity,
-              userName: review.userName,
-              userCountry: review.userCountry,
-              rating: review.rating,
-              comment: review.comment,
-              createdAt: review.createdAt,
-              updatedAt: review.updatedAt,
-              deletedAt: review.deletedAt,
-              isSynced: true,
-              nameEntity: review.nameEntity,
-            ); */
 
-            // PRIMERO guarda con el ID de Firebase
+            // Guarda el modelo actualizado con el ID de Firebase en el caché local
             await localDataSource.cacheReview(modelo);
 
-            // DESPUÉS elimina el registro con ID local para evitar duplicados
+            // Elimina el registro temporal que usaba el ID local
             await localDataSource.deleteLocalRecord(localId);
 
-            continue; // Ya está sincronizada, continúa con la siguiente
+            // Salta al siguiente ítem, ya que este fue manejado completamente
+            continue;
           }
 
-          // Marca como sincronizada
+          // Marca la review como sincronizada en el caché local (aplica a casos A y B)
           await localDataSource.markAsSynced(review.id);
         } catch (e) {
-          // Si falla una review, continúa con las demás
+          // Si falla una review individual, registra el error y continúa con las demás
+          // Esto evita que un fallo puntual detenga toda la sincronización
           print('⚠️ Error al sincronizar review ${review.id}: $e');
           continue;
         }
       }
-
       return right(unit);
-    } on CacheException catch (e) {
-      return left('Error de caché: ${e.message}');
     } catch (e) {
+      // Error general inesperado durante el proceso de sincronización
       return left('Error al sincronizar reviews: ${e.toString()}');
     }
   }
@@ -322,18 +260,17 @@ class ReviewRepositoryImpl implements ReviewRepository {
   ) async {
     try {
       // ESTRATEGIA CACHE-FIRST:
-      // 1. Primero intenta obtener del caché (respuesta inmediata)
+      // 1. Retorna inmediatamente desde el caché local
       ReviewModel? cachedReview;
 
       try {
         cachedReview =
             await localDataSource.getUserReviewByEntity(userId, entityId);
       } catch (e) {
-        // Si falla el caché, continúa con null
         cachedReview = null;
       }
 
-      // 2. Verifica si hay conexión para actualizar en background
+      // 2. Verifica conexión para actualizar el caché en segundo plano
       final isConnected = await networkInfo.isConnected;
 
       if (isConnected) {
@@ -342,26 +279,26 @@ class ReviewRepositoryImpl implements ReviewRepository {
           final remoteReview =
               await remoteDataSource.getUserReviewByEntity(userId, entityId);
 
-          // Si hay review remota, actualiza el caché
+          // Actualiza el caché con los datos remotos más recientes
           if (remoteReview != null) {
             await localDataSource.cacheReview(remoteReview);
+            // Retorna los datos frescos de Firebase
+            return right(remoteReview);
           }
 
-          // Retorna los datos frescos de Firebase
-          return right(remoteReview);
+          // Si no hay review remota pero sí local, la review fue eliminada remotamente
+          // Respeta la fuente de verdad remota y retorna null
+          return right(null);
         } on ServerException catch (e) {
-          // Si falla Firebase pero hay caché, retorna el caché
+          // Si falla Firebase pero hay caché, retorna el caché como fallback
           if (cachedReview != null) {
             return right(cachedReview);
           }
           return left('Error del servidor: ${e.message}');
         }
       }
-
-      // 3. Sin internet, retorna el caché (puede ser null)
+      // 3. Sin internet, retorna el caché como respuesta (puede ser null)
       return right(cachedReview);
-    } on CacheException catch (e) {
-      return left('Error de caché: ${e.message}');
     } catch (e) {
       return left('Error al obtener la review del usuario: ${e.toString()}');
     }
@@ -390,10 +327,6 @@ class ReviewRepositoryImpl implements ReviewRepository {
       await localDataSource.cacheReviews(merged);
 
       return right(unit);
-    } on ServerException catch (e) {
-      return left('Error del servidor: ${e.message}');
-    } on CacheException catch (e) {
-      return left('Error de caché: ${e.message}');
     } catch (e) {
       return left(
           'Error al sincronizar reviews desde Firebase: ${e.toString()}');
@@ -420,7 +353,6 @@ class ReviewRepositoryImpl implements ReviewRepository {
     for (final review in pending) {
       merged[review.id] = review;
     }
-
     return merged.values.toList();
   }
 }

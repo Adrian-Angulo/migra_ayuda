@@ -3,20 +3,16 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/database/sembast_database.dart';
 import 'package:migra_ayuda/core/network/network_provider.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/v2/entity_crud_providers.dart';
 import 'package:migra_ayuda/features/reviews/data/datasources/review_local_datasource.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
 import 'package:migra_ayuda/features/reviews/domain/repositories/review_repository.dart';
 import '../../data/datasources/review_remote_datasource.dart';
 import '../../data/repositories/review_repository_impl.dart';
 
-final reviewLocaldatabase = Provider(
-  (ref) => ReviewLocalDataSourceImpl(sembastDatabase: SembastDatabase.instance),
-);
-
 final reviewRepositoryProvider = Provider<ReviewRepository>((ref) {
-  final remoteDatasource = ReviewRemoteDataSourceImpl();
-  final localDatasource = ref.watch(reviewLocaldatabase);
+  final remoteDatasource = ReviewRemoteDataSource();
+  final localDatasource =
+      ReviewLocalDataSource(sembastDatabase: SembastDatabase.instance);
   final networkInfo = ref.watch(networkInfoProvider);
 
   return ReviewRepositoryImpl(
@@ -44,9 +40,7 @@ final meanReviewByEntity =
     FutureProvider.autoDispose.family<Map<String, double>, String>(
   (ref, idEntity) async {
     final reviews = await ref.watch(getReviewsByEntity(idEntity).future);
-
     if (reviews.isEmpty) return {'mean': 0.0, 'count': 0.0};
-
     final total = reviews.fold<double>(0.0, (sum, r) => sum + r.rating);
     return {
       'mean': (total / reviews.length).toDouble(),
@@ -55,12 +49,21 @@ final meanReviewByEntity =
   },
 );
 
-final reviewNotifierProvider =
-    AsyncNotifierProvider<ReviewsNotifier, void>(ReviewsNotifier.new);
+enum ReviewState {
+  initial,
+  creating,
+  updating,
+  deleting,
+}
 
-class ReviewsNotifier extends AsyncNotifier<void> {
+final reviewNotifierProvider =
+    AsyncNotifierProvider<ReviewsNotifier, ReviewState>(ReviewsNotifier.new);
+
+class ReviewsNotifier extends AsyncNotifier<ReviewState> {
   @override
-  FutureOr<void> build() {}
+  FutureOr<ReviewState> build() {
+    return ReviewState.initial;
+  }
 
   Future<void> createReview(ReviewEntity review) async {
     state = const AsyncValue.loading();
@@ -71,33 +74,23 @@ class ReviewsNotifier extends AsyncNotifier<void> {
         state = AsyncValue.error(failure, StackTrace.current);
       },
       (createdReview) {
-        state = const AsyncValue.data(null);
-        // ✅ Invalida la instancia correcta del family provider
+        state = const AsyncValue.data(ReviewState.creating);
         ref.invalidate(getReviewsByEntity(review.idEntity));
       },
     );
   }
 
   Future<void> updateReview(ReviewEntity review) async {
-    print('🔄 ReviewsNotifier.updateReview llamado');
-    print('   Review ID: ${review.id}');
-    print('   Rating: ${review.rating}');
-    print('   Comment: ${review.comment}');
-
     state = const AsyncValue.loading();
     final repo = ref.read(reviewRepositoryProvider);
     final result = await repo.updateReview(review);
 
     result.fold(
       (failure) {
-        print('   ❌ Error: $failure');
         state = AsyncValue.error(failure, StackTrace.current);
       },
       (updatedReview) {
-        print(
-            '   ✅ Éxito, invalidando provider para entityId: ${review.idEntity}');
-        state = const AsyncValue.data(null);
-        // ✅ Invalida la instancia correcta del family provider
+        state = const AsyncValue.data(ReviewState.updating);
         ref.invalidate(getReviewsByEntity(review.idEntity));
       },
     );
@@ -112,7 +105,7 @@ class ReviewsNotifier extends AsyncNotifier<void> {
         state = AsyncValue.error(failure, StackTrace.current);
       },
       (_) {
-        state = const AsyncValue.data(null);
+        state = const AsyncValue.data(ReviewState.deleting);
         // ✅ Invalida la instancia correcta del family provider
         ref.invalidate(getReviewsByEntity(review.idEntity));
       },

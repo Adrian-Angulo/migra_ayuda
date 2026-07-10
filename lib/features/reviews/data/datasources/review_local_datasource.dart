@@ -3,67 +3,22 @@ import 'package:sembast/sembast.dart';
 import 'package:migra_ayuda/core/database/sembast_database.dart';
 import 'package:migra_ayuda/features/reviews/data/models/review_model.dart';
 
-/// Excepción personalizada para errores de caché
-class CacheException implements Exception {
-  final String message;
-  CacheException(this.message);
-
-  @override
-  String toString() => 'CacheException: $message';
-}
-
-/// Interfaz abstracta para el datasource local de reviews
-abstract class ReviewLocalDataSource {
-  /// Obtiene todas las reviews del caché
-  Future<List<ReviewModel>> getCachedReviews();
-
-  /// Obtiene las reviews de una entidad específica del caché
-  Future<List<ReviewModel>> getReviewsByEntity(String entityId);
-
-  /// Guarda una review individual en el caché
-  Future<void> cacheReview(ReviewModel review);
-
-  /// Guarda múltiples reviews en el caché
-  Future<void> cacheReviews(List<ReviewModel> reviews);
-
-  /// Elimina una review del caché (soft delete - marca deletedAt)
-  Future<void> deleteReview(String reviewId);
-
-  /// Obtiene las reviews pendientes de sincronización (isSynced = false)
-  Future<List<ReviewModel>> getPendingReviews();
-
-  /// Marca una review como sincronizada
-  Future<void> markAsSynced(String reviewId);
-
-  /// Limpia todo el caché de reviews
-  Future<void> clearCache();
-
-  /// Obtiene la review de un usuario específico en una entidad
-  Future<ReviewModel?> getUserReviewByEntity(String userId, String entityId);
-
-  /// Elimina un registro local por ID (hard delete - para limpiar duplicados)
-  Future<void> deleteLocalRecord(String recordId);
-}
-
 /// Implementación del datasource local usando Sembast.
 /// En web, todas las operaciones de caché son no-ops o retornan vacío,
 /// ya que la web siempre usa la base de datos remota.
-class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
+class ReviewLocalDataSource {
   final SembastDatabase sembastDatabase;
 
   // Store para las reviews
   final _store = stringMapStoreFactory.store('reviews');
-
-  ReviewLocalDataSourceImpl({required this.sembastDatabase});
+  ReviewLocalDataSource({required this.sembastDatabase});
 
   /// Obtiene la instancia de la base de datos
   Future<Database> get _db async => await sembastDatabase.database;
 
-  @override
   Future<List<ReviewModel>> getCachedReviews() async {
     // En web no se usa caché local
     if (kIsWeb) return [];
-
     try {
       final db = await _db;
 
@@ -76,14 +31,13 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
 
       // Convierte los registros a ReviewModel
       return records.map((record) {
-        return _fromSembastMap(record.key, record.value);
+        return ReviewModel.fromSembastMap(record.key, record.value);
       }).toList();
     } catch (e) {
-      throw CacheException('Error al obtener reviews del caché: $e');
+      throw 'Error al obtener reviews del caché: $e';
     }
   }
 
-  @override
   Future<List<ReviewModel>> getReviewsByEntity(String entityId) async {
     // En web no se usa caché local
     if (kIsWeb) return [];
@@ -101,24 +55,16 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
       );
       final records = await _store.find(db, finder: finder);
 
-      print(
-          '🔍 getReviewsByEntity($entityId): ${records.length} registros encontrados');
-      for (var record in records) {
-        print('- ID: ${record.key}, isSynced: ${record.value['isSynced']}');
-      }
-
       // Convierte los registros a ReviewModel
       return records.map((record) {
-        return _fromSembastMap(record.key, record.value);
+        return ReviewModel.fromSembastMap(record.key, record.value);
       }).toList();
     } catch (e) {
       print('❌ Error en getReviewsByEntity: $e');
-      throw CacheException(
-          'Error al obtener reviews de la entidad del caché: $e');
+      throw 'Error al obtener reviews de la entidad del caché: $e';
     }
   }
 
-  @override
   Future<void> cacheReview(ReviewModel review) async {
     // En web no se usa caché local
     if (kIsWeb) return;
@@ -127,13 +73,12 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
       final db = await _db;
 
       // Guarda o actualiza la review
-      await _store.record(review.id).put(db, _toSembastMap(review));
+      await _store.record(review.id).put(db, review.toSembastMap());
     } catch (e) {
-      throw CacheException('Error al guardar review en caché: $e');
+      throw 'Error al guardar review en caché: $e';
     }
   }
 
-  @override
   Future<void> cacheReviews(List<ReviewModel> reviews) async {
     // En web no se usa caché local
     if (kIsWeb) return;
@@ -143,14 +88,13 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
 
       // Guarda todas las reviews usando _toSembastMap para consistencia
       for (final review in reviews) {
-        await _store.record(review.id).put(db, _toSembastMap(review));
+        await _store.record(review.id).put(db, review.toSembastMap());
       }
     } catch (e) {
-      throw CacheException('Error al guardar reviews en caché: $e');
+      throw 'Error al guardar reviews en caché: $e';
     }
   }
 
-  @override
   Future<void> deleteReview(String reviewId) async {
     // En web no se usa caché local
     if (kIsWeb) return;
@@ -163,7 +107,7 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
       print('record a eliminar ${record}');
 
       if (record == null) {
-        throw CacheException('Review no encontrada en caché');
+        throw 'Review no encontrada en caché';
       }
 
       // Marca como eliminada (soft delete)
@@ -174,18 +118,15 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
       // Actualiza el registro
       await _store.record(reviewId).put(db, updatedRecord);
     } catch (e) {
-      throw CacheException('Error al eliminar review del caché: $e');
+      throw 'Error al eliminar review del caché: $e';
     }
   }
 
-  @override
   Future<List<ReviewModel>> getPendingReviews() async {
     // En web no hay pendientes locales
     if (kIsWeb) return [];
-
     try {
       final db = await _db;
-
       // Filtra por isSynced = false
       final finder = Finder(
         filter: Filter.equals('isSynced', false),
@@ -195,26 +136,23 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
 
       // Convierte los registros a ReviewModel
       return records.map((record) {
-        return _fromSembastMap(record.key, record.value);
+        return ReviewModel.fromSembastMap(record.key, record.value);
       }).toList();
     } catch (e) {
-      throw CacheException('Error al obtener reviews pendientes: $e');
+      throw 'Error al obtener reviews pendientes: $e';
     }
   }
 
-  @override
   Future<void> markAsSynced(String reviewId) async {
     // En web no se usa caché local
     if (kIsWeb) return;
 
     try {
       final db = await _db;
-
       // Obtiene la review actual
       final record = await _store.record(reviewId).get(db);
-
       if (record == null) {
-        throw CacheException('Review no encontrada en caché');
+        throw 'Review no encontrada en caché';
       }
 
       // Marca como sincronizada
@@ -224,11 +162,10 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
       // Actualiza el registro
       await _store.record(reviewId).put(db, updatedRecord);
     } catch (e) {
-      throw CacheException('Error al marcar review como sincronizada: $e');
+      throw 'Error al marcar review como sincronizada: $e';
     }
   }
 
-  @override
   Future<void> clearCache() async {
     // En web no se usa caché local
     if (kIsWeb) return;
@@ -239,11 +176,10 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
       // Limpia todo el store
       await _store.delete(db);
     } catch (e) {
-      throw CacheException('Error al limpiar caché de reviews: $e');
+      throw 'Error al limpiar caché de reviews: $e';
     }
   }
 
-  @override
   Future<ReviewModel?> getUserReviewByEntity(
       String userId, String entityId) async {
     // En web no se usa caché local
@@ -264,20 +200,17 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
       );
 
       final records = await _store.find(db, finder: finder);
-
       // Si no hay registros, retorna null
       if (records.isEmpty) {
         return null;
       }
-
       // Convierte el primer registro a ReviewModel
-      return _fromSembastMap(records.first.key, records.first.value);
+      return ReviewModel.fromSembastMap(records.first.key, records.first.value);
     } catch (e) {
-      throw CacheException('Error al obtener review del usuario en caché: $e');
+      throw 'Error al obtener review del usuario en caché: $e';
     }
   }
 
-  @override
   Future<void> deleteLocalRecord(String recordId) async {
     // En web no se usa caché local
     if (kIsWeb) return;
@@ -288,70 +221,9 @@ class ReviewLocalDataSourceImpl implements ReviewLocalDataSource {
       // Elimina el registro físicamente (hard delete)
       await _store.record(recordId).delete(db);
     } catch (e) {
-      throw CacheException('Error al eliminar registro local: $e');
+      throw 'Error al eliminar registro local: $e';
     }
   }
 
-  /// Convierte ReviewModel a Map para Sembast
-  Map<String, dynamic> _toSembastMap(ReviewModel review) {
-    return {
-      'idMigrante': review.idMigrante,
-      'idEntity': review.idEntity,
-      'userName': review.userName,
-      'userCountry': review.userCountry,
-      'rating': review.rating,
-      'comment': review.comment,
-      'createdAt': review.createdAt.millisecondsSinceEpoch,
-      'updatedAt': review.updatedAt?.millisecondsSinceEpoch,
-      'deletedAt': review.deletedAt?.millisecondsSinceEpoch,
-      'isSynced': review.isSynced,
-      'cached_at': DateTime.now().millisecondsSinceEpoch,
-      'nameEntity': review.nameEntity
-    };
-  }
-
-  /// Convierte Map de Sembast a ReviewModel
-  ReviewModel _fromSembastMap(String id, Map<String, dynamic> map) {
-    print('🔍 Convirtiendo review $id:');
-    print('   createdAt type: ${map['createdAt'].runtimeType}');
-    print('   createdAt value: ${map['createdAt']}');
-
-    // Determina si createdAt es int (milliseconds) o String (ISO8601)
-    DateTime createdAt;
-    if (map['createdAt'] is int) {
-      // Ya está en formato correcto (milliseconds)
-      createdAt = DateTime.fromMillisecondsSinceEpoch(map['createdAt']);
-    } else if (map['createdAt'] is String) {
-      // Está en formato String ISO8601 - convertir
-      createdAt = DateTime.parse(map['createdAt']);
-      print('⚠️ createdAt estaba como String, se convirtió a DateTime');
-    } else {
-      // Fallback a fecha actual
-      createdAt = DateTime.now();
-      print('❌ createdAt en formato desconocido, usando fecha actual');
-    }
-
-    return ReviewModel(
-      id: id,
-      idMigrante: map['idMigrante'] ?? '',
-      idEntity: map['idEntity'] ?? '',
-      userName: map['userName'] ?? '',
-      userCountry: map['userCountry'] ?? '',
-      rating: (map['rating'] as num?)?.toDouble() ?? 0.0,
-      comment: map['comment'] ?? '',
-      createdAt: createdAt,
-      updatedAt: map['updatedAt'] != null
-          ? (map['updatedAt'] is int
-              ? DateTime.fromMillisecondsSinceEpoch(map['updatedAt'])
-              : DateTime.parse(map['updatedAt']))
-          : null,
-      deletedAt: map['deletedAt'] != null
-          ? (map['deletedAt'] is int
-              ? DateTime.fromMillisecondsSinceEpoch(map['deletedAt'])
-              : DateTime.parse(map['deletedAt']))
-          : null,
-      isSynced: map['isSynced'] ?? false,
-      nameEntity: map['nameEntity'],
-    );
-  }
+  
 }

@@ -5,8 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:migra_ayuda/core/database/sembast_database.dart';
 import 'package:migra_ayuda/core/router/app_router_mobile.dart';
 import 'package:migra_ayuda/core/router/routes.dart';
-import 'package:migra_ayuda/core/sync/sync_provider.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/entity_sync_provider.dart';
 
 class SplashScreenInit extends ConsumerStatefulWidget {
   const SplashScreenInit({super.key});
@@ -23,16 +21,9 @@ class _SplashScreenInitState extends ConsumerState<SplashScreenInit> {
   }
 
   Future<void> _initializeApp() async {
-    final syncService = ref.read(syncServiceProvider);
-
     await SembastDatabase.instance.database;
-
-    await syncService.initialize();
-
-    ref.read(entitySyncInitializerProvider);
-
+    /* await ref.read(reviewRepositoryProvider); */
     await Future.delayed(const Duration(seconds: 3));
-
     if (!mounted) return;
     context.go(Routes.loginMovil);
     ref.read(routerMovilNotifierProvider).refresh();
