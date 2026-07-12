@@ -33,7 +33,7 @@ class _LoginWebState extends ConsumerState<LoginWeb> {
             if (previous?.value == user) return;
             if (user == null) return;
             if (!mounted) return;
-            final role = user.role ?? '';
+            final role = user.role ;
             if (role != "Admin") {
               SnackbarWebWidget.info(
                   context, '¡No Tienes permiso de administrador!');

@@ -49,13 +49,12 @@ class UserActivityRemoteDataSource {
     }
   }
 
-  Future<List<UserActivityModel>> getAllActivities() async {
-    try {
-      final querySnapshot = await _firestore
-          .collection('user_activities')
-          .orderBy('createdAt', descending: true)
-          .get();
-
+  Stream<List<UserActivityModel>> getAllActivities() {
+    return _firestore
+        .collection('user_activities')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((querySnapshot) {
       return querySnapshot.docs.map((doc) {
         final data = doc.data();
         return UserActivityModel(
@@ -71,9 +70,17 @@ class UserActivityRemoteDataSource {
                 ? Map<String, dynamic>.from(data['metadata'] as Map)
                 : null);
       }).toList();
-    } catch (e) {
+    }).handleError((e) {
       throw ServerException(
           'Error al obtener actividades de usuario desde Firebase: $e');
+    });
+  }
+
+  Future<void> synchronize(List<UserActivityModel> activities) async {
+    if (activities.isEmpty) return;
+    for (final act in activities) {
+      final syncedAct = act.copyWith(isSynced: true);
+      await _firestore.collection('user_activities').add(syncedAct.toMap());
     }
   }
 }

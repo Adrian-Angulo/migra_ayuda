@@ -1,8 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/router/app_router_mobile.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
+import 'package:migra_ayuda/features/userActivity/presentation/providers/activities_providers.dart';
 
 class AuthNotifier extends AsyncNotifier<UserModel?> {
   @override
@@ -10,9 +13,7 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
     try {
       final repository = ref.read(repositoryProvider);
       final user = await repository.getAuthenticatedUser();
-
       if (user == null) return null;
-
       // Obtener los datos completos del usuario
       final userData = await repository.getUserData(user.uid);
       return userData;
@@ -27,6 +28,7 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
 
     try {
       final repository = ref.read(repositoryProvider);
+      final activity = ref.read(activityProvider.notifier);
 
       // Ejecutar login
       final user = await repository.login(email, password);
@@ -35,7 +37,11 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
       final userData = await repository.getUserData(user.uid);
 
       state = AsyncValue.data(userData);
+      activity.create(
+          accion: ActivityActions.login(),
+          );
       print('✅ Login exitoso: ${userData.name}');
+
       ref.read(routerMovilNotifierProvider).refresh();
     } on FirebaseAuthException catch (e, stack) {
       print('❌ Error de autenticación: ${e.message}');
@@ -73,20 +79,23 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
 
       // Autenticar con Google
       final credential = await repository.authWithGoogle();
-      print('✅ Credencial de Google obtenida');
 
       // Verificar o crear usuario en Firestore
       final userData = await repository.verifyOrCreateGoogleUser(credential);
-      print('✅ Usuario de Google verificado/creado: ${userData.name}');
 
       state = AsyncValue.data(userData);
+      ref.read(activityProvider.notifier).create(
+       
+          accion: ActivityActions.login(),
+          );
       ref.read(routerMovilNotifierProvider).refresh();
+      debugPrint('Inicio de sesion con login');
     } on FirebaseAuthException catch (e, stack) {
-      print('❌ Error de autenticación con Google: ${e.message}');
+      debugPrint('❌ Error de autenticación con Google: ${e.message}');
       state = AsyncValue.error(_getAuthErrorMessage(e), stack);
       ref.read(routerMovilNotifierProvider).refresh();
     } catch (e, stack) {
-      print('❌ Error inesperado en authWithGoogle: $e');
+      debugPrint('❌ Error inesperado en authWithGoogle: $e');
       state = AsyncValue.error('Error al autenticar con Google: $e', stack);
       ref.read(routerMovilNotifierProvider).refresh();
     }
@@ -108,7 +117,7 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
         destinationCountry: destinationCountry,
         age: age,
       );
-      print('✅ Perfil completado');
+      
 
       // Obtener usuario actualizado
       final user = await repository.getAuthenticatedUser();
@@ -116,7 +125,7 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
         final userData = await repository.getUserData(user.uid);
         state = AsyncValue.data(userData);
         ref.read(routerMovilNotifierProvider).refresh();
-        print('✅ Datos de usuario actualizados: ${userData.toMap()}');
+        
       }
     } on FirebaseAuthException catch (e, stack) {
       print('❌ Error al completar perfil: ${e.message}');

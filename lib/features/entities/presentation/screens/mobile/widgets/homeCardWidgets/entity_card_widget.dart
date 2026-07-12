@@ -23,7 +23,6 @@ class EntityCardWidget extends ConsumerWidget {
     return GestureDetector(
       onTap: () {
         ref.read(mapProvider.notifier).selectEntity(entity);
-        
       },
       child: Container(
         padding: EdgeInsets.all(14),
@@ -165,7 +164,7 @@ class DistanceAndRating extends ConsumerWidget {
         const Icon(Icons.star_rounded, size: 20, color: Colors.amber),
         Text(
           asyncRating.when(
-            data: (data) => '${data['mean']}',
+            data: (data) => (data['mean'] as num).toStringAsFixed(1),
             error: (error, stackTrace) => '0.0',
             loading: () => '---',
           ),

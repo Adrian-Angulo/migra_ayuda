@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/widgets.dart';
+
 
 class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final String title;

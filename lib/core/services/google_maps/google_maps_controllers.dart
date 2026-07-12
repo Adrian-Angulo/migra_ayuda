@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/services/google_maps/google_maps_service.dart';
 import 'package:migra_ayuda/core/services/google_maps/star_navegation_usecase.dart';
+import 'package:migra_ayuda/features/userActivity/presentation/providers/activities_providers.dart';
 
 final googleMapsService = Provider<GoogleMapsNavigationService>(
     (ref) => GoogleMapsNavigationService());
@@ -24,9 +26,12 @@ class StarNavigationNotifier extends AsyncNotifier<void> {
     final result = await usecase(latitude, longitude);
     result.fold(
       (failure) => state = AsyncValue.error(failure, StackTrace.current),
-      (_) => state = const AsyncValue.data(null),
+      (_) async {
+        await ref.read(activityProvider.notifier).create(
+              accion: ActivityActions.navigationMaps(),
+            );
+        return state = const AsyncValue.data(null);
+      },
     );
   }
 }
-
-

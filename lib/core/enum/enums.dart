@@ -1,0 +1,1 @@
+enum ActivityState { init, success, error }

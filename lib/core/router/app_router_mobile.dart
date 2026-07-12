@@ -2,7 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:migra_ayuda/core/presentation/screens/splash_screen.dart';
+
 import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/features/splash_init/splash_init.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';

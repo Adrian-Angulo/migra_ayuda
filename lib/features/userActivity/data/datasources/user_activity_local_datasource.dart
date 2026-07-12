@@ -21,7 +21,7 @@ class UserActivityLocalDataSource {
   /// Obtiene la instancia de la base de datos
   Future<Database> get _db async => await sembastDatabase.database;
 
-  Future<void> cacheActivity(UserActivityModel activity) async {
+  Future<void> save(UserActivityModel activity) async {
     try {
       final db = await _db;
 
@@ -32,10 +32,18 @@ class UserActivityLocalDataSource {
     }
   }
 
-  Future<List<UserActivityModel>> getPendingActivities() async {
+  Future<void> delete(String localId) async {
     try {
       final db = await _db;
+      await _store.record(localId).delete(db);
+    } catch (e) {
+      throw CacheException('Error al eliminar actividad local: $e');
+    }
+  }
 
+  Future<List<UserActivityModel>> getPending() async {
+    try {
+      final db = await _db;
       // Filtra por isSynced = false
       final finder = Finder(
         filter: Filter.equals('isSynced', false),
@@ -49,60 +57,6 @@ class UserActivityLocalDataSource {
       }).toList();
     } catch (e) {
       throw CacheException('Error al obtener actividades pendientes: $e');
-    }
-  }
-
-  Future<void> markAsSynced(String activityId) async {
-    try {
-      final db = await _db;
-
-      // Obtiene la actividad actual
-      final record = await _store.record(activityId).get(db);
-
-      if (record == null) {
-        throw CacheException('Actividad no encontrada en caché');
-      }
-
-      // Marca como sincronizada
-      final updatedRecord = Map<String, dynamic>.from(record);
-      updatedRecord['isSynced'] = true;
-
-      // Actualiza el registro
-      await _store.record(activityId).put(db, updatedRecord);
-    } catch (e) {
-      throw CacheException('Error al marcar actividad como sincronizada: $e');
-    }
-  }
-
-  Future<void> deleteLocalRecord(String recordId) async {
-    try {
-      final db = await _db;
-
-      // Elimina el registro físicamente (hard delete)
-      await _store.record(recordId).delete(db);
-    } catch (e) {
-      throw CacheException('Error al eliminar registro local: $e');
-    }
-  }
-
-  Future<void> updateActivityId(
-      String localId, UserActivityModel syncedModel) async {
-    try {
-      final db = await _db;
-
-      // Operación atómica: elimina el registro antiguo e inserta el nuevo
-      // en una sola transacción para prevenir condiciones de carrera
-      await db.transaction((txn) async {
-        // 1. Eliminar el registro con ID local
-        await _store.record(localId).delete(txn);
-
-        // 2. Insertar el registro con ID de Firebase
-        await _store
-            .record(syncedModel.id)
-            .put(txn, syncedModel.toSembastMap());
-      });
-    } catch (e) {
-      throw CacheException('Error al actualizar ID de actividad: $e');
     }
   }
 }

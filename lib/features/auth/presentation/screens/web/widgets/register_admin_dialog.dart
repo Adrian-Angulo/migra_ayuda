@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
-import 'package:migra_ayuda/features/auth/presentation/providers/datatable_providers.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/register_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/widgets/input_field_web.dart';

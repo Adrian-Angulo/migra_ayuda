@@ -1,7 +1,5 @@
-import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/widgets/snackbar_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/complete_info_screen.dart';
@@ -12,7 +10,6 @@ import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/in
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_password_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/register_card.dart';
-import 'package:migra_ayuda/features/userActivity/presentation/providers/create_activity_notifier.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 // Pantalla principal de autenticación que alterna entre login y registro
@@ -44,13 +41,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           if (user != null) {
             if (user.role == 'Migrante') {
               // Registra la actividad de inicio de sesión en la auditoría
-              await ref.read(createActivityNotifier.notifier).createActivity(
-                  user: user.id,
-                  accion: ActivityActions.login(),
-                  nombre: user.name,
-                  correo: user.email,
-                  pais: user.originCountry!);
-
+              
               if (!context.mounted) return;
               // Redirige según el estado del perfil y el rol del usuario
               if (user.profileComplete == false) {
@@ -64,7 +55,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             } else {
               // Usuario NO es Migrante (Admin u otro rol)
               if (!context.mounted) return;
-
               // Mostrar mensaje de error
               SnackbarWidget.info(context, l10n.alerMessageAdmin);
 
