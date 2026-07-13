@@ -1,4 +1,3 @@
-import 'package:dartz/dartz.dart' as entity;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/utils/format/time_formatter.dart';
@@ -26,7 +25,7 @@ class ReviewItem extends ConsumerWidget {
         userReviewByEntityProvider((userId: user.id, entityId: entity.id))); */
 
     /// Muestra diálogo de confirmación para eliminar
-    Future<void> _showDeleteConfirmation() async {
+    Future<void> showDeleteConfirmation() async {
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
@@ -114,7 +113,7 @@ class ReviewItem extends ConsumerWidget {
                             ),
                           );
                         } else if (value == 'delete') {
-                          _showDeleteConfirmation();
+                          showDeleteConfirmation();
                         }
                       },
                       padding: EdgeInsets.zero,

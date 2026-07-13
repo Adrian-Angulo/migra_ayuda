@@ -8,7 +8,7 @@ class MapWeb extends StatefulWidget {
   final double latitude;
   final double longitude;
 
-  const MapWeb({required this.latitude, required this.longitude});
+  const MapWeb({super.key, required this.latitude, required this.longitude});
 
   @override
   State<MapWeb> createState() => MapWebState();

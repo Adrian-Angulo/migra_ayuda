@@ -15,7 +15,7 @@ class _UserActivityScreenState extends ConsumerState<UserActivityScreen> {
     final activitiesState = ref.watch(getAllActivityP);
 
     return Scaffold(
-      backgroundColor: Color(0xFFF8F9FA),
+      backgroundColor: const Color(0xFFF8F9FA),
       body: activitiesState.when(
         data: (activities) {
           return Expanded(
@@ -24,7 +24,13 @@ class _UserActivityScreenState extends ConsumerState<UserActivityScreen> {
               itemBuilder: (context, index) {
                 final activity = activities[index];
                 return ListTile(
-                  title: Text(activity.accion),
+                  title: Row(
+                    children: [
+                      Text(activity.accion),
+                      if (activity.metadata != null)
+                        Text(activity.metadata?['service']),
+                    ],
+                  ),
                 );
               },
             ),

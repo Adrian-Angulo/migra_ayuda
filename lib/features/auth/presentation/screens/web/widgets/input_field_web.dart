@@ -9,7 +9,7 @@ class InputFieldWeb extends StatelessWidget {
   final TextEditingController controller;
   final Widget? suffixIcon;
 
-  const InputFieldWeb({
+  const InputFieldWeb({super.key, 
     required this.label,
     required this.hint,
     required this.icon,
@@ -75,7 +75,7 @@ class InputFieldWeb extends StatelessWidget {
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(
+              borderSide: const BorderSide(
                 color: Colors.red,
                 width: 2,
               ),

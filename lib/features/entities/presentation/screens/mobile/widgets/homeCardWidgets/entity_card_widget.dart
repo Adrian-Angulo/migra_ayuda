@@ -1,12 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/providers/location_provider.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/map_provider.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/service_tag.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
+import 'package:migra_ayuda/features/userActivity/presentation/providers/activities_providers.dart';
 
 class EntityCardWidget extends ConsumerWidget {
   const EntityCardWidget({
@@ -21,11 +23,14 @@ class EntityCardWidget extends ConsumerWidget {
     final asyncRating = ref.watch(meanReviewByEntity(entity.id));
 
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         ref.read(mapProvider.notifier).selectEntity(entity);
+        await ref.read(activityProvider.notifier).create(
+            accion: ActivityActions.entityViewed(),
+            metadata: {'service': entity.services[0]});
       },
       child: Container(
-        padding: EdgeInsets.all(14),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
@@ -33,7 +38,7 @@ class EntityCardWidget extends ConsumerWidget {
               BoxShadow(
                 color: Colors.black.withOpacity(0.04),
                 blurRadius: 12,
-                offset: Offset(0, 6),
+                offset: const Offset(0, 6),
               )
             ]),
         child: Row(
@@ -42,7 +47,7 @@ class EntityCardWidget extends ConsumerWidget {
             //contenedor de imagen
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: entity.imageUrl != null && entity.imageUrl.isNotEmpty
+              child: entity.imageUrl.isNotEmpty
                   ? CachedNetworkImage(
                       imageUrl: entity.imageUrl,
                       width: 80,

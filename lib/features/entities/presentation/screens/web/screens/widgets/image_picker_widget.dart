@@ -22,7 +22,7 @@ class ImagePickerWidget extends StatefulWidget {
 
 class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   final picker = ImagePicker();
-  XFile? _imagen;
+   XFile? _imagen;
   Uint8List? _imagenBytes;
 
   @override

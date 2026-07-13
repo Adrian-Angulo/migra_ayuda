@@ -33,18 +33,13 @@ class ActivityNotifier extends AsyncNotifier<ActivityState> {
   }
 
   Future<void> create({
-    
     required String accion,
-    
-   
-    
-    
     Map<String, dynamic>? metadata,
   }) async {
     state = const AsyncValue.loading();
     final repo = ref.read(activityRepositoryP);
     final userFake = UserModel(
-      id: 'ad',
+        id: 'ad',
         name: 'Camilo',
         email: 'ejemplo@gmail.com',
         password: '',
@@ -56,11 +51,14 @@ class ActivityNotifier extends AsyncNotifier<ActivityState> {
         accion: accion,
         nombre: userFake.name,
         correo: userFake.email,
+        metadata: metadata,
         pais: userFake.originCountry!);
 
     state = await AsyncValue.guard(() async {
       await repo.createActivity(activity);
       debugPrint('Se creo una actvidad $accion');
+      if(metadata !=null) debugPrint('metadata: ${metadata['service']}');
+
       return ActivityState.success;
     });
   }

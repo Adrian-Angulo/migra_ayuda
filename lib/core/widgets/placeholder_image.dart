@@ -13,7 +13,7 @@ class PlaceholderImage extends StatelessWidget {
           colors: [ Color(0xFF1B4332), Color(0xFF2D6A4F)],
         ),
       ),
-      child: Center(
+      child: const Center(
         child: Icon(Icons.broken_image_outlined, size: 80, color: Colors.white24),
       ),
     );

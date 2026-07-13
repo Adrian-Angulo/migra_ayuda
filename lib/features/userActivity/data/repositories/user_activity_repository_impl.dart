@@ -1,4 +1,3 @@
-import 'package:dartz/dartz.dart';
 import 'package:flutter/foundation.dart';
 import 'package:migra_ayuda/core/network/network_info.dart';
 import 'package:migra_ayuda/features/userActivity/data/datasources/user_activity_local_datasource.dart';
@@ -34,6 +33,7 @@ class UserActivityRepositoryImpl implements UserActivityRepository {
         isSynced: false,
         nombre: activity.nombre,
         correo: activity.correo,
+        metadata: activity.metadata,
         pais: activity.pais, // Inicialmente no sincronizada
       );
 

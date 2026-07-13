@@ -54,7 +54,7 @@ class MapNotifier extends StateNotifier<MapState> {
   void pauseTracking() {
     if (!state.isTracking) return; // Si ya estaba apagado, no hacemos nada
     state = state.copyWith(isTracking: false);
-    print("Tracking pausado: El usuario está explorando el mapa.");
+    debugPrint("Tracking pausado: El usuario está explorando el mapa.");
   }
 
   /// Enciende el seguimiento y vuela inmediatamente a la ubicación actual
@@ -62,7 +62,7 @@ class MapNotifier extends StateNotifier<MapState> {
     state = state.copyWith(isTracking: true);
     if (_lastKnownPosition != null) {
       _moveCamera(_lastKnownPosition!);
-      print("Traking renudado");
+      debugPrint("Traking renudado");
     }
   }
 
@@ -79,7 +79,7 @@ class MapNotifier extends StateNotifier<MapState> {
   /// 🆕 Limpiar la entidad seleccionada (resetear a null)
   void clearSelectEntity() {
     state = state.copyWith(clearSelectEntity: true);
-    print("✅ Entidad deseleccionada");
+    debugPrint("✅ Entidad deseleccionada");
   }
 
   /// 📍 Agrega marcadores al mapa desde una lista de ubicaciones
@@ -96,7 +96,7 @@ class MapNotifier extends StateNotifier<MapState> {
         _createAnnotations(entities);
       } catch (e) {
         // Si falla (porque el mapa se reinició), creamos un nuevo gestor
-        print("⚠️ El gestor anterior no es válido, creando uno nuevo...");
+        debugPrint("⚠️ El gestor anterior no es válido, creando uno nuevo...");
         _pointAnnotationManager = null;
         await addMarkers(entities); // Llamada recursiva para crear nuevo gestor
       }
@@ -116,7 +116,7 @@ class MapNotifier extends StateNotifier<MapState> {
             );
             state = state.copyWith(selectEntity: getEntity);
           } catch (e) {
-            print(
+            debugPrint(
                 "⚠️ No se encontró la entidad para el marcador: ${anotation.textField}");
           }
         },

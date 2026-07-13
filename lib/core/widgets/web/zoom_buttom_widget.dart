@@ -5,7 +5,7 @@ class ZoomButtomWidget extends StatelessWidget {
   final IconData icon;
   final VoidCallback onPressed;
 
-  const ZoomButtomWidget({
+  const ZoomButtomWidget({super.key, 
     required this.tooltip,
     required this.icon,
     required this.onPressed,

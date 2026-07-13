@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/constants.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/home_admin_screen/widgets/widgets.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/filter_providers.dart';
 
 class FilterContainer extends ConsumerWidget {

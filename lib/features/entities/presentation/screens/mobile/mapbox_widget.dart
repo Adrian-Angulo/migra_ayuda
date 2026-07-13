@@ -262,6 +262,10 @@ class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
                             widget.map.selectEntity!.localitation.latitude,
                             widget.map.selectEntity!.localitation.longitude);
 
+                    await ref.read(activityProvider.notifier).create(
+                          accion: ActivityActions.navigationMaps(),
+                          metadata: {'service': widget.map.selectEntity!.services[0]}
+                        );
                     
                   },
                   text: 'Iniciar viaje',

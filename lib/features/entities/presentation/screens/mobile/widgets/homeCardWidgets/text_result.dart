@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/filter_providers.dart';
 
 class TextResult extends ConsumerWidget {
-  const TextResult({Key? key}) : super(key: key);
+  const TextResult({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

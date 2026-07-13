@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
@@ -17,12 +18,12 @@ class RegisterNotifier extends AsyncNotifier<bool?> {
       await repository.registerUser(user);
 
       state = const AsyncValue.data(true);
-      print('✅ Usuario registrado exitosamente: ${user.email}');
+      debugPrint('✅ Usuario registrado exitosamente: ${user.email}');
     } on FirebaseAuthException catch (e, stack) {
-      print('❌ Error de autenticación al registrar: ${e.message}');
+      debugPrint('❌ Error de autenticación al registrar: ${e.message}');
       state = AsyncValue.error(_getAuthErrorMessage(e), stack);
     } catch (e, stack) {
-      print('❌ Error inesperado al registrar: $e');
+      debugPrint('❌ Error inesperado al registrar: $e');
       state = AsyncValue.error('Error al registrar usuario: $e', stack);
     }
   }
