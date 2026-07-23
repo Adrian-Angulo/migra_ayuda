@@ -18,7 +18,7 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
       final userData = await repository.getUserData(user.uid);
       return userData;
     } catch (e) {
-      print('❌ Error al construir AuthNotifier: $e');
+      debugPrint('❌ Error al construir AuthNotifier: $e');
       return null;
     }
   }
@@ -37,18 +37,21 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
       final userData = await repository.getUserData(user.uid);
 
       state = AsyncValue.data(userData);
-      activity.create(
-          accion: ActivityActions.login(),
-          );
-      print('✅ Login exitoso: ${userData.name}');
+
+      debugPrint('✅ Login exitoso: ${userData.name}');
 
       ref.read(routerMovilNotifierProvider).refresh();
+      if (!kIsWeb) {
+        activity.create(
+          accion: ActivityActions.login(),
+        );
+      }
     } on FirebaseAuthException catch (e, stack) {
-      print('❌ Error de autenticación: ${e.message}');
+      debugPrint('❌ Error de autenticación: ${e.message}');
       state = AsyncValue.error(_getAuthErrorMessage(e), stack);
       ref.read(routerMovilNotifierProvider).refresh();
     } catch (e, stack) {
-      print('❌ Error inesperado en login: $e');
+      debugPrint('❌ Error inesperado en login: $e');
       state = AsyncValue.error('Error al iniciar sesión: $e', stack);
       ref.read(routerMovilNotifierProvider).refresh();
     }
@@ -63,9 +66,9 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
 
       state = const AsyncValue.data(null);
       ref.read(routerMovilNotifierProvider).refresh();
-      print('✅ Logout exitoso');
+      debugPrint('✅ Logout exitoso');
     } catch (e, stack) {
-      print('❌ Error en logout: $e');
+      debugPrint('❌ Error en logout: $e');
       state = AsyncValue.error('Error al cerrar sesión: $e', stack);
       ref.read(routerMovilNotifierProvider).refresh();
     }
@@ -85,8 +88,7 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
 
       state = AsyncValue.data(userData);
       ref.read(activityProvider.notifier).create(
-       
-          accion: ActivityActions.login(),
+            accion: ActivityActions.login(),
           );
       ref.read(routerMovilNotifierProvider).refresh();
       debugPrint('Inicio de sesion con login');
@@ -117,7 +119,6 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
         destinationCountry: destinationCountry,
         age: age,
       );
-      
 
       // Obtener usuario actualizado
       final user = await repository.getAuthenticatedUser();
@@ -125,7 +126,6 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
         final userData = await repository.getUserData(user.uid);
         state = AsyncValue.data(userData);
         ref.read(routerMovilNotifierProvider).refresh();
-        
       }
     } on FirebaseAuthException catch (e, stack) {
       print('❌ Error al completar perfil: ${e.message}');

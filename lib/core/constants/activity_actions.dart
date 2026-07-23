@@ -1,9 +1,12 @@
 class ActivityActions {
-  static String login() => "Inicio de Sesión";
-  static String logout() => "Cerro sesion";
-  static String entityViewed() => "Vio detalles de entidad";
-  static String routeRequested() => "Presiono como llegar";
-  static String navigationMaps() => "Inicio navegacion google Maps";
-  static String commentCreated() => "Agrego comentario";
-  static String serviceFiltered() => "Aplico un filtro";
+  static String login() => "Iniciar de Sesión";
+  static String logout() => "Cerrar sesión";
+  static String entityViewed() => "Ver entidad";
+  static String routeRequested() => "Como llegar";
+  static String navigationMaps() => "Navegar";
+  static String addComment() => "Agregar comentario";
+  static String updateComment() => "Agregar comentario";
+  static String deleteComment() => "Eliminar comentario";
+  static String filter() => "Filtrar";
+  static String changeLanguaje() => "Cambiar Idioma";
 }

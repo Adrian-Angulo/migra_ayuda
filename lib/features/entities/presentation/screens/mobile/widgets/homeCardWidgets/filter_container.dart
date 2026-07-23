@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/constants/constants.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/filter_providers.dart';
+import 'package:migra_ayuda/features/userActivity/presentation/providers/activities_providers.dart';
 
 class FilterContainer extends ConsumerWidget {
   const FilterContainer({
@@ -25,9 +27,12 @@ class FilterContainer extends ConsumerWidget {
               showCheckmark: false,
               label: Text(service),
               selected: isSelected,
-              onSelected: (value) {
+              onSelected: (value) async {
                 if (value) {
                   ref.read(seletedFilterProvider.notifier).state = service;
+                  await ref.read(activityProvider.notifier).create(
+                      accion: ActivityActions.filter(),
+                      metadata: {'filtro': service});
                 }
               },
             );

@@ -36,6 +36,7 @@ class ActivityNotifier extends AsyncNotifier<ActivityState> {
     required String accion,
     Map<String, dynamic>? metadata,
   }) async {
+    //TODO: USAR USUARIO REAL PARA REGISTRAR EVENTOS
     state = const AsyncValue.loading();
     final repo = ref.read(activityRepositoryP);
     final userFake = UserModel(

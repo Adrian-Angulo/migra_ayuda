@@ -11,7 +11,6 @@ import 'package:migra_ayuda/features/language/presentation/providers/language_pr
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 import 'core/config/firebase_options.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -19,13 +18,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  if(!kIsWeb){
-
+  if (!kIsWeb) {
     await Loadtoken.setup(); //preparar token de mapa
   }
-
-
-
   runApp(const ProviderScope(child: MainApp()));
 }
 
@@ -37,80 +32,46 @@ class MainApp extends ConsumerStatefulWidget {
 }
 
 class _MainAppState extends ConsumerState<MainApp> {
-
-
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb) {
-      final router = ref.watch(routerProvider);
-      return MaterialApp.router(
-        locale: const Locale('es'),
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [Locale('es')],
-        title: 'MigraAyuda Admin',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6FA3A1)),
-          useMaterial3: true,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        debugShowCheckedModeBanner: false,
-        routerConfig: router,
-      );
-    } else {
-      final mobileRouter = ref.watch(routerMobile);
-      final languageAsync = ref.watch(languageProvider);
+    final language = kIsWeb ? null : ref.watch(languageProvider).value;
+    final mobileRouter = ref.watch(kIsWeb ? routerProvider : routerMobile);
 
-      return languageAsync.when(
-        data: (locale) => MaterialApp.router(
-          key: ValueKey(locale?.languageCode ?? 'default'),
-          locale: locale ?? const Locale('es'),
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [Locale('es'), Locale('en')],
-          title: "Migra Ayuda",
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            scaffoldBackgroundColor: ColorConstants.background,
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
-            visualDensity: VisualDensity.adaptivePlatformDensity,
-            fontFamily: 'Inter',
-            useMaterial3: true,
-          ),
-          routerConfig: mobileRouter,
+    if (kIsWeb) {
+      return MaterialApp.router(
+        title: "Migra Ayuda",
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          scaffoldBackgroundColor: ColorConstants.background,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          fontFamily: 'Inter',
+          useMaterial3: true,
         ),
-        loading: () => const MaterialApp(
-          debugShowCheckedModeBanner: false,
-          home: Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          ),
-        ),
-        error: (error, stack) => MaterialApp(
-          debugShowCheckedModeBanner: false,
-          home: Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error, color: Colors.red, size: 48),
-                  const SizedBox(height: 16),
-                  Text('Error al cargar la aplicación: $error'),
-                ],
-              ),
-            ),
-          ),
-        ),
+        routerConfig: mobileRouter,
       );
     }
+
+    return MaterialApp.router(
+      key: ValueKey(language?.languageCode ?? 'default'),
+      locale: language ?? const Locale('es'),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('es'), Locale('en')],
+      title: "Migra Ayuda",
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        scaffoldBackgroundColor: ColorConstants.background,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.teal),
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        fontFamily: 'Inter',
+        useMaterial3: true,
+      ),
+      routerConfig: mobileRouter,
+    );
   }
 }

@@ -6,8 +6,8 @@ import 'package:migra_ayuda/features/entities/presentation/screens/mobile/mapbox
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/filter_container.dart';
 
 
-class HomeCardScreen extends ConsumerWidget {
-  HomeCardScreen({super.key});
+class HomeScreen extends ConsumerWidget {
+  HomeScreen({super.key});
 
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
