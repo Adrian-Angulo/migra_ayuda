@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/activity_actions.dart';
-import 'package:migra_ayuda/core/errors/error_mappers.dart';
 import 'package:migra_ayuda/core/router/app_router_mobile.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
@@ -49,7 +48,7 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
       }
     } on FirebaseAuthException catch (e, stack) {
       debugPrint('❌ Error de autenticación: ${e.message}');
-      state = AsyncValue.error(ErrorMappers.getAuthErrorMessage(e), stack);
+      state = AsyncValue.error(e.code, stack);
       ref.read(routerMovilNotifierProvider).refresh();
     } catch (e, stack) {
       debugPrint('❌ Error inesperado en login: $e');
@@ -95,7 +94,7 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
       debugPrint('Inicio de sesion con login');
     } on FirebaseAuthException catch (e, stack) {
       debugPrint('❌ Error de autenticación con Google: ${e.message}');
-      state = AsyncValue.error(ErrorMappers.getAuthErrorMessage(e), stack);
+      state = AsyncValue.error(e.code, stack);
       ref.read(routerMovilNotifierProvider).refresh();
     } catch (e, stack) {
       debugPrint('❌ Error inesperado en authWithGoogle: $e');
@@ -130,7 +129,7 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
       }
     } on FirebaseAuthException catch (e, stack) {
       print('❌ Error al completar perfil: ${e.message}');
-      state = AsyncValue.error(ErrorMappers.getAuthErrorMessage(e), stack);
+      state = AsyncValue.error(e.code, stack);
       ref.read(routerMovilNotifierProvider).refresh();
     } catch (e, stack) {
       print('❌ Error inesperado al completar perfil: $e');

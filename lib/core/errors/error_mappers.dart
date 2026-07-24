@@ -1,31 +1,33 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class ErrorMappers {
-    /// Obtener mensaje de error amigable
-  static String getAuthErrorMessage(FirebaseAuthException e) {
-    switch (e.code) {
+  /// Obtener mensaje de error amigable
+  static String getAuthErrorMessage(String error, BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    switch (error) {
       case 'user-not-found':
-        return 'No existe un usuario con este correo';
+        return l10n.authErrorUserNotFoundCode;
       case 'wrong-password':
-        return 'Contraseña incorrecta';
+        return l10n.authErrorWrongPassword;
       case 'invalid-email':
-        return 'Correo electrónico inválido';
+        return l10n.authErrorInvalidEmailCode;
       case 'user-disabled':
-        return 'Esta cuenta ha sido deshabilitada';
+        return l10n.authErrorUserDisabled;
       case 'email-already-in-use':
-        return 'Este correo ya está en uso';
+        return l10n.authErrorEmailAlreadyInUse;
       case 'operation-not-allowed':
-        return 'Operación no permitida';
+        return l10n.authErrorOperationNotAllowedCode;
       case 'weak-password':
-        return 'La contraseña es muy débil';
+        return l10n.authErrorWeakPasswordCode;
       case 'account-exists-with-different-credential':
-        return 'Ya existe una cuenta con este correo usando otro método';
+        return l10n.authErrorAccountExistsWithDifferentCredential;
       case 'invalid-credential':
-        return 'Credenciales inválidas';
+        return l10n.authErrorInvalidCredentialCode;
       case 'network-request-failed':
-        return 'Error de conexión. Verifica tu internet';
+        return l10n.authErrorNetworkRequestFailed;
       default:
-        return e.message ?? 'Error de autenticación';
+        return l10n.authErrorDefault;
     }
   }
 }

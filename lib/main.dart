@@ -39,6 +39,15 @@ class _MainAppState extends ConsumerState<MainApp> {
 
     if (kIsWeb) {
       return MaterialApp.router(
+        key: const ValueKey('web-es'),
+        locale: const Locale('es'),
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('es'), Locale('en')],
         title: "Migra Ayuda",
         debugShowCheckedModeBanner: false,
         theme: ThemeData(

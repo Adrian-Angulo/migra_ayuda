@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/errors/error_mappers.dart';
 import 'package:migra_ayuda/core/widgets/snackbar_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/complete_info_screen.dart';
@@ -41,7 +42,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           if (user != null) {
             if (user.role == 'Migrante') {
               // Registra la actividad de inicio de sesión en la auditoría
-              
+
               if (!context.mounted) return;
               // Redirige según el estado del perfil y el rol del usuario
               if (user.profileComplete == false) {
@@ -69,7 +70,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           }
         }, error: (error, stackTrace) {
           // Muestra el error de autenticación en un snackbar
-          SnackbarWidget.error(context, error.toString());
+          SnackbarWidget.error(context,
+              ErrorMappers.getAuthErrorMessage(error.toString(), context));
         });
       },
     );

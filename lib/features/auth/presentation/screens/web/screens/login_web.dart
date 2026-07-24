@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:migra_ayuda/core/errors/error_mappers.dart';
 import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/core/widgets/snackbar_web_widget.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
@@ -33,7 +34,7 @@ class _LoginWebState extends ConsumerState<LoginWeb> {
             if (previous?.value == user) return;
             if (user == null) return;
             if (!mounted) return;
-            final role = user.role ;
+            final role = user.role;
             if (role != "Admin") {
               SnackbarWebWidget.info(
                   context, '¡No Tienes permiso de administrador!');
@@ -46,7 +47,8 @@ class _LoginWebState extends ConsumerState<LoginWeb> {
             }
           },
           error: (error, stackTrace) {
-            SnackbarWebWidget.error(context, error.toString());
+            SnackbarWebWidget.error(
+                context, ErrorMappers.getAuthErrorMessage(error.toString(), context));
           },
         );
       });

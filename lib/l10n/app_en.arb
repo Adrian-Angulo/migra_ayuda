@@ -100,5 +100,16 @@
   "authErrorNetwork": "Internet connection error",
   "authErrorUnexpected": "An unexpected error occurred",
   "authErrorUserDataNotFound": "User data not found",
-  "alerMessageAdmin": "You are an administrator, log in to the web panel"
+  "alerMessageAdmin": "You are an administrator, log in to the web panel",
+  "authErrorUserNotFoundCode": "No user exists with this email",
+  "authErrorWrongPassword": "Incorrect password",
+  "authErrorInvalidEmailCode": "Invalid email address",
+  "authErrorUserDisabled": "This account has been disabled",
+  "authErrorEmailAlreadyInUse": "This email is already in use",
+  "authErrorOperationNotAllowedCode": "Operation not allowed",
+  "authErrorWeakPasswordCode": "The password is too weak",
+  "authErrorAccountExistsWithDifferentCredential": "An account already exists with this email using a different method",
+  "authErrorInvalidCredentialCode": "Invalid credentials",
+  "authErrorNetworkRequestFailed": "Connection error. Check your internet",
+  "authErrorDefault": "Authentication error"
 }

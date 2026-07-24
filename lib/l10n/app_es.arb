@@ -401,5 +401,51 @@
         "description": "Error: datos de usuario no encontrados"
     },
     "alerMessageAdmin": "¡Eres administrador, ingresa al panel web!",
-    "@alerMessageAdmin": { "description": "Mensaje para indicar que es administrador"}
+    "@alerMessageAdmin": { "description": "Mensaje para indicar que es administrador"},
+
+    "authErrorUserNotFoundCode": "No existe un usuario con este correo",
+    "@authErrorUserNotFoundCode": {
+        "description": "Error auth: no existe usuario con este correo"
+    },
+    "authErrorWrongPassword": "Contraseña incorrecta",
+    "@authErrorWrongPassword": {
+        "description": "Error auth: contraseña incorrecta"
+    },
+    "authErrorInvalidEmailCode": "Correo electrónico inválido",
+    "@authErrorInvalidEmailCode": {
+        "description": "Error auth: correo electrónico inválido"
+    },
+    "authErrorUserDisabled": "Esta cuenta ha sido deshabilitada",
+    "@authErrorUserDisabled": {
+        "description": "Error auth: cuenta deshabilitada"
+    },
+    "authErrorEmailAlreadyInUse": "Este correo ya está en uso",
+    "@authErrorEmailAlreadyInUse": {
+        "description": "Error auth: correo ya en uso"
+    },
+    "authErrorOperationNotAllowedCode": "Operación no permitida",
+    "@authErrorOperationNotAllowedCode": {
+        "description": "Error auth: operación no permitida"
+    },
+    "authErrorWeakPasswordCode": "La contraseña es muy débil",
+    "@authErrorWeakPasswordCode": {
+        "description": "Error auth: contraseña muy débil"
+    },
+    "authErrorAccountExistsWithDifferentCredential": "Ya existe una cuenta con este correo usando otro método",
+    "@authErrorAccountExistsWithDifferentCredential": {
+        "description": "Error auth: cuenta existente con diferente credencial"
+    },
+    "authErrorInvalidCredentialCode": "Correo y/o contraseña incorrectas",
+    "@authErrorInvalidCredentialCode": {
+        "description": "Error auth: credenciales inválidas"
+    },
+    "authErrorNetworkRequestFailed": "Error de conexión. Verifica tu internet",
+    "@authErrorNetworkRequestFailed": {
+        "description": "Error auth: fallo de conexión de red"
+    },
+    "authErrorDefault": "Error de autenticación",
+    "@authErrorDefault": {
+        "description": "Error auth: error genérico de autenticación"
+    }
+
 }

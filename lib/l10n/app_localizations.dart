@@ -703,6 +703,72 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'¡Eres administrador, ingresa al panel web!'**
   String get alerMessageAdmin;
+
+  /// Error auth: no existe usuario con este correo
+  ///
+  /// In es, this message translates to:
+  /// **'No existe un usuario con este correo'**
+  String get authErrorUserNotFoundCode;
+
+  /// Error auth: contraseña incorrecta
+  ///
+  /// In es, this message translates to:
+  /// **'Contraseña incorrecta'**
+  String get authErrorWrongPassword;
+
+  /// Error auth: correo electrónico inválido
+  ///
+  /// In es, this message translates to:
+  /// **'Correo electrónico inválido'**
+  String get authErrorInvalidEmailCode;
+
+  /// Error auth: cuenta deshabilitada
+  ///
+  /// In es, this message translates to:
+  /// **'Esta cuenta ha sido deshabilitada'**
+  String get authErrorUserDisabled;
+
+  /// Error auth: correo ya en uso
+  ///
+  /// In es, this message translates to:
+  /// **'Este correo ya está en uso'**
+  String get authErrorEmailAlreadyInUse;
+
+  /// Error auth: operación no permitida
+  ///
+  /// In es, this message translates to:
+  /// **'Operación no permitida'**
+  String get authErrorOperationNotAllowedCode;
+
+  /// Error auth: contraseña muy débil
+  ///
+  /// In es, this message translates to:
+  /// **'La contraseña es muy débil'**
+  String get authErrorWeakPasswordCode;
+
+  /// Error auth: cuenta existente con diferente credencial
+  ///
+  /// In es, this message translates to:
+  /// **'Ya existe una cuenta con este correo usando otro método'**
+  String get authErrorAccountExistsWithDifferentCredential;
+
+  /// Error auth: credenciales inválidas
+  ///
+  /// In es, this message translates to:
+  /// **'Correo y/o contraseña incorrectas'**
+  String get authErrorInvalidCredentialCode;
+
+  /// Error auth: fallo de conexión de red
+  ///
+  /// In es, this message translates to:
+  /// **'Error de conexión. Verifica tu internet'**
+  String get authErrorNetworkRequestFailed;
+
+  /// Error auth: error genérico de autenticación
+  ///
+  /// In es, this message translates to:
+  /// **'Error de autenticación'**
+  String get authErrorDefault;
 }
 
 class _AppLocalizationsDelegate

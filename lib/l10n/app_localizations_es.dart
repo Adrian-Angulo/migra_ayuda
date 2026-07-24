@@ -321,4 +321,41 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get alerMessageAdmin => '¡Eres administrador, ingresa al panel web!';
+
+  @override
+  String get authErrorUserNotFoundCode =>
+      'No existe un usuario con este correo';
+
+  @override
+  String get authErrorWrongPassword => 'Contraseña incorrecta';
+
+  @override
+  String get authErrorInvalidEmailCode => 'Correo electrónico inválido';
+
+  @override
+  String get authErrorUserDisabled => 'Esta cuenta ha sido deshabilitada';
+
+  @override
+  String get authErrorEmailAlreadyInUse => 'Este correo ya está en uso';
+
+  @override
+  String get authErrorOperationNotAllowedCode => 'Operación no permitida';
+
+  @override
+  String get authErrorWeakPasswordCode => 'La contraseña es muy débil';
+
+  @override
+  String get authErrorAccountExistsWithDifferentCredential =>
+      'Ya existe una cuenta con este correo usando otro método';
+
+  @override
+  String get authErrorInvalidCredentialCode =>
+      'Correo y/o contraseña incorrectas';
+
+  @override
+  String get authErrorNetworkRequestFailed =>
+      'Error de conexión. Verifica tu internet';
+
+  @override
+  String get authErrorDefault => 'Error de autenticación';
 }

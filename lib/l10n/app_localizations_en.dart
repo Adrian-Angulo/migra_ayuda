@@ -321,4 +321,39 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get alerMessageAdmin =>
       'You are an administrator, log in to the web panel';
+
+  @override
+  String get authErrorUserNotFoundCode => 'No user exists with this email';
+
+  @override
+  String get authErrorWrongPassword => 'Incorrect password';
+
+  @override
+  String get authErrorInvalidEmailCode => 'Invalid email address';
+
+  @override
+  String get authErrorUserDisabled => 'This account has been disabled';
+
+  @override
+  String get authErrorEmailAlreadyInUse => 'This email is already in use';
+
+  @override
+  String get authErrorOperationNotAllowedCode => 'Operation not allowed';
+
+  @override
+  String get authErrorWeakPasswordCode => 'The password is too weak';
+
+  @override
+  String get authErrorAccountExistsWithDifferentCredential =>
+      'An account already exists with this email using a different method';
+
+  @override
+  String get authErrorInvalidCredentialCode => 'Invalid credentials';
+
+  @override
+  String get authErrorNetworkRequestFailed =>
+      'Connection error. Check your internet';
+
+  @override
+  String get authErrorDefault => 'Authentication error';
 }
