@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/core/constants/constants.dart';
+import 'package:migra_ayuda/core/constants/services_utils.dart';
 
 // SOLID: Single Responsibility - Widget solo para mostrar chips de servicios
 class ServiceChip extends StatelessWidget {

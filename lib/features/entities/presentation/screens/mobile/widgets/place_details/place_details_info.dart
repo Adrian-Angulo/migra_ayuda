@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/core/providers/location_provider.dart';
+import 'package:migra_ayuda/core/localitation/location_provider.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 
 class PlaceDetailsInfo extends ConsumerWidget {

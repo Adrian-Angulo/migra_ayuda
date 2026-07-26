@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
-import 'package:migra_ayuda/core/providers/location_provider.dart';
+import 'package:migra_ayuda/core/localitation/location_provider.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/filter_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/map_provider.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/entity_seleted_details.dart';

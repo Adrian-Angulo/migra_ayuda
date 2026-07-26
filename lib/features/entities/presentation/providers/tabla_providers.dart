@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:migra_ayuda/core/constants/constants.dart';
+import 'package:migra_ayuda/core/constants/services_utils.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entities_datasource.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 

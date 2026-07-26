@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/core/database/sembast_database.dart';
+import 'package:migra_ayuda/core/config/sembast_database.dart';
 import 'package:migra_ayuda/core/network/network_provider.dart';
 import 'package:migra_ayuda/features/entities/data/datasources/entity_local_datasource.dart';
 import 'package:migra_ayuda/features/entities/data/datasources/entity_remote_datasource.dart';

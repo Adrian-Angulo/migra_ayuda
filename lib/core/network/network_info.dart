@@ -5,16 +5,15 @@ abstract class NetworkInfo {
   /// Verifica si hay conexión a internet
   /// Retorna true si hay conexión WiFi o móvil, false en caso contrario
   Future<bool> get isConnected;
-
   /// Stream que emite eventos cuando cambia el estado de la conexión
   Stream<bool> get onConnectivityChanged;
 }
 
 /// Implementación de NetworkInfo usando connectivity_plus
 class NetworkInfoImpl implements NetworkInfo {
-  final Connectivity connectivity;
+  final Connectivity connectivity = Connectivity();
 
-  NetworkInfoImpl(this.connectivity);
+  NetworkInfoImpl();
 
   @override
   Future<bool> get isConnected async {

@@ -1,5 +1,5 @@
 import 'package:sembast/sembast.dart';
-import 'package:migra_ayuda/core/database/sembast_database.dart';
+import 'package:migra_ayuda/core/config/sembast_database.dart';
 import 'package:migra_ayuda/features/userActivity/data/models/user_activity_model.dart';
 
 /// Excepción personalizada para errores de caché

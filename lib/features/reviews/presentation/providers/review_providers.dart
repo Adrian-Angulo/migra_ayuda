@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/activity_actions.dart';
-import 'package:migra_ayuda/core/database/sembast_database.dart';
+import 'package:migra_ayuda/core/config/sembast_database.dart';
 import 'package:migra_ayuda/core/enum/enums.dart';
 import 'package:migra_ayuda/core/network/network_provider.dart';
 import 'package:migra_ayuda/features/reviews/data/datasources/review_local_datasource.dart';

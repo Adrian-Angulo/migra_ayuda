@@ -51,10 +51,6 @@ class SembastDatabase {
       // Crea la ruta completa para la base de datos
       final dbPath = join(appDocumentDir.path, _dbName);
 
-      // 🐛 DEBUG: Imprime la ruta de la base de datos
-      print('📁 Base de datos Sembast ubicada en:');
-      print('   $dbPath');
-
       // Abre la base de datos
       _database = await databaseFactoryIo.openDatabase(dbPath);
 

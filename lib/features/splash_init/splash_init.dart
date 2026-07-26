@@ -2,7 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:migra_ayuda/core/database/sembast_database.dart';
+import 'package:migra_ayuda/core/config/sembast_database.dart';
 import 'package:migra_ayuda/core/router/app_router_mobile.dart';
 import 'package:migra_ayuda/core/router/routes.dart';
 

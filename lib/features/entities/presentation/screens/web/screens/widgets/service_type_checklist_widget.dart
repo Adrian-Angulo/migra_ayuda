@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/core/constants/constants.dart';
+import 'package:migra_ayuda/core/constants/services_utils.dart';
 
 class ServiceTypeChecklistWidget extends StatelessWidget {
   final List<String> selectedServices;

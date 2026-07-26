@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:migra_ayuda/core/services/locationService/location_service.dart';
+import 'package:migra_ayuda/core/localitation/location_service.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 
 /// Provider del servicio de ubicación.
