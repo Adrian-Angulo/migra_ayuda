@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/constants/services_utils.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/map_provider.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/entity_seleted_details.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/entity_card_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/text_result.dart';
+import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class ListEntitesHome extends ConsumerStatefulWidget {
   const ListEntitesHome({
@@ -23,6 +25,7 @@ class _ListEntitesHomeState extends ConsumerState<ListEntitesHome> {
     String selectedFiltro = ref.watch(filterProvider);
     final listEntity = ref.watch(getAllEntitiesProvider);
     final map = ref.watch(mapProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return DraggableScrollableSheet(
       controller: controllerD,
@@ -69,7 +72,8 @@ class _ListEntitesHomeState extends ConsumerState<ListEntitesHome> {
                                     size: 48, color: Colors.grey),
                                 const SizedBox(height: 12),
                                 Text(
-                                  'No se encontraron entidades proveedoras de servicio $selectedFiltro',
+                                  //entitiesEmpyList
+                                  '${l10n.entitesEmpyList} ${getServicel10n(selectedFiltro, context)}',
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(color: Colors.grey),
                                 ),
@@ -97,7 +101,8 @@ class _ListEntitesHomeState extends ConsumerState<ListEntitesHome> {
                                     color: Colors.red, size: 48),
                                 const SizedBox(height: 12),
                                 Text(
-                                  'Ocurrió un error al cargar los servicios',
+                                  //entitesError
+                                  l10n.entitesError,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(color: Colors.red[700]),
                                 ),

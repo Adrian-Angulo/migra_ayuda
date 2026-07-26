@@ -14,20 +14,11 @@ abstract class EntityRepository {
     Uint8List? imagenBytes,
     String? fileName,
   });
-
+  
   Future<Either<String, Unit>> deleteEntity(String entityId);
-
   Stream<Either<String, List<EntityEntity>>> getAllEntites2();
-
   Future<Either<String, List<EntityEntity>>> getAllEntities();
-
   Future<Either<String, EntityEntity>> getEntityById(String id);
-
-  /// Sincroniza todas las entidades desde Firebase a la base de datos local
-  ///
-  /// Este método descarga TODAS las entidades de Firebase y las guarda en Sembast.
-  /// Retorna [Right(Unit)] si la sincronización fue exitosa
-  /// Retorna [Left(String)] con el mensaje de error si falla
   Future<Either<String, Unit>> syncAllFromFirebase();
   
 }

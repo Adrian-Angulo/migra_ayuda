@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
 
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/v2/entity_crud_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/image_picker_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/service_type_checklist_widget.dart';
 

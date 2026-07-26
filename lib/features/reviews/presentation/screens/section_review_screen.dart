@@ -6,6 +6,7 @@ import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.d
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 import 'package:migra_ayuda/features/reviews/presentation/screens/place_add_review.dart';
+import 'package:migra_ayuda/l10n/app_localizations.dart';
 import '../widgets/review_item.dart';
 
 class SectionReviews extends ConsumerStatefulWidget {
@@ -23,6 +24,7 @@ class SectionReviews extends ConsumerStatefulWidget {
 class _SectionReviewsState extends ConsumerState<SectionReviews> {
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final asyncReviews = ref.watch(getReviewsByEntity(widget.entity.id));
     final authState = ref.watch(authNotifierProvider);
     final user = authState.value;
@@ -37,7 +39,7 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              '$countReviews ${countReviews == 1 ? 'Reseña' : 'Reseñas'}',
+              '$countReviews ${countReviews == 1 ? l10n.review : l10n.reviews}',
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -57,9 +59,9 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
                     ),
                   );
                 },
-                child: const Text(
-                  "Añadir comentario",
-                  style: TextStyle(
+                child: Text(
+                  l10n.addComment,
+                  style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF059669),
@@ -105,6 +107,7 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
   }
 
   Center messageError() {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 24),
@@ -140,6 +143,7 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
   }
 
   Center messageEmty() {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 24),
@@ -153,19 +157,11 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
             ),
             const SizedBox(height: 12),
             Text(
-              "Aún no hay comentarios",
+              l10n.noReviews,
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
                 color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              "Sé el primero en dejar una reseña",
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.grey[400],
               ),
             ),
           ],

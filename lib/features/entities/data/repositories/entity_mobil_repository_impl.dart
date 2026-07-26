@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:dartz/dartz.dart';
+import 'package:flutter/rendering.dart';
 import 'package:migra_ayuda/core/network/network_info.dart';
 import 'package:migra_ayuda/features/entities/data/datasources/entity_local_datasource.dart';
 import 'package:migra_ayuda/features/entities/data/datasources/entity_remote_datasource.dart';
@@ -26,16 +27,15 @@ class EntityMobilRepositoryImpl implements EntityRepository {
   }) async {
     try {
       final modelo = EntityModels(
-        id: '',
-        name: entity.name,
-        description: entity.description,
-        services: entity.services,
-        address: entity.address,
-        localitation: entity.localitation,
-        phone: entity.phone,
-        imageUrl: '',
-        schedule: entity.schedule
-      );
+          id: '',
+          name: entity.name,
+          description: entity.description,
+          services: entity.services,
+          address: entity.address,
+          localitation: entity.localitation,
+          phone: entity.phone,
+          imageUrl: '',
+          schedule: entity.schedule);
 
       // Verifica si hay conexión
       final isConnected = await networkInfo.isConnected;
@@ -73,18 +73,17 @@ class EntityMobilRepositoryImpl implements EntityRepository {
   }) async {
     try {
       final modelo = EntityModels(
-        id: entity.id,
-        name: entity.name,
-        description: entity.description,
-        services: entity.services,
-        address: entity.address,
-        localitation: entity.localitation,
-        phone: entity.phone,
-        averageRating: entity.averageRating,
-        totalReviews: entity.totalReviews,
-        imageUrl: entity.imageUrl,
-        schedule: entity.schedule
-      );
+          id: entity.id,
+          name: entity.name,
+          description: entity.description,
+          services: entity.services,
+          address: entity.address,
+          localitation: entity.localitation,
+          phone: entity.phone,
+          averageRating: entity.averageRating,
+          totalReviews: entity.totalReviews,
+          imageUrl: entity.imageUrl,
+          schedule: entity.schedule);
 
       // Primero actualiza en caché local
       await localDataSource.cacheEntity(modelo);
@@ -109,9 +108,7 @@ class EntityMobilRepositoryImpl implements EntityRepository {
       // Si no hay internet, solo se actualiza localmente
 
       return right(unit);
-    } 
-    catch (e) {
-
+    } catch (e) {
       return left(e.toString());
     }
   }
@@ -138,7 +135,7 @@ class EntityMobilRepositoryImpl implements EntityRepository {
       // Si no hay internet, solo se elimina localmente
 
       return right(unit);
-    }  catch (e) {
+    } catch (e) {
       return left('Error al eliminar la entidad: ${e.toString()}');
     }
   }
@@ -186,7 +183,7 @@ class EntityMobilRepositoryImpl implements EntityRepository {
 
       // 4. Sin caché y sin internet
       return left('No hay datos disponibles. Verifica tu conexión a internet.');
-    }  catch (e) {
+    } catch (e) {
       return left('Error al obtener las entidades: ${e.toString()}');
     }
   }
@@ -244,22 +241,28 @@ class EntityMobilRepositoryImpl implements EntityRepository {
   Future<Either<String, Unit>> syncAllFromFirebase() async {
     try {
       // 1. Verificar conexión a internet
+      debugPrint('iniciando sincronizacion');
       final isConnected = await networkInfo.isConnected;
       if (!isConnected) {
+        debugPrint('existe conexion');
         return left('Sin conexión a internet para sincronizar');
       }
-
+      debugPrint('existe conexion');
       // 2. Descargar TODAS las entidades de Firebase
       final remoteEntities = await remoteDataSource.getAllEntities();
-
+      debugPrint('entidades descargadas');
       // 3. Limpiar caché y guardar todo
       await localDataSource.clearCache();
+      debugPrint('limpiando cache');
       await localDataSource.cacheEntities(remoteEntities);
+      debugPrint('agregando entidades a cache');
 
       return right(unit);
     } on ServerException catch (e) {
+      debugPrint('Ocurrio un error de servidor');
       return left('Error del servidor: ${e.message}');
-    }  catch (e) {
+    } catch (e) {
+      debugPrint('Error a sincronizar $e');
       return left(
           'Error al sincronizar entidades desde Firebase: ${e.toString()}');
     }
@@ -267,7 +270,6 @@ class EntityMobilRepositoryImpl implements EntityRepository {
 
   @override
   Stream<Either<String, List<EntityEntity>>> getAllEntites2() {
-    // TODO: implement getAllEntites2
     throw UnimplementedError();
   }
 }

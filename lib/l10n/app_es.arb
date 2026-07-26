@@ -446,6 +446,135 @@
     "authErrorDefault": "Error de autenticación",
     "@authErrorDefault": {
         "description": "Error auth: error genérico de autenticación"
+    },
+
+    "entitesEmpyList" : "No se encontraron entidades proveedoras de servicio",
+    "@entitesEmpyList": { "description": "Entity: Lista vacia"},
+
+    "entitesError": "Ocurrió un error al cargar los servicios",
+    "@entitesError": { "description": "Entities: error"},
+    "entitiesSearchOne": "entidad encontrada", 
+    "@entitiesSearchOne": {"description": "una entidad encontrada"},
+    "entitiesSearch": "entidades encontradas",
+    "@entitiesSearch": {"description": "varias entidades encontradas"},
+    "filterStateAll": "Todos", 
+    "@filterStateAll": {"description": "filtro todos selecionado"},
+    "filterStateLegal" : "Asesoria Juridica",
+    "@filterStateLegal": {"description": "filtro asesoria juridica"},
+    "filterStateMedical": "Atención Médica",
+    "@filterStateMedical": {"description": "filtro atención médica"},
+    "filterStateFoodSupport": "Apoyo Alimentario",
+    "@filterStateFoodSupport": {"description": "filtro apoyo alimentario"},
+    "filterStateTemporaryLodging": "Hospedaje Temporal",
+    "@filterStateTemporaryLodging": {"description": "filtro hospedaje temporal"},
+    "filterStateLaborInsertion": "Inserción Laboral",
+    "@filterStateLaborInsertion": {"description": "filtro inserción laboral"},
+    "filterStateMobility": "Movilidad y Transporte",
+    "@filterStateMobility": {"description": "filtro movilidad y transporte"}
+    ,
+    "rating": "Valoración",
+    "@rating": {
+        "description": "Label para valoración"
+    },
+    "description": "Descripción",
+    "@description": {
+        "description": "Label para descripción"
+    },
+    "attentionSchedule": "Horario de atención",
+    "@attentionSchedule": {
+        "description": "Label para horario de atención"
+    },
+    "phone": "Teléfono",
+    "@phone": {
+        "description": "Label para teléfono"
+    },
+    "notDefined": "No definido",
+    "@notDefined": {
+        "description": "Texto cuando un campo no está definido"
+    },
+    "address": "Dirección",
+    "@address": {
+        "description": "Label para dirección"
+    },
+    "fromYourLocation": "De tu ubicación",
+    "@fromYourLocation": {
+        "description": "Texto indicando distancia desde la ubicación del usuario"
+    },
+    "howToGetThere": "Cómo llegar",
+    "@howToGetThere": {
+        "description": "Label para indicaciones de cómo llegar"
+    },
+    "startTrip": "Iniciar viaje",
+    "@startTrip": {
+        "description": "Botón para iniciar navegación hacia el destino"
+    },
+    "reviews": "Reseñas",
+    "@reviews": {
+        "description": "Label para sección de reseñas"
+    },
+    "review": "Reseñas",
+    "@review": {
+        "description": "Label para sección de reseñas"
+    },
+    "addComment": "Añadir comentario",
+    "@addComment": {
+        "description": "Botón para añadir un comentario o reseña"
     }
+,
+    "noReviews": "Sin reseñas aún",
+    "@noReviews": {
+        "description": "Texto cuando no hay reseñas disponibles en la pantalla de detalles de entidad"
+    },
+    "writeComment": "Escribe tu comentario...",
+    "@writeComment": {
+        "description": "Placeholder para el campo de comentario en la pantalla de detalles de entidad"
+    },
+    "submitReview": "Enviar reseña",
+    "@submitReview": {
+        "description": "Botón para enviar una reseña en la pantalla de detalles de entidad"
+    },
+    "howWouldYouRateThisEntity": "¿Como calificarías esta entidad",
+    "@howWouldYouRateThisEntity": {"description": "Titulo review"},
+    "describeYourExperienceToHelpOtherUsers": "Describe tu experiencia para ayudar a otros usuario",
+    "@describeYourExperienceToHelpOtherUsers": {"description": "descripcion de reseña"},
+    "comentarioPublicadoExitosamenteReview": "¡Reseña publicada exitosamente!",
+    "@comentarioPublicadoExitosamenteReview": {
+        "description": "Mensaje de éxito al publicar una reseña"
+    },
+    "porFavorEscribeUnComentarioReview": "Por favor escribe un comentario",
+    "@porFavorEscribeUnComentarioReview": {
+        "description": "Mensaje de error cuando no se escribe un comentario"
+    },
+    "comentarioMenorA10Caracteres": "El comentario debe tener al menos 10 caracteres",
+    "@comentarioMenorA10Caracteres": {
+        "description": "Error de validación: comentario demasiado corto"
+    },
+    "comentarioNoPuedeExcederlos200": "El comentario no puede exceder los 200 caracteres",
+    "@comentarioNoPuedeExcederlos200": {
+        "description": "Error de validación: comentario demasiado largo"
+    },
+    "submitLoad": "Enviando...",
+    "@submitLoad": {
+        "description": "Mesaje cargando al enviar una reseña"
+    },
+    "errorCommentRequired": "El comentario no puede estar vacío",
+    "@errorCommentRequired": {
+        "description": "Error de validación: comentario requerido en la pantalla de detalles de entidad"
+    },
+    "errorRatingRequired": "Por favor selecciona una valoración",
+    "@errorRatingRequired": {
+        "description": "Error de validación: valoración requerida en la pantalla de detalles de entidad"
+    },
+    "schedule": "Horario",
+    "@schedule": {
+        "description": "Label para horario en la pantalla de detalles de entidad"
+    }
+    
+    
+    
+    
+    
+    
+
 
 }

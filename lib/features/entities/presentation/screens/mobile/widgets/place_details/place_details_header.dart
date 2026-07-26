@@ -5,6 +5,7 @@ import 'package:migra_ayuda/core/constants/services_utils.dart';
 
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
+import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class PlaceDetailsHeader extends ConsumerWidget {
   final EntityEntity entity;
@@ -17,7 +18,7 @@ class PlaceDetailsHeader extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ratingMeanAndLengt = ref.watch(meanReviewByEntity(entity.id));
-    
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,9 +40,10 @@ class PlaceDetailsHeader extends ConsumerWidget {
             ratingMeanAndLengt.when(
               data: (data) => Row(
                 children: [
-                  const Text(
-                    'Valoracion: ',
-                    style: TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
+                  Text(
+                    "${l10n.rating}: ",
+                    style:
+                        const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
                   ),
                   Text(
                     '${data['mean']}',
@@ -68,7 +70,6 @@ class PlaceDetailsHeader extends ConsumerWidget {
                   const Text('Error'),
               loading: () => const Text('-----'),
             ),
-            
             const SizedBox(height: 12),
             Wrap(
               spacing: 5,
@@ -77,7 +78,7 @@ class PlaceDetailsHeader extends ConsumerWidget {
                 ...entity.services.map(
                   (service) => PlaceInfoChip(
                     icon: getServiceIcon(service),
-                    label: service,
+                    label: getServicel10n(service, context),
                   ),
                 ),
               ],

@@ -4,7 +4,7 @@ import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/constants/services_utils.dart';
 import 'package:migra_ayuda/core/widgets/snackbar_web_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/tabla_providers.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/v2/entity_crud_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/export_button_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/filter_button.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/table_entities.dart';

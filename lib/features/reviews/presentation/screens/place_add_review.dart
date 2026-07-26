@@ -8,6 +8,7 @@ import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/floating_main_button.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
+import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class PlaceAddReview extends ConsumerStatefulWidget {
   final EntityEntity entity;
@@ -36,7 +37,7 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
   @override
   Widget build(BuildContext context) {
     UserModel user = widget.user!;
-
+    final l10n = AppLocalizations.of(context)!;
     // Escucha el estado de creación de review
     ref.listen(
       reviewNotifierProvider,
@@ -44,7 +45,7 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
         if (previous?.isLoading == true && !next.isLoading) {
           if (next.value == ReviewState.creating) {
             SnackbarWidget.success(
-                context, 'Comentario publicado exitosamente');
+                context, l10n.comentarioPublicadoExitosamenteReview);
             Future.delayed(const Duration(seconds: 1), () {
               if (context.mounted) Navigator.pop(context);
             });
@@ -132,9 +133,9 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                   const SizedBox(
                     height: 16,
                   ),
-                  const Text(
-                    '¿Cómo calificarías esta entidad?',
-                    style: TextStyle(
+                  Text(
+                    l10n.howWouldYouRateThisEntity,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1A1A),
@@ -148,7 +149,7 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                       direction: Axis.horizontal,
                       allowHalfRating: true,
                       itemCount: 5,
-                      itemPadding: const EdgeInsetsGeometry.all(8),
+                      itemPadding: const EdgeInsets.all(8),
                       itemBuilder: (context, index) => const Icon(
                         Icons.star,
                         color: Colors.amber,
@@ -160,9 +161,9 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                       },
                     ),
                   ),
-                  const Text(
-                    'Describe tu experiencia para ayudar a otros usuarios',
-                    style: TextStyle(
+                  Text(
+                    l10n.describeYourExperienceToHelpOtherUsers,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1A1A),
@@ -174,27 +175,27 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                   TextFormField(
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return 'Por favor escribe un comentario';
+                        return l10n.porFavorEscribeUnComentarioReview;
                       }
                       if (value.trim().length < 10) {
-                        return 'El comentario debe tener al menos 10 caracteres';
+                        return l10n.comentarioMenorA10Caracteres;
                       }
-                      if (value.trim().length > 500) {
-                        return 'El comentario no puede exceder 500 caracteres';
+                      if (value.trim().length > 200) {
+                        return l10n.comentarioNoPuedeExcederlos200;
                       }
                       return null;
                     },
                     controller: commetController,
                     maxLines: 5,
                     minLines: 5,
-                    maxLength: 500,
+                    maxLength: 200,
                     keyboardType: TextInputType.multiline,
                     style: const TextStyle(
                       fontSize: 14,
                       color: Color(0xFF1A1A1A),
                     ),
                     decoration: InputDecoration(
-                      hintText: 'Escribe tu comentario aquí...',
+                      hintText: l10n.writeComment,
                       hintStyle: const TextStyle(
                         color: Color(0xFF9CA3AF),
                         fontSize: 14,
@@ -239,9 +240,11 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 10),
                   FloatingMainButton(
                     onTap: () async {
+                      if (!formkey.currentState!.validate()) return;
+
                       final review = ReviewEntity(
                           idMigrante: user.id,
                           idEntity: widget.entity.id,
@@ -255,7 +258,7 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                           .read(reviewNotifierProvider.notifier)
                           .createReview(review);
                     },
-                    text: isLoading ? 'Publicando...' : 'Publicar Comentario',
+                    text: isLoading ? l10n.submitLoad : l10n.submitReview,
                   )
                 ],
               ),

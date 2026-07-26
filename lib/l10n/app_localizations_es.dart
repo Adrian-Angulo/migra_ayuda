@@ -358,4 +358,118 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get authErrorDefault => 'Error de autenticación';
+
+  @override
+  String get entitesEmpyList =>
+      'No se encontraron entidades proveedoras de servicio';
+
+  @override
+  String get entitesError => 'Ocurrió un error al cargar los servicios';
+
+  @override
+  String get entitiesSearchOne => 'entidad encontrada';
+
+  @override
+  String get entitiesSearch => 'entidades encontradas';
+
+  @override
+  String get filterStateAll => 'Todos';
+
+  @override
+  String get filterStateLegal => 'Asesoria Juridica';
+
+  @override
+  String get filterStateMedical => 'Atención Médica';
+
+  @override
+  String get filterStateFoodSupport => 'Apoyo Alimentario';
+
+  @override
+  String get filterStateTemporaryLodging => 'Hospedaje Temporal';
+
+  @override
+  String get filterStateLaborInsertion => 'Inserción Laboral';
+
+  @override
+  String get filterStateMobility => 'Movilidad y Transporte';
+
+  @override
+  String get rating => 'Valoración';
+
+  @override
+  String get description => 'Descripción';
+
+  @override
+  String get attentionSchedule => 'Horario de atención';
+
+  @override
+  String get phone => 'Teléfono';
+
+  @override
+  String get notDefined => 'No definido';
+
+  @override
+  String get address => 'Dirección';
+
+  @override
+  String get fromYourLocation => 'De tu ubicación';
+
+  @override
+  String get howToGetThere => 'Cómo llegar';
+
+  @override
+  String get startTrip => 'Iniciar viaje';
+
+  @override
+  String get reviews => 'Reseñas';
+
+  @override
+  String get review => 'Reseñas';
+
+  @override
+  String get addComment => 'Añadir comentario';
+
+  @override
+  String get noReviews => 'Sin reseñas aún';
+
+  @override
+  String get writeComment => 'Escribe tu comentario...';
+
+  @override
+  String get submitReview => 'Enviar reseña';
+
+  @override
+  String get howWouldYouRateThisEntity => '¿Como calificarías esta entidad';
+
+  @override
+  String get describeYourExperienceToHelpOtherUsers =>
+      'Describe tu experiencia para ayudar a otros usuario';
+
+  @override
+  String get comentarioPublicadoExitosamenteReview =>
+      '¡Reseña publicada exitosamente!';
+
+  @override
+  String get porFavorEscribeUnComentarioReview =>
+      'Por favor escribe un comentario';
+
+  @override
+  String get comentarioMenorA10Caracteres =>
+      'El comentario debe tener al menos 10 caracteres';
+
+  @override
+  String get comentarioNoPuedeExcederlos200 =>
+      'El comentario no puede exceder los 200 caracteres';
+
+  @override
+  String get submitLoad => 'Enviando...';
+
+  @override
+  String get errorCommentRequired => 'El comentario no puede estar vacío';
+
+  @override
+  String get errorRatingRequired => 'Por favor selecciona una valoración';
+
+  @override
+  String get schedule => 'Horario';
 }

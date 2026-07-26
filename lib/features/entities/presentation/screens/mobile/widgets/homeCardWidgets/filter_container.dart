@@ -12,8 +12,7 @@ class FilterContainer extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    String selectedFiltro =
-        ref.watch(filterProvider);
+    String selectedFiltro = ref.watch(filterProvider);
     return SingleChildScrollView(
       key: const PageStorageKey('scroll_horizontal_filtros'),
       scrollDirection: Axis.horizontal,
@@ -26,7 +25,7 @@ class FilterContainer extends ConsumerWidget {
             return FilterChip(
               avatar: Icon(getServiceIcon(service)),
               showCheckmark: false,
-              label: Text(service),
+              label: Text(getServicel10n(service, context)),
               selected: isSelected,
               onSelected: (value) async {
                 if (value) {

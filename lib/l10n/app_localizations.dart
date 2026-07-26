@@ -769,6 +769,222 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Error de autenticación'**
   String get authErrorDefault;
+
+  /// Entity: Lista vacia
+  ///
+  /// In es, this message translates to:
+  /// **'No se encontraron entidades proveedoras de servicio'**
+  String get entitesEmpyList;
+
+  /// Entities: error
+  ///
+  /// In es, this message translates to:
+  /// **'Ocurrió un error al cargar los servicios'**
+  String get entitesError;
+
+  /// una entidad encontrada
+  ///
+  /// In es, this message translates to:
+  /// **'entidad encontrada'**
+  String get entitiesSearchOne;
+
+  /// varias entidades encontradas
+  ///
+  /// In es, this message translates to:
+  /// **'entidades encontradas'**
+  String get entitiesSearch;
+
+  /// filtro todos selecionado
+  ///
+  /// In es, this message translates to:
+  /// **'Todos'**
+  String get filterStateAll;
+
+  /// filtro asesoria juridica
+  ///
+  /// In es, this message translates to:
+  /// **'Asesoria Juridica'**
+  String get filterStateLegal;
+
+  /// filtro atención médica
+  ///
+  /// In es, this message translates to:
+  /// **'Atención Médica'**
+  String get filterStateMedical;
+
+  /// filtro apoyo alimentario
+  ///
+  /// In es, this message translates to:
+  /// **'Apoyo Alimentario'**
+  String get filterStateFoodSupport;
+
+  /// filtro hospedaje temporal
+  ///
+  /// In es, this message translates to:
+  /// **'Hospedaje Temporal'**
+  String get filterStateTemporaryLodging;
+
+  /// filtro inserción laboral
+  ///
+  /// In es, this message translates to:
+  /// **'Inserción Laboral'**
+  String get filterStateLaborInsertion;
+
+  /// filtro movilidad y transporte
+  ///
+  /// In es, this message translates to:
+  /// **'Movilidad y Transporte'**
+  String get filterStateMobility;
+
+  /// Label para valoración
+  ///
+  /// In es, this message translates to:
+  /// **'Valoración'**
+  String get rating;
+
+  /// Label para descripción
+  ///
+  /// In es, this message translates to:
+  /// **'Descripción'**
+  String get description;
+
+  /// Label para horario de atención
+  ///
+  /// In es, this message translates to:
+  /// **'Horario de atención'**
+  String get attentionSchedule;
+
+  /// Label para teléfono
+  ///
+  /// In es, this message translates to:
+  /// **'Teléfono'**
+  String get phone;
+
+  /// Texto cuando un campo no está definido
+  ///
+  /// In es, this message translates to:
+  /// **'No definido'**
+  String get notDefined;
+
+  /// Label para dirección
+  ///
+  /// In es, this message translates to:
+  /// **'Dirección'**
+  String get address;
+
+  /// Texto indicando distancia desde la ubicación del usuario
+  ///
+  /// In es, this message translates to:
+  /// **'De tu ubicación'**
+  String get fromYourLocation;
+
+  /// Label para indicaciones de cómo llegar
+  ///
+  /// In es, this message translates to:
+  /// **'Cómo llegar'**
+  String get howToGetThere;
+
+  /// Botón para iniciar navegación hacia el destino
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciar viaje'**
+  String get startTrip;
+
+  /// Label para sección de reseñas
+  ///
+  /// In es, this message translates to:
+  /// **'Reseñas'**
+  String get reviews;
+
+  /// Label para sección de reseñas
+  ///
+  /// In es, this message translates to:
+  /// **'Reseñas'**
+  String get review;
+
+  /// Botón para añadir un comentario o reseña
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir comentario'**
+  String get addComment;
+
+  /// Texto cuando no hay reseñas disponibles en la pantalla de detalles de entidad
+  ///
+  /// In es, this message translates to:
+  /// **'Sin reseñas aún'**
+  String get noReviews;
+
+  /// Placeholder para el campo de comentario en la pantalla de detalles de entidad
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe tu comentario...'**
+  String get writeComment;
+
+  /// Botón para enviar una reseña en la pantalla de detalles de entidad
+  ///
+  /// In es, this message translates to:
+  /// **'Enviar reseña'**
+  String get submitReview;
+
+  /// Titulo review
+  ///
+  /// In es, this message translates to:
+  /// **'¿Como calificarías esta entidad'**
+  String get howWouldYouRateThisEntity;
+
+  /// descripcion de reseña
+  ///
+  /// In es, this message translates to:
+  /// **'Describe tu experiencia para ayudar a otros usuario'**
+  String get describeYourExperienceToHelpOtherUsers;
+
+  /// Mensaje de éxito al publicar una reseña
+  ///
+  /// In es, this message translates to:
+  /// **'¡Reseña publicada exitosamente!'**
+  String get comentarioPublicadoExitosamenteReview;
+
+  /// Mensaje de error cuando no se escribe un comentario
+  ///
+  /// In es, this message translates to:
+  /// **'Por favor escribe un comentario'**
+  String get porFavorEscribeUnComentarioReview;
+
+  /// Error de validación: comentario demasiado corto
+  ///
+  /// In es, this message translates to:
+  /// **'El comentario debe tener al menos 10 caracteres'**
+  String get comentarioMenorA10Caracteres;
+
+  /// Error de validación: comentario demasiado largo
+  ///
+  /// In es, this message translates to:
+  /// **'El comentario no puede exceder los 200 caracteres'**
+  String get comentarioNoPuedeExcederlos200;
+
+  /// Mesaje cargando al enviar una reseña
+  ///
+  /// In es, this message translates to:
+  /// **'Enviando...'**
+  String get submitLoad;
+
+  /// Error de validación: comentario requerido en la pantalla de detalles de entidad
+  ///
+  /// In es, this message translates to:
+  /// **'El comentario no puede estar vacío'**
+  String get errorCommentRequired;
+
+  /// Error de validación: valoración requerida en la pantalla de detalles de entidad
+  ///
+  /// In es, this message translates to:
+  /// **'Por favor selecciona una valoración'**
+  String get errorRatingRequired;
+
+  /// Label para horario en la pantalla de detalles de entidad
+  ///
+  /// In es, this message translates to:
+  /// **'Horario'**
+  String get schedule;
 }
 
 class _AppLocalizationsDelegate
