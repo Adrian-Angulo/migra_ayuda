@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:migra_ayuda/core/config/sembast_database.dart';
 import 'package:migra_ayuda/core/network/network_provider.dart';
 import 'package:migra_ayuda/features/entities/data/datasources/entity_local_datasource.dart';
@@ -49,3 +52,55 @@ final entities2StreamProvider = StreamProvider<List<EntityEntity>>(
         ));
   },
 );
+
+
+final filterProvider = StateProvider<String>(
+  (ref) => 'Todos',
+);
+
+class EntityListNotifier extends AsyncNotifier<List<EntityEntity>> {
+  List<EntityEntity> _allEntities = [];
+
+  @override
+  FutureOr<List<EntityEntity>> build() {
+    return _loadEntities();
+  }
+
+  Future<List<EntityEntity>> _loadEntities() async {
+    state = const AsyncValue.loading();
+    final result = await ref.read(entityRepositoryProvider).getAllEntities();
+
+    return result.fold(
+      (error) => throw error,
+      (entities) {
+        _allEntities = entities;
+        return entities;
+      },
+    );
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(_loadEntities);
+  }
+
+  void filter({String query = 'Todos'}) {
+    ref.read(filterProvider.notifier).state = query;
+    if (query == 'Todos') {
+      state = AsyncValue.data(_allEntities);
+      return;
+    }
+
+    final filtered = _allEntities.where((entity) {
+      return entity.services.any(
+        (s) => s == query,
+      );
+    }).toList();
+
+    state = AsyncValue.data(filtered);
+  }
+}
+
+final getAllEntitiesProvider =
+    AsyncNotifierProvider<EntityListNotifier, List<EntityEntity>>(
+        EntityListNotifier.new);

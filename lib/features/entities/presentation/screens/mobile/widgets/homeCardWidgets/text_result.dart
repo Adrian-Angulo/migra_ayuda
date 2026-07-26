@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/filter_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
+
 
 class TextResult extends ConsumerWidget {
   const TextResult({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final lista = ref.watch(listaEntidades);
+    final lista = ref.watch(getAllEntitiesProvider);
     return lista.when(
       data: (entidades) {
         if (entidades.isEmpty) return const SizedBox.shrink();

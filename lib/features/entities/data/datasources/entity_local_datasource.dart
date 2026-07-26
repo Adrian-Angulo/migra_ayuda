@@ -2,14 +2,7 @@ import 'package:sembast/sembast.dart';
 import 'package:migra_ayuda/core/config/sembast_database.dart';
 import 'package:migra_ayuda/features/entities/data/models/entity_models.dart';
 
-/// Excepción personalizada para errores de caché
-class CacheException implements Exception {
-  final String message;
-  CacheException(this.message);
 
-  @override
-  String toString() => 'CacheException: $message';
-}
 
 /// Implementación del datasource local usando Sembast
 class EntityLocalDataSource {
@@ -36,7 +29,7 @@ class EntityLocalDataSource {
         return EntityModels.fromSembastMap(record.key, record.value);
       }).toList();
     } catch (e) {
-      throw CacheException('Error al obtener entidades del caché: $e');
+      throw Exception('Error al obtener entidades del caché: $e');
     }
   }
 
@@ -52,7 +45,7 @@ class EntityLocalDataSource {
         await _store.record(entity.id).put(db, entity.toMap());
       }
     } catch (e) {
-      throw CacheException('Error al guardar entidades en caché: $e');
+      throw Exception('Error al guardar entidades en caché: $e');
     }
   }
 
@@ -69,7 +62,7 @@ class EntityLocalDataSource {
 
       return EntityModels.fromSembastMap(id, record);
     } catch (e) {
-      throw CacheException('Error al obtener entidad del caché: $e');
+      throw Exception('Error al obtener entidad del caché: $e');
     }
   }
 
@@ -80,7 +73,7 @@ class EntityLocalDataSource {
       // Guarda o actualiza la entidad
       await _store.record(entity.id).put(db, entity.toMap());
     } catch (e) {
-      throw CacheException('Error al guardar entidad en caché: $e');
+      throw Exception('Error al guardar entidad en caché: $e');
     }
   }
 
@@ -91,7 +84,7 @@ class EntityLocalDataSource {
       // Elimina la entidad por ID
       await _store.record(id).delete(db);
     } catch (e) {
-      throw CacheException('Error al eliminar entidad del caché: $e');
+      throw Exception('Error al eliminar entidad del caché: $e');
     }
   }
 
@@ -102,46 +95,8 @@ class EntityLocalDataSource {
       // Limpia todo el store
       await _store.delete(db);
     } catch (e) {
-      throw CacheException('Error al limpiar caché: $e');
+      throw Exception('Error al limpiar caché: $e');
     }
   }
 
-/*   /// Convierte EntityModels a Map para Sembast
-  Map<String, dynamic> _toSembastMap(EntityModels entity) {
-    return {
-      'name': entity.name,
-      'description': entity.description,
-      'services': entity.services,
-      'address': entity.address,
-      'localitation_latitude': entity.localitation.latitude,
-      'localitation_longitude': entity.localitation.longitude,
-      'phone': entity.phone,
-      'image_url': entity.imageUrl,
-      'average_rating': entity.averageRating,
-      'total_reviews': entity.totalReviews,
-      'cached_at': DateTime.now().millisecondsSinceEpoch,
-    };
-  } */
-
-/*   /// Convierte Map de Sembast a EntityModels
-  EntityModels _fromSembastMap(String id, Map<String, dynamic> map) {
-    return EntityModels(
-      id: id,
-      name: map['name'] ?? '',
-      description: map['description'] ?? '',
-      services: (map['services'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          [],
-      address: map['address'] ?? '',
-      localitation: GeoPoint(
-        map['localitation_latitude'] ?? 0.0,
-        map['localitation_longitude'] ?? 0.0,
-      ),
-      phone: map['phone'] ?? '',
-      imageUrl: map['image_url'] ?? '',
-      averageRating: (map['average_rating'] as num?)?.toDouble() ?? 0,
-      totalReviews: (map['total_reviews'] as int?) ?? 0,
-    );
-  } */
 }

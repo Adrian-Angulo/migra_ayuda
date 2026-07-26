@@ -1,0 +1,117 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/map_provider.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/entity_seleted_details.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/entity_card_widget.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/text_result.dart';
+
+class ListEntitesHome extends ConsumerStatefulWidget {
+  const ListEntitesHome({
+    super.key,
+  });
+
+  @override
+  ConsumerState<ListEntitesHome> createState() => _ListEntitesHomeState();
+}
+
+class _ListEntitesHomeState extends ConsumerState<ListEntitesHome> {
+  DraggableScrollableController? controllerD = DraggableScrollableController();
+
+  @override
+  Widget build(BuildContext context) {
+    String selectedFiltro = ref.watch(filterProvider);
+    final listEntity = ref.watch(getAllEntitiesProvider);
+    final map = ref.watch(mapProvider);
+
+    return DraggableScrollableSheet(
+      controller: controllerD,
+      initialChildSize: 0.3,
+      minChildSize: 0.15,
+      maxChildSize: 1,
+      builder: (context, scrollController) {
+        return Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+              ),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black26, blurRadius: 10, spreadRadius: 1),
+              ],
+            ),
+            child: ListView(
+              controller: scrollController,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              children: [
+                Center(
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(vertical: 12),
+                    width: 40,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                if (map.selectEntity == null)
+                  listEntity.when(
+                      data: (data) {
+                        if (data.isEmpty) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.search_off,
+                                    size: 48, color: Colors.grey),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'No se encontraron entidades proveedoras de servicio $selectedFiltro',
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                        return Column(
+                          spacing: 5,
+                          key: const ValueKey('lista'),
+                          children: [
+                            const TextResult(),
+                            ...List.generate(
+                              data.length,
+                              (index) => EntityCardWidget(entity: data[index]),
+                            ),
+                          ],
+                        );
+                      },
+                      error: (error, stackTrace) => Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(Icons.error_outline,
+                                    color: Colors.red, size: 48),
+                                const SizedBox(height: 12),
+                                Text(
+                                  'Ocurrió un error al cargar los servicios',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: Colors.red[700]),
+                                ),
+                              ],
+                            ),
+                          ),
+                      loading: () => const Center(
+                            child: CircularProgressIndicator(),
+                          ))
+                else
+                  EntitySeletedDetails(map: map, controllerD: controllerD),
+              ],
+            ));
+      },
+    );
+  }
+}

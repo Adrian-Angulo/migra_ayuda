@@ -1,7 +1,4 @@
-// data/repositories/entidad_repository_impl.dart
-
 import 'dart:typed_data';
-
 import 'package:dartz/dartz.dart';
 import 'package:migra_ayuda/core/network/network_info.dart';
 import 'package:migra_ayuda/features/entities/data/datasources/entity_local_datasource.dart';
@@ -63,8 +60,6 @@ class EntityMobilRepositoryImpl implements EntityRepository {
       return right(unit);
     } on ServerException catch (e) {
       return left('Error del servidor: ${e.message}');
-    } on CacheException catch (e) {
-      return left('Error de caché: ${e.message}');
     } catch (e) {
       return left('Error al registrar la entidad: ${e.toString()}');
     }
@@ -114,10 +109,10 @@ class EntityMobilRepositoryImpl implements EntityRepository {
       // Si no hay internet, solo se actualiza localmente
 
       return right(unit);
-    } on CacheException catch (e) {
-      return left('Error de caché: ${e.message}');
-    } catch (e) {
-      return left('Error al actualizar la entidad: ${e.toString()}');
+    } 
+    catch (e) {
+
+      return left(e.toString());
     }
   }
 
@@ -143,9 +138,7 @@ class EntityMobilRepositoryImpl implements EntityRepository {
       // Si no hay internet, solo se elimina localmente
 
       return right(unit);
-    } on CacheException catch (e) {
-      return left('Error de caché: ${e.message}');
-    } catch (e) {
+    }  catch (e) {
       return left('Error al eliminar la entidad: ${e.toString()}');
     }
   }
@@ -193,9 +186,7 @@ class EntityMobilRepositoryImpl implements EntityRepository {
 
       // 4. Sin caché y sin internet
       return left('No hay datos disponibles. Verifica tu conexión a internet.');
-    } on CacheException catch (e) {
-      return left('Error de caché: ${e.message}');
-    } catch (e) {
+    }  catch (e) {
       return left('Error al obtener las entidades: ${e.toString()}');
     }
   }
@@ -244,8 +235,6 @@ class EntityMobilRepositoryImpl implements EntityRepository {
       // 4. Sin caché y sin internet
       return left(
           'Entidad no disponible offline. Verifica tu conexión a internet.');
-    } on CacheException catch (e) {
-      return left('Error de caché: ${e.message}');
     } catch (e) {
       return left('Error al obtener la entidad: ${e.toString()}');
     }
@@ -270,9 +259,7 @@ class EntityMobilRepositoryImpl implements EntityRepository {
       return right(unit);
     } on ServerException catch (e) {
       return left('Error del servidor: ${e.message}');
-    } on CacheException catch (e) {
-      return left('Error de caché: ${e.message}');
-    } catch (e) {
+    }  catch (e) {
       return left(
           'Error al sincronizar entidades desde Firebase: ${e.toString()}');
     }
