@@ -70,7 +70,6 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
 
   Future<void> updateRating(double value) async {
     state = const AsyncValue.loading();
-    
   }
 }
 

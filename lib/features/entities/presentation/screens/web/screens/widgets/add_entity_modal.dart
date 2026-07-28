@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:migra_ayuda/core/constants/services_utils.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/button_save_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/image_picker_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/service_type_checklist_widget.dart';
@@ -28,17 +29,16 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
   final _longitudController = TextEditingController();
   final _phoneController = TextEditingController();
   final _scheduleController = TextEditingController();
-  final _openingTime1Controller = TextEditingController(text: '08:00');
-  final _closingTime1Controller = TextEditingController(text: '12:00');
-  final _openingTime2Controller = TextEditingController(text: '14:00');
-  final _closingTime2Controller = TextEditingController(text: '18:00');
+
   final _mapController = MapController();
   bool _isSearching = false;
   bool _addressNotFound = false;
-  List<String> selectedDays = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi'];
+
   List<String> selectedServices = [];
   XFile? _selectedImage;
   Uint8List? _selectedImageBytes;
+
+  String seleted = services[1];
 
   @override
   void dispose() {
@@ -46,10 +46,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
     _descriptionController.dispose();
     _addressController.dispose();
     _phoneController.dispose();
-    _openingTime1Controller.dispose();
-    _closingTime1Controller.dispose();
-    _openingTime2Controller.dispose();
-    _closingTime2Controller.dispose();
+
     super.dispose();
   }
 
@@ -105,29 +102,6 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
 
   @override
   Widget build(BuildContext context) {
-    
-
-/*     // Escuchar cambios en el estado del registro
-    ref.listen<AsyncValue<void>>(entitiesCrudProvider, (
-      previous,
-      next,
-    ) {
-      next.when(
-        data: (_) {
-          // Éxito - cerrar modal y mostrar mensaje
-          Navigator.of(context).pop();
-
-          SnackbarWebWidget.success(
-              context, 'Entidad registrada existosamente');
-        },
-        loading: () {}, // No hacer nada mientras carga
-        error: (error, stack) {
-          // Error - mostrar mensaje
-          SnackbarWebWidget.error(context, 'Error: ${error.toString()}');
-        },
-      );
-    }); */
-
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
@@ -281,7 +255,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Seleccione los servicios que ofrece esta entidad',
+                        'Seleccione los servicios que ofrece esta entidad (maximo 3)',
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.grey.shade600,
@@ -296,6 +270,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                           });
                         },
                       ),
+
                       const SizedBox(height: 32),
 
                       // Ubicación y Contacto Section
@@ -373,43 +348,42 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                           ),
                         ),
                       const SizedBox(height: 12),
-                      if(location != null)
-                      SizedBox(
-                        height: 250,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: FlutterMap(
-                            mapController: _mapController,
-                            options: MapOptions(
-                              initialCenter: location!,
-                              initialZoom: 14,
-                              minZoom: 13,
-                              maxZoom: 13,
-                            ),
-                            children: [
-                              TileLayer(
-                                urlTemplate:
-                                    'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                userAgentPackageName: 'com.migraayuda.app',
+                      if (location != null)
+                        SizedBox(
+                          height: 250,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: FlutterMap(
+                              mapController: _mapController,
+                              options: MapOptions(
+                                initialCenter: location!,
+                                initialZoom: 14,
+                                minZoom: 13,
+                                maxZoom: 13,
                               ),
-                              MarkerLayer(
-                                markers: [
-                                  if (location != null)
-                                    Marker(
-                                      point: location!,
-                                      child: const Icon(
-                                        Icons.location_pin,
-                                        color: Colors.red,
-                                        size: 40,
+                              children: [
+                                TileLayer(
+                                  urlTemplate:
+                                      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                  userAgentPackageName: 'com.migraayuda.app',
+                                ),
+                                MarkerLayer(
+                                  markers: [
+                                    if (location != null)
+                                      Marker(
+                                        point: location!,
+                                        child: const Icon(
+                                          Icons.location_pin,
+                                          color: Colors.red,
+                                          size: 40,
+                                        ),
                                       ),
-                                    ),
-                                ],
-                              ),
-                            ],
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      
 
                       const SizedBox(height: 20),
                       _buildTextField(
@@ -488,7 +462,6 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                   Expanded(
                     flex: 2,
                     child: ButtonSaveWidget(
-                      
                       formKey: _formKey,
                       selectedImageBytes: _selectedImageBytes,
                       selectedServices: selectedServices,

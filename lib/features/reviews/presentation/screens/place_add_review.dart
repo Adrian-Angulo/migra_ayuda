@@ -244,7 +244,6 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                   FloatingMainButton(
                     onTap: () async {
                       if (!formkey.currentState!.validate()) return;
-
                       final review = ReviewEntity(
                           idMigrante: user.id,
                           idEntity: widget.entity.id,

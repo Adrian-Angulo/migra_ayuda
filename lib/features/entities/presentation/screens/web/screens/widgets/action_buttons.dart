@@ -72,12 +72,10 @@ class ActionButtons extends ConsumerWidget {
               builder: (context) => DeleteConfirmationDialog(
                 entityName: entity.name,
                 onConfirm: () async {
-                  ref.invalidate(entitiesCrudProvider);
                   await ref
                       .read(entitiesCrudProvider.notifier)
                       .deleteEntity(entity.id);
-
-                  // Invalidar el stream para forzar recarga
+                  ref.invalidate(entitiesCrudProvider);
                   ref.invalidate(entities2StreamProvider);
                 },
               ),

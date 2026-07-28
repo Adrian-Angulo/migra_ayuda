@@ -17,14 +17,14 @@ class ServiceTypeChecklistWidget extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 30,
+        crossAxisCount: 5,
+        crossAxisSpacing: 20,
         mainAxisSpacing: 12,
         childAspectRatio: 1.2,
       ),
-      itemCount: services.length,
+      itemCount: services.length - 1,
       itemBuilder: (context, index) {
-        final service = services[index];
+        final service = services[index + 1];
         final isSelected = selectedServices.contains(service);
 
         return InkWell(
@@ -33,7 +33,9 @@ class ServiceTypeChecklistWidget extends StatelessWidget {
             if (isSelected) {
               newSelectedServices.remove(service);
             } else {
-              newSelectedServices.add(service);
+              if (newSelectedServices.length <= 2) {
+                newSelectedServices.add(service);
+              }
             }
             onServicesChanged(newSelectedServices);
           },
@@ -66,7 +68,7 @@ class ServiceTypeChecklistWidget extends StatelessWidget {
                 Text(
                   service,
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                     color: isSelected
                         ? getServiceColor(service)
@@ -74,14 +76,6 @@ class ServiceTypeChecklistWidget extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                if (isSelected) ...[
-                  const SizedBox(height: 4),
-                  Icon(
-                    Icons.check_circle,
-                    size: 16,
-                    color: getServiceColor(service),
-                  ),
-                ],
               ],
             ),
           ),
