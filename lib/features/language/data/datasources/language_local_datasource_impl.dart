@@ -1,11 +1,10 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import 'language_local_datasource.dart';
 
 /// Implementación concreta del DataSource usando SharedPreferences.
-class LanguageLocalDataSourceImpl implements LanguageLocalDataSource {
+class LanguageLocalDataSourceImpl {
   static const _languageKey = 'language';
 
-  @override
+  
   Future<String?> getLanguageCode() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -16,7 +15,7 @@ class LanguageLocalDataSourceImpl implements LanguageLocalDataSource {
     }
   }
 
-  @override
+  
   Future<void> saveLanguageCode(String code) async {
     try {
       final prefs = await SharedPreferences.getInstance();

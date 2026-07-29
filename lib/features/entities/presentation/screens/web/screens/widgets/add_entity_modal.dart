@@ -51,29 +51,42 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
   }
 
   Future<LatLng?> getCoordinates(String address) async {
-    final encoded = Uri.encodeComponent(address);
-    final url = Uri.parse(
-      'https://nominatim.openstreetmap.org/search'
-      '?q=$encoded&format=json&limit=1',
-    );
+    try {
+      final encoded = Uri.encodeComponent(address);
 
-    final response = await http.get(
-      url,
-      headers: {
-        'User-Agent': 'MigraAyuda/1.0', // Nominatim requiere esto
-      },
-    );
+      final url = Uri.parse(
+        'https://nominatim.openstreetmap.org/search'
+        '?q=$encoded&format=json&limit=1',
+      );
 
-    if (response.statusCode == 200) {
-      final List data = jsonDecode(response.body);
-      if (data.isNotEmpty) {
-        return LatLng(
-          double.parse(data[0]['lat']),
-          double.parse(data[0]['lon']),
-        );
+      debugPrint("Consultando: $url");
+
+      final response = await http.get(url);
+
+      debugPrint("Status: ${response.statusCode}");
+      debugPrint(response.body);
+
+      if (response.statusCode == 200) {
+        final List data = jsonDecode(response.body);
+
+        if (data.isNotEmpty) {
+          return LatLng(
+            double.parse(data[0]['lat']),
+            double.parse(data[0]['lon']),
+          );
+        }
       }
+
+      return null;
+    } catch (e, s) {
+      debugPrint("ERROR:");
+      debugPrint(e.toString());
+
+      debugPrint("STACK:");
+      debugPrintStack(stackTrace: s);
+
+      rethrow;
     }
-    return null;
   }
 
   Future<void> _searchAddress() async {
@@ -96,7 +109,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
     if (coords != null) {
       _latitudController.text = coords.latitude.toString();
       _longitudController.text = coords.longitude.toString();
-      _mapController.move(coords, 15);
+      //_mapController.move(coords, 15);
     }
   }
 
@@ -358,8 +371,8 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                               options: MapOptions(
                                 initialCenter: location!,
                                 initialZoom: 14,
-                                minZoom: 13,
-                                maxZoom: 13,
+                                minZoom: 14,
+                                maxZoom: 14,
                               ),
                               children: [
                                 TileLayer(

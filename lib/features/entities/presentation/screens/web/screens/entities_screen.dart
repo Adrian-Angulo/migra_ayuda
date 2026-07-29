@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/constants/services_utils.dart';
-import 'package:migra_ayuda/core/widgets/snackbar_web_widget.dart';
+import 'package:migra_ayuda/core/widgets/mobil/snackbar_web_widget.dart';
+import 'package:migra_ayuda/core/widgets/web/text_fiel_search_web.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/tabla_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/export_button_widget.dart';
@@ -87,31 +88,13 @@ class EntitiesScreen extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                SizedBox(
-                  width: 400,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.grey[300]!),
-                    ),
-                    child: TextField(
-                      onChanged: (value) {
-                        ref
-                            .read(datasourceProvider)
-                            .aplicarFiltros(value, seletedService);
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Buscar por usuario, acción o recurso...',
-                        border: InputBorder.none,
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 16),
-                        hintStyle:
-                            TextStyle(color: Colors.grey[400], fontSize: 14),
-                      ),
-                    ),
-                  ),
-                ),
+                TextFielSearchWeb(onChanged: (String value) { 
+                   ref.read(seletedServiceProvider.notifier).state =
+                              value;
+                          ref
+                              .read(datasourceProvider)
+                              .aplicarFiltros("", value);
+                 }, hintText: '',),
                 Row(
                   children: [
                     SizedBox(

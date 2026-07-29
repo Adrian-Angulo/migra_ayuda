@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/constants/list_countries.dart';
 import 'package:migra_ayuda/core/utils/validators/email_validator.dart';
-import 'package:migra_ayuda/core/widgets/snackbar_widget.dart';
+import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/register_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/alert_success_register.dart';

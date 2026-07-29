@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/features/language/domain/repositories/language_repository.dart';
-import 'package:migra_ayuda/features/language/data/datasources/language_local_datasource.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Implementación concreta del repositorio de idioma.
 /// Utiliza un DataSource para separar la lógica de persistencia.
 class LanguageRepositoryImpl implements LanguageRepository {
-  final LanguageLocalDataSource _dataSource;
+  
 
-  LanguageRepositoryImpl(this._dataSource);
+  LanguageRepositoryImpl();
 
   /// Carga el idioma guardado previamente.
   /// Retorna un [Locale] con el código de idioma almacenado, o null si no hay ninguno.
   @override
   Future<Locale?> loadLanguage() async {
     try {
-      final languageCode = await _dataSource.getLanguageCode();
-      return languageCode != null ? Locale(languageCode) : null;
+      final prefs = await SharedPreferences.getInstance();
+      final languaje = prefs.getString('language');
+      return languaje != null ? Locale(languaje) : null;
     } catch (e) {
-      // Fallback silencioso: si hay error, retornamos null
+      // En caso de error, retornamos null (idioma no guardado)
       return null;
     }
   }
@@ -27,10 +28,14 @@ class LanguageRepositoryImpl implements LanguageRepository {
   @override
   Future<void> saveLanguage(String languageCode) async {
     try {
-      await _dataSource.saveLanguageCode(languageCode);
+      final prefs = await SharedPreferences.getInstance();
+    
+      await prefs.setString('language', languageCode);
+      debugPrint('lenguaje guardado: $languageCode');
+     
     } catch (e) {
-      // Relanzamos la excepción para que el provider la maneje
-      rethrow;
+      debugPrint('Error al guardar el leguaje seleccionado: $e');
+      throw Exception(e);
     }
   }
 }

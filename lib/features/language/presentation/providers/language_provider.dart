@@ -1,21 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/router/app_router_mobile.dart';
-import 'package:migra_ayuda/features/language/data/datasources/language_local_datasource.dart';
-import 'package:migra_ayuda/features/language/data/datasources/language_local_datasource_impl.dart';
 import 'package:migra_ayuda/features/language/data/repositories/language_repository_impl.dart';
 import 'package:migra_ayuda/features/language/domain/repositories/language_repository.dart';
 
-// DataSource Provider
-final languageLocalDataSourceProvider = Provider<LanguageLocalDataSource>(
-  (ref) => LanguageLocalDataSourceImpl(),
-);
-
 // Repository Provider (con inyección de dependencias)
 final languageRepositoryProvider = Provider<LanguageRepository>(
-  (ref) => LanguageRepositoryImpl(
-    ref.watch(languageLocalDataSourceProvider),
-  ),
+  (ref) => LanguageRepositoryImpl(),
 );
 
 // Language Notifier
