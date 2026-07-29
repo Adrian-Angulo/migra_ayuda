@@ -33,7 +33,7 @@ class ServiceTypeChecklistWidget extends StatelessWidget {
             if (isSelected) {
               newSelectedServices.remove(service);
             } else {
-              if (newSelectedServices.length <= 2) {
+              if (newSelectedServices.length <= 1) {
                 newSelectedServices.add(service);
               }
             }

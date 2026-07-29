@@ -67,14 +67,17 @@ class ActionButtons extends ConsumerWidget {
           color: Colors.red,
           tooltip: 'Eliminar',
           onPressed: () {
+            
             showDialog(
               context: context,
               builder: (context) => DeleteConfirmationDialog(
                 entityName: entity.name,
                 onConfirm: () async {
+                  debugPrint('Enitdad a eliminar: ${entity.id}');
                   await ref
                       .read(entitiesCrudProvider.notifier)
                       .deleteEntity(entity.id);
+                  
                   ref.invalidate(entitiesCrudProvider);
                   ref.invalidate(entities2StreamProvider);
                 },

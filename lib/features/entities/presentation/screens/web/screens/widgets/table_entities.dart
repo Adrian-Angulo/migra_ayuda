@@ -100,7 +100,7 @@ class _TableEntitiesState extends ConsumerState<TableEntities> {
                     ),
                     DataColumn2(
                       label: DataTableUtils.buildHeaderCell('Servicios'),
-                      size: ColumnSize.M,
+                      size: ColumnSize.L,
                     ),
                     DataColumn2(
                       label: DataTableUtils.buildHeaderCell('Valoración'),

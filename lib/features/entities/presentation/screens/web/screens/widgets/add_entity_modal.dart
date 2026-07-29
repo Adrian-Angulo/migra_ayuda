@@ -268,7 +268,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        'Seleccione los servicios que ofrece esta entidad (maximo 3)',
+                        'Seleccione los servicios que ofrece esta entidad (maximo 2)',
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.grey.shade600,

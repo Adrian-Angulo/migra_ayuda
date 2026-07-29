@@ -1,4 +1,3 @@
-
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
@@ -105,6 +104,7 @@ class EntityDataSource extends DataTableSource {
             spacing: 4,
             runSpacing: 4,
             children: entity.services
+                .take(2)
                 .map((service) => ServiceChip(service: service))
                 .toList(),
           ),
