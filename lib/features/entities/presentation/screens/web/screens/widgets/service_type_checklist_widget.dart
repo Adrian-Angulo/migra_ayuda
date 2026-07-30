@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/core/constants/services_utils.dart';
 
@@ -17,8 +18,8 @@ class ServiceTypeChecklistWidget extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 5,
-        crossAxisSpacing: 20,
+        crossAxisCount: kIsWeb ? 5 : 3,
+        crossAxisSpacing: kIsWeb ? 20 : 5,
         mainAxisSpacing: 12,
         childAspectRatio: 1.2,
       ),

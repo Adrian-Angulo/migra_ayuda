@@ -8,7 +8,7 @@ import 'package:migra_ayuda/core/widgets/mobil/splash_init.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/complete_info_screen.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/mobile/register_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/mobile/register_migrante_screen.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/home_screen.dart';
 import 'package:migra_ayuda/features/language/presentation/providers/language_provider.dart';
 import 'package:migra_ayuda/features/language/presentation/screens/language_screen.dart';

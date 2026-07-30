@@ -22,7 +22,7 @@ class ImagePickerWidget extends StatefulWidget {
 
 class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   final picker = ImagePicker();
-   XFile? _imagen;
+  XFile? _imagen;
   Uint8List? _imagenBytes;
 
   @override
@@ -58,7 +58,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
         width: 400,
         height: 300,
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300, width: 2),
+          border: Border.all(color: Colors.grey.shade400, width: 2),
           borderRadius: BorderRadius.circular(12),
         ),
         child: _imagenBytes != null
@@ -72,20 +72,20 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                 ),
               )
             : widget.existingImageUrl != null &&
-                  widget.existingImageUrl!.isNotEmpty
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: Image.network(
-                  widget.existingImageUrl!,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
-                  errorBuilder: (context, error, stackTrace) {
-                    return _buildPlaceholder();
-                  },
-                ),
-              )
-            : _buildPlaceholder(),
+                    widget.existingImageUrl!.isNotEmpty
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(
+                      widget.existingImageUrl!,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                      errorBuilder: (context, error, stackTrace) {
+                        return _buildPlaceholder();
+                      },
+                    ),
+                  )
+                : _buildPlaceholder(),
       ),
     );
   }
