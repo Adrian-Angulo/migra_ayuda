@@ -27,6 +27,7 @@ class SyncNotifier extends AsyncNotifier<SyncState> {
   Future<void> _syncAll() async {
     final entities =
         await ref.read(entityRepositoryProvider).syncAllFromFirebase();
+    
     entities.fold(
       (failure) => throw Exception(failure.toString()),
       (result) => result,

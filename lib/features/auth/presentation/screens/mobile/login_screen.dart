@@ -4,9 +4,8 @@ import 'package:migra_ayuda/core/errors/error_mappers.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/complete_info_screen.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/mobile/register_migrante_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/mobile/register_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/reset_password/send_email_screen.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/mobile/seleted_register.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/button_google_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/button_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_password_widget.dart';
@@ -244,7 +243,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const SeletedRegister(),
+                                builder: (context) => const RegisterScreen(),
                               ));
                         })
                       ],
