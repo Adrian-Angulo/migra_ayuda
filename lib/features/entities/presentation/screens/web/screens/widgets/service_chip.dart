@@ -12,12 +12,12 @@ class ServiceChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = Colors.green;
+    const color = Colors.green;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -31,7 +31,7 @@ class ServiceChip extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             service,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w600,
             ),

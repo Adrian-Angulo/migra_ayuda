@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:migra_ayuda/core/constants/list_countries.dart';
 import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
@@ -20,22 +21,12 @@ class CompleteInfoScreen extends ConsumerStatefulWidget {
 class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
   final _formKey = GlobalKey<FormState>();
   final _edadController = TextEditingController();
-
   String? originCountry;
   String? destinationCountry;
   bool acceptTerms = false;
   bool _loading = false;
 
-  final List<String> countries = [
-    'México',
-    'Estados Unidos',
-    'Guatemala',
-    'Honduras',
-    'El Salvador',
-    'Nicaragua',
-    'Costa Rica',
-    'Panamá',
-  ];
+  final List<String> countries = ListCountries.contries();
 
   @override
   void dispose() {

@@ -17,7 +17,7 @@ class SidebarFooterWidget extends ConsumerWidget {
           Text(
             'Administrador',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               fontSize: 14,
               fontWeight: FontWeight.w600,
             ),
@@ -30,7 +30,7 @@ class SidebarFooterWidget extends ConsumerWidget {
               error: (_, __) => 'Error al cargar',
             ),
             style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
               fontSize: 12,
               fontWeight: FontWeight.w400,
             ),
@@ -45,12 +45,12 @@ class SidebarFooterWidget extends ConsumerWidget {
             icon: Icon(
               Icons.logout_rounded,
               size: 16,
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
             ),
             label: Text(
               'Cerrar sesión',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 fontSize: 13,
               ),
             ),

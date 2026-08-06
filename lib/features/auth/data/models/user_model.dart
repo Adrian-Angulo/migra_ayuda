@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 class UserModel {
   final String id;
@@ -50,35 +51,34 @@ class UserModel {
       password: data['password'] ?? '',
       role: data['role'] ?? 'Migrante',
       profileComplete: data['profileComplete'] ?? false,
-      // Intenta leer primero 'createdAt', luego 'registrationDate' como fallback
+      
       createdAt: _parseDate(data['createdAt']),
     );
   }
 
   static DateTime _parseDate(dynamic value) {
-    // Si el valor es null, retornar fecha actual
+   
     if (value == null) {
-      print('⚠️  [UserModel] Campo de fecha es null, usando fecha actual');
+      debugPrint('⚠️  [UserModel] Campo de fecha es null, usando fecha actual');
       return DateTime.now();
     }
 
-    // Si es un Timestamp de Firestore, convertirlo a DateTime
+    
     if (value is Timestamp) {
       return value.toDate();
     }
-
-    // Si es un String ISO8601, parsearlo
+    
     if (value is String) {
       final parsed = DateTime.tryParse(value);
       if (parsed != null) {
         return parsed;
       } else {
-        print('⚠️  [UserModel] No se pudo parsear la fecha: $value');
+        debugPrint('⚠️  [UserModel] No se pudo parsear la fecha: $value');
         return DateTime.now();
       }
     }
 
-    print('⚠️  [UserModel] Tipo de fecha desconocido: ${value.runtimeType}');
+    debugPrint('⚠️  [UserModel] Tipo de fecha desconocido: ${value.runtimeType}');
     return DateTime.now();
   }
 }

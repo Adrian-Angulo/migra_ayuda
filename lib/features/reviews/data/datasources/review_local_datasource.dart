@@ -3,9 +3,7 @@ import 'package:sembast/sembast.dart';
 import 'package:migra_ayuda/core/config/sembast_database.dart';
 import 'package:migra_ayuda/features/reviews/data/models/review_model.dart';
 
-/// Implementación del datasource local usando Sembast.
-/// En web, todas las operaciones de caché son no-ops o retornan vacío,
-/// ya que la web siempre usa la base de datos remota.
+
 class ReviewLocalDataSource {
   final SembastDatabase sembastDatabase;
 
@@ -73,7 +71,7 @@ class ReviewLocalDataSource {
       final db = await _db;
 
       // Guarda o actualiza la review
-      await _store.record(review.id).put(db, review.toSembastMap());
+      await _store.record(review.id).put(db, review.toMap());
     } catch (e) {
       throw 'Error al guardar review en caché: $e';
     }
@@ -88,7 +86,7 @@ class ReviewLocalDataSource {
 
       // Guarda todas las reviews usando _toSembastMap para consistencia
       for (final review in reviews) {
-        await _store.record(review.id).put(db, review.toSembastMap());
+        await _store.record(review.id).put(db, review.toMap());
       }
     } catch (e) {
       throw 'Error al guardar reviews en caché: $e';
@@ -104,7 +102,7 @@ class ReviewLocalDataSource {
 
       // Obtiene la review actual
       final record = await _store.record(reviewId).get(db);
-      print('record a eliminar ${record}');
+      print('record a eliminar $record');
 
       if (record == null) {
         throw 'Review no encontrada en caché';

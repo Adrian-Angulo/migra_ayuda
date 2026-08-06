@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
+import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 
 enum SyncState { init, success, error }
 
@@ -27,10 +28,10 @@ class SyncNotifier extends AsyncNotifier<SyncState> {
   Future<void> _syncAll() async {
     final entities =
         await ref.read(entityRepositoryProvider).syncAllFromFirebase();
-    
     entities.fold(
       (failure) => throw Exception(failure.toString()),
       (result) => result,
     );
+    await ref.read(reviewRepositoryProvider).syncPendingReviews();
   }
 }

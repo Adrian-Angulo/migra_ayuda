@@ -29,7 +29,7 @@ class DropdownFieldWidget extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          value: value,
+          initialValue: value,
           validator: (value) {
             if (value == null || value.isEmpty) {
               return l10n.errorSelectOption;

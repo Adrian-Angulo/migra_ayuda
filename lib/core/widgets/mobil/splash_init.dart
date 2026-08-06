@@ -24,6 +24,7 @@ class _SplashScreenInitState extends ConsumerState<SplashScreenInit> {
   Future<void> _initializeApp() async {
     await SembastDatabase.instance.database;
     await ref.read(syncProvider.notifier).syncAll();
+    
     await Future.delayed(const Duration(seconds: 1));
     if (!mounted) return;
     context.go(Routes.loginMovil);

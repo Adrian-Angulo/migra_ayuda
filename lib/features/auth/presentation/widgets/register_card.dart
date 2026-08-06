@@ -22,20 +22,20 @@ class RegisterCard extends StatelessWidget {
         child: InkWell(
           onTap: onPressed,
           borderRadius: BorderRadius.circular(20),
-          splashColor: const Color(0xFF0B8A6D).withOpacity(0.08),
-          highlightColor: const Color(0xFF0B8A6D).withOpacity(0.04),
+          splashColor: const Color(0xFF0B8A6D).withValues(alpha: 0.08),
+          highlightColor: const Color(0xFF0B8A6D).withValues(alpha: 0.04),
           child: Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: const Color(0xFF0B8A6D).withOpacity(0.18),
+                color: const Color(0xFF0B8A6D).withValues(alpha: 0.18),
                 width: 1.2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha: 0.04),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -48,7 +48,7 @@ class RegisterCard extends StatelessWidget {
                   width: 52,
                   height: 52,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0B8A6D).withOpacity(0.1),
+                    color: const Color(0xFF0B8A6D).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: const Icon(

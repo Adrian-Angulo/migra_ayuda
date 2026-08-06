@@ -6,6 +6,7 @@ import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/place_details_screen.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/delete_confirmation_dialog.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/edit_entity_modal.dart';
+import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 
 class ActionButtons extends ConsumerWidget {
   final EntityEntity entity;
@@ -25,6 +26,8 @@ class ActionButtons extends ConsumerWidget {
           color: Colors.blue,
           tooltip: 'Ver detalles',
           onPressed: () {
+            
+            ref.invalidate(getReviewsByEntity(entity.id));
             showDialog(
               context: context,
               builder: (context) => Dialog(
@@ -67,7 +70,6 @@ class ActionButtons extends ConsumerWidget {
           color: Colors.red,
           tooltip: 'Eliminar',
           onPressed: () {
-            
             showDialog(
               context: context,
               builder: (context) => DeleteConfirmationDialog(
@@ -77,7 +79,7 @@ class ActionButtons extends ConsumerWidget {
                   await ref
                       .read(entitiesCrudProvider.notifier)
                       .deleteEntity(entity.id);
-                  
+
                   ref.invalidate(entitiesCrudProvider);
                   ref.invalidate(entities2StreamProvider);
                 },
@@ -124,12 +126,12 @@ class _ActionButtonState extends State<_ActionButton> {
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
               color: _isHovered
-                  ? widget.color.withOpacity(0.1)
+                  ? widget.color.withValues(alpha: 0.1)
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: _isHovered
-                    ? widget.color.withOpacity(0.3)
+                    ? widget.color.withValues(alpha: 0.3)
                     : Colors.transparent,
               ),
             ),

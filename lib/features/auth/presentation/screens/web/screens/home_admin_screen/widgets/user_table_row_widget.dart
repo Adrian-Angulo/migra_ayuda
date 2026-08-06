@@ -153,7 +153,7 @@ class _CountryBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFF7FD4A8).withOpacity(0.2),
+        color: const Color(0xFF7FD4A8).withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(

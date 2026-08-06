@@ -45,7 +45,7 @@ class ServiceTypeChecklistWidget extends StatelessWidget {
             duration: const Duration(milliseconds: 200),
             decoration: BoxDecoration(
               color: isSelected
-                  ? (getServiceColor(service) as Color).withOpacity(0.1)
+                  ? (getServiceColor(service) as Color).withValues(alpha: 0.1)
                   : Colors.grey.shade50,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(

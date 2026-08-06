@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
@@ -30,6 +31,20 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
     final user = authState.value;
 
     final int countReviews = asyncReviews.value?.length ?? 0;
+
+    //Mostrar mensaje de eliminacion;
+    ref.listen(
+      reviewNotifierProvider,
+      (previous, next) {
+        if (previous?.isLoading == true && !next.isLoading) {
+          if (next.value == ReviewState.deleting) {
+            SnackbarWidget.success(context, "Comentario eliminado con exito");
+          } else if (next.hasError) {
+            SnackbarWidget.error(context, next.error.toString());
+          }
+        }
+      },
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

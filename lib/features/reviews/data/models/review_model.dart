@@ -1,39 +1,72 @@
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
+import 'package:sembast/timestamp.dart';
 
-class ReviewModel extends ReviewEntity {
+class ReviewModel {
+  final String id;
+  final String idMigrante;
+  final String idEntity;
+  final String nameEntity;
+  final String userName;
+  final String userCountry;
+  final double rating;
+  final String comment;
+  final DateTime createdAt;
+  final DateTime? updatedAt;
+  final DateTime? deletedAt;
+
+  final bool isSynced;
   ReviewModel(
-      {required super.id,
-      required super.idMigrante,
-      required super.idEntity,
-      required super.userName,
-      required super.userCountry,
-      required super.rating,
-      required super.comment,
-      required super.createdAt,
-      required super.updatedAt,
-      required super.deletedAt,
-      required super.isSynced,
-      required super.nameEntity});
+      {required this.id,
+      required this.idMigrante,
+      required this.idEntity,
+      required this.userName,
+      required this.userCountry,
+      required this.rating,
+      required this.comment,
+      required this.createdAt,
+      required this.updatedAt,
+      required this.deletedAt,
+      required this.isSynced,
+      required this.nameEntity});
 
-  factory ReviewModel.fromMap(
+  factory ReviewModel.fromFirebase(
     Map<String, dynamic> map,
   ) {
     return ReviewModel(
-      id: map['id'],
-      idMigrante: map['idMigrante'],
-      idEntity: map['idEntity'],
-      rating: (map['rating'] as num).toDouble(),
-      comment: map['comment'],
-      createdAt: DateTime.parse(map['createdAt']),
+      id: map['id'] ?? '',
+      idMigrante: map['idMigrante'] ?? '',
+      idEntity: map['idEntity'] ?? '',
+      rating: (map['rating'] != null) ? (map['rating'] as num).toDouble() : 0.0,
+      comment: map['comment'] ?? '',
+      createdAt: map['createdAt'] != null
+          ? DateTime.parse(map['createdAt'])
+          : DateTime.now(),
       updatedAt:
-          map['updatedAt'] != null ? DateTime.parse(map['updatedAt']) : null,
+          map['updatedAt'] != null ? DateTime.tryParse(map['updatedAt']) : null,
       deletedAt:
-          map['deletedAt'] != null ? DateTime.parse(map['deletedAt']) : null,
-      isSynced: map['isSynced'],
-      userName: map['userName'],
-      userCountry: map['userCountry'],
-      nameEntity: map['nameEntity'],
+          map['deletedAt'] != null ? DateTime.tryParse(map['deletedAt']) : null,
+      isSynced: map['isSynced'] ?? false,
+      userName: map['userName'] ?? '',
+      userCountry: map['userCountry'] ?? '',
+      nameEntity: map['nameEntity'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'idMigrante': idMigrante,
+      'idEntity': idEntity,
+      'rating': rating,
+      'comment': comment,
+      'createdAt': createdAt.toUtc().toIso8601String(),
+      'updatedAt': updatedAt?.toUtc().toIso8601String(),
+      'deletedAt': deletedAt?.toUtc().toIso8601String(),
+      'isSynced': isSynced,
+      'userName': userName,
+      'nameEntity': nameEntity,
+      'userCountry': userCountry,
+    };
   }
 
   factory ReviewModel.fromReviewEntity(
@@ -57,56 +90,24 @@ class ReviewModel extends ReviewEntity {
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'idMigrante': idMigrante,
-      'idEntity': idEntity,
-      'rating': rating,
-      'comment': comment,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
-      'deletedAt': deletedAt?.toIso8601String(),
-      'isSynced': isSynced,
-      'userName': userName,
-      'nameEntity': nameEntity,
-      'userCountry': userCountry,
-    };
+  ReviewEntity toEntity() {
+    return ReviewEntity(
+      id: id,
+      idMigrante: idMigrante,
+      idEntity: idEntity,
+      nameEntity: nameEntity,
+      userName: userName,
+      userCountry: userCountry,
+      rating: rating,
+      comment: comment,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      deletedAt: deletedAt,
+      isSynced: isSynced,
+    );
   }
 
-  /// Convierte ReviewModel a Map para Sembast
-  Map<String, dynamic> toSembastMap() {
-    return {
-      'idMigrante': idMigrante,
-      'idEntity': idEntity,
-      'userName': userName,
-      'userCountry': userCountry,
-      'rating': rating,
-      'comment': comment,
-      'createdAt': createdAt.millisecondsSinceEpoch,
-      'updatedAt': updatedAt?.millisecondsSinceEpoch,
-      'deletedAt': deletedAt?.millisecondsSinceEpoch,
-      'isSynced': isSynced,
-      'nameEntity': nameEntity,
-      'cached_at': DateTime.now().millisecondsSinceEpoch,
-    };
-  }
-
-  /// Convierte Map de Sembast a ReviewModel
   factory ReviewModel.fromSembastMap(String id, Map<String, dynamic> map) {
-    // Determina si createdAt es int (milliseconds) o String (ISO8601)
-    DateTime createdAt;
-    if (map['createdAt'] is int) {
-      // Ya está en formato correcto (milliseconds)
-      createdAt = DateTime.fromMillisecondsSinceEpoch(map['createdAt']);
-    } else if (map['createdAt'] is String) {
-      // Está en formato String ISO8601 - convertir
-      createdAt = DateTime.parse(map['createdAt']);
-    } else {
-      // Fallback a fecha actual
-      createdAt = DateTime.now();
-    }
-
     return ReviewModel(
       id: id,
       idMigrante: map['idMigrante'] ?? '',
@@ -115,7 +116,7 @@ class ReviewModel extends ReviewEntity {
       userCountry: map['userCountry'] ?? '',
       rating: (map['rating'] as num?)?.toDouble() ?? 0.0,
       comment: map['comment'] ?? '',
-      createdAt: createdAt,
+      createdAt: DateTime.parse(map['createdAt'] as String),
       updatedAt: map['updatedAt'] != null
           ? (map['updatedAt'] is int
               ? DateTime.fromMillisecondsSinceEpoch(map['updatedAt'])
@@ -131,11 +132,11 @@ class ReviewModel extends ReviewEntity {
     );
   }
 
-  @override
   ReviewModel copyWith({
     String? id,
     String? idMigrante,
     String? idEntity,
+    String? nameEntity,
     String? userName,
     String? userCountry,
     double? rating,
@@ -144,12 +145,12 @@ class ReviewModel extends ReviewEntity {
     DateTime? updatedAt,
     DateTime? deletedAt,
     bool? isSynced,
-    String? nameEntity,
   }) {
     return ReviewModel(
       id: id ?? this.id,
       idMigrante: idMigrante ?? this.idMigrante,
       idEntity: idEntity ?? this.idEntity,
+      nameEntity: nameEntity ?? this.nameEntity,
       userName: userName ?? this.userName,
       userCountry: userCountry ?? this.userCountry,
       rating: rating ?? this.rating,
@@ -158,7 +159,6 @@ class ReviewModel extends ReviewEntity {
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
       isSynced: isSynced ?? this.isSynced,
-      nameEntity: nameEntity ?? this.nameEntity,
     );
   }
 }

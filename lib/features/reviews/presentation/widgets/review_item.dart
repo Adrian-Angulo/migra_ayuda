@@ -21,8 +21,6 @@ class ReviewItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-/*     final userReviewAsync = ref.watch(
-        userReviewByEntityProvider((userId: user.id, entityId: entity.id))); */
 
     /// Muestra diálogo de confirmación para eliminar
     Future<void> showDeleteConfirmation() async {
@@ -92,6 +90,7 @@ class ReviewItem extends ConsumerWidget {
               ),
               Row(
                 children: [
+                  //fecha y hora
                   Text(
                     TimeFormatter.formatDate(review.createdAt),
                     style: const TextStyle(

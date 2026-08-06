@@ -36,7 +36,7 @@ class EntityCardWidget extends ConsumerWidget {
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
               )
@@ -169,7 +169,7 @@ class DistanceAndRating extends ConsumerWidget {
         const Icon(Icons.star_rounded, size: 20, color: Colors.amber),
         Text(
           asyncRating.when(
-            data: (data) => (data['mean'] as num).toStringAsFixed(1),
+            data: (data) => (double.tryParse(data['mean'].toString()) ?? 0.0).toStringAsFixed(1),
             error: (error, stackTrace) => '0.0',
             loading: () => '---',
           ),

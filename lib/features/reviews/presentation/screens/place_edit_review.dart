@@ -26,7 +26,6 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
   late double rating;
   final formkey = GlobalKey<FormState>();
   late TextEditingController commentController;
-  bool isloading = false;
 
   @override
   void initState() {
@@ -45,6 +44,7 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
 
   @override
   Widget build(BuildContext context) {
+  bool isloading =  ref.watch(reviewNotifierProvider).isLoading;
     ref.listen(
       reviewNotifierProvider,
       (previous, next) async {
@@ -300,18 +300,9 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
                 FloatingMainButton(
                   onTap: () async {
                     if (!formkey.currentState!.validate()) {
-                      print('❌ Validación falló');
+                      debugPrint('❌ Validación falló');
                       return;
                     }
-
-                    print('🎬 === INICIANDO ACTUALIZACIÓN ===');
-                    print(
-                        '   Rating original: ${widget.existingReview.rating}');
-                    print('   Rating nuevo: $rating');
-                    print(
-                        '   Comment original: ${widget.existingReview.comment}');
-                    print('   Comment nuevo: ${commentController.text.trim()}');
-
                     // ✅ Construye la review con los datos EDITADOS
                     final updatedReview = widget.existingReview.copyWith(
                         rating: rating,
@@ -319,12 +310,7 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
                         updatedAt: DateTime.now(),
                         isSynced: false);
 
-                    print('   Review actualizada:');
-                    print('      ID: ${updatedReview.id}');
-                    print('      EntityID: ${updatedReview.idEntity}');
-                    print('      Rating: ${updatedReview.rating}');
-                    print('      Comment: ${updatedReview.comment}');
-
+        
                     await ref
                         .read(reviewNotifierProvider.notifier)
                         .updateReview(updatedReview);

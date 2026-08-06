@@ -28,7 +28,7 @@ class AddButtonWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF10B981).withOpacity(0.35),
+                color: const Color(0xFF10B981).withValues(alpha: 0.35),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -42,7 +42,7 @@ class AddButtonWidget extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: const Icon(Icons.add, size: 16, color: Colors.white),

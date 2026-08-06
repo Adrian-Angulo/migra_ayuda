@@ -35,7 +35,7 @@ class SidebarMenuItemWidget extends StatelessWidget {
                 icon,
                 color: isActive
                     ? const Color(0xFF1E4438)
-                    : Colors.white.withOpacity(0.9),
+                    : Colors.white.withValues(alpha: 0.9),
                 size: 22,
               ),
               const SizedBox(width: 14),
@@ -61,8 +61,8 @@ class SidebarMenuItemWidget extends StatelessWidget {
                         subtitle!,
                         style: TextStyle(
                           color: isActive
-                              ? const Color(0xFF1E4438).withOpacity(0.7)
-                              : Colors.white.withOpacity(0.6),
+                              ? const Color(0xFF1E4438).withValues(alpha: 0.7)
+                              : Colors.white.withValues(alpha: 0.6),
                           fontSize: 12,
                           fontWeight: FontWeight.w400,
                         ),

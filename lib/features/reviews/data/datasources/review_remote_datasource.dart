@@ -6,18 +6,17 @@ class ServerException implements Exception {
   final String message;
   ServerException(this.message);
 
-  
+  @override
   String toString() => 'ServerException: $message';
 }
 
 /// Implementación del datasource remoto usando Firebase Firestore
-class ReviewRemoteDataSource  {
+class ReviewRemoteDataSource {
   final FirebaseFirestore _firestore;
 
   ReviewRemoteDataSource({FirebaseFirestore? firestore})
       : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  
   Future<String> createReview(ReviewModel review) async {
     try {
       // Marca la review como sincronizada antes de guardar en Firebase
@@ -34,7 +33,6 @@ class ReviewRemoteDataSource  {
     }
   }
 
-  
   Future<List<ReviewModel>> getAllReviews() async {
     try {
       // Obtiene todas las reviews ordenadas por fecha de creación
@@ -54,7 +52,6 @@ class ReviewRemoteDataSource  {
     }
   }
 
-  
   Future<List<ReviewModel>> getReviewsByEntity(String entityId) async {
     try {
       // Filtra por entityId y ordena por fecha
@@ -66,7 +63,7 @@ class ReviewRemoteDataSource  {
       // Convierte los documentos a ReviewModel
       final reviews = snapshot.docs.map((doc) {
         /* return _fromFirestore(doc); */
-        return ReviewModel.fromMap(doc.data());
+        return ReviewModel.fromFirebase(doc.data());
       }).toList();
 
       return reviews;
@@ -76,7 +73,6 @@ class ReviewRemoteDataSource  {
     }
   }
 
-  
   Future<void> updateReview(ReviewModel review) async {
     try {
       // Actualiza el documento en Firestore
@@ -89,7 +85,6 @@ class ReviewRemoteDataSource  {
     }
   }
 
-  
   Future<void> deleteReview(String reviewId) async {
     try {
       // Elimina el documento de Firestore (hard delete)
@@ -99,7 +94,6 @@ class ReviewRemoteDataSource  {
     }
   }
 
-  
   Future<ReviewModel?> getUserReviewByEntity(
       String userId, String entityId) async {
     try {

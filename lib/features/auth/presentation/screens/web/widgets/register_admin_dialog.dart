@@ -90,7 +90,7 @@ class _RegisterAdminDialogState extends ConsumerState<RegisterAdminDialog> {
                       width: 64,
                       height: 64,
                       decoration: BoxDecoration(
-                        color: colors.primary.withOpacity(.08),
+                        color: colors.primary.withValues(alpha: .08),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
@@ -179,7 +179,7 @@ class _RegisterAdminDialogState extends ConsumerState<RegisterAdminDialog> {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: colors.primary.withOpacity(.05),
+                    color: colors.primary.withValues(alpha: .05),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(
