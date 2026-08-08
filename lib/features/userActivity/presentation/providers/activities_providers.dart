@@ -20,11 +20,29 @@ final queryActivityProvider = StateProvider<String>((ref) => '');
 
 /// Lista de actividades filtrada según [queryActivityProvider]
 final activitiesFilterProvider =
-    StreamProvider.autoDispose<List<UserActivity>>((ref) {
+    StateProvider.autoDispose<AsyncValue<List<UserActivity>>>((ref) {
   final query = ref.watch(queryActivityProvider);
-  final stream = ref.watch(activityRepositoryP).getAll();
+  final stream = ref.watch(getAllActivityP);
 
-  if (query.isEmpty) return stream;
+  return stream.when(
+      data: (originList) {
+        List<UserActivity> filterList = originList;
+        if (query.isNotEmpty) {
+          filterList = originList
+              .where((a) =>
+                  a.nombre.toLowerCase().contains(query) ||
+                  a.correo.toLowerCase().contains(query) ||
+                  a.accion.toLowerCase().contains(query) ||
+                  a.pais.toLowerCase().contains(query))
+              .toList();
+        }
+
+        return AsyncValue.data(filterList);
+      },
+      error: (error, stackTrace) => AsyncValue.error(error, stackTrace),
+      loading: () => const AsyncValue.loading());
+
+/*   if (query.isEmpty) return stream;
 
   return stream.map((list) => list
       .where((a) =>
@@ -32,7 +50,7 @@ final activitiesFilterProvider =
           a.correo.toLowerCase().contains(query) ||
           a.accion.toLowerCase().contains(query) ||
           a.pais.toLowerCase().contains(query))
-      .toList());
+      .toList()); */
 });
 
 final activityRepositoryP = Provider<UserActivityRepository>(

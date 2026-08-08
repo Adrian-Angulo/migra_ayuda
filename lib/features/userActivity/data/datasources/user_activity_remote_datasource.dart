@@ -1,15 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:migra_ayuda/features/userActivity/data/models/user_activity_model.dart';
 
-
-
 /// Implementación del datasource remoto usando Firebase Firestore
 class UserActivityRemoteDataSource {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<String> createActivity(UserActivityModel activity) async {
     try {
-     /*  // 1. Verificar si ya existe un documento con este localId (idempotencia)
+      /*  // 1. Verificar si ya existe un documento con este localId (idempotencia)
       final existingQuery = await _firestore
           .collection('user_activities')
           .where('localId', isEqualTo: activity.id)
@@ -21,25 +19,15 @@ class UserActivityRemoteDataSource {
         return existingQuery.docs.first.id;
       } */
 
-
       // 2. Si no existe, crear nuevo documento con localId como clave de idempotencia
-      final docRef = await _firestore.collection('user_activities').add({
-        'localId': activity.id, 
-        'idUser': activity.idUser,
-        'accion': activity.accion,
-        "nombre": activity.nombre,
-        "correo": activity.correo,
-        'pais': activity.pais,
-        'createdAt': activity.createdAt.toIso8601String(),
-        'isSynced': true, // En Firebase siempre está sincronizada
-        'metadata': activity.metadata
-      });
+      final docRef = await _firestore
+          .collection('user_activities')
+          .add(activity.copyWith(isSynced: true).toMap());
 
       // Retorna el ID generado por Firebase
       return docRef.id;
     } catch (e) {
-      throw Exception(
-          'Error al crear actividad de usuario en Firebase: $e');
+      throw Exception('Error al crear actividad de usuario en Firebase: $e');
     }
   }
 
@@ -75,7 +63,7 @@ class UserActivityRemoteDataSource {
   Future<void> synchronize(List<UserActivityModel> activities) async {
     if (activities.isEmpty) return;
     for (final act in activities) {
-      await _firestore.collection('user_activities').add(act.copyWith(isSynced: true).toMap());
+      await createActivity(act.copyWith(isSynced: true));
     }
   }
 }

@@ -24,16 +24,14 @@ class UserActivityDatatable extends DataTableSource {
         DataCell(_buildAccionChip(activity.accion)),
         DataCell(
           activity.metadata != null && activity.metadata!.isNotEmpty
-              ? Tooltip(
-                  message: activity.metadata!.entries
-                      .map((e) => '${e.key}: ${e.value}')
-                      .join('\n'),
-                  child: const Icon(Icons.info_outline,
-                      size: 18, color: Colors.blueGrey),
+              ? Text(
+                  activity.metadata!.entries
+                      .map((e) => '${e.value}')
+                      .join(', '),
                 )
               : const Text('—'),
         ),
-        DataCell(Text(TimeFormatter.formatDate(activity.createdAt))),
+        DataCell(Text(TimeFormatter.formatShortDate(activity.createdAt))),
       ],
     );
   }
