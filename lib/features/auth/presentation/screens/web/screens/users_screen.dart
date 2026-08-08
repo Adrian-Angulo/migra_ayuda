@@ -12,19 +12,24 @@ import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/w
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/export_button_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/filter_button.dart';
 
+// Pantalla principal para la gestión de usuarios en la versión web.
 class UsersScreen extends ConsumerWidget {
   const UsersScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Obtenemos el estado filtrado de los usuarios usando Riverpod
     final usersState = ref.watch(usersFilterProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(
-          horizontal: UIConstants.spacingL, vertical: UIConstants.spacingL),
+        horizontal: UIConstants.spacingL, 
+        vertical: UIConstants.spacingL
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Encabezado con el título y el botón para registrar administrador
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -38,9 +43,11 @@ class UsersScreen extends ConsumerWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  // Subtítulo descriptivo
                   Text("Gestiona los usuarios registradas en el sistema")
                 ],
               ),
+              // Botón para abrir el diálogo de registro de administrador
               AddButtonWidget(
                 text: "Registrar Administrador",
                 onTap: () {
@@ -57,13 +64,16 @@ class UsersScreen extends ConsumerWidget {
           const SizedBox(
             height: UIConstants.spacingM,
           ),
+          // Barra de búsqueda y acciones (filtrar/exportar)
           SizedBox(
             height: 40,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Campo de búsqueda básica
                 TextFielSearchWeb(
                   onChanged: (String value) {
+                    // Cambiamos el filtro de búsqueda con el texto ingresado
                     ref.read(queryUserProvider.notifier).state =
                         value.toLowerCase().trim();
                   },
@@ -71,6 +81,7 @@ class UsersScreen extends ConsumerWidget {
                 ),
                 Row(
                   children: [
+                    // Botón desplegable para filtro por rol
                     SizedBox(
                       width: 200,
                       child: FilterButton(
@@ -81,10 +92,13 @@ class UsersScreen extends ConsumerWidget {
                           'Migrante',
                           'Administrador',
                         ],
-                        onChanged: (String? value) {},
+                        onChanged: (String? value) {
+                          // TODO: implementar la acción al cambiar el filtro
+                        },
                       ),
                     ),
                     const SizedBox(width: UIConstants.spacingM),
+                    // Botón para exportar usuarios
                     ExportButtonWidget(label: 'Exportar', onPressed: () {})
                   ],
                 ),
@@ -94,47 +108,59 @@ class UsersScreen extends ConsumerWidget {
           const SizedBox(
             height: UIConstants.spacingM,
           ),
+          // Sección donde se muestran los datos de la tabla según el estado 
           usersState.when(
             data: (users) {
+              // Creamos las filas de la tabla con los usuarios
               final rows = UsersDatatable(listUsers: users);
 
+              // Tabla personalizada mostrando los usuarios y sus propiedades
               return BuildTable(
                 rows: rows,
                 columns: [
                   DataColumn2(
-                      label: DataTableUtils.buildHeaderCell('ID'),
-                      fixedWidth: 30),
+                    label: DataTableUtils.buildHeaderCell('ID'),
+                    fixedWidth: 30,
+                  ),
                   DataColumn2(
-                      label: DataTableUtils.buildHeaderCell('Nombre'),
-                      size: ColumnSize.M),
+                    label: DataTableUtils.buildHeaderCell('Nombre'),
+                    size: ColumnSize.M,
+                  ),
                   DataColumn2(
-                      label: DataTableUtils.buildHeaderCell('Correo'),
-                      size: ColumnSize.L),
+                    label: DataTableUtils.buildHeaderCell('Correo'),
+                    size: ColumnSize.L,
+                  ),
                   DataColumn2(
-                      label: DataTableUtils.buildHeaderCell('Rol'),
-                      size: ColumnSize.S),
+                    label: DataTableUtils.buildHeaderCell('Rol'),
+                    size: ColumnSize.S,
+                  ),
                   DataColumn2(
-                      label: DataTableUtils.buildHeaderCell('Edad'),
-                      size: ColumnSize.S),
+                    label: DataTableUtils.buildHeaderCell('Edad'),
+                    size: ColumnSize.S,
+                  ),
                   DataColumn2(
-                      label: DataTableUtils.buildHeaderCell('País de origen'),
-                      size: ColumnSize.M),
+                    label: DataTableUtils.buildHeaderCell('País de origen'),
+                    size: ColumnSize.M,
+                  ),
                   DataColumn2(
-                      label: DataTableUtils.buildHeaderCell('País de destino'),
-                      size: ColumnSize.M),
+                    label: DataTableUtils.buildHeaderCell('País de destino'),
+                    size: ColumnSize.M,
+                  ),
                   DataColumn2(
-                      label:
-                          DataTableUtils.buildHeaderCell('Fecha de registro'),
-                      size: ColumnSize.S),
+                    label: DataTableUtils.buildHeaderCell('Fecha de registro'),
+                    size: ColumnSize.S,
+                  ),
                 ],
               );
             },
+            // Mostrar mensaje si ocurre un error al cargar los usuarios
             error: (error, stackTrace) {
               return Text('Error $error');
             },
-            loading: () {
-              return const Text('Cargando...');
-            },
+            // Indicador de carga mientras se cargan los usuarios
+            loading: () => const Expanded(
+              child: Center(child: CircularProgressIndicator()),
+            ),
           )
         ],
       ),

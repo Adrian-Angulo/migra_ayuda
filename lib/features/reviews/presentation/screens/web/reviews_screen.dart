@@ -50,6 +50,7 @@ class ReviewsScreen extends ConsumerWidget {
                   onChanged: (String value) {
                     ref.read(queryReviewProvider.notifier).state =
                         value.toLowerCase().trim();
+                    
                   },
                   hintText: 'Buscar por usuario, entidad o país...',
                 ),

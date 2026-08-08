@@ -92,7 +92,7 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
                 : containerReviews(reviews, user!);
           },
           error: (error, stackTrace) {
-            print("error al llamar reviews: $error");
+            debugPrint("error al llamar reviews: $error");
             return messageError();
           },
           loading: () {

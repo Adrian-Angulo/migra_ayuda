@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 
 class TextFielSearchWeb extends ConsumerWidget {
   final Function(String)? onChanged;
@@ -14,8 +15,6 @@ class TextFielSearchWeb extends ConsumerWidget {
       width: 450,
       child: TextField(
         onChanged: onChanged,
-        /*  onChanged: (value) => ref.read(queryUserProvider.notifier).state =
-            value.toLowerCase().trim(), */
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(
@@ -26,16 +25,6 @@ class TextFielSearchWeb extends ConsumerWidget {
             Icons.search_rounded,
             color: Colors.grey.shade500,
             size: 20,
-          ),
-          suffixIcon: IconButton(
-            onPressed: () {
-              // Limpiar búsqueda
-            },
-            icon: Icon(
-              Icons.close_rounded,
-              size: 18,
-              color: Colors.grey.shade500,
-            ),
           ),
           filled: true,
           fillColor: Colors.white,
