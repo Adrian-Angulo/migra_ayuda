@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/place_details_screen.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/delete_confirmation_dialog.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/edit_entity_modal.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/add_entity_modal.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 
 class ActionButtons extends ConsumerWidget {
@@ -26,7 +25,6 @@ class ActionButtons extends ConsumerWidget {
           color: Colors.blue,
           tooltip: 'Ver detalles',
           onPressed: () {
-            
             ref.invalidate(getReviewsByEntity(entity.id));
             showDialog(
               context: context,
@@ -60,7 +58,7 @@ class ActionButtons extends ConsumerWidget {
           onPressed: () {
             showDialog(
               context: context,
-              builder: (context) => EditEntityModal(entity: entity),
+              builder: (context) => AddEntityModal(entity: entity),
             );
           },
         ),
@@ -75,13 +73,9 @@ class ActionButtons extends ConsumerWidget {
               builder: (context) => DeleteConfirmationDialog(
                 entityName: entity.name,
                 onConfirm: () async {
-                  debugPrint('Enitdad a eliminar: ${entity.id}');
                   await ref
                       .read(entitiesCrudProvider.notifier)
                       .deleteEntity(entity.id);
-
-                  ref.invalidate(entitiesCrudProvider);
-                  ref.invalidate(entities2StreamProvider);
                 },
               ),
             );

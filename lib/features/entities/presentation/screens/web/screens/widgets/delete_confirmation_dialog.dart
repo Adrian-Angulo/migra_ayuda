@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
 
-class DeleteConfirmationDialog extends ConsumerWidget {
+class DeleteConfirmationDialog extends ConsumerStatefulWidget {
   final String entityName;
-  final VoidCallback onConfirm;
+  final Future<void> Function() onConfirm;
 
   const DeleteConfirmationDialog({
     super.key,
@@ -12,8 +13,27 @@ class DeleteConfirmationDialog extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    
+  ConsumerState<DeleteConfirmationDialog> createState() =>
+      _DeleteConfirmationDialogState();
+}
+
+class _DeleteConfirmationDialogState
+    extends ConsumerState<DeleteConfirmationDialog> {
+  @override
+  Widget build(BuildContext context) {
+    final crudState = ref.watch(entitiesCrudProvider);
+    final isLoading = crudState.isLoading;
+
+    // Cierra el diálogo cuando la operación delete completa con éxito
+    ref.listen<AsyncValue<CrudOperation>>(entitiesCrudProvider,
+        (previous, next) {
+      if (previous?.isLoading == true && !next.isLoading) {
+        if (next.hasValue && next.value == CrudOperation.delete && mounted) {
+          Navigator.of(context).pop();
+        }
+      }
+    });
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
@@ -26,7 +46,7 @@ class DeleteConfirmationDialog extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Icono de advertencia
+            // ── Ícono ────────────────────────────────────────────────
             Container(
               width: 80,
               height: 80,
@@ -40,10 +60,9 @@ class DeleteConfirmationDialog extends ConsumerWidget {
                 color: Colors.red.shade400,
               ),
             ),
-
             const SizedBox(height: 24),
 
-            // Título
+            // ── Título ───────────────────────────────────────────────
             const Text(
               '¿Eliminar entidad?',
               style: TextStyle(
@@ -53,10 +72,9 @@ class DeleteConfirmationDialog extends ConsumerWidget {
               ),
               textAlign: TextAlign.center,
             ),
-
             const SizedBox(height: 12),
 
-            // Mensaje
+            // ── Mensaje ──────────────────────────────────────────────
             RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
@@ -68,7 +86,7 @@ class DeleteConfirmationDialog extends ConsumerWidget {
                 children: [
                   const TextSpan(text: 'Está a punto de eliminar la entidad '),
                   TextSpan(
-                    text: '"$entityName"',
+                    text: '"${widget.entityName}"',
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF111827),
@@ -81,15 +99,15 @@ class DeleteConfirmationDialog extends ConsumerWidget {
                 ],
               ),
             ),
-
             const SizedBox(height: 32),
 
-            // Botones
+            // ── Botones ──────────────────────────────────────────────
             Row(
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(),
+                    onPressed:
+                        isLoading ? null : () => Navigator.of(context).pop(),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       side: BorderSide(color: Colors.grey.shade300),
@@ -110,10 +128,7 @@ class DeleteConfirmationDialog extends ConsumerWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      onConfirm();
-                    },
+                    onPressed: isLoading ? null : () => widget.onConfirm(),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red.shade500,
                       foregroundColor: Colors.white,
@@ -122,14 +137,25 @@ class DeleteConfirmationDialog extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       elevation: 0,
+                      disabledBackgroundColor: Colors.grey.shade400,
                     ),
-                    child: const Text(
-                      'Eliminar',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Text(
+                            'Eliminar',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                   ),
                 ),
               ],

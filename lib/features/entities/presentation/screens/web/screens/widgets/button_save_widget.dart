@@ -1,124 +1,30 @@
-import 'dart:typed_data';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
 
-class ButtonSaveWidget extends StatelessWidget {
+/// Botón de guardar genérico para el modal de entidad.
+///
+/// Recibe [onPressed] como callback, tipicamente el método `_submit`
+/// expuesto desde [FormRegisterEntity] a través de su GlobalKey.
+class ButtonSaveWidget extends ConsumerWidget {
   const ButtonSaveWidget({
     super.key,
-    required GlobalKey<FormState> formKey,
-    required Uint8List? selectedImageBytes,
-    required this.selectedServices,
-    required TextEditingController nameController,
-    required TextEditingController descriptionController,
-    required TextEditingController addressController,
-    required TextEditingController latitudController,
-    required TextEditingController longitudController,
-    required TextEditingController phoneController,
-    required TextEditingController scheduleController,
-    required this.ref,
-    required XFile? selectedImage,
-  })  : _formKey = formKey,
-        _selectedImageBytes = selectedImageBytes,
-        _nameController = nameController,
-        _descriptionController = descriptionController,
-        _addressController = addressController,
-        _latitudController = latitudController,
-        _longitudController = longitudController,
-        _phoneController = phoneController,
-        _scheduleController = scheduleController,
-        _selectedImage = selectedImage;
+    required this.onPressed,
+    required this.isEditing,
+  });
 
-  final GlobalKey<FormState> _formKey;
-  final Uint8List? _selectedImageBytes;
-  final List<String> selectedServices;
-  final TextEditingController _nameController;
-  final TextEditingController _descriptionController;
-  final TextEditingController _addressController;
-  final TextEditingController _latitudController;
-  final TextEditingController _longitudController;
-  final TextEditingController _phoneController;
-  final TextEditingController _scheduleController;
-  final WidgetRef ref;
-  final XFile? _selectedImage;
+  final VoidCallback onPressed;
+
+  /// Si es true muestra "Guardar Cambios", si no "Guardar Entidad".
+  final bool isEditing;
 
   @override
-  Widget build(BuildContext context) {
-    final registerState = ref.watch(entitiesCrudProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final crudState = ref.watch(entitiesCrudProvider);
 
     return ElevatedButton.icon(
-      onPressed: registerState.isLoading
-          ? null
-          : () async {
-              if (_formKey.currentState!.validate()) {
-                if (_selectedImageBytes == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Por favor seleccione una imagen'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                  return;
-                }
-
-                if (selectedServices.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Por favor seleccione al menos un servicio',
-                      ),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                  return;
-                }
-
-                if (_latitudController.text.isEmpty ||
-                    _longitudController.text.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Debes buscar y confirmar la dirección en el mapa',
-                      ),
-                      backgroundColor: Colors.orange,
-                    ),
-                  );
-                  return;
-                }
-
-                // Crear entidad con los valores del formulario
-                final entity = EntityEntity(
-                    id: '',
-                    name: _nameController.text.trim(),
-                    description: _descriptionController.text.trim(),
-                    services: selectedServices,
-                    address: _addressController.text.trim(),
-                    localitation: GeoPoint(
-                      double.parse(_latitudController.text),
-                      double.parse(_longitudController.text),
-                    ),
-                    phone: _phoneController.text.trim(),
-                    imageUrl: "",
-                    schedule: _scheduleController.text.trim());
-
-                await ref.read(entitiesCrudProvider.notifier).registerEntity(
-                    entity: entity,
-                    imagenBytes: _selectedImageBytes!,
-                    fileName: _selectedImage?.name ?? '');
-
-                if (context.mounted) {
-                  final state = ref.read(entitiesCrudProvider);
-                  if (state.hasValue && !state.hasError) {
-                    Navigator.pop(context);
-                  }
-                }
-              }
-            },
-      icon: registerState.isLoading
+      onPressed: crudState.isLoading ? null : onPressed,
+      icon: crudState.isLoading
           ? const SizedBox(
               width: 20,
               height: 20,
@@ -129,11 +35,14 @@ class ButtonSaveWidget extends StatelessWidget {
             )
           : const Icon(Icons.save, size: 20),
       label: Text(
-        registerState.isLoading ? 'Guardando...' : 'Guardar Entidad',
+        crudState.isLoading
+            ? (isEditing ? 'Actualizando...' : 'Guardando...')
+            : (isEditing ? 'Guardar Cambios' : 'Guardar Entidad'),
         style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
       ),
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF10B981),
+        backgroundColor:
+            isEditing ? const Color(0xFF2D5F4F) : const Color(0xFF10B981),
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

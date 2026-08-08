@@ -1,119 +1,44 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:migra_ayuda/core/constants/services_utils.dart';
+import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/button_save_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/widgets/form_register_entity.dart';
 
 class AddEntityModal extends ConsumerStatefulWidget {
-  const AddEntityModal({super.key});
+  /// Si se proporciona, el modal opera en modo edición.
+  final EntityEntity? entity;
+
+  const AddEntityModal({super.key, this.entity});
+
+  bool get isEditing => entity != null;
 
   @override
   ConsumerState<AddEntityModal> createState() => _AddEntityModalState();
 }
 
 class _AddEntityModalState extends ConsumerState<AddEntityModal> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _addressController = TextEditingController();
-  LatLng? location;
-  final _latitudController = TextEditingController();
-  final _longitudController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _scheduleController = TextEditingController();
-
-  final _mapController = MapController();
-  bool _isSearching = false;
-  bool _addressNotFound = false;
-
-  List<String> selectedServices = [];
-  XFile? _selectedImage;
-  Uint8List? _selectedImageBytes;
-
-  String seleted = services[1];
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _descriptionController.dispose();
-    _addressController.dispose();
-    _phoneController.dispose();
-
-    super.dispose();
-  }
-
-  Future<LatLng?> getCoordinates(String address) async {
-    try {
-      final encoded = Uri.encodeComponent(address);
-
-      final url = Uri.parse(
-        'https://nominatim.openstreetmap.org/search'
-        '?q=$encoded&format=json&limit=1',
-      );
-
-      debugPrint("Consultando: $url");
-
-      final response = await http.get(url);
-
-      debugPrint("Status: ${response.statusCode}");
-      debugPrint(response.body);
-
-      if (response.statusCode == 200) {
-        final List data = jsonDecode(response.body);
-
-        if (data.isNotEmpty) {
-          return LatLng(
-            double.parse(data[0]['lat']),
-            double.parse(data[0]['lon']),
-          );
-        }
-      }
-
-      return null;
-    } catch (e, s) {
-      debugPrint("ERROR:");
-      debugPrint(e.toString());
-
-      debugPrint("STACK:");
-      debugPrintStack(stackTrace: s);
-
-      rethrow;
-    }
-  }
-
-  Future<void> _searchAddress() async {
-    if (_addressController.text.trim().isEmpty) return;
-    setState(() {
-      _isSearching = true;
-      _addressNotFound = false;
-    });
-
-    final coords = await getCoordinates(_addressController.text);
-
-    if (!mounted) return;
-
-    setState(() {
-      location = coords;
-      _isSearching = false;
-      _addressNotFound = coords == null;
-    });
-
-    if (coords != null) {
-      _latitudController.text = coords.latitude.toString();
-      _longitudController.text = coords.longitude.toString();
-      //_mapController.move(coords, 15);
-    }
-  }
+  final _formKey = GlobalKey<FormRegisterEntityState>();
 
   @override
   Widget build(BuildContext context) {
+    final isEditing = widget.isEditing;
+
+    // Escucha el resultado del CRUD y cierra el modal al completar.
+    // ref.listen en build es la forma correcta en Riverpod.
+    ref.listen<AsyncValue<CrudOperation>>(entitiesCrudProvider,
+        (previous, next) {
+      if (previous?.isLoading == true && !next.isLoading) {
+        if (next.hasValue && !next.hasError) {
+          final op = next.value;
+          final isSuccess = isEditing
+              ? op == CrudOperation.update
+              : op == CrudOperation.register;
+          if (isSuccess && mounted) Navigator.pop(context);
+        }
+      }
+    });
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
@@ -133,7 +58,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header mejorado
+            // ── Header dinámico ──────────────────────────────────────
             Container(
               padding: const EdgeInsets.all(28),
               decoration: const BoxDecoration(
@@ -155,8 +80,8 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                       color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(
-                      Icons.business,
+                    child: Icon(
+                      isEditing ? Icons.edit : Icons.business,
                       color: Colors.white,
                       size: 24,
                     ),
@@ -166,9 +91,9 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Nueva Entidad',
-                          style: TextStyle(
+                        Text(
+                          isEditing ? 'Editar Entidad' : 'Nueva Entidad',
+                          style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -176,7 +101,9 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Complete los datos de la nueva entidad colaboradora',
+                          isEditing
+                              ? 'Actualice la información de la entidad'
+                              : 'Complete los datos de la nueva entidad colaboradora',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.white.withValues(alpha: 0.9),
@@ -197,10 +124,13 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
               ),
             ),
 
-            // Form Content
-            const FormRegisterEntity(),
+            // ── Formulario ───────────────────────────────────────────
+            FormRegisterEntity(
+              key: _formKey,
+              entity: widget.entity,
+            ),
 
-            // Footer mejorado
+            // ── Footer ───────────────────────────────────────────────
             Container(
               padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
@@ -237,18 +167,8 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                   Expanded(
                     flex: 2,
                     child: ButtonSaveWidget(
-                      formKey: _formKey,
-                      selectedImageBytes: _selectedImageBytes,
-                      selectedServices: selectedServices,
-                      nameController: _nameController,
-                      descriptionController: _descriptionController,
-                      addressController: _addressController,
-                      latitudController: _latitudController,
-                      longitudController: _longitudController,
-                      phoneController: _phoneController,
-                      scheduleController: _scheduleController,
-                      ref: ref,
-                      selectedImage: _selectedImage,
+                      isEditing: isEditing,
+                      onPressed: () => _formKey.currentState?.submit(),
                     ),
                   ),
                 ],

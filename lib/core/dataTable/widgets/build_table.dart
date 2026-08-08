@@ -10,6 +10,8 @@ class BuildTable extends StatelessWidget {
     this.emptyIcon = Icons.table_rows_outlined,
     this.emptyTitle = 'No hay datos',
     this.emptySubtitle = 'Aún no se han registrado elementos',
+    this.sortColumnIndex,
+    this.sortAscending = true,
   });
 
   final DataTableSource rows;
@@ -17,6 +19,8 @@ class BuildTable extends StatelessWidget {
   final IconData emptyIcon;
   final String emptyTitle;
   final String emptySubtitle;
+  final int? sortColumnIndex;
+  final bool sortAscending;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +34,8 @@ class BuildTable extends StatelessWidget {
                 border: Border.all(width: 1, color: Colors.grey.shade300),
                 borderRadius: BorderRadius.circular(16)),
             child: PaginatedDataTable2(
+              sortColumnIndex: sortColumnIndex,
+              sortAscending: sortAscending,
               wrapInCard: false,
               rowsPerPage: 10,
               source: rows,
