@@ -22,7 +22,7 @@ final queryActivityProvider = StateProvider<String>((ref) => '');
 final activitiesFilterProvider =
     StateProvider.autoDispose<AsyncValue<List<UserActivity>>>((ref) {
   final query = ref.watch(queryActivityProvider);
-  final stream = ref.watch(getAllActivityP);
+  final stream =  ref.watch(getAllActivityP);
 
   return stream.when(
       data: (originList) {
@@ -42,15 +42,7 @@ final activitiesFilterProvider =
       error: (error, stackTrace) => AsyncValue.error(error, stackTrace),
       loading: () => const AsyncValue.loading());
 
-/*   if (query.isEmpty) return stream;
 
-  return stream.map((list) => list
-      .where((a) =>
-          a.nombre.toLowerCase().contains(query) ||
-          a.correo.toLowerCase().contains(query) ||
-          a.accion.toLowerCase().contains(query) ||
-          a.pais.toLowerCase().contains(query))
-      .toList()); */
 });
 
 final activityRepositoryP = Provider<UserActivityRepository>(

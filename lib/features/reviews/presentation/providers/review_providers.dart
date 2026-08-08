@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/config/sembast_database.dart';
 import 'package:migra_ayuda/core/network/network_provider.dart';
@@ -98,3 +99,53 @@ class ReviewsNotifier extends AsyncNotifier<ReviewState> {
     });
   }
 }
+
+// ---------------------------------------------------------------------------
+// Providers para la tabla web de reseñas
+// ---------------------------------------------------------------------------
+
+/// Texto de búsqueda ingresado en la barra de la tabla
+final queryReviewProvider = StateProvider<String>((ref) => '');
+
+/// Todas las reseñas sin filtro de entidad (para la vista web admin)
+final getAllReviewsProvider =
+    FutureProvider.autoDispose<List<ReviewEntity>>((ref) {
+  return ref.watch(reviewRepositoryProvider).getAllReviews();
+});
+
+/// Lista de reseñas filtrada según [queryReviewProvider]
+/// Provider para obtener la lista filtrada de reseñas según el texto de búsqueda.
+/// Utiliza el valor de [queryReviewProvider] para filtrar la lista traida por [getAllReviewsProvider].
+final reviewsFilterProvider =
+    StateProvider.autoDispose<AsyncValue<List<ReviewEntity>>>((ref) {
+  // Obtiene el texto de búsqueda actual
+  final query = ref.watch(queryReviewProvider);
+  // Obtiene el estado (cargando, error o datos) de la lista de todas las reseñas
+  final reviews = ref.watch(getAllReviewsProvider);
+
+  // Maneja los diferentes estados del proveedor de reseñas
+  return reviews.when(
+    data: (reviewsList) {
+      // Por defecto todas las reseñas
+      List<ReviewEntity> filteredReviews = reviewsList;
+      // Si hay texto de búsqueda, filtra la lista
+      if (query.isNotEmpty) {
+        filteredReviews = reviewsList
+            .where((r) =>
+                // Filtra por nombre de usuario
+                r.userName.toLowerCase().contains(query.toLowerCase()) ||
+                // Filtra por nombre de la entidad
+                r.nameEntity.toLowerCase().contains(query.toLowerCase()) ||
+                // Filtra por país del usuario
+                r.userCountry.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+      }
+      // Retorna la lista filtrada envuelta en un AsyncValue.data
+      return AsyncValue.data(filteredReviews);
+    },
+    // Si hay error al cargar las reseñas
+    error: (error, stackTrace) => AsyncValue.error(error, stackTrace),
+    // Si las reseñas están cargando
+    loading: () => const AsyncValue.loading(),
+  );
+});
