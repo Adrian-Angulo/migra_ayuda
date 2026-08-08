@@ -23,9 +23,7 @@ class UsersScreen extends ConsumerWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: UIConstants.spacingL, 
-        vertical: UIConstants.spacingL
-      ),
+          horizontal: UIConstants.spacingL, vertical: UIConstants.spacingL),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -86,14 +84,15 @@ class UsersScreen extends ConsumerWidget {
                       width: 200,
                       child: FilterButton(
                         label: 'Filtrar',
-                        value: 'Todos',
+                        value: ref.watch(userRoleFilterProvider),
                         options: const [
                           'Todos',
                           'Migrante',
-                          'Administrador',
+                          'Admin',
                         ],
                         onChanged: (String? value) {
-                          // TODO: implementar la acción al cambiar el filtro
+                          ref.read(userRoleFilterProvider.notifier).state =
+                              value ?? 'Todos';
                         },
                       ),
                     ),
@@ -108,7 +107,7 @@ class UsersScreen extends ConsumerWidget {
           const SizedBox(
             height: UIConstants.spacingM,
           ),
-          // Sección donde se muestran los datos de la tabla según el estado 
+          // Sección donde se muestran los datos de la tabla según el estado
           usersState.when(
             data: (users) {
               // Creamos las filas de la tabla con los usuarios
