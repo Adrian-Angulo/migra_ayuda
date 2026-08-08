@@ -1,7 +1,7 @@
-import 'package:migra_ayuda/features/userActivity/domain/entities/user_activity_entity.dart';
+import 'package:migra_ayuda/features/userActivity/domain/entities/user_activity.dart';
 
 abstract class UserActivityRepository {
-  Future<void> createActivity(UserActivityEntity activity);
-  Stream<List<UserActivityEntity>> getAll();
+  Future<void> createActivity(UserActivity activity);
+  Stream<List<UserActivity>> getAll();
   Future<void> synchronize();
 }

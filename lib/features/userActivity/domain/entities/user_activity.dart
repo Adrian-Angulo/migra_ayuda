@@ -1,6 +1,6 @@
 enum UserAccion { login, logout, seeDetailsEntity, goToEntity }
 
-class UserActivityEntity {
+class UserActivity {
   final String id;
   final String idUser;
   final String nombre;
@@ -10,7 +10,7 @@ class UserActivityEntity {
   final Map<String, dynamic>? metadata;
   final DateTime createdAt;
 
-  UserActivityEntity({
+  UserActivity({
     required this.id,
     required this.idUser,
     required this.accion,
@@ -20,4 +20,18 @@ class UserActivityEntity {
     required this.pais,
     this.metadata,
   }) : createdAt = createdAt ?? DateTime.now();
+
+  @override
+  String toString() {
+    return 'UserActivity('
+        'id: $id, '
+        'idUser: $idUser, '
+        'nombre: $nombre, '
+        'correo: $correo, '
+        'pais: $pais, '
+        'accion: $accion, '
+        'metadata: $metadata, '
+        'createdAt: $createdAt'
+        ')';
+  }
 }

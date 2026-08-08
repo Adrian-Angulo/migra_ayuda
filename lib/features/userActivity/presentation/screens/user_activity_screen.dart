@@ -24,13 +24,7 @@ class _UserActivityScreenState extends ConsumerState<UserActivityScreen> {
               itemBuilder: (context, index) {
                 final activity = activities[index];
                 return ListTile(
-                  title: Row(
-                    children: [
-                      Text(activity.accion),
-                      if (activity.metadata != null)
-                        Text(activity.metadata?['service']),
-                    ],
-                  ),
+                  title: Text('$activity'),
                 );
               },
             ),

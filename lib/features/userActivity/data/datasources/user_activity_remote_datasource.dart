@@ -1,14 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:migra_ayuda/features/userActivity/data/models/user_activity_model.dart';
 
-/// Excepción personalizada para errores del servidor
-class ServerException implements Exception {
-  final String message;
-  ServerException(this.message);
 
-  @override
-  String toString() => 'ServerException: $message';
-}
 
 /// Implementación del datasource remoto usando Firebase Firestore
 class UserActivityRemoteDataSource {
@@ -16,7 +9,7 @@ class UserActivityRemoteDataSource {
 
   Future<String> createActivity(UserActivityModel activity) async {
     try {
-      // 1. Verificar si ya existe un documento con este localId (idempotencia)
+     /*  // 1. Verificar si ya existe un documento con este localId (idempotencia)
       final existingQuery = await _firestore
           .collection('user_activities')
           .where('localId', isEqualTo: activity.id)
@@ -26,11 +19,12 @@ class UserActivityRemoteDataSource {
       // Si ya existe, retornar su ID en lugar de crear duplicado
       if (existingQuery.docs.isNotEmpty) {
         return existingQuery.docs.first.id;
-      }
+      } */
+
 
       // 2. Si no existe, crear nuevo documento con localId como clave de idempotencia
       final docRef = await _firestore.collection('user_activities').add({
-        'localId': activity.id, // Clave de idempotencia
+        'localId': activity.id, 
         'idUser': activity.idUser,
         'accion': activity.accion,
         "nombre": activity.nombre,
@@ -44,11 +38,12 @@ class UserActivityRemoteDataSource {
       // Retorna el ID generado por Firebase
       return docRef.id;
     } catch (e) {
-      throw ServerException(
+      throw Exception(
           'Error al crear actividad de usuario en Firebase: $e');
     }
   }
 
+  //metodo para obtener todas las acciones del usuario
   Stream<List<UserActivityModel>> getAllActivities() {
     return _firestore
         .collection('user_activities')
@@ -71,16 +66,16 @@ class UserActivityRemoteDataSource {
                 : null);
       }).toList();
     }).handleError((e) {
-      throw ServerException(
+      throw Exception(
           'Error al obtener actividades de usuario desde Firebase: $e');
     });
   }
 
+  //Metodo para subir actividades pendientes a firebase
   Future<void> synchronize(List<UserActivityModel> activities) async {
     if (activities.isEmpty) return;
     for (final act in activities) {
-      final syncedAct = act.copyWith(isSynced: true);
-      await _firestore.collection('user_activities').add(syncedAct.toMap());
+      await _firestore.collection('user_activities').add(act.copyWith(isSynced: true).toMap());
     }
   }
 }

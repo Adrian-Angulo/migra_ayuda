@@ -1,14 +1,13 @@
 import 'dart:async';
 
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/enum/enums.dart';
 import 'package:migra_ayuda/core/network/network_provider.dart';
-import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/userActivity/data/datasources/user_activity_local_datasource.dart';
 import 'package:migra_ayuda/features/userActivity/data/datasources/user_activity_remote_datasource.dart';
 import 'package:migra_ayuda/features/userActivity/data/repositories/user_activity_repository_impl.dart';
-import 'package:migra_ayuda/features/userActivity/domain/entities/user_activity_entity.dart';
+import 'package:migra_ayuda/features/userActivity/domain/entities/user_activity.dart';
 import 'package:migra_ayuda/features/userActivity/domain/repositories/user_activity_repository.dart';
 
 final activityRepositoryP = Provider<UserActivityRepository>(
@@ -36,29 +35,34 @@ class ActivityNotifier extends AsyncNotifier<ActivityState> {
     required String accion,
     Map<String, dynamic>? metadata,
   }) async {
-    //TODO: USAR USUARIO REAL PARA REGISTRAR EVENTOS
+    //inicializa el estado de carga
     state = const AsyncValue.loading();
-    final repo = ref.read(activityRepositoryP);
-    final userFake = UserModel(
-        id: 'ad',
-        name: 'Camilo',
-        email: 'ejemplo@gmail.com',
-        password: '',
-        originCountry: 'Venezuela',
-        role: 'Migrante');
-    final activity = UserActivityEntity(
-        id: userFake.id,
-        idUser: userFake.id,
-        accion: accion,
-        nombre: userFake.name,
-        correo: userFake.email,
-        metadata: metadata,
-        pais: userFake.originCountry!);
 
+    //obtiene el usuario autenticado
+    final user = ref.watch(authNotifierProvider).value;
+
+    //si no existe usuario manda un error
+    if (user == null) {
+      state = AsyncValue.error(
+        'El usuario no está autenticado',
+        StackTrace.current,
+      );
+      return;
+    }
+    //crear una accion del usuario
+    final activity = UserActivity(
+        id: user.id,
+        idUser: user.id,
+        accion: accion,
+        nombre: user.name,
+        correo: user.email,
+        metadata: metadata,
+        pais: user.originCountry!);
+
+    // guard. captura errores automaticamente
     state = await AsyncValue.guard(() async {
-      await repo.createActivity(activity);
-      debugPrint('Se creo una actvidad $accion');
-      if(metadata !=null) debugPrint('metadata: ${metadata['service']}');
+      //crear la actividad
+      await ref.read(activityRepositoryP).createActivity(activity);
 
       return ActivityState.success;
     });

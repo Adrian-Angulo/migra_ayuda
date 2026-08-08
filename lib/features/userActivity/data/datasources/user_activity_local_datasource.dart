@@ -2,16 +2,8 @@ import 'package:sembast/sembast.dart';
 import 'package:migra_ayuda/core/config/sembast_database.dart';
 import 'package:migra_ayuda/features/userActivity/data/models/user_activity_model.dart';
 
-/// Excepción personalizada para errores de caché
-class CacheException implements Exception {
-  final String message;
-  CacheException(this.message);
 
-  @override
-  String toString() => 'CacheException: $message';
-}
 
-/// Implementación del datasource local usando Sembast
 class UserActivityLocalDataSource {
   final SembastDatabase sembastDatabase = SembastDatabase.instance;
 
@@ -26,9 +18,9 @@ class UserActivityLocalDataSource {
       final db = await _db;
 
       // Guarda o actualiza la actividad
-      await _store.record(activity.id).put(db, activity.toSembastMap());
+      await _store.record(activity.id).put(db, activity.toMap());
     } catch (e) {
-      throw CacheException('Error al guardar actividad en caché: $e');
+      throw Exception('Error al guardar actividad en caché: $e');
     }
   }
 
@@ -37,7 +29,7 @@ class UserActivityLocalDataSource {
       final db = await _db;
       await _store.record(localId).delete(db);
     } catch (e) {
-      throw CacheException('Error al eliminar actividad local: $e');
+      throw Exception('Error al eliminar actividad local: $e');
     }
   }
 
@@ -53,10 +45,10 @@ class UserActivityLocalDataSource {
 
       // Convierte los registros a UserActivityModel
       return records.map((record) {
-        return UserActivityModel.fromSembastMap(record.key, record.value);
+        return UserActivityModel.fromMap(record.key, record.value);
       }).toList();
     } catch (e) {
-      throw CacheException('Error al obtener actividades pendientes: $e');
+      throw Exception('Error al obtener actividades pendientes: $e');
     }
   }
 }
