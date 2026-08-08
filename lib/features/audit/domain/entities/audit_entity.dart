@@ -1,6 +1,6 @@
 enum UserAccion { login, logout, seeDetailsEntity, goToEntity }
 
-class UserActivity {
+class AuditEntity {
   final String id;
   final String idUser;
   final String nombre;
@@ -10,7 +10,7 @@ class UserActivity {
   final Map<String, dynamic>? metadata;
   final DateTime createdAt;
 
-  UserActivity({
+  AuditEntity({
     required this.id,
     required this.idUser,
     required this.accion,

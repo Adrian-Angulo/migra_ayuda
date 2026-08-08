@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/features/language/presentation/providers/language_provider.dart';
-import 'package:migra_ayuda/features/userActivity/presentation/providers/activities_providers.dart';
+import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class DrawerMenuItems extends ConsumerWidget {
@@ -81,7 +81,7 @@ class DrawerMenuItems extends ConsumerWidget {
           Navigator.pop(ctx);
           // Usar el notifier capturado en lugar de ref
           await languageNotifier.changeLanguage(code);
-          await ref.read(activityProvider.notifier).create(
+          await ref.read(auditNotifierProvider.notifier).create(
               accion: ActivityActions.changeLanguaje(),
               metadata: {'languaje': code});
         },

@@ -8,7 +8,7 @@ import 'package:migra_ayuda/core/network/network_provider.dart';
 import 'package:migra_ayuda/features/reviews/data/datasources/review_local_datasource.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
 import 'package:migra_ayuda/features/reviews/domain/repositories/review_repository.dart';
-import 'package:migra_ayuda/features/userActivity/presentation/providers/activities_providers.dart';
+import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
 import '../../data/datasources/review_remote_datasource.dart';
 import '../../data/repositories/review_repository_impl.dart';
 
@@ -68,7 +68,7 @@ class ReviewsNotifier extends AsyncNotifier<ReviewState> {
     state = await AsyncValue.guard(() async {
       await ref.read(reviewRepositoryProvider).createReview(review);
       await ref
-          .read(activityProvider.notifier)
+          .read(auditNotifierProvider.notifier)
           .create(accion: ActivityActions.addComment());
       ref.invalidate(getReviewsByEntity(review.idEntity));
       return ReviewState.creating;
@@ -80,7 +80,7 @@ class ReviewsNotifier extends AsyncNotifier<ReviewState> {
     state = await AsyncValue.guard(() async {
       await ref.read(reviewRepositoryProvider).updateReview(review);
       await ref
-          .read(activityProvider.notifier)
+          .read(auditNotifierProvider.notifier)
           .create(accion: ActivityActions.updateComment());
       ref.invalidate(getReviewsByEntity(review.idEntity));
       return ReviewState.updating;
@@ -92,7 +92,7 @@ class ReviewsNotifier extends AsyncNotifier<ReviewState> {
     state = await AsyncValue.guard(() async {
       await ref.read(reviewRepositoryProvider).deleteReview(review.id);
       await ref
-          .read(activityProvider.notifier)
+          .read(auditNotifierProvider.notifier)
           .create(accion: ActivityActions.deleteComment());
       ref.invalidate(getReviewsByEntity(review.idEntity));
       return ReviewState.deleting;

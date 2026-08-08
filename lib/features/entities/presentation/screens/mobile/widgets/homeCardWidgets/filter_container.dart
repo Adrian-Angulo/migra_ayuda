@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/constants/services_utils.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
-import 'package:migra_ayuda/features/userActivity/presentation/providers/activities_providers.dart';
+import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
 
 class FilterContainer extends ConsumerWidget {
   const FilterContainer({
@@ -32,7 +32,7 @@ class FilterContainer extends ConsumerWidget {
                   ref
                       .read(getAllEntitiesProvider.notifier)
                       .filter(query: service);
-                  await ref.read(activityProvider.notifier).create(
+                  await ref.read(auditNotifierProvider.notifier).create(
                       accion: ActivityActions.filter(),
                       metadata: {'filtro': service});
                 }

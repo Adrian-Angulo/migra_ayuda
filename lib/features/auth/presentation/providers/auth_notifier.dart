@@ -5,7 +5,7 @@ import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/router/app_router_mobile.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
-import 'package:migra_ayuda/features/userActivity/presentation/providers/activities_providers.dart';
+import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
 
 class AuthNotifier extends AsyncNotifier<UserModel?> {
   @override
@@ -28,7 +28,7 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
 
     try {
       final repository = ref.read(repositoryProvider);
-      final activity = ref.read(activityProvider.notifier);
+      final activity = ref.read(auditNotifierProvider.notifier);
 
       // Ejecutar login
       final user = await repository.login(email, password);
@@ -87,7 +87,7 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
       final userData = await repository.verifyOrCreateGoogleUser(credential);
 
       state = AsyncValue.data(userData);
-      ref.read(activityProvider.notifier).create(
+      ref.read(auditNotifierProvider.notifier).create(
             accion: ActivityActions.login(),
           );
       ref.read(routerMovilNotifierProvider).refresh();

@@ -1,10 +1,8 @@
 import 'package:sembast/sembast.dart';
 import 'package:migra_ayuda/core/config/sembast_database.dart';
-import 'package:migra_ayuda/features/userActivity/data/models/user_activity_model.dart';
+import 'package:migra_ayuda/features/audit/data/models/audit_model.dart';
 
-
-
-class UserActivityLocalDataSource {
+class AuditLocalDataSource {
   final SembastDatabase sembastDatabase = SembastDatabase.instance;
 
   // Store para las actividades de usuario
@@ -13,7 +11,7 @@ class UserActivityLocalDataSource {
   /// Obtiene la instancia de la base de datos
   Future<Database> get _db async => await sembastDatabase.database;
 
-  Future<void> save(UserActivityModel activity) async {
+  Future<void> save(AuditModel activity) async {
     try {
       final db = await _db;
 
@@ -33,7 +31,7 @@ class UserActivityLocalDataSource {
     }
   }
 
-  Future<List<UserActivityModel>> getPending() async {
+  Future<List<AuditModel>> getPending() async {
     try {
       final db = await _db;
       // Filtra por isSynced = false
@@ -45,7 +43,7 @@ class UserActivityLocalDataSource {
 
       // Convierte los registros a UserActivityModel
       return records.map((record) {
-        return UserActivityModel.fromMap(record.key, record.value);
+        return AuditModel.fromMap(record.key, record.value);
       }).toList();
     } catch (e) {
       throw Exception('Error al obtener actividades pendientes: $e');

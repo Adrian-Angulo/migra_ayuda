@@ -1,12 +1,12 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/core/utils/format/time_formatter.dart';
-import 'package:migra_ayuda/features/userActivity/domain/entities/user_activity.dart';
+import 'package:migra_ayuda/features/audit/domain/entities/audit_entity.dart';
 
-class UserActivityDatatable extends DataTableSource {
-  final List<UserActivity> listActivities;
+class AuditDatatable extends DataTableSource {
+  final List<AuditEntity> listActivities;
 
-  UserActivityDatatable({required this.listActivities});
+  AuditDatatable({required this.listActivities});
 
   @override
   DataRow? getRow(int index) {

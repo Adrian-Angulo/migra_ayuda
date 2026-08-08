@@ -1,24 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:migra_ayuda/features/userActivity/data/models/user_activity_model.dart';
+import 'package:migra_ayuda/features/audit/data/models/audit_model.dart';
 
 /// Implementación del datasource remoto usando Firebase Firestore
-class UserActivityRemoteDataSource {
+class AuditRemoteDataSource {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<String> createActivity(UserActivityModel activity) async {
+  Future<String> createActivity(AuditModel activity) async {
     try {
-      /*  // 1. Verificar si ya existe un documento con este localId (idempotencia)
-      final existingQuery = await _firestore
-          .collection('user_activities')
-          .where('localId', isEqualTo: activity.id)
-          .limit(1)
-          .get();
-
-      // Si ya existe, retornar su ID en lugar de crear duplicado
-      if (existingQuery.docs.isNotEmpty) {
-        return existingQuery.docs.first.id;
-      } */
-
       // 2. Si no existe, crear nuevo documento con localId como clave de idempotencia
       final docRef = await _firestore
           .collection('user_activities')
@@ -32,7 +20,7 @@ class UserActivityRemoteDataSource {
   }
 
   //metodo para obtener todas las acciones del usuario
-  Stream<List<UserActivityModel>> getAllActivities() {
+  Stream<List<AuditModel>> getAllActivities() {
     return _firestore
         .collection('user_activities')
         .orderBy('createdAt', descending: true)
@@ -40,7 +28,7 @@ class UserActivityRemoteDataSource {
         .map((querySnapshot) {
       return querySnapshot.docs.map((doc) {
         final data = doc.data();
-        return UserActivityModel(
+        return AuditModel(
             id: data['localId'] as String,
             idUser: data['idUser'] as String,
             accion: data['accion'] ?? "null",
@@ -60,7 +48,7 @@ class UserActivityRemoteDataSource {
   }
 
   //Metodo para subir actividades pendientes a firebase
-  Future<void> synchronize(List<UserActivityModel> activities) async {
+  Future<void> synchronize(List<AuditModel> activities) async {
     if (activities.isEmpty) return;
     for (final act in activities) {
       await createActivity(act.copyWith(isSynced: true));

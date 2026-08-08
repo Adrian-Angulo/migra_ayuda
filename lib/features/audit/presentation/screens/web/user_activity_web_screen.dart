@@ -6,15 +6,15 @@ import 'package:migra_ayuda/core/dataTable/widgets/build_header_cell.dart';
 import 'package:migra_ayuda/core/dataTable/widgets/build_table.dart';
 import 'package:migra_ayuda/core/widgets/web/text_fiel_search_web.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/export_button_widget.dart';
-import 'package:migra_ayuda/features/userActivity/domain/entities/user_activity_datatable.dart';
-import 'package:migra_ayuda/features/userActivity/presentation/providers/activities_providers.dart';
+import 'package:migra_ayuda/features/audit/domain/entities/audit_datatable.dart';
+import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
 
 class UserActivityWebScreen extends ConsumerWidget {
   const UserActivityWebScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final activitiesState = ref.watch(activitiesFilterProvider);
+    final activitiesState = ref.watch(auditFilterProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -48,7 +48,7 @@ class UserActivityWebScreen extends ConsumerWidget {
               children: [
                 TextFielSearchWeb(
                   onChanged: (String value) {
-                    ref.read(queryActivityProvider.notifier).state =
+                    ref.read(queryAuditProvider.notifier).state =
                         value.toLowerCase().trim();
                   },
                   hintText: 'Buscar por usuario, correo o acción...',
@@ -62,7 +62,7 @@ class UserActivityWebScreen extends ConsumerWidget {
           // ── Tabla ─────────────────────────────────────────────────────
           activitiesState.when(
             data: (activities) {
-              final rows = UserActivityDatatable(listActivities: activities);
+              final rows = AuditDatatable(listActivities: activities);
 
               return BuildTable(
                 rows: rows,

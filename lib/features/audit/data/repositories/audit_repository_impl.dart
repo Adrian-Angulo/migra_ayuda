@@ -1,31 +1,31 @@
 import 'package:flutter/foundation.dart';
 import 'package:migra_ayuda/core/network/network_info.dart';
-import 'package:migra_ayuda/features/userActivity/data/datasources/user_activity_local_datasource.dart';
-import 'package:migra_ayuda/features/userActivity/data/datasources/user_activity_remote_datasource.dart';
-import 'package:migra_ayuda/features/userActivity/data/mappers/user_activity_mappers.dart';
-import 'package:migra_ayuda/features/userActivity/domain/entities/user_activity.dart';
-import 'package:migra_ayuda/features/userActivity/domain/repositories/user_activity_repository.dart';
+import 'package:migra_ayuda/features/audit/data/datasources/audit_local_datasource.dart';
+import 'package:migra_ayuda/features/audit/data/datasources/audit_remote_datasource.dart';
+import 'package:migra_ayuda/features/audit/data/mappers/audit_mappers.dart';
+import 'package:migra_ayuda/features/audit/domain/entities/audit_entity.dart';
+import 'package:migra_ayuda/features/audit/domain/repositories/audit_repository.dart';
 import 'package:uuid/uuid.dart';
 
-class UserActivityRepositoryImpl implements UserActivityRepository {
-  final UserActivityRemoteDataSource remoteDataSource;
-  final UserActivityLocalDataSource localDataSource;
+class AuditRepositoryImpl implements UserActivityRepository {
+  final AuditRemoteDataSource remoteDataSource;
+  final AuditLocalDataSource localDataSource;
   final NetworkInfo networkInfo;
 
-  UserActivityRepositoryImpl({
+  AuditRepositoryImpl({
     required this.remoteDataSource,
     required this.localDataSource,
     required this.networkInfo,
   });
 
   @override
-  Future<void> createActivity(UserActivity activity) async {
+  Future<void> createActivity(AuditEntity activity) async {
     try {
       // 1. Genera un ID único local
       final localId = const Uuid().v4();
 
       // 2. Crea el modelo con el ID local
-      final modelo = UserActivityMappers.toActivityModel(activity);
+      final modelo = AuditMappers.toActivityModel(activity);
       final modeloWithId = modelo.copyWith(id: localId);
 
       // 3. Guarda primero en caché local (respuesta inmediata)
@@ -53,10 +53,10 @@ class UserActivityRepositoryImpl implements UserActivityRepository {
   }
 
   @override
-  Stream<List<UserActivity>> getAll() {
+  Stream<List<AuditEntity>> getAll() {
     return remoteDataSource
         .getAllActivities()
-        .map((list) => list.map(UserActivityMappers.toActivityEntity).toList());
+        .map((list) => list.map(AuditMappers.toActivityEntity).toList());
   }
 
   @override

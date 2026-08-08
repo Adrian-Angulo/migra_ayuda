@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
-import 'package:migra_ayuda/features/userActivity/presentation/providers/activities_providers.dart';
+import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
 
 enum SyncState { init, success, error }
 
@@ -34,6 +34,6 @@ class SyncNotifier extends AsyncNotifier<SyncState> {
       (result) => result,
     );
     await ref.read(reviewRepositoryProvider).syncPendingReviews();
-    await ref.read(activityRepositoryP).synchronize();
+    await ref.read(auditRepositoryProvider).synchronize();
   }
 }

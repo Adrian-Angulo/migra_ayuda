@@ -8,7 +8,7 @@ import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widget
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/place_details_header.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/place_details_info.dart';
 import 'package:migra_ayuda/features/reviews/presentation/screens/section_review_screen.dart';
-import 'package:migra_ayuda/features/userActivity/presentation/providers/activities_providers.dart';
+import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class EntitySeletedDetails extends ConsumerStatefulWidget {
@@ -53,7 +53,7 @@ class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
                           .read(mapProvider.notifier)
                           .drawRouteToEntity(widget.map.selectEntity!);
 
-                      await ref.read(activityProvider.notifier).create(
+                      await ref.read(auditNotifierProvider.notifier).create(
                           accion: ActivityActions.routeRequested(),
                           metadata: {
                             'service': widget.map.selectEntity!.services[0],
@@ -79,7 +79,7 @@ class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
                               widget.map.selectEntity!.localitation.latitude,
                               widget.map.selectEntity!.localitation.longitude);
 
-                      await ref.read(activityProvider.notifier).create(
+                      await ref.read(auditNotifierProvider.notifier).create(
                           accion: ActivityActions.navigationMaps(),
                           metadata: {
                             'service': widget.map.selectEntity!.services[0],

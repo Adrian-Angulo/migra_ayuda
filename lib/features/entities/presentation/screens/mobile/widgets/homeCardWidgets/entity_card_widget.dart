@@ -8,7 +8,7 @@ import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart
 import 'package:migra_ayuda/features/entities/presentation/providers/map_provider.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/service_tag.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
-import 'package:migra_ayuda/features/userActivity/presentation/providers/activities_providers.dart';
+import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
 
 class EntityCardWidget extends ConsumerWidget {
   const EntityCardWidget({
@@ -25,7 +25,7 @@ class EntityCardWidget extends ConsumerWidget {
     return GestureDetector(
       onTap: () async {
         ref.read(mapProvider.notifier).selectEntity(entity);
-        await ref.read(activityProvider.notifier).create(
+        await ref.read(auditNotifierProvider.notifier).create(
             accion: ActivityActions.entityViewed(),
             metadata: {'service': entity.services[0]});
       },
@@ -169,7 +169,8 @@ class DistanceAndRating extends ConsumerWidget {
         const Icon(Icons.star_rounded, size: 20, color: Colors.amber),
         Text(
           asyncRating.when(
-            data: (data) => (double.tryParse(data['mean'].toString()) ?? 0.0).toStringAsFixed(1),
+            data: (data) => (double.tryParse(data['mean'].toString()) ?? 0.0)
+                .toStringAsFixed(1),
             error: (error, stackTrace) => '0.0',
             loading: () => '---',
           ),

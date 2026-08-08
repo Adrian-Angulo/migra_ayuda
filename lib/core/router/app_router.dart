@@ -8,7 +8,7 @@ import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/login
 import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/users_screen.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/entities_screen.dart';
 import 'package:migra_ayuda/features/reviews/presentation/screens/web/reviews_screen.dart';
-import 'package:migra_ayuda/features/userActivity/presentation/screens/web/user_activity_web_screen.dart';
+import 'package:migra_ayuda/features/audit/presentation/screens/web/user_activity_web_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final notifier = ref.read(routerNotifierProvider.notifier);

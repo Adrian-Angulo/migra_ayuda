@@ -1,8 +1,4 @@
-
-
-
-class UserActivityModel  {
-
+class AuditModel {
   final bool isSynced;
   final String id;
   final String idUser;
@@ -12,8 +8,8 @@ class UserActivityModel  {
   final String accion;
   final Map<String, dynamic>? metadata;
   final DateTime createdAt;
-  
-  UserActivityModel(
+
+  AuditModel(
       {required this.id,
       required this.idUser,
       required this.accion,
@@ -22,12 +18,10 @@ class UserActivityModel  {
       required this.nombre,
       required this.correo,
       required this.pais,
-       this.metadata});
+      this.metadata});
 
-
-  factory UserActivityModel.fromMap(String? id ,Map<String, dynamic> map) {
-
-    return UserActivityModel(
+  factory AuditModel.fromMap(String? id, Map<String, dynamic> map) {
+    return AuditModel(
       id: id ?? map['id'] as String,
       idUser: map['idUser'] as String,
       accion: map['accion'] as String? ?? '',
@@ -40,7 +34,6 @@ class UserActivityModel  {
     );
   }
 
- 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -55,9 +48,8 @@ class UserActivityModel  {
     };
   }
 
-
   /// Crea una copia del modelo con campos actualizados
-  UserActivityModel copyWith(
+  AuditModel copyWith(
       {String? id,
       String? idUser,
       String? accion,
@@ -67,7 +59,7 @@ class UserActivityModel  {
       String? correo,
       String? pais,
       Map<String, dynamic>? metadata}) {
-    return UserActivityModel(
+    return AuditModel(
         id: id ?? this.id,
         idUser: idUser ?? this.idUser,
         accion: accion ?? this.accion,

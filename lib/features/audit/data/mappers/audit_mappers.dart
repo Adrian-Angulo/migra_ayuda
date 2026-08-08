@@ -1,10 +1,10 @@
-import 'package:migra_ayuda/features/userActivity/data/models/user_activity_model.dart';
-import 'package:migra_ayuda/features/userActivity/domain/entities/user_activity.dart';
+import 'package:migra_ayuda/features/audit/data/models/audit_model.dart';
+import 'package:migra_ayuda/features/audit/domain/entities/audit_entity.dart';
 
-class UserActivityMappers {
+class AuditMappers {
   /// Convierte un UserActivityModel a UserActivityEntity
-  static UserActivity toActivityEntity(UserActivityModel model) {
-    return UserActivity(
+  static AuditEntity toActivityEntity(AuditModel model) {
+    return AuditEntity(
       id: model.id,
       idUser: model.idUser,
       accion: model.accion,
@@ -17,8 +17,8 @@ class UserActivityMappers {
   }
 
   /// Convierte un UserActivityEntity a UserActivityModel
-  static UserActivityModel toActivityModel(UserActivity entity) {
-    return UserActivityModel(
+  static AuditModel toActivityModel(AuditEntity entity) {
+    return AuditModel(
       id: entity.id,
       idUser: entity.idUser,
       accion: entity.accion,
