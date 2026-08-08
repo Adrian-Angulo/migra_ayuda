@@ -1,5 +1,4 @@
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
-import 'package:sembast/timestamp.dart';
 
 class ReviewModel {
   final String id;

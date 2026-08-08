@@ -1,17 +1,22 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/core/dataTable/widgets/build_header_cell.dart';
-import 'package:migra_ayuda/features/auth/domain/entites/users_datatable.dart';
 
 class BuildTable extends StatelessWidget {
   const BuildTable({
     super.key,
     required this.rows,
     required this.columns,
+    this.emptyIcon = Icons.table_rows_outlined,
+    this.emptyTitle = 'No hay datos',
+    this.emptySubtitle = 'Aún no se han registrado elementos',
   });
 
-  final UsersDatatable rows;
+  final DataTableSource rows;
   final List<DataColumn> columns;
+  final IconData emptyIcon;
+  final String emptyTitle;
+  final String emptySubtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -43,9 +48,9 @@ class BuildTable extends StatelessWidget {
                 ),
               ),
               empty: DataTableUtils.buildEmptyFrame(
-                icon: Icons.people_outline_rounded,
-                title: 'No hay usuarios registrados',
-                subtitle: 'Aún no se han registrado usuarios en el sistema',
+                icon: emptyIcon,
+                title: emptyTitle,
+                subtitle: emptySubtitle,
               ),
               border: TableBorder(
                 horizontalInside: BorderSide(

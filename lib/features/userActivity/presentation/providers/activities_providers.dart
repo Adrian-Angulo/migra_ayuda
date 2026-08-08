@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:migra_ayuda/core/enum/enums.dart';
 import 'package:migra_ayuda/core/network/network_provider.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
@@ -9,6 +10,30 @@ import 'package:migra_ayuda/features/userActivity/data/datasources/user_activity
 import 'package:migra_ayuda/features/userActivity/data/repositories/user_activity_repository_impl.dart';
 import 'package:migra_ayuda/features/userActivity/domain/entities/user_activity.dart';
 import 'package:migra_ayuda/features/userActivity/domain/repositories/user_activity_repository.dart';
+
+// ---------------------------------------------------------------------------
+// Providers para la tabla web de actividades
+// ---------------------------------------------------------------------------
+
+/// Texto de búsqueda ingresado en la barra de la tabla
+final queryActivityProvider = StateProvider<String>((ref) => '');
+
+/// Lista de actividades filtrada según [queryActivityProvider]
+final activitiesFilterProvider =
+    StreamProvider.autoDispose<List<UserActivity>>((ref) {
+  final query = ref.watch(queryActivityProvider);
+  final stream = ref.watch(activityRepositoryP).getAll();
+
+  if (query.isEmpty) return stream;
+
+  return stream.map((list) => list
+      .where((a) =>
+          a.nombre.toLowerCase().contains(query) ||
+          a.correo.toLowerCase().contains(query) ||
+          a.accion.toLowerCase().contains(query) ||
+          a.pais.toLowerCase().contains(query))
+      .toList());
+});
 
 final activityRepositoryP = Provider<UserActivityRepository>(
   (ref) {

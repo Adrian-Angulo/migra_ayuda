@@ -8,7 +8,7 @@ import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/login
 import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/users_screen.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/entities_screen.dart';
 import 'package:migra_ayuda/features/reviews/presentation/screens/web/reviews_screen.dart';
-import 'package:migra_ayuda/features/userActivity/presentation/screens/user_activity_screen.dart';
+import 'package:migra_ayuda/features/userActivity/presentation/screens/web/user_activity_web_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final notifier = ref.read(routerNotifierProvider.notifier);
@@ -34,7 +34,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
               path: '/dashboard/userActivity',
-              builder: (context, state) => const UserActivityScreen()),
+              builder: (context, state) => const UserActivityWebScreen()),
           GoRoute(
               path: '/dashboard/users',
               builder: (context, state) => const UsersScreen()),
@@ -53,7 +53,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
               path: '/dashboard/entities',
               builder: (context, state) => const EntitiesScreen()),
-          
         ],
       ),
     ],
