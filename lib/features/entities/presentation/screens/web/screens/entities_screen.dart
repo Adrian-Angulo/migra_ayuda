@@ -58,7 +58,7 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
           },
           loading: () {},
           error: (error, _) =>
-              SnackbarWebWidget.error(context, 'Error: $error'),
+              SnackbarWebWidget.error(context, '$error'),
         );
       }
     });

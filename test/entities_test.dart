@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/domain/repositories/entity_repository.dart';
@@ -36,38 +35,25 @@ void main() {
     // =========================================================================
 
     group('getAllEntities', () {
-      test('deberia retornar Right con lista de entidades', () async {
-        // Simular respuesta exitosa del repositorio con una lista de entidades
+      test('deberia retornar lista de entidades cuando es exitoso', () async {
         when(() => mockRepository.getAllEntities())
-            .thenAnswer((_) async => Right([fakeEntity]));
+            .thenAnswer((_) async => [fakeEntity]);
 
-        // Ejecutar el método a probar
         final result = await mockRepository.getAllEntities();
 
-        // Verificar que el resultado sea exitoso y contenga los datos esperados
-        result.fold(
-          (error) => fail('Se esperaba Right pero se obtuvo Left: $error'),
-          (entities) {
-            expect(entities, isA<List<EntityEntity>>());
-            expect(entities.length, 1);
-            expect(entities.first.id, 'entity-001');
-          },
-        );
-        // Verificar que el método fue llamado 1 vez
+        expect(result, isA<List<EntityEntity>>());
+        expect(result.length, 1);
+        expect(result.first.id, 'entity-001');
         verify(() => mockRepository.getAllEntities()).called(1);
       });
 
-      test('deberia retornar Left con mensaje de error cuando falla', () async {
-        // Simular un fallo en el repositorio retornando un mensaje de error
+      test('deberia lanzar excepcion cuando falla', () async {
         when(() => mockRepository.getAllEntities())
-            .thenAnswer((_) async => const Left('Error al obtener entidades'));
+            .thenThrow(Exception('Error al obtener entidades'));
 
-        final result = await mockRepository.getAllEntities();
-
-        // Verificar que retorne el fallo esperado
-        result.fold(
-          (error) => expect(error, 'Error al obtener entidades'),
-          (_) => fail('Se esperaba Left pero se obtuvo Right'),
+        expect(
+          () async => await mockRepository.getAllEntities(),
+          throwsA(isA<Exception>()),
         );
       });
     });
@@ -77,36 +63,24 @@ void main() {
     // =========================================================================
 
     group('getEntityById', () {
-      test('deberia retornar Right con la entidad cuando el ID existe',
-          () async {
-        // Simular obtención exitosa de una entidad por su ID
+      test('deberia retornar la entidad cuando el ID existe', () async {
         when(() => mockRepository.getEntityById('entity-001'))
-            .thenAnswer((_) async => Right(fakeEntity));
+            .thenAnswer((_) async => fakeEntity);
 
         final result = await mockRepository.getEntityById('entity-001');
+        expect(result.id, 'entity-001');
+        expect(result.name, 'Centro de Migrantes');
 
-        // Validar que la entidad obtenida coincida con los datos simulados
-        result.fold(
-          (error) => fail('Se esperaba Right pero se obtuvo Left: $error'),
-          (entity) {
-            expect(entity.id, 'entity-001');
-            expect(entity.name, 'Centro de Migrantes');
-          },
-        );
         verify(() => mockRepository.getEntityById('entity-001')).called(1);
       });
 
-      test('deberia retornar Left cuando el ID no existe', () async {
-        // Simular fallo al buscar una entidad con ID inexistente
+      test('deberia lanzar excepcion cuando el ID no existe', () async {
         when(() => mockRepository.getEntityById(any()))
-            .thenAnswer((_) async => const Left('Entidad no encontrada'));
+            .thenThrow(Exception('Entidad no encontrada'));
 
-        final result = await mockRepository.getEntityById('id-inexistente');
-
-        // Validar que devuelva el mensaje de error correspondiente
-        result.fold(
-          (error) => expect(error, 'Entidad no encontrada'),
-          (_) => fail('Se esperaba Left pero se obtuvo Right'),
+        expect(
+          () async => await mockRepository.getEntityById('id-inexistente'),
+          throwsA(isA<Exception>()),
         );
       });
     });
@@ -116,25 +90,23 @@ void main() {
     // =========================================================================
 
     group('registerEntity', () {
-      test('deberia retornar Right(Unit) en registro exitoso', () async {
-        // Simular registro exitoso de una nueva entidad
+      test('deberia retornar registro exitoso', () async {
+        var called = false;
         when(() => mockRepository.registerEntity(
               entity: fakeEntity,
               imagenBytes: fakeImageBytes,
               fileName: 'imagen.jpg',
-            )).thenAnswer((_) async => const Right(unit));
+            )).thenAnswer((_) async {
+          called = true;
+        });
 
-        final result = await mockRepository.registerEntity(
+        await mockRepository.registerEntity(
           entity: fakeEntity,
           imagenBytes: fakeImageBytes,
           fileName: 'imagen.jpg',
         );
 
-        // Validar que el resultado sea exitoso (Right(unit))
-        result.fold(
-          (error) => fail('Se esperaba Right pero se obtuvo Left: $error'),
-          (success) => expect(success, unit),
-        );
+        expect(called, isTrue);
         verify(() => mockRepository.registerEntity(
               entity: fakeEntity,
               imagenBytes: fakeImageBytes,
@@ -142,25 +114,20 @@ void main() {
             )).called(1);
       });
 
-      test('deberia retornar Left si hay error al registrar', () async {
-        // Simular error al intentar registrar la entidad
+      test('deberia lanzar excepcion si hay error al registrar', () async {
         when(() => mockRepository.registerEntity(
-                  entity: fakeEntity,
-                  imagenBytes: fakeImageBytes,
-                  fileName: any(named: 'fileName'),
-                ))
-            .thenAnswer((_) async => const Left('Error al registrar entidad'));
+              entity: fakeEntity,
+              imagenBytes: fakeImageBytes,
+              fileName: any(named: 'fileName'),
+            )).thenThrow(Exception('Error al registrar entidad'));
 
-        final result = await mockRepository.registerEntity(
-          entity: fakeEntity,
-          imagenBytes: fakeImageBytes,
-          fileName: 'imagen.jpg',
-        );
-
-        // Validar que devuelva el mensaje de error de registro
-        result.fold(
-          (error) => expect(error, 'Error al registrar entidad'),
-          (_) => fail('Se esperaba Left pero se obtuvo Right'),
+        expect(
+          () async => await mockRepository.registerEntity(
+            entity: fakeEntity,
+            imagenBytes: fakeImageBytes,
+            fileName: 'imagen.jpg',
+          ),
+          throwsA(isA<Exception>()),
         );
       });
     });
@@ -170,41 +137,34 @@ void main() {
     // =========================================================================
 
     group('updateEntity', () {
-      test('deberia retornar Right(Unit) en actualizacion exitosa', () async {
-        // Simular actualización exitosa de la entidad
+      test('deberia realizar la actualizacion de forma exitosa', () async {
+        var called = false;
         when(() => mockRepository.updateEntity(
               entity: fakeEntity,
               imagenBytes: any(named: 'imagenBytes'),
               fileName: any(named: 'fileName'),
-            )).thenAnswer((_) async => const Right(unit));
+            )).thenAnswer((_) async {
+          called = true;
+        });
 
-        final result = await mockRepository.updateEntity(entity: fakeEntity);
+        await mockRepository.updateEntity(entity: fakeEntity);
 
-        // Validar respuesta exitosa
-        result.fold(
-          (error) => fail('Se esperaba Right pero se obtuvo Left: $error'),
-          (success) => expect(success, unit),
-        );
+        expect(called, isTrue);
         verify(() => mockRepository.updateEntity(
               entity: fakeEntity,
             )).called(1);
       });
 
-      test('deberia retornar Left si hay error al actualizar', () async {
-        // Simular fallo durante la actualización de la entidad
+      test('deberia lanzar excepcion si hay error al actualizar', () async {
         when(() => mockRepository.updateEntity(
-                  entity: fakeEntity,
-                  imagenBytes: any(named: 'imagenBytes'),
-                  fileName: any(named: 'fileName'),
-                ))
-            .thenAnswer((_) async => const Left('Error al actualizar entidad'));
+              entity: fakeEntity,
+              imagenBytes: any(named: 'imagenBytes'),
+              fileName: any(named: 'fileName'),
+            )).thenThrow(Exception('Error al actualizar entidad'));
 
-        final result = await mockRepository.updateEntity(entity: fakeEntity);
-
-        // Validar mensaje de error
-        result.fold(
-          (error) => expect(error, 'Error al actualizar entidad'),
-          (_) => fail('Se esperaba Left pero se obtuvo Right'),
+        expect(
+          () async => await mockRepository.updateEntity(entity: fakeEntity),
+          throwsA(isA<Exception>()),
         );
       });
     });
@@ -214,32 +174,26 @@ void main() {
     // =========================================================================
 
     group('deleteEntity', () {
-      test('deberia retornar Right(Unit) en eliminacion exitosa', () async {
-        // Simular eliminación exitosa de la entidad por ID
+      test('deberia realizar la eliminacion de forma exitosa', () async {
+        var called = false;
         when(() => mockRepository.deleteEntity('entity-001'))
-            .thenAnswer((_) async => const Right(unit));
+            .thenAnswer((_) async {
+          called = true;
+        });
 
-        final result = await mockRepository.deleteEntity('entity-001');
+        await mockRepository.deleteEntity('entity-001');
 
-        // Validar que retorne confirmación exitosa (unit)
-        result.fold(
-          (error) => fail('Se esperaba Right pero se obtuvo Left: $error'),
-          (success) => expect(success, unit),
-        );
+        expect(called, isTrue);
         verify(() => mockRepository.deleteEntity('entity-001')).called(1);
       });
 
-      test('deberia retornar Left si hay error al eliminar', () async {
-        // Simular error al intentar eliminar la entidad
+      test('deberia lanzar excepcion si hay error al eliminar', () async {
         when(() => mockRepository.deleteEntity(any()))
-            .thenAnswer((_) async => const Left('Error al eliminar entidad'));
+            .thenThrow(Exception('Error al eliminar entidad'));
 
-        final result = await mockRepository.deleteEntity('entity-001');
-
-        // Validar mensaje de error recibido
-        result.fold(
-          (error) => expect(error, 'Error al eliminar entidad'),
-          (_) => fail('Se esperaba Left pero se obtuvo Right'),
+        expect(
+          () async => await mockRepository.deleteEntity('entity-001'),
+          throwsA(isA<Exception>()),
         );
       });
     });

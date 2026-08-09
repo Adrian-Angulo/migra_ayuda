@@ -1,23 +1,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 
-class EntityModels extends EntityEntity {
+class EntityModels {
+  final String id;
+  final String name;
+  final String description;
+  final List<String> services;
+  final String address;
+  final GeoPoint localitation;
+  final String phone;
+  final String imageUrl;
+  final double averageRating;
+  final int totalReviews;
+  final String schedule;
+
   EntityModels({
-    required super.id,
-    required super.name,
-    required super.description,
-    required super.services,
-    required super.address,
-    required super.localitation,
-    required super.phone,
-    required super.imageUrl,
-    super.averageRating = 0,
-    super.totalReviews = 0,
-    required super.schedule,
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.services,
+    required this.address,
+    required this.localitation,
+    required this.phone,
+    required this.imageUrl,
+    this.averageRating = 0,
+    this.totalReviews = 0,
+    required this.schedule,
   });
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'name': name,
       'description': description,
       'services': services,
@@ -29,36 +41,14 @@ class EntityModels extends EntityEntity {
       'average_rating': averageRating,
       'total_reviews': totalReviews,
       'schedule': schedule,
-      'cached_at': DateTime.now().millisecondsSinceEpoch,
+      'cached_at': DateTime.now().toUtc().toIso8601String(),
     };
   }
 
-  factory EntityModels.fromMap(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+  factory EntityModels.fromMap(String? id, Map<String, dynamic> map) {
+    /* final data = doc.data() as Map<String, dynamic>; */
     return EntityModels(
-        id: doc.id,
-        name: data['name'] ?? '',
-        description: data['description'] ?? '',
-        services: (data['services'] as List<dynamic>?)
-                ?.map((e) => e.toString())
-                .toList() ??
-            [],
-        address: data['address'] ?? '',
-        localitation: GeoPoint(
-          data['localitation_latitude'] ?? 0.0,
-          data['localitation_longitude'] ?? 0.0,
-        ),
-        phone: data['phone'] ?? '',
-        imageUrl: data['image_url'] ?? '',
-        averageRating: (data['average_rating'] as num?)?.toDouble() ?? 0,
-        totalReviews: (data['total_reviews'] as int?) ?? 0,
-        schedule: data['schedule'] ?? 'No definido');
-  }
-
-  /// Convierte Map de Sembast a EntityModels
-  factory EntityModels.fromSembastMap(String id, Map<String, dynamic> map) {
-    return EntityModels(
-        id: id,
+        id: id ?? map['id'],
         name: map['name'] ?? '',
         description: map['description'] ?? '',
         services: (map['services'] as List<dynamic>?)
@@ -75,5 +65,33 @@ class EntityModels extends EntityEntity {
         averageRating: (map['average_rating'] as num?)?.toDouble() ?? 0,
         totalReviews: (map['total_reviews'] as int?) ?? 0,
         schedule: map['schedule'] ?? 'No definido');
+  }
+
+  EntityModels copyWith({
+    String? id,
+    String? name,
+    String? description,
+    List<String>? services,
+    String? address,
+    GeoPoint? localitation,
+    String? phone,
+    String? imageUrl,
+    double? averageRating,
+    int? totalReviews,
+    String? schedule,
+  }) {
+    return EntityModels(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      services: services ?? this.services,
+      address: address ?? this.address,
+      localitation: localitation ?? this.localitation,
+      phone: phone ?? this.phone,
+      imageUrl: imageUrl ?? this.imageUrl,
+      averageRating: averageRating ?? this.averageRating,
+      totalReviews: totalReviews ?? this.totalReviews,
+      schedule: schedule ?? this.schedule,
+    );
   }
 }

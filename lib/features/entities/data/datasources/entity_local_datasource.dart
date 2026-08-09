@@ -26,7 +26,7 @@ class EntityLocalDataSource {
 
       // Convierte los registros a EntityModels
       return records.map((record) {
-        return EntityModels.fromSembastMap(record.key, record.value);
+        return EntityModels.fromMap(record.key, record.value);
       }).toList();
     } catch (e) {
       throw Exception('Error al obtener entidades del caché: $e');
@@ -60,7 +60,7 @@ class EntityLocalDataSource {
         return null;
       }
 
-      return EntityModels.fromSembastMap(id, record);
+      return EntityModels.fromMap(id, record);
     } catch (e) {
       throw Exception('Error al obtener entidad del caché: $e');
     }

@@ -21,13 +21,9 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
     state = await AsyncValue.guard(
       () async {
         final repository = ref.read(entityRepositoryProvider);
-        final result = await repository.registerEntity(
+        await repository.registerEntity(
             entity: entity, imagenBytes: imagenBytes, fileName: fileName);
-
-        return result.fold(
-          (error) => throw Exception(error),
-          (success) => CrudOperation.register,
-        );
+        return CrudOperation.register;
       },
     );
   }
@@ -42,15 +38,12 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
 
     state = await AsyncValue.guard(() async {
       final repository = ref.read(entityRepositoryProvider);
-      final result = await repository.updateEntity(
+      await repository.updateEntity(
         entity: entity,
         imagenBytes: imagenBytes,
         fileName: fileName,
       );
-      return result.fold(
-        (error) => throw Exception(error),
-        (success) => CrudOperation.update,
-      );
+      return CrudOperation.update;
     });
   }
 
@@ -59,12 +52,8 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
 
     state = await AsyncValue.guard(() async {
       final repository = ref.read(entityRepositoryProvider);
-      final result = await repository.deleteEntity(id);
-
-      return result.fold(
-        (error) => throw Exception(error),
-        (success) => CrudOperation.delete,
-      );
+      await repository.deleteEntity(id);
+      return CrudOperation.delete;
     });
   }
 

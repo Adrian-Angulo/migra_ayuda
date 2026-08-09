@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dartz/dartz.dart';
 import 'package:migra_ayuda/features/entities/data/datasources/entity_remote_datasource.dart';
 import 'package:migra_ayuda/features/entities/data/models/entity_models.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
@@ -23,14 +22,13 @@ class EntityWebRepositoryImpl extends EntityRepository {
   ///
   /// Requiere conexión a internet (no hay fallback offline en web)
   @override
-  Future<Either<String, Unit>> registerEntity({
+  Future<void> registerEntity({
     required EntityEntity entity,
     required Uint8List imagenBytes,
     required String fileName,
   }) async {
-    try {
-      // Convertir entidad del dominio a modelo de datos
-      final modelo = EntityModels(
+    // Convertir entidad del dominio a modelo de datos
+    final modelo = EntityModels(
         id: '', // Firebase generará el ID
         name: entity.name,
         description: entity.description,
@@ -38,24 +36,15 @@ class EntityWebRepositoryImpl extends EntityRepository {
         address: entity.address,
         localitation: entity.localitation,
         phone: entity.phone,
-
         imageUrl: '', // Se actualizará después de subir la imagen
-        schedule: entity.schedule
-      );
+        schedule: entity.schedule);
 
-      // Registrar en Firebase (incluye subida de imagen a Cloudinary)
-      await remoteDataSource.registerEntity(
-        entityModel: modelo,
-        imageBytes: imagenBytes,
-        fileName: fileName,
-      );
-
-      return right(unit);
-    } on ServerException catch (e) {
-      return left('Error del servidor: ${e.message}');
-    } catch (e) {
-      return left('Error al registrar la entidad: ${e.toString()}');
-    }
+    // Registrar en Firebase (incluye subida de imagen a Cloudinary)
+    await remoteDataSource.registerEntity(
+      entityModel: modelo,
+      imageBytes: imagenBytes,
+      fileName: fileName,
+    );
   }
 
   /// Actualiza una entidad existente en Firebase
@@ -69,14 +58,13 @@ class EntityWebRepositoryImpl extends EntityRepository {
   /// - imagenBytes: Nueva imagen (si se quiere cambiar)
   /// - fileName: Nombre del archivo de la nueva imagen
   @override
-  Future<Either<String, Unit>> updateEntity({
+  Future<void> updateEntity({
     required EntityEntity entity,
     Uint8List? imagenBytes,
     String? fileName,
   }) async {
-    try {
-      // Convertir entidad del dominio a modelo de datos
-      final modelo = EntityModels(
+    // Convertir entidad del dominio a modelo de datos
+    final modelo = EntityModels(
         id: entity.id,
         name: entity.name,
         description: entity.description,
@@ -88,39 +76,23 @@ class EntityWebRepositoryImpl extends EntityRepository {
         totalReviews: entity.totalReviews,
         imageUrl:
             entity.imageUrl, // Mantiene la URL actual si no hay nueva imagen
-        schedule:entity.schedule
-      );
+        schedule: entity.schedule);
 
-      // Actualizar en Firebase (sube nueva imagen si se proporciona)
-      await remoteDataSource.updateEntity(
-        entityModel: modelo,
-        imageBytes: imagenBytes,
-        fileName: fileName,
-      );
-
-      return right(unit);
-    } on ServerException catch (e) {
-      return left('Error del servidor: ${e.message}');
-    } catch (e) {
-      return left('Error al actualizar la entidad: ${e.toString()}');
-    }
+    // Actualizar en Firebase (sube nueva imagen si se proporciona)
+    await remoteDataSource.updateEntity(
+      entityModel: modelo,
+      imageBytes: imagenBytes,
+      fileName: fileName,
+    );
   }
 
   /// Elimina una entidad de Firebase
   ///
   /// Este método elimina permanentemente la entidad de Firebase.
   @override
-  Future<Either<String, Unit>> deleteEntity(String entityId) async {
-    try {
-      // Eliminar directamente de Firebase
-      await remoteDataSource.deleteEntity(entityId);
-
-      return right(unit);
-    } on ServerException catch (e) {
-      return left('Error del servidor: ${e.message}');
-    } catch (e) {
-      return left('Error al eliminar la entidad: ${e.toString()}');
-    }
+  Future<void> deleteEntity(String entityId) async {
+    // Eliminar directamente de Firebase
+    await remoteDataSource.deleteEntity(entityId);
   }
 
   /// Obtiene todas las entidades desde Firebase
@@ -128,17 +100,13 @@ class EntityWebRepositoryImpl extends EntityRepository {
   /// Este método retorna siempre datos frescos directamente desde Firebase.
   /// No usa caché local, por lo que requiere conexión a internet.
   @override
-  Future<Either<String, List<EntityEntity>>> getAllEntities() async {
-    try {
-      // Obtener entidades directamente desde Firebase
-      final entities = await remoteDataSource.getAllEntities();
-
-      return right(entities);
-    } on ServerException catch (e) {
-      return left('Error del servidor: ${e.message}');
-    } catch (e) {
-      return left('Error al obtener las entidades: ${e.toString()}');
-    }
+  Future<List<EntityEntity>> getAllEntities() async {
+    // Obtener entidades directamente desde Firebase
+    final entitiesModel = await remoteDataSource.getAllEntities();
+    // Mapear de EntityModels a EntityEntity
+    return entitiesModel
+        .map((e) => _entityModelsToEntityEntity(e))
+        .toList();
   }
 
   /// Obtiene una entidad específica por ID desde Firebase
@@ -146,21 +114,14 @@ class EntityWebRepositoryImpl extends EntityRepository {
   /// Este método retorna siempre datos frescos directamente desde Firebase.
   /// No usa caché local, por lo que requiere conexión a internet.
   @override
-  Future<Either<String, EntityEntity>> getEntityById(String id) async {
-    try {
-      // Obtener entidad directamente desde Firebase
-      final entity = await remoteDataSource.getEntityById(id);
-
-      return right(entity);
-    } on ServerException catch (e) {
-      return left('Error del servidor: ${e.message}');
-    } catch (e) {
-      return left('Error al obtener la entidad: ${e.toString()}');
-    }
+  Future<EntityEntity> getEntityById(String id) async {
+    // Obtener entidad directamente desde Firebase
+    final entityModel = await remoteDataSource.getEntityById(id);
+    return _entityModelsToEntityEntity(entityModel);
   }
 
   @override
-  Future<Either<String, Unit>> syncAllFromFirebase() {
+  Future<void> syncAllFromFirebase() {
     throw UnimplementedError(
       'syncAllFromFirebase no está disponible en la versión web. '
       'En web, cada llamada a getAllEntities() ya obtiene datos frescos de Firebase.',
@@ -168,15 +129,26 @@ class EntityWebRepositoryImpl extends EntityRepository {
   }
 
   @override
-  Stream<Either<String, List<EntityEntity>>> getAllEntites2() {
-    return remoteDataSource.getAllEntities2().map((list) {
-      try {
-        return Right(list);
-      } on FirebaseException catch (e) {
-        return Left<String, List<EntityEntity>>(e.toString());
-      } catch (e) {
-        return Left<String, List<EntityEntity>>(e.toString());
-      }
+  Stream<List<EntityEntity>> getAllEntites2() {
+    return remoteDataSource.getAllEntitiesStream().map((list) {
+      return list.map((e) => _entityModelsToEntityEntity(e)).toList();
     });
+  }
+
+  // Helper para convertir EntityModels a EntityEntity (para mantener consistencia)
+  EntityEntity _entityModelsToEntityEntity(EntityModels modelo) {
+    return EntityEntity(
+      id: modelo.id,
+      name: modelo.name,
+      description: modelo.description,
+      services: modelo.services,
+      address: modelo.address,
+      localitation: modelo.localitation,
+      phone: modelo.phone,
+      imageUrl: modelo.imageUrl,
+      averageRating: modelo.averageRating,
+      totalReviews: modelo.totalReviews,
+      schedule: modelo.schedule,
+    );
   }
 }

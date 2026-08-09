@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'package:dartz/dartz.dart';
 import 'package:flutter/rendering.dart';
 import 'package:migra_ayuda/core/network/network_info.dart';
 import 'package:migra_ayuda/features/entities/data/datasources/entity_local_datasource.dart';
@@ -20,256 +19,206 @@ class EntityMobilRepositoryImpl implements EntityRepository {
   });
 
   @override
-  Future<Either<String, Unit>> registerEntity({
+  Future<void> registerEntity({
     required EntityEntity entity,
     required Uint8List imagenBytes,
     required String fileName,
   }) async {
-    try {
-      final modelo = EntityModels(
-          id: '',
-          name: entity.name,
-          description: entity.description,
-          services: entity.services,
-          address: entity.address,
-          localitation: entity.localitation,
-          phone: entity.phone,
-          imageUrl: '',
-          schedule: entity.schedule);
+    final modelo = EntityModels(
+        id: '',
+        name: entity.name,
+        description: entity.description,
+        services: entity.services,
+        address: entity.address,
+        localitation: entity.localitation,
+        phone: entity.phone,
+        imageUrl: '',
+        schedule: entity.schedule);
 
-      // Verifica si hay conexión
-      final isConnected = await networkInfo.isConnected;
+    final isConnected = await networkInfo.isConnected;
 
-      if (isConnected) {
-        // Si hay internet, registra en Firebase
-        await remoteDataSource.registerEntity(
-          entityModel: modelo,
-          imageBytes: imagenBytes,
-          fileName: fileName,
-        );
+    if (isConnected) {
+      await remoteDataSource.registerEntity(
+        entityModel: modelo,
+        imageBytes: imagenBytes,
+        fileName: fileName,
+      );
 
-        // Actualiza el caché después de registrar
-        final entities = await remoteDataSource.getAllEntities();
-        await localDataSource.cacheEntities(entities);
-      } else {
-        // Sin internet, retorna error (no se puede subir imagen sin conexión)
-        return left(
-            'No hay conexión a internet. Se requiere conexión para registrar entidades con imágenes.');
-      }
-
-      return right(unit);
-    } on ServerException catch (e) {
-      return left('Error del servidor: ${e.message}');
-    } catch (e) {
-      return left('Error al registrar la entidad: ${e.toString()}');
+      final entities = await remoteDataSource.getAllEntities();
+      await localDataSource.cacheEntities(entities);
+    } else {
+      throw Exception(
+          'No hay conexión a internet. Se requiere conexión para registrar entidades con imágenes.');
     }
   }
 
   @override
-  Future<Either<String, Unit>> updateEntity({
+  Future<void> updateEntity({
     required EntityEntity entity,
     Uint8List? imagenBytes,
     String? fileName,
   }) async {
-    try {
-      final modelo = EntityModels(
-          id: entity.id,
-          name: entity.name,
-          description: entity.description,
-          services: entity.services,
-          address: entity.address,
-          localitation: entity.localitation,
-          phone: entity.phone,
-          averageRating: entity.averageRating,
-          totalReviews: entity.totalReviews,
-          imageUrl: entity.imageUrl,
-          schedule: entity.schedule);
+    final modelo = EntityModels(
+        id: entity.id,
+        name: entity.name,
+        description: entity.description,
+        services: entity.services,
+        address: entity.address,
+        localitation: entity.localitation,
+        phone: entity.phone,
+        averageRating: entity.averageRating,
+        totalReviews: entity.totalReviews,
+        imageUrl: entity.imageUrl,
+        schedule: entity.schedule);
 
-      // Primero actualiza en caché local
-      await localDataSource.cacheEntity(modelo);
+    await localDataSource.cacheEntity(modelo);
 
-      // Verifica si hay conexión
-      final isConnected = await networkInfo.isConnected;
+    final isConnected = await networkInfo.isConnected;
 
-      if (isConnected) {
-        // Si hay internet, sincroniza con Firebase
-        try {
-          await remoteDataSource.updateEntity(
-            entityModel: modelo,
-            imageBytes: imagenBytes,
-            fileName: fileName,
-          );
-        } catch (e) {
-          // Si falla Firebase, los datos ya están en caché
-          return left(
-              'Actualizado localmente. Error al sincronizar: ${e.toString()}');
-        }
-      }
-      // Si no hay internet, solo se actualiza localmente
-
-      return right(unit);
-    } catch (e) {
-      return left(e.toString());
-    }
-  }
-
-  @override
-  Future<Either<String, Unit>> deleteEntity(String entityId) async {
-    try {
-      // Primero elimina del caché local
-      await localDataSource.deleteEntity(entityId);
-
-      // Verifica si hay conexión
-      final isConnected = await networkInfo.isConnected;
-
-      if (isConnected) {
-        // Si hay internet, elimina de Firebase
-        try {
-          await remoteDataSource.deleteEntity(entityId);
-        } catch (e) {
-          // Si falla Firebase, ya está eliminado localmente
-          return left(
-              'Eliminado localmente. Error al sincronizar: ${e.toString()}');
-        }
-      }
-      // Si no hay internet, solo se elimina localmente
-
-      return right(unit);
-    } catch (e) {
-      return left('Error al eliminar la entidad: ${e.toString()}');
-    }
-  }
-
-  @override
-  Future<Either<String, List<EntityEntity>>> getAllEntities() async {
-    try {
-      // ESTRATEGIA CACHE-FIRST:
-      // 1. Primero intenta obtener del caché (respuesta inmediata)
-      List<EntityModels> cachedEntities = [];
-
+    if (isConnected) {
       try {
-        cachedEntities = await localDataSource.getCachedEntities();
+        await remoteDataSource.updateEntity(
+          entityModel: modelo,
+          imageBytes: imagenBytes,
+          fileName: fileName,
+        );
       } catch (e) {
-        // Si falla el caché, continúa con lista vacía
-        left("Ha ocurrdio un error: $e");
+        // Si falla Firebase, los datos ya están en caché, pero avisamos mediante excepción
+        throw Exception(
+            'Actualizado localmente. Error al sincronizar: ${e.toString()}');
       }
-
-      // 2. Verifica si hay conexión para actualizar en background
-      final isConnected = await networkInfo.isConnected;
-
-      if (isConnected) {
-        try {
-          // Obtiene datos frescos de Firebase
-          final remoteEntities = await remoteDataSource.getAllEntities();
-
-          // Actualiza el caché con los datos frescos
-          await localDataSource.cacheEntities(remoteEntities);
-
-          // Retorna los datos frescos de Firebase
-          return right(remoteEntities);
-        } on ServerException catch (e) {
-          // Si falla Firebase pero hay caché, retorna el caché
-          if (cachedEntities.isNotEmpty) {
-            return right(cachedEntities);
-          }
-          return left('Error del servidor: ${e.message}');
-        }
-      }
-
-      // 3. Sin internet, retorna el caché
-      if (cachedEntities.isNotEmpty) {
-        return right(cachedEntities);
-      }
-
-      // 4. Sin caché y sin internet
-      return left('No hay datos disponibles. Verifica tu conexión a internet.');
-    } catch (e) {
-      return left('Error al obtener las entidades: ${e.toString()}');
     }
+    // Si no hay internet, solo se actualiza localmente
   }
 
   @override
-  Future<Either<String, EntityEntity>> getEntityById(String id) async {
-    try {
-      // ESTRATEGIA CACHE-FIRST:
-      // 1. Primero intenta obtener del caché
-      EntityModels? cachedEntity;
+  Future<void> deleteEntity(String entityId) async {
+    await localDataSource.deleteEntity(entityId);
 
+    final isConnected = await networkInfo.isConnected;
+
+    if (isConnected) {
       try {
-        cachedEntity = await localDataSource.getEntityById(id);
+        await remoteDataSource.deleteEntity(entityId);
       } catch (e) {
-        // Si falla el caché, continúa
-        cachedEntity = null;
+        // Si falla Firebase, ya está eliminado localmente, pero avisamos mediante excepción
+        throw Exception(
+            'Eliminado localmente. Error al sincronizar: ${e.toString()}');
       }
-
-      // 2. Verifica si hay conexión
-      final isConnected = await networkInfo.isConnected;
-
-      if (isConnected) {
-        try {
-          // Obtiene datos frescos de Firebase
-          final remoteEntity = await remoteDataSource.getEntityById(id);
-
-          // Actualiza el caché
-          await localDataSource.cacheEntity(remoteEntity);
-
-          // Retorna los datos frescos
-          return right(remoteEntity);
-        } on ServerException catch (e) {
-          // Si falla Firebase pero hay caché, retorna el caché
-          if (cachedEntity != null) {
-            return right(cachedEntity);
-          }
-          return left('Error del servidor: ${e.message}');
-        }
-      }
-
-      // 3. Sin internet, retorna el caché
-      if (cachedEntity != null) {
-        return right(cachedEntity);
-      }
-
-      // 4. Sin caché y sin internet
-      return left(
-          'Entidad no disponible offline. Verifica tu conexión a internet.');
-    } catch (e) {
-      return left('Error al obtener la entidad: ${e.toString()}');
     }
+    // Si no hay internet, solo se elimina localmente
   }
 
   @override
-  Future<Either<String, Unit>> syncAllFromFirebase() async {
+  Future<List<EntityEntity>> getAllEntities() async {
+    // Estrategia cache-first
+    List<EntityModels> cachedEntities = [];
     try {
-      // 1. Verificar conexión a internet
-      debugPrint('iniciando sincronizacion');
-      final isConnected = await networkInfo.isConnected;
-      if (!isConnected) {
-        debugPrint('existe conexion');
-        return left('Sin conexión a internet para sincronizar');
-      }
-      debugPrint('existe conexion');
-      // 2. Descargar TODAS las entidades de Firebase
-      final remoteEntities = await remoteDataSource.getAllEntities();
-      debugPrint('entidades descargadas');
-      // 3. Limpiar caché y guardar todo
-      await localDataSource.clearCache();
-      debugPrint('limpiando cache');
-      await localDataSource.cacheEntities(remoteEntities);
-      debugPrint('agregando entidades a cache');
-
-      return right(unit);
-    } on ServerException catch (e) {
-      debugPrint('Ocurrio un error de servidor');
-      return left('Error del servidor: ${e.message}');
-    } catch (e) {
-      debugPrint('Error a sincronizar $e');
-      return left(
-          'Error al sincronizar entidades desde Firebase: ${e.toString()}');
+      cachedEntities = await localDataSource.getCachedEntities();
+    } catch (_) {
+      cachedEntities = [];
     }
+
+    final isConnected = await networkInfo.isConnected;
+
+    if (isConnected) {
+      try {
+        final remoteEntities = await remoteDataSource.getAllEntities();
+        await localDataSource.cacheEntities(remoteEntities);
+        // Convertir a EntityEntity para el dominio
+        return remoteEntities
+            .map((e) => _entityModelsToEntityEntity(e))
+            .toList();
+      } catch (e) {
+        // Si falla Firebase pero hay caché, retorna el caché
+        if (cachedEntities.isNotEmpty) {
+          return cachedEntities
+              .map((e) => _entityModelsToEntityEntity(e))
+              .toList();
+        }
+        throw Exception('Error del servidor: ${e.toString()}');
+      }
+    }
+
+    if (cachedEntities.isNotEmpty) {
+      return cachedEntities
+          .map((e) => _entityModelsToEntityEntity(e))
+          .toList();
+    }
+
+    throw Exception(
+        'No hay datos disponibles. Verifica tu conexión a internet.');
   }
 
   @override
-  Stream<Either<String, List<EntityEntity>>> getAllEntites2() {
+  Future<EntityEntity> getEntityById(String id) async {
+    EntityModels? cachedEntity;
+
+    try {
+      cachedEntity = await localDataSource.getEntityById(id);
+    } catch (e) {
+      cachedEntity = null;
+    }
+
+    final isConnected = await networkInfo.isConnected;
+
+    if (isConnected) {
+      try {
+        final remoteEntity = await remoteDataSource.getEntityById(id);
+        await localDataSource.cacheEntity(remoteEntity);
+        return _entityModelsToEntityEntity(remoteEntity);
+      } catch (e) {
+        if (cachedEntity != null) {
+          return _entityModelsToEntityEntity(cachedEntity);
+        }
+        throw Exception('Error del servidor: ${e.toString()}');
+      }
+    }
+
+    if (cachedEntity != null) {
+      return _entityModelsToEntityEntity(cachedEntity);
+    }
+
+    throw Exception(
+        'Entidad no disponible offline. Verifica tu conexión a internet.');
+  }
+
+  @override
+  Future<void> syncAllFromFirebase() async {
+    debugPrint('iniciando sincronizacion');
+    final isConnected = await networkInfo.isConnected;
+    if (!isConnected) {
+      debugPrint('sin conexion');
+      throw Exception('Sin conexión a internet para sincronizar');
+    }
+    debugPrint('existe conexion');
+    final remoteEntities = await remoteDataSource.getAllEntities();
+    debugPrint('entidades descargadas');
+    await localDataSource.clearCache();
+    debugPrint('limpiando cache');
+    await localDataSource.cacheEntities(remoteEntities);
+    debugPrint('agregando entidades a cache');
+  }
+
+  @override
+  Stream<List<EntityEntity>> getAllEntites2() {
     throw UnimplementedError();
+  }
+
+  // Helper for conversion (puedes mover esto a otro sitio si lo prefieres)
+  EntityEntity _entityModelsToEntityEntity(EntityModels modelo) {
+    return EntityEntity(
+      id: modelo.id,
+      name: modelo.name,
+      description: modelo.description,
+      services: modelo.services,
+      address: modelo.address,
+      localitation: modelo.localitation,
+      phone: modelo.phone,
+      imageUrl: modelo.imageUrl,
+      averageRating: modelo.averageRating,
+      totalReviews: modelo.totalReviews,
+      schedule: modelo.schedule,
+    );
   }
 }

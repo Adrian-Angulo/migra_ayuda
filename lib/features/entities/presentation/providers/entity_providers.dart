@@ -45,14 +45,10 @@ final entityRepositoryProvider = Provider<EntityRepository>((ref) {
 final entities2StreamProvider = StreamProvider<List<EntityEntity>>(
   (ref) {
     final repo = ref.watch(entityRepositoryProvider);
-    final res = repo.getAllEntites2();
-    return res.map((either) => either.fold(
-          (error) => throw Exception(error),
-          (entities) => entities,
-        ));
+    // Asumimos que getAllEntites2() ahora retorna directamente un Stream<List<EntityEntity>>.
+    return repo.getAllEntites2();
   },
 );
-
 
 final filterProvider = StateProvider<String>(
   (ref) => 'Todos',
@@ -68,15 +64,13 @@ class EntityListNotifier extends AsyncNotifier<List<EntityEntity>> {
 
   Future<List<EntityEntity>> _loadEntities() async {
     state = const AsyncValue.loading();
-    final result = await ref.read(entityRepositoryProvider).getAllEntities();
-
-    return result.fold(
-      (error) => throw error,
-      (entities) {
-        _allEntities = entities;
-        return entities;
-      },
-    );
+    try {
+      final entities = await ref.read(entityRepositoryProvider).getAllEntities();
+      _allEntities = entities;
+      return entities;
+    } catch (error) {
+      throw error!;
+    }
   }
 
   Future<void> refresh() async {

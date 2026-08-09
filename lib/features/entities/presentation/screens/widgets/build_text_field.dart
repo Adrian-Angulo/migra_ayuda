@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class BuildTextField extends StatelessWidget {
   const BuildTextField({
@@ -11,7 +12,10 @@ class BuildTextField extends StatelessWidget {
     this.onChanged,
     this.validator,
     this.suffixIcon,
+    this.maxLength,
+    this.onlyNumbers = false,
   });
+
   final Widget? suffixIcon;
   final TextEditingController controller;
   final String label;
@@ -20,6 +24,8 @@ class BuildTextField extends StatelessWidget {
   final int? maxLines;
   final void Function(String)? onChanged;
   final String? Function(String?)? validator;
+  final int? maxLength;
+  final bool onlyNumbers;
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +44,19 @@ class BuildTextField extends StatelessWidget {
         if (label.isNotEmpty) const SizedBox(height: 8),
         TextFormField(
           controller: controller,
-          maxLines: maxLines,
+          maxLines: maxLines ?? 1,
           onChanged: onChanged,
+          maxLength: maxLength,
+          inputFormatters: onlyNumbers
+              ? <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly,
+                  if (maxLength != null)
+                    LengthLimitingTextInputFormatter(maxLength),
+                ]
+              : (maxLength != null
+                  ? [LengthLimitingTextInputFormatter(maxLength)]
+                  : null),
+          keyboardType: onlyNumbers ? TextInputType.number : TextInputType.text,
           decoration: InputDecoration(
             suffixIcon: suffixIcon,
             hintText: hint,
@@ -69,6 +86,7 @@ class BuildTextField extends StatelessWidget {
               horizontal: 16,
               vertical: 14,
             ),
+            counterText: "", // Hides the counter if you wish
           ),
           validator: validator,
         ),

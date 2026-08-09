@@ -11,7 +11,6 @@ class EntityEntity {
   final String imageUrl;
   final double averageRating;
   final int totalReviews; 
- 
   final String schedule;  
 
   const EntityEntity({

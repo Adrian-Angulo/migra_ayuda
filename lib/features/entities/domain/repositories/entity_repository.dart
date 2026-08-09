@@ -1,24 +1,22 @@
 import 'dart:typed_data';
-import 'package:dartz/dartz.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 
 abstract class EntityRepository {
-  Future<Either<String, Unit>> registerEntity({
+  Future<void> registerEntity({
     required EntityEntity entity,
     required Uint8List imagenBytes,
     required String fileName,
   });
 
-  Future<Either<String, Unit>> updateEntity({
+  Future<void> updateEntity({
     required EntityEntity entity,
     Uint8List? imagenBytes,
     String? fileName,
   });
-  
-  Future<Either<String, Unit>> deleteEntity(String entityId);
-  Stream<Either<String, List<EntityEntity>>> getAllEntites2();
-  Future<Either<String, List<EntityEntity>>> getAllEntities();
-  Future<Either<String, EntityEntity>> getEntityById(String id);
-  Future<Either<String, Unit>> syncAllFromFirebase();
-  
+
+  Future<void> deleteEntity(String entityId);
+  Stream<List<EntityEntity>> getAllEntites2();
+  Future<List<EntityEntity>> getAllEntities();
+  Future<EntityEntity> getEntityById(String id);
+  Future<void> syncAllFromFirebase();
 }

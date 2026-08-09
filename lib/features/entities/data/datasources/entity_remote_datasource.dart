@@ -3,17 +3,9 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:migra_ayuda/features/entities/data/models/entity_models.dart';
-
-/// Excepción personalizada para errores del servidor
-class ServerException implements Exception {
-  final String message;
-  ServerException(this.message);
-
-  @override
-  String toString() => 'ServerException: $message';
-}
 
 /// Implementación del datasource remoto usando Firebase
 class EntityRemoteDataSource {
@@ -47,13 +39,13 @@ class EntityRemoteDataSource {
       final response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode != 200) {
-        throw ServerException('Error al subir imagen: ${response.body}');
+        throw Exception('Error al subir imagen: ${response.body}');
       }
 
       final json = jsonDecode(response.body);
       return json['secure_url'];
     } catch (e) {
-      throw ServerException('Error al subir imagen: $e');
+      throw Exception('Error al subir imagen: $e');
     }
   }
 
@@ -63,24 +55,25 @@ class EntityRemoteDataSource {
     required String fileName,
   }) async {
     try {
-      final imagenUrl =
+      // Subir la imagen a Cloudinary y obtener la URL segura
+      final String imagenUrl =
           await _uploadImage(bytes: imageBytes, fileName: fileName);
 
-      final entidadConImagen = EntityModels(
-        id: '',
-        name: entityModel.name,
-        description: entityModel.description,
-        services: entityModel.services,
-        address: entityModel.address,
-        localitation: entityModel.localitation,
-        phone: entityModel.phone,
-        imageUrl: imagenUrl,
-        schedule: entityModel.schedule
-      );
+      // Crear una copia del modelo de entidad con la nueva imagen y sin ID
+      final entidadConImagen =
+          entityModel.copyWith(id: '', imageUrl: imagenUrl);
 
-      await _firestore.collection('entities').add(entidadConImagen.toMap());
-    } catch (e) {
-      throw ServerException('Error al registrar entidad: $e');
+      // Añadir a Firestore y obtener la referencia al nuevo documento
+      final docRef =
+          await _firestore.collection('entities').add(entidadConImagen.toMap());
+
+      // Actualizar el documento con su ID generado automáticamente
+      await docRef.update({'id': docRef.id});
+    } catch (e, stackTrace) {
+      // Imprimir stacktrace para ayudar en la depuración
+      debugPrint('Error al registrar entidad: $e');
+      debugPrint('Stacktrace: $stackTrace');
+      throw 'Ocurrio un error inesperado';
     }
   }
 
@@ -97,26 +90,27 @@ class EntityRemoteDataSource {
         imagenUrl = await _uploadImage(bytes: imageBytes, fileName: fileName);
       }
 
-      final entidadActualizada = EntityModels(
-        id: entityModel.id,
-        name: entityModel.name,
-        description: entityModel.description,
-        services: entityModel.services,
-        address: entityModel.address,
-        localitation: entityModel.localitation,
-        phone: entityModel.phone,
-        imageUrl: imagenUrl,
-        averageRating: entityModel.averageRating,
-        totalReviews: entityModel.totalReviews,
-        schedule: entityModel.schedule
-      );
+      final entidadActualizada = entityModel.copyWith(imageUrl: imagenUrl);
+      debugPrint('ID: ${entidadActualizada.id}');
+      debugPrint('Nombre: ${entidadActualizada.name}');
+      debugPrint('Descripción: ${entidadActualizada.description}');
+      debugPrint('Servicios: ${entidadActualizada.services.join(', ')}');
+      debugPrint('Dirección: ${entidadActualizada.address}');
+      debugPrint(
+          'Localización: Latitud: ${entidadActualizada.localitation.latitude}, Longitud: ${entidadActualizada.localitation.longitude}');
+      debugPrint('Teléfono: ${entidadActualizada.phone}');
+      debugPrint('Imagen URL: ${entidadActualizada.imageUrl}');
+      debugPrint('Rating promedio: ${entidadActualizada.averageRating}');
+      debugPrint('Total de reseñas: ${entidadActualizada.totalReviews}');
+      debugPrint('Horario: ${entidadActualizada.schedule}');
 
       await _firestore
           .collection('entities')
           .doc(entityModel.id)
           .update(entidadActualizada.toMap());
     } catch (e) {
-      throw ServerException('Error al actualizar entidad: $e');
+      debugPrint('Erro en updateEntity: $e');
+      throw 'Ocurrio un error inesperado';
     }
   }
 
@@ -124,7 +118,7 @@ class EntityRemoteDataSource {
     try {
       await _firestore.collection('entities').doc(entityId).delete();
     } catch (e) {
-      throw ServerException('Error al eliminar entidad: $e');
+      throw Exception('Error al eliminar entidad: $e');
     }
   }
 
@@ -133,12 +127,13 @@ class EntityRemoteDataSource {
       final snapshot =
           await _firestore.collection('entities').orderBy('name').get();
 
-      final entities =
-          snapshot.docs.map((doc) => EntityModels.fromMap(doc)).toList();
-          
+      final entities = snapshot.docs
+          .map((doc) => EntityModels.fromMap(null, doc.data()))
+          .toList();
+
       return entities;
     } catch (e) {
-      throw ServerException('Error al obtener entidades: $e');
+      throw Exception('Error al obtener entidades: $e');
     }
   }
 
@@ -147,21 +142,21 @@ class EntityRemoteDataSource {
       final doc = await _firestore.collection('entities').doc(id).get();
 
       if (!doc.exists) {
-        throw ServerException('Entidad no encontrada');
+        throw Exception('Entidad no encontrada');
       }
 
-      final entity = EntityModels.fromMap(doc);
+      final entity = EntityModels.fromMap(null, doc.data()!);
 
       return entity;
     } catch (e) {
-      throw ServerException('Error al obtener entidad: $e');
+      throw Exception('Error al obtener entidad: $e');
     }
   }
 
-  Stream<List<EntityModels>> getAllEntities2() {
+  Stream<List<EntityModels>> getAllEntitiesStream() {
     return _firestore.collection('entities').orderBy('name').snapshots().map(
         (snap) => snap.docs
-            .map((doc) => EntityModels.fromMap(doc))
+            .map((doc) => EntityModels.fromMap(null, doc.data()))
             .toList());
   }
 }

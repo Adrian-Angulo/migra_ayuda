@@ -284,6 +284,7 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                 label: 'Nombre de la entidad',
                 hint: 'Ej: Centro de Salud Norte',
                 icon: Icons.business_outlined,
+                maxLength: 20,
                 validator: (v) =>
                     (v == null || v.isEmpty) ? 'El nombre es requerido' : null,
               ),
@@ -295,6 +296,7 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                     'Describa brevemente los servicios que ofrece esta entidad',
                 icon: null,
                 maxLines: 4,
+                maxLength: 500,
               ),
               const SizedBox(height: 32),
 
@@ -359,8 +361,6 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                   ),
                 ),
                 onChanged: (_) {
-                  if (_addressNotFound)
-                    setState(() => _addressNotFound = false);
                   if (location != null) {
                     setState(() {
                       location = null;
@@ -369,11 +369,18 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                     });
                   }
                 },
-                validator: (v) => (v == null || v.isEmpty)
-                    ? 'La dirección es requerida'
-                    : null,
+                validator: (v) {
+                  if (v == null || v.isEmpty) {
+                    return 'La dirección es requerida';
+                  } else if (location == null) {
+                    return 'Haz clic en el botón de la lupa para buscar y confirmar la dirección';
+                  } else if (_addressNotFound) {
+                    return 'No se encontró la ubicación para esta dirección. Por favor, verifica que esté escrita correctamente e intenta de nuevo.';
+                  }
+                  return null;
+                },
               ),
-              if (_addressNotFound)
+              /* if (_addressNotFound)
                 Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Row(
@@ -388,7 +395,7 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                       ),
                     ],
                   ),
-                ),
+                ), */
               const SizedBox(height: 12),
               if (location != null)
                 SizedBox(
@@ -431,6 +438,8 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                 label: 'Teléfono de contacto',
                 hint: '(57+) 3225321234',
                 icon: Icons.phone_outlined,
+                maxLength: 10,
+                onlyNumbers: true,
                 validator: (v) => (v == null || v.isEmpty)
                     ? 'El teléfono es requerido'
                     : null,
