@@ -4,6 +4,7 @@ import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/constants/services_utils.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/map_provider.dart';
 
 class FilterContainer extends ConsumerWidget {
   const FilterContainer({
@@ -32,9 +33,12 @@ class FilterContainer extends ConsumerWidget {
                   ref
                       .read(getAllEntitiesProvider.notifier)
                       .filter(query: service);
+
                   await ref.read(auditNotifierProvider.notifier).create(
                       accion: ActivityActions.filter(),
                       metadata: {'filtro': service});
+                  //limpiar entidad seleccionada al presionar filtro
+                  ref.read(mapProvider.notifier).clearSelectEntity();
                 }
               },
             );

@@ -69,7 +69,7 @@ class EntityListNotifier extends AsyncNotifier<List<EntityEntity>> {
       _allEntities = entities;
       return entities;
     } catch (error) {
-      throw error!;
+      rethrow;
     }
   }
 

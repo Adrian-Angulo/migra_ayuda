@@ -39,15 +39,6 @@ final routerProvider = Provider<GoRouter>((ref) {
               path: '/dashboard/users',
               builder: (context, state) => const UsersScreen()),
           GoRoute(
-            path: '/dashboard/services',
-            builder: (context, state) => const Center(
-              child: Text(
-                "Servicios",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-          GoRoute(
               path: '/dashboard/reviews',
               builder: (context, state) => const ReviewsScreen()),
           GoRoute(

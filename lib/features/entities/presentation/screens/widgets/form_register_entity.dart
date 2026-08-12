@@ -53,6 +53,13 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
 
   String seleted = services[1];
 
+  // Estado para los errores de validación por campo
+  String? _imageErrorMsg;
+  String? _servicesErrorMsg;
+
+  // NUEVO: Control para validación bajo demanda
+  AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
+
   @override
   void initState() {
     super.initState();
@@ -118,12 +125,35 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
   }
 
   Future<void> _searchAddress() async {
-    if (_addressController.text.trim().isEmpty) return;
+    final address = _addressController.text.trim();
+
+    // Validación: Calle o Carrera, número, # número-número, y Pasto al final
+    final RegExp regExp = RegExp(
+      r'^(Calle|Carrera)\s+\d+\s*#\d+-\d+,\s*Pasto$',
+      caseSensitive: false,
+    );
+
+    if (address.isEmpty) return;
+
+    if (!regExp.hasMatch(address)) {
+      setState(() {
+        _addressNotFound = false;
+      });
+      // Quitar el SnackBar. El error aparecerá junto al campo dirección (por validator).
+      // Forzar una revalidación para mostrar el error en el campo
+      // Solo valida si está el autovalidateMode on
+      if (_autovalidateMode != AutovalidateMode.disabled) {
+        _formKey.currentState?.validate();
+      }
+      return;
+    }
+
     setState(() {
       _isSearching = true;
       _addressNotFound = false;
     });
-    final coords = await _getCoordinates(_addressController.text);
+
+    final coords = await _getCoordinates(address);
     if (!mounted) return;
     setState(() {
       location = coords;
@@ -134,35 +164,41 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
       _latitudController.text = coords.latitude.toString();
       _longitudController.text = coords.longitude.toString();
     }
+    // Solo forzar revalidación si el form está en modo autovalidate
+    if (_autovalidateMode != AutovalidateMode.disabled) {
+      _formKey.currentState?.validate();
+    }
   }
 
   /// Valida y ejecuta la operación (crear o actualizar).
   /// El cierre del modal es responsabilidad del padre via [ref.listen].
   Future<void> _submit() async {
+    setState(() {
+      _imageErrorMsg = null;
+      _servicesErrorMsg = null;
+      _autovalidateMode = AutovalidateMode.onUserInteraction;
+    });
+
     if (!_formKey.currentState!.validate()) return;
 
-    // Imagen obligatoria solo al crear
+    // Imagen obligatoria solo al crear, mostrar error debajo de la imagen
     if (!widget.isEditing && _selectedImageBytes == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Por favor seleccione una imagen'),
-        backgroundColor: Colors.red,
-      ));
+      setState(() {
+        _imageErrorMsg = 'Por favor seleccione una imagen';
+      });
       return;
     }
 
+    // Servicio obligatorio, mostrar error debajo de la selección de servicios
     if (selectedServices.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Por favor seleccione al menos un servicio'),
-        backgroundColor: Colors.red,
-      ));
+      setState(() {
+        _servicesErrorMsg = 'Por favor seleccione al menos un servicio';
+      });
       return;
     }
 
     if (_latitudController.text.isEmpty || _longitudController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Debes buscar y confirmar la dirección en el mapa'),
-        backgroundColor: Colors.orange,
-      ));
+      // Esto está cubierto por el validator del campo dirección ya
       return;
     }
 
@@ -234,6 +270,7 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
         padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
+          autovalidateMode: _autovalidateMode,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -251,6 +288,7 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                           _selectedImage = imagen;
                           _selectedImageBytes = bytes;
                           _imageChanged = true;
+                          _imageErrorMsg = null;
                         });
                       },
                     ),
@@ -268,6 +306,26 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                             : Colors.grey.shade500,
                       ),
                     ),
+                    // Error de imagen como validación de formulario
+                    if (_imageErrorMsg != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.error_outline,
+                                size: 16, color: Colors.red),
+                            const SizedBox(width: 6),
+                            Flexible(
+                              child: Text(
+                                _imageErrorMsg!,
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.red.shade700),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -313,8 +371,32 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
               const SizedBox(height: 16),
               ServiceTypeChecklistWidget(
                 selectedServices: selectedServices,
-                onServicesChanged: (s) => setState(() => selectedServices = s),
+                onServicesChanged: (s) {
+                  setState(() {
+                    selectedServices = s;
+                    _servicesErrorMsg = null;
+                  });
+                },
               ),
+              // Validación de selección de servicios
+              if (_servicesErrorMsg != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6.0),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.error_outline,
+                          size: 16, color: Colors.red),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          _servicesErrorMsg!,
+                          style: TextStyle(
+                              fontSize: 12, color: Colors.red.shade700),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               const SizedBox(height: 32),
 
               // ── Ubicación y contacto ─────────────────────────────────
@@ -366,12 +448,21 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                       location = null;
                       _latitudController.clear();
                       _longitudController.clear();
+                      _addressNotFound = false;
                     });
                   }
                 },
                 validator: (v) {
+                  // Validar formato
+                  final regExp = RegExp(
+                    r'^(Calle|Carrera)\s+\d+\s*#\d+-\d+,\s*Pasto$',
+                    caseSensitive: false,
+                  );
+
                   if (v == null || v.isEmpty) {
                     return 'La dirección es requerida';
+                  } else if (!regExp.hasMatch(v.trim())) {
+                    return 'La dirección debe tener el formato: Calle/Carrera 123 #45-67, Pasto';
                   } else if (location == null) {
                     return 'Haz clic en el botón de la lupa para buscar y confirmar la dirección';
                   } else if (_addressNotFound) {
@@ -380,22 +471,6 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                   return null;
                 },
               ),
-              /* if (_addressNotFound)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.error_outline,
-                          size: 14, color: Colors.red),
-                      const SizedBox(width: 6),
-                      Text(
-                        'No se encontró la dirección. Intenta ser más específico.',
-                        style:
-                            TextStyle(fontSize: 12, color: Colors.red.shade700),
-                      ),
-                    ],
-                  ),
-                ), */
               const SizedBox(height: 12),
               if (location != null)
                 SizedBox(
@@ -472,7 +547,14 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                           ? 'Actualizando...'
                           : 'Registrando...')
                       : (widget.isEditing ? 'Guardar Cambios' : 'Registrarse'),
-                  onPressed: crudState.isLoading ? null : _submit,
+                  onPressed: crudState.isLoading
+                      ? null
+                      : () {
+                          setState(() {
+                            _autovalidateMode = AutovalidateMode.onUserInteraction;
+                          });
+                          _submit();
+                        },
                 ),
               const SizedBox(height: 16),
             ],

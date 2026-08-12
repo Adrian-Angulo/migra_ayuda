@@ -72,13 +72,6 @@ class HomeScreen extends StatelessWidget {
                           isActive: location.startsWith('/dashboard/reviews'),
                           onTap: () => context.go('/dashboard/reviews'),
                         ),
-                        const SizedBox(height: 8),
-                        SidebarMenuItemWidget(
-                          icon: Icons.work_outline_rounded,
-                          title: 'Servicios',
-                          isActive: location.startsWith('/dashboard/services'),
-                          onTap: () => context.go('/dashboard/services'),
-                        ),
                       ],
                     ),
                   ),

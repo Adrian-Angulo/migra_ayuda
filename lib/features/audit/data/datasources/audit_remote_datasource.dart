@@ -29,7 +29,7 @@ class AuditRemoteDataSource {
       return querySnapshot.docs.map((doc) {
         final data = doc.data();
         return AuditModel(
-            id: data['localId'] as String,
+            id: doc.id,
             idUser: data['idUser'] as String,
             accion: data['accion'] ?? "null",
             createdAt: DateTime.parse(data['createdAt'] as String),
