@@ -54,8 +54,8 @@ class MapboxWidget extends ConsumerWidget {
       ),
       const ListEntitesHome(),
       Positioned(
-        bottom: 30,
-        right: 20,
+        bottom: 80,
+        right: 10,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -76,6 +76,3 @@ class MapboxWidget extends ConsumerWidget {
     ]);
   }
 }
-
-
-
