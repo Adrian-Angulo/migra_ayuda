@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/core/widgets/web/statistic_card.dart';
 
-
 class SectionStaticsCard extends StatelessWidget {
   const SectionStaticsCard({
     super.key,

@@ -1,10 +1,10 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/core/utils/format/time_formatter.dart';
-import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
+import 'package:migra_ayuda/features/users/domain/entities/migrant.dart';
 
 class UsersDatatable extends DataTableSource {
-  List<UserModel> listUsers;
+  List<Migrant> listUsers;
   UsersDatatable({required this.listUsers});
 
   @override
@@ -18,8 +18,8 @@ class UsersDatatable extends DataTableSource {
       DataCell(Text(user.email)),
       DataCell(Text(user.role)),
       DataCell(Text(user.age.toString())),
-      DataCell(Text(user.originCountry!)),
-      DataCell(Text(user.destinationCountry!)),
+      DataCell(Text(user.originCountry)),
+      DataCell(Text(user.destinationCountry)),
       DataCell(Text(TimeFormatter.formatShortDate(user.createdAt))),
     ]);
   }

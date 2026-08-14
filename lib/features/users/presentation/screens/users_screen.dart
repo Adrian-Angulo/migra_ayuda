@@ -112,7 +112,7 @@ class UsersScreen extends ConsumerWidget {
             data: (users) {
               // Creamos las filas de la tabla con los usuarios
               final rows = UsersDatatable(listUsers: users);
-
+              
               // Tabla personalizada mostrando los usuarios y sus propiedades
               return BuildTable(
                 rows: rows,

@@ -7,13 +7,13 @@ import 'package:migra_ayuda/core/widgets/web/activity_chart_card.dart';
 import 'package:migra_ayuda/core/widgets/web/dasboard_header.dart';
 import 'package:migra_ayuda/core/widgets/web/recent_activities.dart';
 import 'package:migra_ayuda/core/widgets/web/section_statics_card.dart';
-import 'package:migra_ayuda/core/widgets/web/statistic_card.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/home_admin_screen/home_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/login_web.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/users_screen.dart';
+
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/entities_screen.dart';
 import 'package:migra_ayuda/features/reviews/presentation/screens/web/reviews_screen.dart';
 import 'package:migra_ayuda/features/audit/presentation/screens/web/user_activity_web_screen.dart';
+import 'package:migra_ayuda/features/users/presentation/screens/users_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final notifier = ref.read(routerNotifierProvider.notifier);
