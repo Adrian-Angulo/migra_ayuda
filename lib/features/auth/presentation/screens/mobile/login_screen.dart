@@ -53,6 +53,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       builder: (context) => const CompleteInfoScreen(),
                     ));
               }
+              
             } else {
               // Usuario NO es Migrante (Admin u otro rol)
               if (!context.mounted) return;

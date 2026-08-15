@@ -9,8 +9,8 @@ class SectionStaticsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      spacing: 16,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      /* spacing: 16, */
       children: [
         StatisticCard(
             title: 'Usuarios Registrados',

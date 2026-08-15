@@ -1,6 +1,8 @@
 // UX Constants
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
+
 class UXConstants {
   // Animation durations
   static const Duration fastAnimation = Duration(milliseconds: 200);
@@ -103,4 +105,21 @@ class ColorConstants {
   static const double opacityMedium = 0.60;
   static const double opacityHigh = 0.87;
   static const double opacityFull = 1.0;
+}
+
+class ContainerDecorationBorder {
+  static Decoration decorationBox() {
+    return BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+            width: 0.5, color: const Color.fromARGB(187, 199, 196, 216)),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x26000000),
+            blurRadius: 2,
+            offset: Offset(0, 1),
+          ),
+        ]);
+  }
 }

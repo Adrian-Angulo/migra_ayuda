@@ -84,7 +84,7 @@ class HomeScreen extends StatelessWidget {
           // Contenido principal
           Expanded(
             child: Container(
-              color: Colors.white,
+              color: const Color(0xFFF7F9FB),
               child: child,
             ),
           ),

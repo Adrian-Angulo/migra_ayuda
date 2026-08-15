@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/router/router_notifier.dart';
 import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/core/widgets/web/activity_chart_card.dart';
 import 'package:migra_ayuda/core/widgets/web/dasboard_header.dart';
-import 'package:migra_ayuda/core/widgets/web/recent_activities.dart';
+import 'package:migra_ayuda/features/dashboard/widgets/recent_activities.dart';
 import 'package:migra_ayuda/core/widgets/web/section_statics_card.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/home_admin_screen/home_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/login_web.dart';
+import 'package:migra_ayuda/features/dashboard/widgets/entity_for_category.dart';
+import 'package:migra_ayuda/features/dashboard/widgets/service_more_filter_container.dart';
 
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/entities_screen.dart';
 import 'package:migra_ayuda/features/reviews/presentation/screens/web/reviews_screen.dart';
@@ -33,7 +36,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(path: '/dashboard', redirect: (_, __) => '/dashboard/home'),
           GoRoute(
             path: '/dashboard/home',
-            builder: (context, state) => Dashboard(),
+            builder: (context, state) => const Dashboard(),
           ),
           GoRoute(
               path: '/dashboard/userActivity',
@@ -86,22 +89,8 @@ class Dashboard extends StatelessWidget {
                 Row(
                   spacing: 16,
                   children: [
-                    Expanded(
-                        child: SizedBox(
-                            height: 350,
-                            child: Card(
-                              child: Center(
-                                child: Text('Grafico'),
-                              ),
-                            ))),
-                    Expanded(
-                        child: SizedBox(
-                            height: 350,
-                            child: Card(
-                              child: Center(
-                                child: Text('servicios mas filtrados'),
-                              ),
-                            )))
+                    Expanded(child: EntityForCategoryContainer()),
+                    Expanded(child: ServiceMoreFilterContainer())
                   ],
                 )
               ],
