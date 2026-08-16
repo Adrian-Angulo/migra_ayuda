@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 
 class StatisticCard extends StatelessWidget {
   final String title;
-  final String value;
+  final AsyncValue<int> value;
   final IconData icon;
 
   const StatisticCard({
@@ -13,8 +14,23 @@ class StatisticCard extends StatelessWidget {
     required this.icon,
   });
 
+  Color _getColorByTitle(String title) {
+    final lowerTitle = title.toLowerCase();
+    if (lowerTitle.contains('usuarios')) {
+      return Colors.blue;
+    } else if (lowerTitle.contains('entidades')) {
+      return Colors.green;
+    } else if (lowerTitle.contains('reseñas')) {
+      return const Color(0xFF9333EA);
+    } else if (lowerTitle.contains('Inicios de sesion')) {
+      return const Color(0xFFEA580C);
+    }
+    return Colors.grey;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final cardColor = _getColorByTitle(title);
     return Container(
       height: 110,
       width: 280,
@@ -26,12 +42,12 @@ class StatisticCard extends StatelessWidget {
             width: 50,
             height: 50,
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.12),
+              color: cardColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               icon,
-              color: Colors.blue[700],
+              color: cardColor,
               size: 28,
             ),
           ),
@@ -46,24 +62,49 @@ class StatisticCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     color: Color(0xFF464555),
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.bold,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                value.when(
+                  data: (data) => StaticTitle(value: data.toString()),
+                  error: (error, stackTrace) =>
+                      StaticTitle(value: error.toString()),
+                  loading: () => const SizedBox(
+                    width: 30,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                    ),
                   ),
-                ),
+                )
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class StaticTitle extends StatelessWidget {
+  const StaticTitle({
+    super.key,
+    required this.value,
+  });
+
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      value,
+      style: const TextStyle(
+        fontSize: 30,
+        fontWeight: FontWeight.bold,
+        color: Colors.black,
       ),
     );
   }

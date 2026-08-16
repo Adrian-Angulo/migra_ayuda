@@ -29,8 +29,9 @@ class RecentActivities extends StatelessWidget {
                   child: const Text(
                     'Ver todas',
                     style: TextStyle(
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF3525CD),
+                      color: Color(0xFF2D5F4F),
                     ),
                   ),
                 ),
