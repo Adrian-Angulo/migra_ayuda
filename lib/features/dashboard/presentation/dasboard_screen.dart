@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/core/widgets/web/dasboard_header.dart';
 import 'package:migra_ayuda/features/dashboard/presentation/widgets/activity_chart_card.dart';
-import 'package:migra_ayuda/features/dashboard/presentation/widgets/entity_for_category.dart';
+import 'package:migra_ayuda/features/dashboard/presentation/widgets/category_chart.dart';
 import 'package:migra_ayuda/features/dashboard/presentation/widgets/recent_activities.dart';
 import 'package:migra_ayuda/features/dashboard/presentation/widgets/section_statics_card.dart';
 import 'package:migra_ayuda/features/dashboard/presentation/widgets/service_more_filter_container.dart';
@@ -39,7 +39,7 @@ class Dashboard extends StatelessWidget {
                 Row(
                   spacing: 16,
                   children: [
-                    Expanded(child: EntityForCategoryContainer()),
+                    Expanded(child: CategoryChart()),
                     Expanded(child: ServiceMoreFilterContainer())
                   ],
                 )

@@ -47,6 +47,15 @@ class ActivityChartCard extends StatelessWidget {
       ChartData('26 May', 2),
       ChartData('31 May', 16),
     ];
+    final googleMapData = [
+      ChartData('1 May', 11),
+      ChartData('6 May', 22),
+      ChartData('11 May', 18),
+      ChartData('16 May', 25),
+      ChartData('21 May', 20),
+      ChartData('26 May', 15),
+      ChartData('31 May', 28),
+    ];
     return Container(
       decoration: ContainerDecorationBorder.decorationBox(),
       height: 450,
@@ -63,7 +72,7 @@ class ActivityChartCard extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: Container(
+              child: SizedBox(
                 width: double.infinity,
                 child: SfCartesianChart(
                   legend: const Legend(
@@ -74,25 +83,35 @@ class ActivityChartCard extends StatelessWidget {
                   ),
                   primaryXAxis: CategoryAxis(),
                   primaryYAxis:
-                      const NumericAxis(minimum: 0, maximum: 100, interval: 20),
+                      const NumericAxis(minimum: 0, maximum: 100, interval: 5),
                   series: [
                     LineSeries<ChartData, String>(
+                      name: 'Inicio de Sesión',
                       dataSource: loginData,
                       xValueMapper: (data, _) => data.day,
                       yValueMapper: (data, _) => data.value,
                     ),
                     LineSeries<ChartData, String>(
+                      name: 'Detalles de entidad',
                       dataSource: entityData,
                       xValueMapper: (data, _) => data.day,
                       yValueMapper: (data, _) => data.value,
                     ),
                     LineSeries<ChartData, String>(
+                      name: 'Ruta solicitada',
                       dataSource: routeData,
                       xValueMapper: (data, _) => data.day,
                       yValueMapper: (data, _) => data.value,
                     ),
                     LineSeries<ChartData, String>(
+                      name: 'Filtros',
                       dataSource: filterData,
+                      xValueMapper: (data, _) => data.day,
+                      yValueMapper: (data, _) => data.value,
+                    ),
+                    LineSeries<ChartData, String>(
+                      name: 'Navegar por google maps',
+                      dataSource: googleMapData,
                       xValueMapper: (data, _) => data.day,
                       yValueMapper: (data, _) => data.value,
                     ),
