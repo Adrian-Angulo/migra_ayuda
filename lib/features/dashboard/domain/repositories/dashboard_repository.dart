@@ -1,3 +1,5 @@
+
+
 abstract class DashboardRepository {
   Future<int> getUsersCount();
   Future<int> getEntitiesCount();

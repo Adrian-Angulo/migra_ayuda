@@ -40,7 +40,7 @@ class SectionStaticsCard extends ConsumerWidget {
             value: reviewState,
             icon: Icons.comment),
         StatisticCard(
-            title: 'Acciones realizadas',
+            title: 'Acciones ruta solicitada',
             value: servicesState,
             icon: Icons.filter_alt)
       ],

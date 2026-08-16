@@ -11,7 +11,12 @@ class DashboardRepositoryImple implements DashboardRepository {
 
   @override
   Future<int> getUsersCount() async {
-    return await _getCountColletion('users');
+    final snapshot = await _firestore
+        .collection('users')
+        .where('role', isEqualTo: 'Migrante')
+        .count()
+        .get();
+    return snapshot.count ?? 0;
   }
 
   @override
@@ -28,7 +33,7 @@ class DashboardRepositoryImple implements DashboardRepository {
   Future<int> getServicesCount() async {
     final snapshot = await _firestore
         .collection('user_activities')
-        .where('accion', isEqualTo: 'Filtrar')
+        .where('accion', isEqualTo: 'Como llegar')
         .count()
         .get();
     return snapshot.count ?? 0;

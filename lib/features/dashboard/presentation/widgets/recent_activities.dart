@@ -1,11 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
+import 'package:migra_ayuda/core/utils/format/time_formatter.dart';
+import 'package:migra_ayuda/features/audit/domain/entities/audit_entity.dart';
+import 'package:migra_ayuda/features/dashboard/presentation/providers/dashboard_providers.dart';
 
-class RecentActivities extends StatelessWidget {
+class RecentActivities extends ConsumerWidget {
   const RecentActivities({super.key});
 
+  String? _getMetadatos(AuditEntity audit) {
+    if (audit.metadata != null && audit.metadata!.isNotEmpty) {
+      return audit.metadata?.entries.map((e) => '${e.value}').join(', ');
+    } else {
+      return audit.correo;
+    }
+  }
+
+  String _mapAccion(String accion) {
+    final Map<String, String> accionMap = {
+      'filtrar': 'Filtro aplicado',
+      'iniciar sesión': 'Nuevo ingreso',
+      'ver entidad': 'Entidad selecionada',
+      'como llegar': 'ruta solicitada',
+      'cierre de session': 'Cierre de sesión',
+    };
+
+    return accionMap[accion.toLowerCase()] ?? accion;
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final audirRecentState = ref.watch(recentActivityProvider);
     return Container(
       decoration: ContainerDecorationBorder.decorationBox(),
       height: 450,
@@ -37,31 +62,36 @@ class RecentActivities extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            const ActivityItem(
-              icon: Icons.person_outline,
-              title: 'Nuevo usuario registrado',
-              subtitle: 'juan.perez@email.com',
-              time: 'Hace 5 minutos',
-            ),
-            const ActivityItem(
-              icon: Icons.business,
-              title: 'Nueva entidad agregada',
-              subtitle: 'Centro de Salud Central',
-              time: 'Hace 1 hora',
-            ),
-            const ActivityItem(
-              icon: Icons.comment_outlined,
-              title: 'Nuevo comentario',
-              subtitle: 'Muy útil la información',
-              time: 'Hace 2 horas',
-            ),
-            const ActivityItem(
-              icon: Icons.filter_alt_outlined,
-              title: 'Ruta solicitada',
-              subtitle: 'Hacia: Centro de Empleo',
-              time: 'Hace 3 horas',
-            ),
+            Expanded(
+                child: audirRecentState.when(
+                    data: (list) {
+                      return ListView.separated(
+                          itemBuilder: (context, index) {
+                            final AuditEntity audit = list[index];
+                            return ActivityItem(
+                                icon: Icons.person_outline,
+                                title: _mapAccion(audit.accion),
+                                subtitle: _getMetadatos(audit)!,
+                                time:
+                                    TimeFormatter.formatDate(audit.createdAt));
+                          },
+                          separatorBuilder: (context, index) => const SizedBox(
+                                height: 5,
+                              ),
+                          itemCount: list.length);
+                    },
+                    error: (error, stackTrace) => Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text('Ha ocurrido un error:'),
+                              Text('Error: ${error.toString()}'),
+                            ],
+                          ),
+                        ),
+                    loading: () => const Center(
+                          child: CircularProgressIndicator(),
+                        ))),
           ],
         ),
       ),
@@ -96,7 +126,7 @@ class ActivityItem extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 12,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -104,7 +134,7 @@ class ActivityItem extends StatelessWidget {
                 Text(
                   subtitle,
                   style: const TextStyle(
-                    fontSize: 10,
+                    fontSize: 12,
                     color: Colors.grey,
                   ),
                 ),
@@ -114,7 +144,7 @@ class ActivityItem extends StatelessWidget {
           Text(
             time,
             style: const TextStyle(
-              fontSize: 9,
+              fontSize: 12,
               color: Colors.grey,
             ),
           ),
