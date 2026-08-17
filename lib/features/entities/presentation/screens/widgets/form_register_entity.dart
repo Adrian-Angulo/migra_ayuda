@@ -153,17 +153,27 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
       _addressNotFound = false;
     });
 
-    final coords = await _getCoordinates(address);
-    if (!mounted) return;
-    setState(() {
-      location = coords;
-      _isSearching = false;
-      _addressNotFound = coords == null;
-    });
-    if (coords != null) {
-      _latitudController.text = coords.latitude.toString();
-      _longitudController.text = coords.longitude.toString();
+    try {
+      final coords = await _getCoordinates(address);
+      if (!mounted) return;
+      setState(() {
+        location = coords;
+        _isSearching = false;
+        _addressNotFound = coords == null;
+      });
+      if (coords != null) {
+        _latitudController.text = coords.latitude.toString();
+        _longitudController.text = coords.longitude.toString();
+      }
+    } finally {
+      // Esto asegura que el loading siempre se apaga aunque falle
+      if (mounted && _isSearching) {
+        setState(() {
+          _isSearching = false;
+        });
+      }
     }
+
     // Solo forzar revalidación si el form está en modo autovalidate
     if (_autovalidateMode != AutovalidateMode.disabled) {
       _formKey.currentState?.validate();
@@ -410,37 +420,54 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                 label: 'Dirección',
                 hint: 'Ej. Calle 123 #45-67, Pasto',
                 icon: Icons.location_on_outlined,
-                suffixIcon: Container(
-                  height: 50,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primary,
-                    borderRadius: const BorderRadius.only(
-                      topRight: Radius.circular(11),
-                      bottomRight: Radius.circular(11),
-                    ),
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      onTap: _isSearching ? null : _searchAddress,
-                      child: SizedBox(
-                        width: 48,
-                        height: 48,
-                        child: Center(
-                          child: _isSearching
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : const Icon(Icons.search, color: Colors.white),
+                // SOLUCIÓN AL BOTÓN DE LA LUPA:
+                // El campo suffixIcon se debe asegurar de usar un Builder para que el context esté bien
+                // y evite problemas de re-render al cambiar _isSearching (opcional).
+                // Pero el error real era que _searchAddress no es async para el onTap de InkWell.
+                suffixIcon: Builder(
+                  builder: (context) {
+                    return Container(
+                      height: 50,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
+                        borderRadius: const BorderRadius.only(
+                          topRight: Radius.circular(11),
+                          bottomRight: Radius.circular(11),
                         ),
                       ),
-                    ),
-                  ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: _isSearching
+                              ? null
+                              : () async {
+                                  setState(() {
+                                    _autovalidateMode =
+                                        AutovalidateMode.onUserInteraction;
+                                  });
+                                  await _searchAddress();
+                                },
+                          child: SizedBox(
+                            width: 48,
+                            height: 48,
+                            child: Center(
+                              child: _isSearching
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Icon(Icons.search,
+                                      color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 onChanged: (_) {
                   if (location != null) {
@@ -551,7 +578,8 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                       ? null
                       : () {
                           setState(() {
-                            _autovalidateMode = AutovalidateMode.onUserInteraction;
+                            _autovalidateMode =
+                                AutovalidateMode.onUserInteraction;
                           });
                           _submit();
                         },
@@ -564,3 +592,9 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
     );
   }
 }
+
+// ¿QUÉ PASÓ?
+// El problema era que el onTap del InkWell debe ser una función async si quieres usar await adentro,
+// y también necesitas asegurar que se llame correctamente setState para _autovalidateMode y que
+// _searchAddress se ejecute realmente. Además, por temas de context y render el uso de Builder puede hacer
+// más robusto el widget, pero el core es convertir el onTap a async y llamar await _searchAddress().

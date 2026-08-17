@@ -9,16 +9,16 @@ final dashboardRespositoryProvider = Provider<DashboardRepository>(
   (ref) => DashboardRepositoryImple(),
 );
 
-final usersCountProvider = FutureProvider<int>(
+final usersCountProvider = FutureProvider.autoDispose<int>(
   (ref) => ref.watch(dashboardRespositoryProvider).getUsersCount(),
 );
-final entitiesCountProvider = FutureProvider(
+final entitiesCountProvider = FutureProvider.autoDispose(
   (ref) => ref.watch(dashboardRespositoryProvider).getEntitiesCount(),
 );
-final reviewCountProvider = FutureProvider(
+final reviewCountProvider = FutureProvider.autoDispose(
   (ref) => ref.watch(dashboardRespositoryProvider).getReviewCount(),
 );
-final servicesCountProvider = FutureProvider(
+final servicesCountProvider = FutureProvider.autoDispose(
   (ref) => ref.watch(dashboardRespositoryProvider).getServicesCount(),
 );
 
@@ -30,7 +30,7 @@ final recentActivityProvider = StreamProvider<List<AuditEntity>>((ref) {
   });
 });
 
-final getCategoryDataProvider = FutureProvider<List<CategoryData>>(
+final getCategoryDataProvider = FutureProvider.autoDispose<List<CategoryData>>(
   (ref) {
     return ref.read(dashboardRespositoryProvider).getCategoryData();
   },
