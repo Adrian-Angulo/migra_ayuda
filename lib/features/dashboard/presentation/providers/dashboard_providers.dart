@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/audit/domain/entities/audit_entity.dart';
 import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
 import 'package:migra_ayuda/features/dashboard/data/repositories/dashboard_repository_imple.dart';
+import 'package:migra_ayuda/features/dashboard/domain/entities/category_data.dart';
 import 'package:migra_ayuda/features/dashboard/domain/repositories/dashboard_repository.dart';
 
 final dashboardRespositoryProvider = Provider<DashboardRepository>(
@@ -28,3 +29,9 @@ final recentActivityProvider = StreamProvider<List<AuditEntity>>((ref) {
     return sortedAudits.take(10).toList();
   });
 });
+
+final getCategoryDataProvider = FutureProvider<List<CategoryData>>(
+  (ref) {
+    return ref.read(dashboardRespositoryProvider).getCategoryData();
+  },
+);

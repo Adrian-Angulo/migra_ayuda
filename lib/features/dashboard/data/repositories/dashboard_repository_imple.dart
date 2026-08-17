@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:migra_ayuda/features/dashboard/domain/entities/category_data.dart';
 import 'package:migra_ayuda/features/dashboard/domain/repositories/dashboard_repository.dart';
 
 class DashboardRepositoryImple implements DashboardRepository {
@@ -37,5 +40,21 @@ class DashboardRepositoryImple implements DashboardRepository {
         .count()
         .get();
     return snapshot.count ?? 0;
+  }
+
+  @override
+  Future<List<CategoryData>> getCategoryData() async {
+    final snapshot = await _firestore.collection('entities').get();
+    Map<String, int> serviceCount = {};
+
+    for (var doc in snapshot.docs) {
+      for (var service in doc['services']) {
+        serviceCount[service] = (serviceCount[service] ?? 0) + 1;
+      }
+    }
+
+    return serviceCount.entries
+        .map((entry) => CategoryData(name: entry.key, value: entry.value))
+        .toList();
   }
 }
