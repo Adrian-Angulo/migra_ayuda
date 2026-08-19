@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/constants/services_utils.dart';
 import 'package:migra_ayuda/features/dashboard/domain/entities/category_data.dart';
 import 'package:migra_ayuda/features/dashboard/presentation/providers/dashboard_providers.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 
 class CategoryChart extends ConsumerWidget {
   CategoryChart({
@@ -48,7 +48,7 @@ class CategoryChart extends ConsumerWidget {
                         Expanded(
                           flex: 3,
                           child: SizedBox(
-                            height: 180,
+                            height: 250,
                             child: SfCircularChart(
                               annotations: [
                                 CircularChartAnnotation(

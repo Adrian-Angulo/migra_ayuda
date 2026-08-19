@@ -53,7 +53,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       builder: (context) => const CompleteInfoScreen(),
                     ));
               }
-              
             } else {
               // Usuario NO es Migrante (Admin u otro rol)
               if (!context.mounted) return;
@@ -113,9 +112,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            Image.asset(
-                              "assets/logo/MigraAyuda.png",
-                              width: 180,
+                            Hero(
+                              tag: 'app-logo2',
+                              child: Image.asset(
+                                'assets/logo/MigraAyuda.png',
+                                width: 180,
+                                fit: BoxFit.contain,
+                              ),
                             ),
                             const SizedBox(height: 20),
                             Text(

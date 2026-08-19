@@ -76,7 +76,6 @@ final routerMobile = Provider<GoRouter>(
           builder: (context, state) => const FadeIn(
               duration: Duration(seconds: 2), child: SplashScreenInit()),
         ),
-        
         GoRoute(
           path: Routes.selectLanguaje,
           builder: (context, state) => const LanguageScreen(),
@@ -87,8 +86,7 @@ final routerMobile = Provider<GoRouter>(
         ),
         GoRoute(
           path: Routes.loginMovil,
-          builder: (context, state) => const FadeIn(
-              duration: Duration(seconds: 2), child: LoginScreen()),
+          builder: (context, state) => const LoginScreen(),
         ),
         GoRoute(
           path: Routes.registerMovil,

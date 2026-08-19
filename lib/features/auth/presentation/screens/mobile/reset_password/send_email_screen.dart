@@ -40,6 +40,8 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
     ref.listen(
       resetPasswordProvider,
       (previous, next) {
+        // Solo mostrar mensajes si el estado cambia y no es initial/cargando
+        if (previous == next) return;
         next.whenOrNull(
           data: (data) {
             Navigator.pushReplacement(
@@ -61,7 +63,7 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: SingleChildScrollView(
+          child: Expanded(
             child: Form(
               key: _formKey,
               child: Column(
@@ -69,24 +71,25 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
                 children: [
                   const SizedBox(height: 60),
                   // Logo
-                  Image.asset(
-                    'assets/logo_login.png',
-                    height: 100,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 100,
-                        width: 100,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF6FA3A1).withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          Icons.help_outline,
-                          size: 50,
-                          color: Color(0xFF6FA3A1),
-                        ),
-                      );
-                    },
+                  Hero(
+                    tag: 'app-logo',
+                    child: Image.asset(
+                      'assets/logo/Logo.png',
+                      width: 110,
+                      height: 110,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 9,
+                  ),
+                  Hero(
+                    tag: 'app-logo2',
+                    child: Image.asset(
+                      'assets/logo/MigraAyuda.png',
+                      width: 180,
+                      fit: BoxFit.contain,
+                    ),
                   ),
 
                   const SizedBox(height: 30),
@@ -95,7 +98,7 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
                     l10n.resetPasswordTitle,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      fontSize: 32,
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
