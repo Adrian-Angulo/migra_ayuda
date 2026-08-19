@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/services/google_maps/google_maps_controllers.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/map_state.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/map_provider.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/floating_main_button.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/place_details_header.dart';
@@ -53,17 +54,21 @@ class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
                           .read(mapProvider.notifier)
                           .drawRouteToEntity(widget.map.selectEntity!);
 
+                      
+
                       await ref.read(auditNotifierProvider.notifier).create(
                           accion: ActivityActions.routeRequested(),
                           metadata: {
                             'service': widget.map.selectEntity!.services[0],
                             'entidad': widget.map.selectEntity!.name
                           });
-                      widget.controllerD?.animateTo(
-                        0.3,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
+
+                      ref.read(degradableScrollControllerProvider).animateTo(
+                            0.3,
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeInOut,
+                          );
+                      
                     },
                     text: l10n.howToGetThere,
                     icon: Icons.directions,
@@ -112,11 +117,11 @@ class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
               // limpiamos la ruta trazada
               ref.read(mapProvider.notifier).clearRoute();
               //volver a la altura iniciar
-              widget.controllerD?.animateTo(
-                0.3,
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.easeInOut,
-              );
+              ref.read(degradableScrollControllerProvider).animateTo(
+                    0.3,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                  );
             },
           ),
         ),

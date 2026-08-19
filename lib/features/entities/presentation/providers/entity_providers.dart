@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:migra_ayuda/core/config/sembast_database.dart';
@@ -65,7 +66,8 @@ class EntityListNotifier extends AsyncNotifier<List<EntityEntity>> {
   Future<List<EntityEntity>> _loadEntities() async {
     state = const AsyncValue.loading();
     try {
-      final entities = await ref.read(entityRepositoryProvider).getAllEntities();
+      final entities =
+          await ref.read(entityRepositoryProvider).getAllEntities();
       _allEntities = entities;
       return entities;
     } catch (error) {
@@ -98,3 +100,7 @@ class EntityListNotifier extends AsyncNotifier<List<EntityEntity>> {
 final getAllEntitiesProvider =
     AsyncNotifierProvider<EntityListNotifier, List<EntityEntity>>(
         EntityListNotifier.new);
+
+final degradableScrollControllerProvider = StateProvider<DraggableScrollableController>(
+  (ref) => DraggableScrollableController(),
+);

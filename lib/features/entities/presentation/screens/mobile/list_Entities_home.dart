@@ -18,7 +18,7 @@ class ListEntitesHome extends ConsumerStatefulWidget {
 }
 
 class _ListEntitesHomeState extends ConsumerState<ListEntitesHome> {
-  DraggableScrollableController? controllerD = DraggableScrollableController();
+  
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +26,7 @@ class _ListEntitesHomeState extends ConsumerState<ListEntitesHome> {
     final listEntity = ref.watch(getAllEntitiesProvider);
     final map = ref.watch(mapProvider);
     final l10n = AppLocalizations.of(context)!;
+    final controllerD = ref.watch(degradableScrollControllerProvider);
 
     return DraggableScrollableSheet(
       controller: controllerD,

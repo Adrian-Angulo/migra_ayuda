@@ -39,6 +39,8 @@ class FilterContainer extends ConsumerWidget {
                       metadata: {'filtro': service});
                   //limpiar entidad seleccionada al presionar filtro
                   ref.read(mapProvider.notifier).clearSelectEntity();
+                  //limpiar la ruta
+                  ref.read(mapProvider.notifier).clearRoute();
                 }
               },
             );
