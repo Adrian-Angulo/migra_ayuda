@@ -1,14 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
+import 'package:migra_ayuda/features/dashboard/domain/entities/destination_data.dart';
+import 'package:migra_ayuda/features/dashboard/presentation/providers/dashboard_providers.dart';
 
-class ServiceMoreFilterContainer extends StatelessWidget {
+class ServiceMoreFilterContainer extends ConsumerWidget {
   const ServiceMoreFilterContainer({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final stateDestianations = ref.watch(getDestinationsProvider);
+
+    return stateDestianations.when(
+      error: (error, stackTrace) => Center(
+        child: Text('Ha ocurrido un error inesperado: ${error.toString()}'),
+      ),
+      loading: () => CircularProgressIndicator(),
+      data: (list) {
+        return Container(
+            decoration: ContainerDecorationBorder.decorationBox(),
+            padding: const EdgeInsets.all(16),
+            height: 350,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Destinos mas requeridos',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(
+                  height: 16,
+                ),
+                Expanded(
+                    child: ListView.builder(
+                        itemCount: list.length > 5 ? 5 : list.length,
+                        itemBuilder: (context, index) {
+                          final item = list[index];
+                          return DestinoBarRow(
+                              stat: DestinationData(
+                                  nombre: item.nombre, cantidad: item.cantidad),
+                              maxValue: 100);
+                        }))
+              ],
+            ));
+      },
+    );
+
+    /*   return Container(
         decoration: ContainerDecorationBorder.decorationBox(),
         padding: const EdgeInsets.all(16),
         height: 350,
@@ -29,22 +72,16 @@ class ServiceMoreFilterContainer extends StatelessWidget {
                 child: ListView.builder(
                     itemCount: 4,
                     itemBuilder: (context, index) => const DestinoBarRow(
-                        stat: DestinoStat(nombre: 'Venezuela', cantidad: 10),
+                        stat:
+                            DestinationData(nombre: 'Venezuela', cantidad: 10),
                         maxValue: 100)))
           ],
-        ));
+        )); */
   }
 }
 
-class DestinoStat {
-  final String nombre;
-  final int cantidad;
-
-  const DestinoStat({required this.nombre, required this.cantidad});
-}
-
 class DestinoBarRow extends StatelessWidget {
-  final DestinoStat stat;
+  final DestinationData stat;
   final int maxValue;
 
   const DestinoBarRow({

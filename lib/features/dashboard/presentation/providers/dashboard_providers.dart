@@ -3,6 +3,7 @@ import 'package:migra_ayuda/features/audit/domain/entities/audit_entity.dart';
 import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
 import 'package:migra_ayuda/features/dashboard/data/repositories/dashboard_repository_imple.dart';
 import 'package:migra_ayuda/features/dashboard/domain/entities/category_data.dart';
+import 'package:migra_ayuda/features/dashboard/domain/entities/destination_data.dart';
 import 'package:migra_ayuda/features/dashboard/domain/repositories/dashboard_repository.dart';
 
 final dashboardRespositoryProvider = Provider<DashboardRepository>(
@@ -35,3 +36,10 @@ final getCategoryDataProvider = FutureProvider.autoDispose<List<CategoryData>>(
     return ref.read(dashboardRespositoryProvider).getCategoryData();
   },
 );
+
+
+final getDestinationsProvider =
+    StreamProvider.autoDispose<List<DestinationData>>((ref) {
+  return ref.watch(dashboardRespositoryProvider).getDetinations();
+});
+

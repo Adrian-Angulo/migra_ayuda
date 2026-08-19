@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:migra_ayuda/features/dashboard/domain/entities/category_data.dart';
+import 'package:migra_ayuda/features/dashboard/domain/entities/destination_data.dart';
 import 'package:migra_ayuda/features/dashboard/domain/repositories/dashboard_repository.dart';
 
 class DashboardRepositoryImple implements DashboardRepository {
@@ -56,5 +57,32 @@ class DashboardRepositoryImple implements DashboardRepository {
     return serviceCount.entries
         .map((entry) => CategoryData(name: entry.key, value: entry.value))
         .toList();
+  }
+
+  @override
+  Stream<List<DestinationData>> getDetinations() {
+    return _firestore.collection('users').snapshots().map((snapshot) {
+      // Contar la cantidad por país de destino
+      final Map<String, int> destinationsCount = {};
+
+      for (var doc in snapshot.docs) {
+        final nombreDestino = doc.data()['destinationCountry'];
+        if (nombreDestino != null &&
+            nombreDestino is String &&
+            nombreDestino.isNotEmpty) {
+          destinationsCount[nombreDestino] =
+              (destinationsCount[nombreDestino] ?? 0) + 1;
+        }
+      }
+
+      // Crear la lista de DestinationData ordenada de mayor a menor cantidad
+      final List<DestinationData> destinations = destinationsCount.entries
+          .map((entry) =>
+              DestinationData(nombre: entry.key, cantidad: entry.value))
+          .toList()
+        ..sort((a, b) => b.cantidad.compareTo(a.cantidad));
+
+      return destinations;
+    });
   }
 }
