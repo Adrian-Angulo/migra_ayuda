@@ -12,16 +12,17 @@ class ServiceMoreFilterContainer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final stateDestianations = ref.watch(getDestinationsProvider);
+    final userLength = ref.watch(getUserLength);
 
     return stateDestianations.when(
       error: (error, stackTrace) => Center(
         child: Text('Ha ocurrido un error inesperado: ${error.toString()}'),
       ),
-      loading: () => CircularProgressIndicator(),
+      loading: () => const CircularProgressIndicator(),
       data: (list) {
         return Container(
             decoration: ContainerDecorationBorder.decorationBox(),
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             height: 350,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,39 +45,12 @@ class ServiceMoreFilterContainer extends ConsumerWidget {
                           return DestinoBarRow(
                               stat: DestinationData(
                                   nombre: item.nombre, cantidad: item.cantidad),
-                              maxValue: 100);
+                              maxValue: userLength);
                         }))
               ],
             ));
       },
     );
-
-    /*   return Container(
-        decoration: ContainerDecorationBorder.decorationBox(),
-        padding: const EdgeInsets.all(16),
-        height: 350,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Destinos mas requeridos',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(
-              height: 16,
-            ),
-            Expanded(
-                child: ListView.builder(
-                    itemCount: 4,
-                    itemBuilder: (context, index) => const DestinoBarRow(
-                        stat:
-                            DestinationData(nombre: 'Venezuela', cantidad: 10),
-                        maxValue: 100)))
-          ],
-        )); */
   }
 }
 
@@ -146,7 +120,7 @@ class DestinoBarRow extends StatelessWidget {
           SizedBox(
             width: 40,
             child: Text(
-              '${stat.cantidad}',
+              '${porcentaje * 100} %',
               textAlign: TextAlign.right,
               style: const TextStyle(
                 fontSize: 14,

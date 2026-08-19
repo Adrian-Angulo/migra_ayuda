@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/audit/domain/entities/audit_entity.dart';
 import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
@@ -37,9 +38,21 @@ final getCategoryDataProvider = FutureProvider.autoDispose<List<CategoryData>>(
   },
 );
 
-
 final getDestinationsProvider =
     StreamProvider.autoDispose<List<DestinationData>>((ref) {
   return ref.watch(dashboardRespositoryProvider).getDetinations();
 });
 
+final getUserLength = Provider<int>(
+  (ref) {
+    final usersCountState = ref.watch(usersCountProvider);
+    return usersCountState.when(
+      data: (data) => data,
+      error: (error, stackTrace) {
+        debugPrint('ha ocurrido un error ${error.toString()}');
+        return 0;
+      },
+      loading: () => 0,
+    );
+  },
+);
