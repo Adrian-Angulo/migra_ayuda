@@ -19,19 +19,14 @@ import 'package:migra_ayuda/features/entities/presentation/screens/widgets/build
 class FormRegisterEntity extends ConsumerStatefulWidget {
   /// Si se proporciona, el formulario opera en modo edición prellenando los campos.
   final EntityEntity? entity;
-
   const FormRegisterEntity({super.key, this.entity});
-
   bool get isEditing => entity != null;
-
   @override
   ConsumerState<FormRegisterEntity> createState() => FormRegisterEntityState();
 }
 
 class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
-  /// Expuesto para que el modal padre pueda llamarlo desde el footer.
-  void submit() => _submit();
-
+  
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
@@ -40,23 +35,18 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
   late final TextEditingController _longitudController;
   late final TextEditingController _phoneController;
   late final TextEditingController _scheduleController;
-
   final _mapController = MapController();
   bool _isSearching = false;
   bool _addressNotFound = false;
-
   late List<String> selectedServices;
   XFile? _selectedImage;
   Uint8List? _selectedImageBytes;
   bool _imageChanged = false;
   LatLng? location;
-
   String seleted = services[1];
-
   // Estado para los errores de validación por campo
   String? _imageErrorMsg;
   String? _servicesErrorMsg;
-
   // NUEVO: Control para validación bajo demanda
   AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
 
@@ -64,7 +54,6 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
   void initState() {
     super.initState();
     final e = widget.entity;
-
     _nameController = TextEditingController(text: e?.name ?? '');
     _descriptionController = TextEditingController(text: e?.description ?? '');
     _addressController = TextEditingController(text: e?.address ?? '');
@@ -592,9 +581,3 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
     );
   }
 }
-
-// ¿QUÉ PASÓ?
-// El problema era que el onTap del InkWell debe ser una función async si quieres usar await adentro,
-// y también necesitas asegurar que se llame correctamente setState para _autovalidateMode y que
-// _searchAddress se ejecute realmente. Además, por temas de context y render el uso de Builder puede hacer
-// más robusto el widget, pero el core es convertir el onTap a async y llamar await _searchAddress().
