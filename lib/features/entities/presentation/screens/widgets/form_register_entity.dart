@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:migra_ayuda/core/constants/services_utils.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/providers/form_add_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/button_save_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/image_picker_widget.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/service_type_checklist_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/widgets/build_section_title.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/widgets/build_text_field.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/widgets/container_map_address.dart';
@@ -114,35 +114,11 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                           TextStyle(fontSize: 13, color: Colors.grey.shade600),
                     ),
                     const SizedBox(height: 16),
-                    /* ServiceTypeChecklistWidget(
-                      selectedServices: selectedServices,
-                      onServicesChanged: (s) {
-                        setState(() {
-                          selectedServices = s;
-                          _servicesErrorMsg = null;
-                        });
-                      },
-                    ), */
-                    // Validación de selección de servicios
-                    /*  if (_servicesErrorMsg != null)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 6.0),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.error_outline,
-                                size: 16, color: Colors.red),
-                            const SizedBox(width: 6),
-                            Flexible(
-                              child: Text(
-                                _servicesErrorMsg!,
-                                style: TextStyle(
-                                    fontSize: 12, color: Colors.red.shade700),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    const SizedBox(height: 32), */
+
+                     const ServiceTypeChecklistWidget(
+                    ), 
+                    
+                    const SizedBox(height: 32), 
 
                     // ── Ubicación y contacto ─────────────────────────────────
                     const BuildSectionTitle(
@@ -291,11 +267,16 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                     child: ButtonSaveWidget(
                       onPressed: () {
                         //TODO: VALIDAR IMAGEN NO SELECCIONADA
-                        if (_formKey.currentState!.validate()) {
-                          debugPrint('//////////////////////Todo valido');
-                        } else {
-                           debugPrint('//////////////////////Nada');
-                        }
+                        if (!_formKey.currentState!.validate()) return;
+                        _formKey.currentState!.save();
+
+                        
+                       /*  final imagenbytes = ref.read(imagenInBytesProvider);
+                        final selectServices = ref.read(selectServiceProvider);
+                        final entity = EntityEntity(id: '', name: _nameController.text.trim(), description: _descriptionController.text.trim(), services: services, address: address, localitation: localitation, phone: phone, imageUrl: imageUrl, schedule: schedule)
+
+                        ref.read(entitiesCrudProvider.notifier).registerEntity(entity: entity, imagenBytes: imagenBytes, fileName: fileName)
+ */
                       },
                     ),
                   ),
