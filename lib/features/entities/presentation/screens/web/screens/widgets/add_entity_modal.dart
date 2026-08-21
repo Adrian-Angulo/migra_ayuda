@@ -4,31 +4,31 @@ import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/widgets/form_register_entity.dart';
 
-class AddEntityModal extends ConsumerStatefulWidget {
-  const AddEntityModal({super.key});
+class ModalFormEntity extends ConsumerStatefulWidget {
+  final EntityEntity? entity;
+  const ModalFormEntity({super.key, this.entity});
 
   @override
-  ConsumerState<AddEntityModal> createState() => _AddEntityModalState();
+  ConsumerState<ModalFormEntity> createState() => _AddEntityModalState();
 }
 
-class _AddEntityModalState extends ConsumerState<AddEntityModal> {
-  
-
+class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
   @override
   Widget build(BuildContext context) {
-
-
     // Escucha el resultado del CRUD y cierra el modal al completar.
-    // ref.listen en build es la forma correcta en Riverpod.
-    ref.listen<AsyncValue<CrudOperation>>(entitiesCrudProvider,
-        (previous, next) {
+    ref.listen<AsyncValue<CrudOperation>>(entitiesCrudProvider, (previous, next) {
       if (previous?.isLoading == true && !next.isLoading) {
         if (next.hasValue && !next.hasError) {
           final op = next.value;
-          if (op == CrudOperation.register && mounted) Navigator.pop(context);
+          // Cierra el modal tanto para editar como para registrar
+          if ((op == CrudOperation.register || op == CrudOperation.update) && mounted) {
+            Navigator.pop(context);
+          }
         }
       }
     });
+
+    final isEdit = widget.entity != null;
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -40,7 +40,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
+              color: Colors.black.withAlpha(26), // .withValues is not a valid method for Color; used withAlpha(26) for ~10%
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -68,7 +68,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
+                      color: Colors.white.withAlpha(51), // 20% opacity
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
@@ -82,9 +82,9 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Nueva Entidad',
-                          style: TextStyle(
+                        Text(
+                          isEdit ? 'Editar Entidad' : 'Nueva Entidad',
+                          style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -92,10 +92,12 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                           'Complete los datos de la nueva entidad colaboradora',
+                          isEdit
+                            ? 'Modifique los datos de la entidad colaboradora'
+                            : 'Complete los datos de la nueva entidad colaboradora',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.white.withValues(alpha: 0.9),
+                            color: Colors.white.withOpacity(0.9),
                           ),
                         ),
                       ],
@@ -106,7 +108,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
                     icon: const Icon(Icons.close),
                     color: Colors.white,
                     style: IconButton.styleFrom(
-                      backgroundColor: Colors.white.withValues(alpha: 0.2),
+                      backgroundColor: Colors.white.withAlpha(51), // 20% opacity
                     ),
                   ),
                 ],
@@ -114,7 +116,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
             ),
 
             // ── Formulario ───────────────────────────────────────────
-            const FormRegisterEntity(),
+            FormEntity(entity: widget.entity),
           ],
         ),
       ),

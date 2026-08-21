@@ -9,8 +9,10 @@ import 'package:migra_ayuda/features/entities/presentation/screens/web/providers
 /// Puede manejar una imagen local seleccionada, bytes de imagen, o una URL de imagen remota existente.
 /// También permite notificar al widget padre cuando una nueva imagen ha sido elegida.
 class ImagePickerWidget extends ConsumerStatefulWidget {
+  final String? imagenUrl;
+  
   const ImagePickerWidget({
-    super.key,
+    super.key, this.imagenUrl,
   });
 
   @override
@@ -39,25 +41,24 @@ class _ImagePickerWidgetState extends ConsumerState<ImagePickerWidget> {
       imagenBytes = bytes;
     });
 
-/*     ref.read(imagenSelectProvider.notifier).state = resultado;
-    ref.read(imagenInBytesProvider.notifier).state = bytes; */
   }
 
   @override
   Widget build(BuildContext context) {
     // InkWell para detectar taps y mostrar un feedback visual táctil
-    
-    
 
     return FormField<XFile?>(
       initialValue: imagen,
       validator: (value) {
-        if (value == null) return 'Debes seleccionar una imagen';
+        // Si no hay imagen cargada desde galería, y tampoco url, mostrar error
+        if (value == null && (widget.imagenUrl == null || widget.imagenUrl!.isEmpty)) {
+          return 'Debes seleccionar una imagen';
+        }
         ref.read(imagenSelectProvider.notifier).state = imagen;
         ref.read(imagenInBytesProvider.notifier).state = imagenBytes;
         return null;
       },
-      builder: (field) =>  Center(
+      builder: (field) => Center(
         child: Column(
           children: [
             InkWell(
@@ -67,37 +68,61 @@ class _ImagePickerWidgetState extends ConsumerState<ImagePickerWidget> {
                 width: 400, // Ancho fijo de la caja de la imagen
                 height: 300, // Alto fijo de la caja de la imagen
                 decoration: BoxDecoration(
-                  border: Border.all(color: field.hasError ? Colors.red : Colors.grey.shade400, width: 2),
+                  border: Border.all(
+                      color: field.hasError ? Colors.red : Colors.grey.shade400,
+                      width: 2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-      
-                child: imagen != null
-                    ? ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.memory(
-                          imagenBytes!,
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: double.infinity,
-                        ),
-                      )
-                    : _buildPlaceholder(),
+                child: _buildImageToShow(),
               ),
             ),
             const SizedBox(height: 8),
-            Text( field.hasError ? field.errorText! :
-              'Tamaño recomendado: 400x400px',
+            Text(
+              field.hasError ? field.errorText! : 'Tamaño recomendado: 400x400px',
               style: TextStyle(
                 fontSize: 12,
-                color: field.hasError ? Colors.red :  Colors.grey.shade500,
+                color: field.hasError ? Colors.red : Colors.grey.shade500,
               ),
             ),
             // Error de imagen como validación de formulario
-           
           ],
         ),
       ),
     );
+  }
+
+  /// Muestra la imagen seleccionada localmente, o la de internet si imagenUrl existe, o el placeholder si ninguna
+  Widget _buildImageToShow() {
+    if (imagen != null && imagenBytes != null) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.memory(
+          imagenBytes!,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+        ),
+      );
+    } else if (widget.imagenUrl != null && widget.imagenUrl!.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.network(
+          widget.imagenUrl!,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+          errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          },
+        ),
+      );
+    } else {
+      return _buildPlaceholder();
+    }
   }
 
   /// Widget placeholder: se muestra cuando todavía no hay ninguna imagen seleccionada

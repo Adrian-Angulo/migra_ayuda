@@ -58,7 +58,7 @@ class ActionButtons extends ConsumerWidget {
           onPressed: () {
             showDialog(
               context: context,
-              builder: (context) => const AddEntityModal(),
+              builder: (context) => ModalFormEntity(entity:entity ,),
             );
           },
         ),

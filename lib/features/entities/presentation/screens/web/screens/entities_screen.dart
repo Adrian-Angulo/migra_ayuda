@@ -93,7 +93,7 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
                 onTap: () {
                   showDialog(
                     context: context,
-                    builder: (context) => const AddEntityModal(),
+                    builder: (context) => const ModalFormEntity(),
                   );
                 },
               ),

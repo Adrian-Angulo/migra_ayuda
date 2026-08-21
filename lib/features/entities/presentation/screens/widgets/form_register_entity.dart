@@ -1,8 +1,8 @@
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:migra_ayuda/core/constants/services_utils.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/providers/form_add_providers.dart';
@@ -13,39 +13,67 @@ import 'package:migra_ayuda/features/entities/presentation/screens/widgets/build
 import 'package:migra_ayuda/features/entities/presentation/screens/widgets/build_text_field.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/widgets/container_map_address.dart';
 
-class FormRegisterEntity extends ConsumerStatefulWidget {
+class FormEntity extends ConsumerStatefulWidget {
   /// Si se proporciona, el formulario opera en modo edición prellenando los campos.
-
-  const FormRegisterEntity({super.key});
+  final EntityEntity? entity;
+  const FormEntity({super.key, this.entity});
 
   @override
-  ConsumerState<FormRegisterEntity> createState() => FormRegisterEntityState();
+  ConsumerState<FormEntity> createState() => FormEntityState();
 }
 
-class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
+class FormEntityState extends ConsumerState<FormEntity> {
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<FormFieldState> _addressFieldKey = GlobalKey<FormFieldState>();
-  
+
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _descriptionController =
-      TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _latitudController = TextEditingController();
-  final TextEditingController _longitudController =
-      TextEditingController();
+  final TextEditingController _longitudController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _scheduleController =
-      TextEditingController();
+  final TextEditingController _scheduleController = TextEditingController();
 
   bool? errorCoridenates;
-
-  
-
-
 
   @override
   void initState() {
     super.initState();
+
+    // Si recibimos una entidad, precargamos los datos en los campos
+    if (widget.entity != null) {
+      final entity = widget.entity!;
+      _nameController.text = entity.name;
+      _descriptionController.text = entity.description;
+      _addressController.text = entity.address;
+      _phoneController.text = entity.phone;
+      _scheduleController.text = entity.schedule;
+      // Preselecciona servicios si tiene entidad
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(listSelectedServicesFormProviders.notifier).state = List<String>.from(entity.services ?? []);
+        ref.read(geocodingProvider.notifier).setCoordinate(LatLng(entity.localitation.latitude, entity.localitation.longitude));
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant FormEntity oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Si el entity cambia (por hot reload o update), recargamos los datos
+    if (widget.entity != null && oldWidget.entity != widget.entity) {
+      final entity = widget.entity!;
+      _nameController.text = entity.name;
+      _descriptionController.text = entity.description ?? '';
+      _addressController.text = entity.address;
+      _latitudController.text = entity.localitation.latitude.toString();
+      _longitudController.text = entity.localitation.longitude.toString();
+      _phoneController.text = entity.phone ?? '';
+      _scheduleController.text = entity.schedule ?? '';
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(listSelectedServicesFormProviders.notifier).state = entity.services;
+
+      });
+    }
   }
 
   @override
@@ -58,6 +86,45 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
     _phoneController.dispose();
     _scheduleController.dispose();
     super.dispose();
+  }
+
+  /// Método de submit que identifica si es registro o edición.
+  void _handleSubmit() {
+    if (!_formKey.currentState!.validate()) return;
+    _formKey.currentState!.save();
+
+    final imagenbytes = ref.read(imagenInBytesProvider);
+    final selectServices = ref.read(listSelectedServicesFormProviders);
+    final cordinates = ref.read(geocodingProvider).value;
+    final isEdit = widget.entity != null;
+
+    final entity = EntityEntity(
+      id: isEdit ? widget.entity!.id : '', // Usa el id si es edición, si no, vacío para registro nuevo
+      name: _nameController.text.trim(),
+      description: _descriptionController.text.trim(),
+      services: selectServices,
+      address: _addressController.text.trim(),
+      localitation: GeoPoint(cordinates!.latitude, cordinates.longitude),
+      phone: _phoneController.text.trim(),
+      imageUrl: isEdit ? widget.entity!.imageUrl : '', // Conserva url imagen existente en edición
+      schedule: _scheduleController.text.trim(),
+    );
+
+    if (isEdit) {
+      // Lógica de edición
+      ref.read(entitiesCrudProvider.notifier).updateEntity(
+        entity: entity,
+        imagenBytes: imagenbytes, // Puede ser null si no cambió la imagen
+        fileName: 'Abc${_nameController.text}',
+      );
+    } else {
+      // Lógica de registro
+      ref.read(entitiesCrudProvider.notifier).registerEntity(
+        entity: entity,
+        imagenBytes: imagenbytes!,
+        fileName: 'Abc${_nameController.text}',
+      );
+    }
   }
 
   @override
@@ -77,7 +144,7 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // ── Imagen ───────────────────────────────────────────────
-                    const ImagePickerWidget(),
+                    ImagePickerWidget(imagenUrl: widget.entity?.imageUrl ,),
 
                     const SizedBox(height: 32),
 
@@ -122,7 +189,7 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                     ),
                     const SizedBox(height: 16),
 
-                     const ServiceTypeChecklistWidget(), 
+                    const ServiceTypeChecklistWidget(), 
                     
                     const SizedBox(height: 32), 
 
@@ -172,7 +239,7 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                         },
                       ),
                       
-                      validator: (v) {
+                      validator: cordinates.hasValue ? null : (v) {
                         // Validar formato
                         final regExp = RegExp(
                           r'^(Calle|Carrera)\s+\d+\s*#\d+-\d+,\s*Pasto$',
@@ -266,18 +333,7 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                   Expanded(
                     flex: 2,
                     child: ButtonSaveWidget(
-                      onPressed: () {
-                        //TODO: VALIDAR IMAGEN NO SELECCIONADA
-                        if (!_formKey.currentState!.validate()) return;
-                        _formKey.currentState!.save();
-
-                        
-                        final imagenbytes = ref.read(imagenInBytesProvider);
-                        final selectServices = ref.read(listSelectedServicesFormProviders);
-                       // final entity = EntityEntity(id: '', name: _nameController.text.trim(), description: _descriptionController.text.trim(), services: selectServices, address: _addressController.text.trim(), localitation: localitation, phone: _phoneController.text.trim(), imageUrl: , schedule: _scheduleController.text.trim())
-                       // ref.read(entitiesCrudProvider.notifier).registerEntity(entity: entity, imagenBytes: imagenbytes!, fileName: 'Abc${_nameController.text}');
-
-                      },
+                      onPressed: _handleSubmit,
                     ),
                   ),
                 ],

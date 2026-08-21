@@ -11,7 +11,7 @@ final messageErrorImageProvider = StateProvider<String?>(
   (ref) => null,
 );
 
-final listSelectedServicesFormProviders = StateProvider<List<String>>((ref) => [],); 
+final listSelectedServicesFormProviders = StateProvider.autoDispose<List<String>>((ref) => [],); 
 
 class GeocodingNotifier extends AsyncNotifier<LatLng?> {
   @override
@@ -22,6 +22,10 @@ class GeocodingNotifier extends AsyncNotifier<LatLng?> {
     state = await AsyncValue.guard(
       () => Utils.getCoordinates(address),
     );
+  }
+
+  void setCoordinate(LatLng latLng) {
+    state = AsyncValue.data(latLng);
   }
 }
 
