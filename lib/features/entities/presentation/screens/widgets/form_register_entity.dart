@@ -1,76 +1,51 @@
-import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:migra_ayuda/core/constants/services_utils.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/widgets/button_widget.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/providers/imge_provider.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/button_save_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/image_picker_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/service_type_checklist_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/widgets/build_section_title.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/widgets/build_text_field.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/widgets/container_map_address.dart';
 
 class FormRegisterEntity extends ConsumerStatefulWidget {
   /// Si se proporciona, el formulario opera en modo edición prellenando los campos.
-  final EntityEntity? entity;
-  const FormRegisterEntity({super.key, this.entity});
-  bool get isEditing => entity != null;
+
+  const FormRegisterEntity({super.key});
+
   @override
   ConsumerState<FormRegisterEntity> createState() => FormRegisterEntityState();
 }
 
 class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
-  
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _nameController;
-  late final TextEditingController _descriptionController;
-  late final TextEditingController _addressController;
-  late final TextEditingController _latitudController;
-  late final TextEditingController _longitudController;
-  late final TextEditingController _phoneController;
-  late final TextEditingController _scheduleController;
-  final _mapController = MapController();
-  bool _isSearching = false;
+  late final TextEditingController _nameController = TextEditingController();
+  late final TextEditingController _descriptionController =
+      TextEditingController();
+  late final TextEditingController _addressController = TextEditingController();
+  late final TextEditingController _latitudController = TextEditingController();
+  late final TextEditingController _longitudController =
+      TextEditingController();
+  late final TextEditingController _phoneController = TextEditingController();
+  late final TextEditingController _scheduleController =
+      TextEditingController();
   bool _addressNotFound = false;
-  late List<String> selectedServices;
-  XFile? _selectedImage;
-  Uint8List? _selectedImageBytes;
-  bool _imageChanged = false;
+  late List<String>? selectedServices;
   LatLng? location;
   String seleted = services[1];
-  // Estado para los errores de validación por campo
-  String? _imageErrorMsg;
   String? _servicesErrorMsg;
-  // NUEVO: Control para validación bajo demanda
-  AutovalidateMode _autovalidateMode = AutovalidateMode.disabled;
 
   @override
   void initState() {
     super.initState();
-    final e = widget.entity;
-    _nameController = TextEditingController(text: e?.name ?? '');
-    _descriptionController = TextEditingController(text: e?.description ?? '');
-    _addressController = TextEditingController(text: e?.address ?? '');
-    _latitudController = TextEditingController(
-      text: e != null ? e.localitation.latitude.toString() : '',
-    );
-    _longitudController = TextEditingController(
-      text: e != null ? e.localitation.longitude.toString() : '',
-    );
-    _phoneController = TextEditingController(text: e?.phone ?? '');
-    _scheduleController = TextEditingController(text: e?.schedule ?? '');
-    selectedServices = e != null ? List.from(e.services) : [];
-
-    // Inicializar mapa si hay coordenadas
-    if (e != null) {
-      location = LatLng(e.localitation.latitude, e.localitation.longitude);
-    }
   }
 
   @override
@@ -85,239 +60,86 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
     super.dispose();
   }
 
-  Future<LatLng?> _getCoordinates(String address) async {
-    try {
-      final encoded = Uri.encodeComponent(address);
-      final url = Uri.parse(
-        'https://nominatim.openstreetmap.org/search'
-        '?q=$encoded&format=json&limit=1',
-      );
-      final response = await http.get(url, headers: {
-        'User-Agent': 'MigraAyuda Flutter App',
-        'Accept': 'application/json',
-      });
-      if (response.statusCode == 200) {
-        final List data = jsonDecode(response.body);
-        if (data.isNotEmpty) {
-          return LatLng(
-            double.parse(data[0]['lat']),
-            double.parse(data[0]['lon']),
-          );
-        }
-      }
-      return null;
-    } catch (e, s) {
-      debugPrint('ERROR: $e');
-      debugPrintStack(stackTrace: s);
-      rethrow;
-    }
-  }
-
-  Future<void> _searchAddress() async {
-    final address = _addressController.text.trim();
-
-    // Validación: Calle o Carrera, número, # número-número, y Pasto al final
-    final RegExp regExp = RegExp(
-      r'^(Calle|Carrera)\s+\d+\s*#\d+-\d+,\s*Pasto$',
-      caseSensitive: false,
-    );
-
-    if (address.isEmpty) return;
-
-    if (!regExp.hasMatch(address)) {
-      setState(() {
-        _addressNotFound = false;
-      });
-      // Quitar el SnackBar. El error aparecerá junto al campo dirección (por validator).
-      // Forzar una revalidación para mostrar el error en el campo
-      // Solo valida si está el autovalidateMode on
-      if (_autovalidateMode != AutovalidateMode.disabled) {
-        _formKey.currentState?.validate();
-      }
-      return;
-    }
-
-    setState(() {
-      _isSearching = true;
-      _addressNotFound = false;
-    });
-
-    try {
-      final coords = await _getCoordinates(address);
-      if (!mounted) return;
-      setState(() {
-        location = coords;
-        _isSearching = false;
-        _addressNotFound = coords == null;
-      });
-      if (coords != null) {
-        _latitudController.text = coords.latitude.toString();
-        _longitudController.text = coords.longitude.toString();
-      }
-    } finally {
-      // Esto asegura que el loading siempre se apaga aunque falle
-      if (mounted && _isSearching) {
-        setState(() {
-          _isSearching = false;
-        });
-      }
-    }
-
-    // Solo forzar revalidación si el form está en modo autovalidate
-    if (_autovalidateMode != AutovalidateMode.disabled) {
-      _formKey.currentState?.validate();
-    }
-  }
-
-  /// Valida y ejecuta la operación (crear o actualizar).
-  /// El cierre del modal es responsabilidad del padre via [ref.listen].
-  Future<void> _submit() async {
-    setState(() {
-      _imageErrorMsg = null;
-      _servicesErrorMsg = null;
-      _autovalidateMode = AutovalidateMode.onUserInteraction;
-    });
-
-    if (!_formKey.currentState!.validate()) return;
-
-    // Imagen obligatoria solo al crear, mostrar error debajo de la imagen
-    if (!widget.isEditing && _selectedImageBytes == null) {
-      setState(() {
-        _imageErrorMsg = 'Por favor seleccione una imagen';
-      });
-      return;
-    }
-
-    // Servicio obligatorio, mostrar error debajo de la selección de servicios
-    if (selectedServices.isEmpty) {
-      setState(() {
-        _servicesErrorMsg = 'Por favor seleccione al menos un servicio';
-      });
-      return;
-    }
-
-    if (_latitudController.text.isEmpty || _longitudController.text.isEmpty) {
-      // Esto está cubierto por el validator del campo dirección ya
-      return;
-    }
-
-    final notifier = ref.read(entitiesCrudProvider.notifier);
-
-    if (widget.isEditing) {
-      final updated = EntityEntity(
-        id: widget.entity!.id,
-        name: _nameController.text.trim(),
-        description: _descriptionController.text.trim(),
-        services: selectedServices,
-        address: _addressController.text.trim(),
-        localitation: GeoPoint(
-          double.parse(_latitudController.text),
-          double.parse(_longitudController.text),
-        ),
-        phone: _phoneController.text.trim(),
-        imageUrl: widget.entity!.imageUrl,
-        schedule: _scheduleController.text.trim(),
-      );
-      await notifier.updateEntity(
-        entity: updated,
-        imagenBytes: _selectedImageBytes,
-        fileName: _selectedImage?.name,
-      );
-    } else {
-      final newEntity = EntityEntity(
-        id: '',
-        name: _nameController.text.trim(),
-        description: _descriptionController.text.trim(),
-        services: selectedServices,
-        address: _addressController.text.trim(),
-        localitation: GeoPoint(
-          double.parse(_latitudController.text),
-          double.parse(_longitudController.text),
-        ),
-        phone: _phoneController.text.trim(),
-        imageUrl: '',
-        schedule: _scheduleController.text.trim(),
-      );
-      await notifier.registerEntity(
-        entity: newEntity,
-        imagenBytes: _selectedImageBytes!,
-        fileName: _selectedImage?.name ?? '',
-      );
-    }
-    // El modal escucha entitiesCrudProvider y se cierra solo.
-    // En mobile (sin modal) cerramos aquí.
-    if (!kIsWeb && mounted) {
-      final state = ref.read(entitiesCrudProvider);
-      if (state.hasValue && !state.hasError) Navigator.pop(context);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb) return _buildForm();
-    return Scaffold(
-      appBar: AppBar(title: const Text('Completar información')),
-      body: _buildForm(),
-    );
-  }
-
-  Expanded _buildForm() {
-    final crudState = ref.watch(entitiesCrudProvider);
-
     return Expanded(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          autovalidateMode: _autovalidateMode,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ── Imagen ───────────────────────────────────────────────
-              Center(
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ImagePickerWidget(
-                      imagen: _selectedImage,
-                      imagenBytes: _selectedImageBytes,
-                      existingImageUrl:
-                          _imageChanged ? null : widget.entity?.imageUrl,
-                      onImageSelected: (imagen, bytes) {
+                    // ── Imagen ───────────────────────────────────────────────
+                    const ImagePickerWidget(),
+
+                    const SizedBox(height: 32),
+
+                    // ── Información básica ───────────────────────────────────
+                    const BuildSectionTitle(
+                      title: 'Información Básica',
+                      icon: Icons.info_outline,
+                    ),
+                    const SizedBox(height: 20),
+                    BuildTextField(
+                      controller: _nameController,
+                      label: 'Nombre de la entidad',
+                      hint: 'Ej: Centro de Salud Norte',
+                      icon: Icons.business_outlined,
+                      maxLength: 20,
+                      validator: (v) => (v == null || v.isEmpty)
+                          ? 'El nombre es requerido'
+                          : null,
+                    ),
+                    const SizedBox(height: 20),
+                    BuildTextField(
+                      controller: _descriptionController,
+                      label: 'Descripción',
+                      hint:
+                          'Describa brevemente los servicios que ofrece esta entidad',
+                      icon: null,
+                      maxLines: 4,
+                      maxLength: 500,
+                    ),
+                    const SizedBox(height: 32),
+
+                    // ── Tipos de servicio ────────────────────────────────────
+                    const BuildSectionTitle(
+                      title: 'Tipos de Servicio',
+                      icon: Icons.category_outlined,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Seleccione los servicios que ofrece esta entidad (máximo 2)',
+                      style:
+                          TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                    ),
+                    const SizedBox(height: 16),
+                    /* ServiceTypeChecklistWidget(
+                      selectedServices: selectedServices,
+                      onServicesChanged: (s) {
                         setState(() {
-                          _selectedImage = imagen;
-                          _selectedImageBytes = bytes;
-                          _imageChanged = true;
-                          _imageErrorMsg = null;
+                          selectedServices = s;
+                          _servicesErrorMsg = null;
                         });
                       },
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      widget.isEditing
-                          ? (_imageChanged
-                              ? 'Nueva imagen seleccionada'
-                              : 'Imagen actual — selecciona una nueva para cambiar')
-                          : 'Tamaño recomendado: 400x400px',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: _imageChanged
-                            ? const Color(0xFF10B981)
-                            : Colors.grey.shade500,
-                      ),
-                    ),
-                    // Error de imagen como validación de formulario
-                    if (_imageErrorMsg != null)
+                    ), */
+                    // Validación de selección de servicios
+                    /*  if (_servicesErrorMsg != null)
                       Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
+                        padding: const EdgeInsets.only(top: 6.0),
                         child: Row(
-                          mainAxisSize: MainAxisSize.min,
                           children: [
                             const Icon(Icons.error_outline,
                                 size: 16, color: Colors.red),
                             const SizedBox(width: 6),
                             Flexible(
                               child: Text(
-                                _imageErrorMsg!,
+                                _servicesErrorMsg!,
                                 style: TextStyle(
                                     fontSize: 12, color: Colors.red.shade700),
                               ),
@@ -325,257 +147,169 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                           ],
                         ),
                       ),
+                    const SizedBox(height: 32), */
+
+                    // ── Ubicación y contacto ─────────────────────────────────
+                    const BuildSectionTitle(
+                      title: 'Ubicación y Contacto',
+                      icon: Icons.location_on_outlined,
+                    ),
+                    const SizedBox(height: 20),
+                    BuildTextField(
+                      controller: _addressController,
+                      label: 'Dirección',
+                      hint: 'Ej. Calle 123 #45-67, Pasto',
+                      icon: Icons.location_on_outlined,
+                      suffixIcon: Builder(
+                        builder: (context) {
+                          return Container(
+                            height: 50,
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primary,
+                              borderRadius: const BorderRadius.only(
+                                topRight: Radius.circular(11),
+                                bottomRight: Radius.circular(11),
+                              ),
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () async {},
+                                child: const SizedBox(
+                                  width: 48,
+                                  height: 48,
+                                  child: Center(
+                                    child:
+                                        Icon(Icons.search, color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      onChanged: (_) {
+                        if (location != null) {
+                          setState(() {
+                            location = null;
+                            _latitudController.clear();
+                            _longitudController.clear();
+                            _addressNotFound = false;
+                          });
+                        }
+                      },
+                      validator: (v) {
+                        // Validar formato
+                        final regExp = RegExp(
+                          r'^(Calle|Carrera)\s+\d+\s*#\d+-\d+,\s*Pasto$',
+                          caseSensitive: false,
+                        );
+
+                        if (v == null || v.isEmpty) {
+                          return 'La dirección es requerida';
+                        } else if (!regExp.hasMatch(v.trim())) {
+                          return 'La dirección debe tener el formato: Calle/Carrera 123 #45-67, Pasto';
+                        } else if (location == null) {
+                          return 'Haz clic en el botón de la lupa para buscar y confirmar la dirección';
+                        } else if (_addressNotFound) {
+                          return 'No se encontró la ubicación para esta dirección. Por favor, verifica que esté escrita correctamente e intenta de nuevo.';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 12),
+
+                    //Mostrar imagen del mapa cuando se realice la busqueda
+                    if (location != null)
+                      ContainerMapAddress(location: location),
+
+                    const SizedBox(height: 20),
+                    BuildTextField(
+                      controller: _phoneController,
+                      label: 'Teléfono de contacto',
+                      hint: '(57+) 3225321234',
+                      icon: Icons.phone_outlined,
+                      maxLength: 10,
+                      onlyNumbers: true,
+                      validator: (v) => (v == null || v.isEmpty)
+                          ? 'El teléfono es requerido'
+                          : null,
+                    ),
+                    const SizedBox(height: 32),
+
+                    // ── Horario ──────────────────────────────────────────────
+                    const BuildSectionTitle(
+                      title: 'Horario de Atención',
+                      icon: Icons.access_time,
+                    ),
+                    const SizedBox(height: 12),
+                    BuildTextField(
+                      controller: _scheduleController,
+                      label: '',
+                      hint: 'Ej. Lunes a viernes 8:30 AM a 12:00 PM',
+                      icon: null,
+                      maxLines: 4,
+                      validator: (v) => (v == null || v.isEmpty)
+                          ? 'El horario es requerido'
+                          : null,
+                    ),
+                    const SizedBox(height: 32),
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
-
-              // ── Información básica ───────────────────────────────────
-              const BuildSectionTitle(
-                title: 'Información Básica',
-                icon: Icons.info_outline,
-              ),
-              const SizedBox(height: 20),
-              BuildTextField(
-                controller: _nameController,
-                label: 'Nombre de la entidad',
-                hint: 'Ej: Centro de Salud Norte',
-                icon: Icons.business_outlined,
-                maxLength: 20,
-                validator: (v) =>
-                    (v == null || v.isEmpty) ? 'El nombre es requerido' : null,
-              ),
-              const SizedBox(height: 20),
-              BuildTextField(
-                controller: _descriptionController,
-                label: 'Descripción',
-                hint:
-                    'Describa brevemente los servicios que ofrece esta entidad',
-                icon: null,
-                maxLines: 4,
-                maxLength: 500,
-              ),
-              const SizedBox(height: 32),
-
-              // ── Tipos de servicio ────────────────────────────────────
-              const BuildSectionTitle(
-                title: 'Tipos de Servicio',
-                icon: Icons.category_outlined,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Seleccione los servicios que ofrece esta entidad (máximo 2)',
-                style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
-              ),
-              const SizedBox(height: 16),
-              ServiceTypeChecklistWidget(
-                selectedServices: selectedServices,
-                onServicesChanged: (s) {
-                  setState(() {
-                    selectedServices = s;
-                    _servicesErrorMsg = null;
-                  });
-                },
-              ),
-              // Validación de selección de servicios
-              if (_servicesErrorMsg != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 6.0),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.error_outline,
-                          size: 16, color: Colors.red),
-                      const SizedBox(width: 6),
-                      Flexible(
-                        child: Text(
-                          _servicesErrorMsg!,
-                          style: TextStyle(
-                              fontSize: 12, color: Colors.red.shade700),
-                        ),
-                      ),
-                    ],
-                  ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(28),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
                 ),
-              const SizedBox(height: 32),
-
-              // ── Ubicación y contacto ─────────────────────────────────
-              const BuildSectionTitle(
-                title: 'Ubicación y Contacto',
-                icon: Icons.location_on_outlined,
+                border: Border(top: BorderSide(color: Colors.grey.shade200)),
               ),
-              const SizedBox(height: 20),
-              BuildTextField(
-                controller: _addressController,
-                label: 'Dirección',
-                hint: 'Ej. Calle 123 #45-67, Pasto',
-                icon: Icons.location_on_outlined,
-                // SOLUCIÓN AL BOTÓN DE LA LUPA:
-                // El campo suffixIcon se debe asegurar de usar un Builder para que el context esté bien
-                // y evite problemas de re-render al cambiar _isSearching (opcional).
-                // Pero el error real era que _searchAddress no es async para el onTap de InkWell.
-                suffixIcon: Builder(
-                  builder: (context) {
-                    return Container(
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(11),
-                          bottomRight: Radius.circular(11),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        side: BorderSide(color: Colors.grey.shade300),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: _isSearching
-                              ? null
-                              : () async {
-                                  setState(() {
-                                    _autovalidateMode =
-                                        AutovalidateMode.onUserInteraction;
-                                  });
-                                  await _searchAddress();
-                                },
-                          child: SizedBox(
-                            width: 48,
-                            height: 48,
-                            child: Center(
-                              child: _isSearching
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : const Icon(Icons.search,
-                                      color: Colors.white),
-                            ),
-                          ),
+                      child: Text(
+                        'Cancelar',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey.shade700,
                         ),
                       ),
-                    );
-                  },
-                ),
-                onChanged: (_) {
-                  if (location != null) {
-                    setState(() {
-                      location = null;
-                      _latitudController.clear();
-                      _longitudController.clear();
-                      _addressNotFound = false;
-                    });
-                  }
-                },
-                validator: (v) {
-                  // Validar formato
-                  final regExp = RegExp(
-                    r'^(Calle|Carrera)\s+\d+\s*#\d+-\d+,\s*Pasto$',
-                    caseSensitive: false,
-                  );
-
-                  if (v == null || v.isEmpty) {
-                    return 'La dirección es requerida';
-                  } else if (!regExp.hasMatch(v.trim())) {
-                    return 'La dirección debe tener el formato: Calle/Carrera 123 #45-67, Pasto';
-                  } else if (location == null) {
-                    return 'Haz clic en el botón de la lupa para buscar y confirmar la dirección';
-                  } else if (_addressNotFound) {
-                    return 'No se encontró la ubicación para esta dirección. Por favor, verifica que esté escrita correctamente e intenta de nuevo.';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 12),
-              if (location != null)
-                SizedBox(
-                  height: 250,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: FlutterMap(
-                      mapController: _mapController,
-                      options: MapOptions(
-                        initialCenter: location!,
-                        initialZoom: 14,
-                        minZoom: 14,
-                        maxZoom: 14,
-                      ),
-                      children: [
-                        TileLayer(
-                          urlTemplate:
-                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          userAgentPackageName: 'com.migraayuda.app',
-                        ),
-                        MarkerLayer(
-                          markers: [
-                            Marker(
-                              point: location!,
-                              child: const Icon(
-                                Icons.location_pin,
-                                color: Colors.red,
-                                size: 40,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
                     ),
                   ),
-                ),
-              const SizedBox(height: 20),
-              BuildTextField(
-                controller: _phoneController,
-                label: 'Teléfono de contacto',
-                hint: '(57+) 3225321234',
-                icon: Icons.phone_outlined,
-                maxLength: 10,
-                onlyNumbers: true,
-                validator: (v) => (v == null || v.isEmpty)
-                    ? 'El teléfono es requerido'
-                    : null,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: ButtonSaveWidget(
+                      onPressed: () {
+                        //TODO: VALIDAR IMAGEN NO SELECCIONADA
+                        if (_formKey.currentState?.validate() ?? false) {
+                          // Form is valid, proceed with submission logic
+                          // Aquí puedes continuar con el guardado/envío del formulario
+                        } else {
+                          ref.read(messageErrorImageProvider.notifier).state =
+                              'Debe seleccionar una imagen para continuar';
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 32),
-
-              // ── Horario ──────────────────────────────────────────────
-              const BuildSectionTitle(
-                title: 'Horario de Atención',
-                icon: Icons.access_time,
-              ),
-              const SizedBox(height: 12),
-              BuildTextField(
-                controller: _scheduleController,
-                label: '',
-                hint: 'Ej. Lunes a viernes 8:30 AM a 12:00 PM',
-                icon: null,
-                maxLines: 4,
-                validator: (v) =>
-                    (v == null || v.isEmpty) ? 'El horario es requerido' : null,
-              ),
-              const SizedBox(height: 32),
-
-              // ── Botón solo en mobile ─────────────────────────────────
-              if (!kIsWeb)
-                ButtonWidget(
-                  formKey: _formKey,
-                  text: crudState.isLoading
-                      ? (widget.isEditing
-                          ? 'Actualizando...'
-                          : 'Registrando...')
-                      : (widget.isEditing ? 'Guardar Cambios' : 'Registrarse'),
-                  onPressed: crudState.isLoading
-                      ? null
-                      : () {
-                          setState(() {
-                            _autovalidateMode =
-                                AutovalidateMode.onUserInteraction;
-                          });
-                          _submit();
-                        },
-                ),
-              const SizedBox(height: 16),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

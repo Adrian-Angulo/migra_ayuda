@@ -1,95 +1,131 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
 
-class ImagePickerWidget extends StatefulWidget {
-  final XFile? imagen;
-  final Uint8List? imagenBytes;
-  final String? existingImageUrl;
-  final Function(XFile imagen, Uint8List bytes)? onImageSelected;
+import 'package:migra_ayuda/features/entities/presentation/screens/web/providers/imge_provider.dart';
 
+/// Widget personalizado para seleccionar e indicar imágenes mediante la galería del dispositivo.
+/// Puede manejar una imagen local seleccionada, bytes de imagen, o una URL de imagen remota existente.
+/// También permite notificar al widget padre cuando una nueva imagen ha sido elegida.
+class ImagePickerWidget extends ConsumerStatefulWidget {
   const ImagePickerWidget({
     super.key,
-    this.imagen,
-    this.imagenBytes,
-    this.existingImageUrl,
-    this.onImageSelected,
   });
 
   @override
-  State<ImagePickerWidget> createState() => _ImagePickerWidgetState();
+  ConsumerState<ImagePickerWidget> createState() => _ImagePickerWidgetState();
 }
 
-class _ImagePickerWidgetState extends State<ImagePickerWidget> {
+class _ImagePickerWidgetState extends ConsumerState<ImagePickerWidget> {
   final picker = ImagePicker();
-  XFile? _imagen;
-  Uint8List? _imagenBytes;
 
   @override
   void initState() {
     super.initState();
-    _imagen = widget.imagen;
-    _imagenBytes = widget.imagenBytes;
   }
 
+  /// Abre la galería del usuario y permite seleccionar una imagen.
+  /// Si se selecciona, actualiza el estado y notifica al padre si es necesario.
   Future<void> _elegirImagen() async {
+    //elegir imagen de la galeria
     final resultado = await picker.pickImage(source: ImageSource.gallery);
-    if (resultado == null) return;
-
+    if (resultado == null) return; // si el usuario cancela la operacion
     final bytes = await resultado.readAsBytes();
-
-    setState(() {
-      _imagen = resultado;
-      _imagenBytes = bytes;
-    });
-
-    // Notificar al padre
-    if (widget.onImageSelected != null) {
-      widget.onImageSelected!(resultado, bytes);
-    }
+    ref.read(imagenSelectProvider.notifier).state = resultado;
+    ref.read(imagenInBytesProvider.notifier).state = bytes;
   }
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    // InkWell para detectar taps y mostrar un feedback visual táctil
+    final messageError = ref.watch(messageErrorImageProvider);
+    Uint8List? imagenBytes = ref.watch(imagenInBytesProvider);
+    return Center(
+      child: Column(
+        children: [
+          InkWell(
+            onTap: _elegirImagen,
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              width: 400, // Ancho fijo de la caja de la imagen
+              height: 300, // Alto fijo de la caja de la imagen
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.shade400, width: 2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+
+              child: imagenBytes != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.memory(
+                        imagenBytes,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
+                      ),
+                    )
+                  : _buildPlaceholder(),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Tamaño recomendado: 400x400px',
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade500,
+            ),
+          ),
+          // Error de imagen como validación de formulario
+          if (messageError != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.error_outline, size: 16, color: Colors.red),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(
+                      messageError,
+                      style:
+                          TextStyle(fontSize: 12, color: Colors.red.shade700),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+
+    /*  InkWell(
       onTap: _elegirImagen,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        width: 400,
-        height: 300,
+        width: 400,     // Ancho fijo de la caja de la imagen
+        height: 300,    // Alto fijo de la caja de la imagen
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade400, width: 2),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: _imagenBytes != null
+
+        child: imagenBytes != null
             ? ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.memory(
-                  _imagenBytes!,
+                  imagenBytes,
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: double.infinity,
                 ),
               )
-            : widget.existingImageUrl != null &&
-                    widget.existingImageUrl!.isNotEmpty
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.network(
-                      widget.existingImageUrl!,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                      errorBuilder: (context, error, stackTrace) {
-                        return _buildPlaceholder();
-                      },
-                    ),
-                  )
-                : _buildPlaceholder(),
+            :  _buildPlaceholder(),
       ),
-    );
+    ); */
   }
 
+  /// Widget placeholder: se muestra cuando todavía no hay ninguna imagen seleccionada
   Widget _buildPlaceholder() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

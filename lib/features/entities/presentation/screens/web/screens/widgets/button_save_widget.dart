@@ -10,13 +10,11 @@ class ButtonSaveWidget extends ConsumerWidget {
   const ButtonSaveWidget({
     super.key,
     required this.onPressed,
-    required this.isEditing,
   });
 
   final VoidCallback onPressed;
 
-  /// Si es true muestra "Guardar Cambios", si no "Guardar Entidad".
-  final bool isEditing;
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -36,13 +34,13 @@ class ButtonSaveWidget extends ConsumerWidget {
           : const Icon(Icons.save, size: 20),
       label: Text(
         crudState.isLoading
-            ? (isEditing ? 'Actualizando...' : 'Guardando...')
-            : (isEditing ? 'Guardar Cambios' : 'Guardar Entidad'),
+            ? 'Guardando...'
+            : 'Guardar Entidad',
         style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
       ),
       style: ElevatedButton.styleFrom(
         backgroundColor:
-            isEditing ? const Color(0xFF2D5F4F) : const Color(0xFF10B981),
+             const Color(0xFF2D5F4F),
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
