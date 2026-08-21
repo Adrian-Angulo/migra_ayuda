@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:migra_ayuda/core/constants/services_utils.dart';
+import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/providers/form_add_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/button_save_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/image_picker_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/service_type_checklist_widget.dart';
@@ -21,22 +24,24 @@ class FormRegisterEntity extends ConsumerStatefulWidget {
 
 class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
   final _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormFieldState> _addressFieldKey = GlobalKey<FormFieldState>();
   
-  late final TextEditingController _nameController = TextEditingController();
-  late final TextEditingController _descriptionController =
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _descriptionController =
       TextEditingController();
-  late final TextEditingController _addressController = TextEditingController();
-  late final TextEditingController _latitudController = TextEditingController();
-  late final TextEditingController _longitudController =
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _latitudController = TextEditingController();
+  final TextEditingController _longitudController =
       TextEditingController();
-  late final TextEditingController _phoneController = TextEditingController();
-  late final TextEditingController _scheduleController =
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _scheduleController =
       TextEditingController();
-  bool _addressNotFound = false;
-  late List<String>? selectedServices;
-  LatLng? location;
-  String seleted = services[1];
-  String? _servicesErrorMsg;
+
+  bool? errorCoridenates;
+
+  
+
+
 
   @override
   void initState() {
@@ -57,6 +62,8 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
 
   @override
   Widget build(BuildContext context) {
+    final cordinates = ref.watch(geocodingProvider);
+
     return Expanded(
       child: Form(
         key: _formKey,
@@ -115,8 +122,7 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                     ),
                     const SizedBox(height: 16),
 
-                     const ServiceTypeChecklistWidget(
-                    ), 
+                     const ServiceTypeChecklistWidget(), 
                     
                     const SizedBox(height: 32), 
 
@@ -127,6 +133,7 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                     ),
                     const SizedBox(height: 20),
                     BuildTextField(
+                      inputKey: _addressFieldKey,
                       controller: _addressController,
                       label: 'Dirección',
                       hint: 'Ej. Calle 123 #45-67, Pasto',
@@ -145,13 +152,18 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                             child: Material(
                               color: Colors.transparent,
                               child: InkWell(
-                                onTap: () async {},
-                                child: const SizedBox(
+                                onTap: ()  {
+                                  //TODO: IMPLEMENTAR FUNCION DE BUSQUEDA
+                                  ref.read(geocodingProvider.notifier).search(_addressController.text.trim());
+                                  _addressFieldKey.currentState!.validate();
+                                  
+                                },
+                                child:  SizedBox(
                                   width: 48,
                                   height: 48,
-                                  child: Center(
-                                    child:
-                                        Icon(Icons.search, color: Colors.white),
+                                  child:  Center(
+                                    child: cordinates.isLoading ? const CircularProgressIndicator()  :
+                                        const Icon(Icons.search, color: Colors.white),
                                   ),
                                 ),
                               ),
@@ -159,40 +171,29 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                           );
                         },
                       ),
-                      onChanged: (_) {
-                        if (location != null) {
-                          setState(() {
-                            location = null;
-                            _latitudController.clear();
-                            _longitudController.clear();
-                            _addressNotFound = false;
-                          });
-                        }
-                      },
+                      
                       validator: (v) {
                         // Validar formato
                         final regExp = RegExp(
                           r'^(Calle|Carrera)\s+\d+\s*#\d+-\d+,\s*Pasto$',
                           caseSensitive: false,
                         );
-
-                        if (v == null || v.isEmpty) {
+                        if (v == null || v.isEmpty ) {
                           return 'La dirección es requerida';
                         } else if (!regExp.hasMatch(v.trim())) {
                           return 'La dirección debe tener el formato: Calle/Carrera 123 #45-67, Pasto';
-                        } else if (location == null) {
-                          return 'Haz clic en el botón de la lupa para buscar y confirmar la dirección';
-                        } else if (_addressNotFound) {
+                        } else if (cordinates.value == null) {
                           return 'No se encontró la ubicación para esta dirección. Por favor, verifica que esté escrita correctamente e intenta de nuevo.';
+                        } else if(cordinates.hasError){
+                          return 'Ha ocurrido un error inesperado';
                         }
                         return null;
                       },
                     ),
                     const SizedBox(height: 12),
-
-                    //Mostrar imagen del mapa cuando se realice la busqueda
-                    if (location != null)
-                      ContainerMapAddress(location: location),
+                    
+                    if (cordinates.value != null)
+                      ContainerMapAddress(location: cordinates.value),
 
                     const SizedBox(height: 20),
                     BuildTextField(
@@ -271,12 +272,11 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                         _formKey.currentState!.save();
 
                         
-                       /*  final imagenbytes = ref.read(imagenInBytesProvider);
-                        final selectServices = ref.read(selectServiceProvider);
-                        final entity = EntityEntity(id: '', name: _nameController.text.trim(), description: _descriptionController.text.trim(), services: services, address: address, localitation: localitation, phone: phone, imageUrl: imageUrl, schedule: schedule)
+                        final imagenbytes = ref.read(imagenInBytesProvider);
+                        final selectServices = ref.read(listSelectedServicesFormProviders);
+                       // final entity = EntityEntity(id: '', name: _nameController.text.trim(), description: _descriptionController.text.trim(), services: selectServices, address: _addressController.text.trim(), localitation: localitation, phone: _phoneController.text.trim(), imageUrl: , schedule: _scheduleController.text.trim())
+                       // ref.read(entitiesCrudProvider.notifier).registerEntity(entity: entity, imagenBytes: imagenbytes!, fileName: 'Abc${_nameController.text}');
 
-                        ref.read(entitiesCrudProvider.notifier).registerEntity(entity: entity, imagenBytes: imagenBytes, fileName: fileName)
- */
                       },
                     ),
                   ),

@@ -14,8 +14,9 @@ class BuildTextField extends StatelessWidget {
     this.suffixIcon,
     this.maxLength,
     this.onlyNumbers = false,
+     this.inputKey,
   });
-
+  final GlobalKey? inputKey;
   final Widget? suffixIcon;
   final TextEditingController controller;
   final String label;
@@ -43,6 +44,7 @@ class BuildTextField extends StatelessWidget {
           ),
         if (label.isNotEmpty) const SizedBox(height: 8),
         TextFormField(
+          key: inputKey,
           controller: controller,
           maxLines: maxLines ?? 1,
           onChanged: onChanged,

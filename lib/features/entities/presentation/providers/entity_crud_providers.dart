@@ -20,6 +20,7 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
     required String fileName,
   }) async {
     state = const AsyncValue.loading();
+    
     state = await AsyncValue.guard(
       () async {
         final repository = ref.read(entityRepositoryProvider);

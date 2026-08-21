@@ -104,3 +104,4 @@ final getAllEntitiesProvider =
 final degradableScrollControllerProvider = StateProvider<DraggableScrollableController>(
   (ref) => DraggableScrollableController(),
 );
+
