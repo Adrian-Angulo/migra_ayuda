@@ -12,7 +12,7 @@ class AddEntityModal extends ConsumerStatefulWidget {
 }
 
 class _AddEntityModalState extends ConsumerState<AddEntityModal> {
-  final _formKey = GlobalKey<FormRegisterEntityState>();
+  
 
   @override
   Widget build(BuildContext context) {
@@ -114,11 +114,7 @@ class _AddEntityModalState extends ConsumerState<AddEntityModal> {
             ),
 
             // ── Formulario ───────────────────────────────────────────
-            FormRegisterEntity(
-              key: _formKey,
-            ),
-
-            
+            const FormRegisterEntity(),
           ],
         ),
       ),

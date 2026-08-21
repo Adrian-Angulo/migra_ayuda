@@ -1,17 +1,11 @@
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:migra_ayuda/core/constants/services_utils.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/web/widgets/button_widget.dart';
-import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/providers/imge_provider.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/providers/form_add_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/button_save_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/image_picker_widget.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/service_type_checklist_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/widgets/build_section_title.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/widgets/build_text_field.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/widgets/container_map_address.dart';
@@ -27,6 +21,7 @@ class FormRegisterEntity extends ConsumerStatefulWidget {
 
 class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
   final _formKey = GlobalKey<FormState>();
+  
   late final TextEditingController _nameController = TextEditingController();
   late final TextEditingController _descriptionController =
       TextEditingController();
@@ -296,12 +291,10 @@ class FormRegisterEntityState extends ConsumerState<FormRegisterEntity> {
                     child: ButtonSaveWidget(
                       onPressed: () {
                         //TODO: VALIDAR IMAGEN NO SELECCIONADA
-                        if (_formKey.currentState?.validate() ?? false) {
-                          // Form is valid, proceed with submission logic
-                          // Aquí puedes continuar con el guardado/envío del formulario
+                        if (_formKey.currentState!.validate()) {
+                          debugPrint('//////////////////////Todo valido');
                         } else {
-                          ref.read(messageErrorImageProvider.notifier).state =
-                              'Debe seleccionar una imagen para continuar';
+                           debugPrint('//////////////////////Nada');
                         }
                       },
                     ),
