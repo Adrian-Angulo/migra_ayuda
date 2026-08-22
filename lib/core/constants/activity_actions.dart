@@ -9,4 +9,17 @@ class ActivityActions {
   static String deleteComment() => "Eliminar comentario";
   static String filter() => "Filtrar";
   static String changeLanguaje() => "Cambiar Idioma";
+  static List<String> types() => [
+    login(),
+    logout(),
+    entityViewed(),
+    routeRequested(),
+    navigationMaps(),
+    addComment(),
+    updateComment(),
+    deleteComment(),
+    filter(),
+    changeLanguaje(),
+  ];
+
 }

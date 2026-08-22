@@ -1,6 +1,8 @@
-import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:migra_ayuda/core/constants/activity_actions.dart';
+import 'package:migra_ayuda/core/utils/utils.dart';
+import 'package:migra_ayuda/features/dashboard/domain/entities/activity_chart_result.dart';
 import 'package:migra_ayuda/features/dashboard/domain/entities/category_data.dart';
 import 'package:migra_ayuda/features/dashboard/domain/entities/destination_data.dart';
 import 'package:migra_ayuda/features/dashboard/domain/repositories/dashboard_repository.dart';
@@ -85,4 +87,56 @@ class DashboardRepositoryImple implements DashboardRepository {
       return destinations;
     });
   }
+
+
+
+
+
+
+  @override
+  Future<ActivityChartResult> getActivityData({int days = 31}) async {
+    final desde = DateTime.now().subtract(Duration(days: days));
+
+    // createdAt se guarda como ISO-8601 (String), no como Timestamp.
+    final snapshot = await _firestore
+        .collection('user_activities')
+        .where(
+          'createdAt',
+          isGreaterThanOrEqualTo: desde.toUtc().toIso8601String(),
+        )
+        .orderBy('createdAt')
+        .get();
+
+    final Map<String, Map<String, int>> agrupado = {};
+
+    for (final doc in snapshot.docs) {
+      final data = doc.data();
+      final createdAt = Utils.parseCreatedAt(data['createdAt']);
+      if (createdAt == null || createdAt.isBefore(desde)) continue;
+
+      final diaLabel = Utils.formatDia(createdAt);
+      final tipo = data['accion'] as String? ?? '';
+
+      agrupado.putIfAbsent(
+        diaLabel,
+        () => {for (final t in ActivityActions.types()) t: 0},
+      );
+      if (agrupado[diaLabel]!.containsKey(tipo)) {
+        agrupado[diaLabel]![tipo] = agrupado[diaLabel]![tipo]! + 1;
+      }
+    }
+
+    final dias = agrupado.keys.toList();
+
+    return ActivityChartResult(
+      loginData: Utils.serie(dias, agrupado, ActivityActions.login()),
+      entityData: Utils.serie(dias, agrupado, ActivityActions.entityViewed()),
+      routeData: Utils.serie(dias, agrupado, ActivityActions.routeRequested()),
+      filterData: Utils.serie(dias, agrupado, ActivityActions.filter()),
+      googleMapData:
+          Utils.serie(dias, agrupado, ActivityActions.navigationMaps()),
+    );
+  }
+
+
 }

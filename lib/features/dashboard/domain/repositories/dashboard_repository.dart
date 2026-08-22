@@ -1,3 +1,4 @@
+import 'package:migra_ayuda/features/dashboard/domain/entities/activity_chart_result.dart';
 import 'package:migra_ayuda/features/dashboard/domain/entities/category_data.dart';
 import 'package:migra_ayuda/features/dashboard/domain/entities/destination_data.dart';
 
@@ -8,4 +9,5 @@ abstract class DashboardRepository {
   Future<int> getServicesCount();
   Future<List<CategoryData>> getCategoryData();
   Stream<List<DestinationData>> getDetinations();
+   Future<ActivityChartResult> getActivityData({int days});
 }

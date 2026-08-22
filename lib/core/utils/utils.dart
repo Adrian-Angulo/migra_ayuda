@@ -1,10 +1,13 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:migra_ayuda/features/dashboard/domain/entities/chart_data.dart';
 
 class Utils {
+
   static Future<LatLng?> getCoordinates(String address) async {
     try {
       final encoded = Uri.encodeComponent(address);
@@ -31,5 +34,40 @@ class Utils {
       debugPrintStack(stackTrace: s);
       rethrow;
     }
+  }
+
+  static  List<ChartData> serie(
+    List<String> dias,
+    Map<String, Map<String, int>> agrupado,
+    String tipo,
+  ) {
+    return dias
+        .map(
+          (dia) => ChartData(
+            dia,
+            (agrupado[dia]?[tipo] ?? 0).toDouble(),
+          ),
+        )
+        .toList();
+  }
+
+ static String formatDia(DateTime dt) {
+    const meses = [
+      'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+      'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic',
+    ];
+    return '${dt.day} ${meses[dt.month - 1]}';
+  }
+
+  static DateTime? parseCreatedAt(dynamic value) {
+    if (value is Timestamp) return value.toDate();
+    if (value is String) {
+      try {
+        return DateTime.parse(value).toLocal();
+      } catch (_) {
+        return null;
+      }
+    }
+    return null;
   }
 }
