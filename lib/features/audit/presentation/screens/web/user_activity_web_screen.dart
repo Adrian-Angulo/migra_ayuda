@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/dataTable/widgets/build_header_cell.dart';
 import 'package:migra_ayuda/core/dataTable/widgets/build_table.dart';
+import 'package:migra_ayuda/core/services/export/export_services.dart';
 import 'package:migra_ayuda/core/widgets/web/text_fiel_search_web.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/export_button_widget.dart';
 import 'package:migra_ayuda/features/audit/domain/entities/audit_datatable.dart';
@@ -53,7 +54,10 @@ class UserActivityWebScreen extends ConsumerWidget {
                   },
                   hintText: 'Buscar por usuario, correo o acción...',
                 ),
-                ExportButtonWidget(label: 'Exportar', onPressed: () {}),
+                ExportButtonWidget(label: 'Exportar', onPressed: () {
+                 
+                  ExportService.exportActivities(activitiesState.value!);
+                }),
               ],
             ),
           ),

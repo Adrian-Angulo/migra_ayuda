@@ -70,4 +70,8 @@ class Utils {
     }
     return null;
   }
+  static String formatMetadata(Map<String, dynamic>? metadata) {
+    if (metadata == null || metadata.isEmpty) return '';
+    return metadata.entries.map((e) => '${e.value}').join(', ');
+  }
 }

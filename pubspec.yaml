@@ -38,7 +38,6 @@ dependencies:
   timeago: ^3.7.1
   image_picker: ^1.2.1
   fl_chart: ^1.2.0
-  flutter_native_splash: ^2.4.7
   data_table_2: ^2.7.2
   fpdart: ^1.2.0
   mapbox_maps_flutter: ^2.25.0
@@ -47,6 +46,8 @@ dependencies:
   uuid: ^4.5.3
   flutter_launcher_icons: ^0.14.4
   syncfusion_flutter_charts: ^34.2.3
+  web: ^1.1.1
+  csv: ^8.0.0
 
 
 dev_dependencies:

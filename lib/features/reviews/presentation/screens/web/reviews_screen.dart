@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/dataTable/widgets/build_header_cell.dart';
 import 'package:migra_ayuda/core/dataTable/widgets/build_table.dart';
+import 'package:migra_ayuda/core/services/export/export_services.dart';
 import 'package:migra_ayuda/core/widgets/web/text_fiel_search_web.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/export_button_widget.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_datatable.dart';
@@ -54,7 +55,9 @@ class ReviewsScreen extends ConsumerWidget {
                   },
                   hintText: 'Buscar por usuario, entidad o país...',
                 ),
-                ExportButtonWidget(label: 'Exportar', onPressed: () {}),
+                ExportButtonWidget(label: 'Exportar', onPressed: () {
+                  ExportService.exportReviews(reviewsState.value!);
+                }),
               ],
             ),
           ),

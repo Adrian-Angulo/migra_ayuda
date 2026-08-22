@@ -5,6 +5,7 @@ import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/constants/services_utils.dart';
 import 'package:migra_ayuda/core/dataTable/widgets/build_header_cell.dart';
 import 'package:migra_ayuda/core/dataTable/widgets/build_table.dart';
+import 'package:migra_ayuda/core/services/export/export_services.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_web_widget.dart';
 import 'package:migra_ayuda/core/widgets/web/text_fiel_search_web.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_datatable.dart';
@@ -130,7 +131,9 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
                       ),
                     ),
                     const SizedBox(width: UIConstants.spacingM),
-                    ExportButtonWidget(label: 'Exportar', onPressed: () {}),
+                    ExportButtonWidget(label: 'Exportar', onPressed: () {
+                       ExportService.exportEntities(entitiesState.value ?? []);
+                    }),
                   ],
                 ),
               ],

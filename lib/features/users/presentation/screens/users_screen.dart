@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/dataTable/widgets/build_header_cell.dart';
 import 'package:migra_ayuda/core/dataTable/widgets/build_table.dart';
+import 'package:migra_ayuda/core/services/export/export_services.dart';
 import 'package:migra_ayuda/core/widgets/web/text_fiel_search_web.dart';
 import 'package:migra_ayuda/features/users/domain/entities/users_datatable.dart';
 import 'package:migra_ayuda/features/users/presentation/providers/datatable_providers.dart';
@@ -98,7 +99,9 @@ class UsersScreen extends ConsumerWidget {
                     ),
                     const SizedBox(width: UIConstants.spacingM),
                     // Botón para exportar usuarios
-                    ExportButtonWidget(label: 'Exportar', onPressed: () {})
+                    ExportButtonWidget(label: 'Exportar', onPressed: () {
+                       ExportService.exportUsers(usersState.value ?? []);
+                    })
                   ],
                 ),
               ],
