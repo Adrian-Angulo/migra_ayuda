@@ -251,7 +251,7 @@ class _LoginWebState extends ConsumerState<LoginWeb> {
                                     children: [
                                       TextButton(
                                         onPressed: () {
-                                          context.push('/reset-password');
+                                          context.go('/reset-password');
                                         },
                                         child: const Text(
                                           "¿Olvidaste tu contraseña?",
