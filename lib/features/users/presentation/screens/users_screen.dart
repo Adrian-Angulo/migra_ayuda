@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,149 +23,135 @@ class UsersScreen extends ConsumerWidget {
     // Obtenemos el estado filtrado de los usuarios usando Riverpod
     final usersState = ref.watch(usersFilterProvider);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-          horizontal: UIConstants.spacingL, vertical: UIConstants.spacingL),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Encabezado con el título y el botón para registrar administrador
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Usuarios",
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  // Subtítulo descriptivo
-                  Text("Gestiona los usuarios registradas en el sistema")
-                ],
-              ),
-              // Botón para abrir el diálogo de registro de administrador
-              AddButtonWidget(
-                text: "Registrar Administrador",
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return const RegisterAdminDialog();
-                    },
-                  );
-                },
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: UIConstants.spacingM,
-          ),
-          // Barra de búsqueda y acciones (filtrar/exportar)
-          SizedBox(
-            height: 40,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return FadeIn(
+      delay: const Duration(seconds: 1),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+            horizontal: UIConstants.spacingL, vertical: UIConstants.spacingL),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Encabezado con el título y el botón para registrar administrador
+            const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Campo de búsqueda básica
-                TextFielSearchWeb(
-                  onChanged: (String value) {
-                    // Cambiamos el filtro de búsqueda con el texto ingresado
-                    ref.read(queryUserProvider.notifier).state =
-                        value.toLowerCase().trim();
-                  },
-                  hintText: 'Buscar usuario...',
+                Text(
+                  "Usuarios",
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                Row(
-                  children: [
-                    // Botón desplegable para filtro por rol
-                    SizedBox(
-                      width: 200,
-                      child: FilterButton(
-                        label: 'Filtrar',
-                        value: ref.watch(userRoleFilterProvider),
-                        options: const [
-                          'Todos',
-                          'Migrante',
-                          'Admin',
-                        ],
-                        onChanged: (String? value) {
-                          ref.read(userRoleFilterProvider.notifier).state =
-                              value ?? 'Todos';
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: UIConstants.spacingM),
-                    // Botón para exportar usuarios
-                    ExportButtonWidget(label: 'Exportar', onPressed: () {
-                       ExportService.exportUsers(usersState.value ?? []);
-                    })
-                  ],
-                ),
+                // Subtítulo descriptivo
+                Text("Gestiona los usuarios registradas en el sistema")
               ],
             ),
-          ),
-          const SizedBox(
-            height: UIConstants.spacingM,
-          ),
-          // Sección donde se muestran los datos de la tabla según el estado
-          usersState.when(
-            data: (users) {
-              // Creamos las filas de la tabla con los usuarios
-              final rows = UsersDatatable(listUsers: users);
-              
-              // Tabla personalizada mostrando los usuarios y sus propiedades
-              return BuildTable(
-                rows: rows,
-                columns: [
-                  DataColumn2(
-                    label: DataTableUtils.buildHeaderCell('ID'),
-                    fixedWidth: 30,
+            const SizedBox(
+              height: UIConstants.spacingM,
+            ),
+            // Barra de búsqueda y acciones (filtrar/exportar)
+            SizedBox(
+              height: 40,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Campo de búsqueda básica
+                  TextFielSearchWeb(
+                    onChanged: (String value) {
+                      // Cambiamos el filtro de búsqueda con el texto ingresado
+                      ref.read(queryUserProvider.notifier).state =
+                          value.toLowerCase().trim();
+                    },
+                    hintText: 'Buscar usuario...',
                   ),
-                  DataColumn2(
-                    label: DataTableUtils.buildHeaderCell('Nombre'),
-                    size: ColumnSize.M,
-                  ),
-                  DataColumn2(
-                    label: DataTableUtils.buildHeaderCell('Correo'),
-                    size: ColumnSize.L,
-                  ),
-                  DataColumn2(
-                    label: DataTableUtils.buildHeaderCell('Rol'),
-                    size: ColumnSize.S,
-                  ),
-                  DataColumn2(
-                    label: DataTableUtils.buildHeaderCell('Edad'),
-                    size: ColumnSize.S,
-                  ),
-                  DataColumn2(
-                    label: DataTableUtils.buildHeaderCell('País de origen'),
-                    size: ColumnSize.M,
-                  ),
-                  DataColumn2(
-                    label: DataTableUtils.buildHeaderCell('País de destino'),
-                    size: ColumnSize.M,
-                  ),
-                  DataColumn2(
-                    label: DataTableUtils.buildHeaderCell('Fecha de registro'),
-                    size: ColumnSize.S,
+                  Row(
+                    children: [
+                      // Botón desplegable para filtro por rol
+                      SizedBox(
+                        width: 200,
+                        child: FilterButton(
+                          label: 'Filtrar',
+                          value: ref.watch(userRoleFilterProvider),
+                          options: const [
+                            'Todos',
+                            'Migrante',
+                            'Admin',
+                          ],
+                          onChanged: (String? value) {
+                            ref.read(userRoleFilterProvider.notifier).state =
+                                value ?? 'Todos';
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: UIConstants.spacingM),
+                      // Botón para exportar usuarios
+                      ExportButtonWidget(label: 'Exportar', onPressed: () {
+                         ExportService.exportUsers(usersState.value ?? []);
+                      })
+                    ],
                   ),
                 ],
-              );
-            },
-            // Mostrar mensaje si ocurre un error al cargar los usuarios
-            error: (error, stackTrace) {
-              return Text('Error $error');
-            },
-            // Indicador de carga mientras se cargan los usuarios
-            loading: () => const Expanded(
-              child: Center(child: CircularProgressIndicator()),
+              ),
             ),
-          )
-        ],
+            const SizedBox(
+              height: UIConstants.spacingM,
+            ),
+            // Sección donde se muestran los datos de la tabla según el estado
+            usersState.when(
+              data: (users) {
+                // Creamos las filas de la tabla con los usuarios
+                final rows = UsersDatatable(listUsers: users);
+                
+                // Tabla personalizada mostrando los usuarios y sus propiedades
+                return BuildTable(
+                  rows: rows,
+                  columns: [
+                    DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('ID'),
+                      fixedWidth: 30,
+                    ),
+                    DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('Nombre'),
+                      size: ColumnSize.M,
+                    ),
+                    DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('Correo'),
+                      size: ColumnSize.L,
+                    ),
+                    DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('Rol'),
+                      size: ColumnSize.S,
+                    ),
+                    DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('Edad'),
+                      size: ColumnSize.S,
+                    ),
+                    DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('País de origen'),
+                      size: ColumnSize.M,
+                    ),
+                    DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('País de destino'),
+                      size: ColumnSize.M,
+                    ),
+                    DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('Fecha de registro'),
+                      size: ColumnSize.S,
+                    ),
+                  ],
+                );
+              },
+              // Mostrar mensaje si ocurre un error al cargar los usuarios
+              error: (error, stackTrace) {
+                return Text('Error $error');
+              },
+              // Indicador de carga mientras se cargan los usuarios
+              loading: () => const Expanded(
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
@@ -18,37 +19,47 @@ class ServiceMoreFilterContainer extends ConsumerWidget {
       error: (error, stackTrace) => Center(
         child: Text('Ha ocurrido un error inesperado: ${error.toString()}'),
       ),
-      loading: () => const CircularProgressIndicator(),
-      data: (list) {
-        return Container(
-            decoration: ContainerDecorationBorder.decorationBox(),
-            padding: const EdgeInsets.all(20),
+      loading: () => FadeInUp(
+        child: Container(
+           decoration: ContainerDecorationBorder.decorationBox(),
             height: 350,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Destinos mas requeridos',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+          child: const SizedBox(
+            height: 50,
+            width: 50,
+            child: CircularProgressIndicator())),
+      ),
+      data: (list) {
+        return FadeInUp(
+          child: Container(
+              decoration: ContainerDecorationBorder.decorationBox(),
+              padding: const EdgeInsets.all(20),
+              height: 350,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Destinos mas requeridos',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                Expanded(
-                    child: ListView.builder(
-                        itemCount: list.length > 5 ? 5 : list.length,
-                        itemBuilder: (context, index) {
-                          final item = list[index];
-                          return DestinoBarRow(
-                              stat: DestinationData(
-                                  nombre: item.nombre, cantidad: item.cantidad),
-                              maxValue: userLength);
-                        }))
-              ],
-            ));
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  Expanded(
+                      child: ListView.builder(
+                          itemCount: list.length > 5 ? 5 : list.length,
+                          itemBuilder: (context, index) {
+                            final item = list[index];
+                            return DestinoBarRow(
+                                stat: DestinationData(
+                                    nombre: item.nombre, cantidad: item.cantidad),
+                                maxValue: userLength);
+                          }))
+                ],
+              )),
+        );
       },
     );
   }

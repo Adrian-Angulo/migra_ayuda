@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -64,128 +65,131 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
       }
     });
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: UIConstants.spacingL,
-        vertical: UIConstants.spacingL,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // ── Encabezado ────────────────────────────────────────────────
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Entidades',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text('Gestiona las entidades registradas en el sistema'),
-                ],
-              ),
-              AddButtonWidget(
-                text: 'Registrar entidad',
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => const ModalFormEntity(),
-                  );
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: UIConstants.spacingM),
-
-          // ── Barra de búsqueda + filtro + exportar ─────────────────────
-          SizedBox(
-            height: 40,
-            child: Row(
+    return FadeIn(
+      delay: const Duration(seconds: 1),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: UIConstants.spacingL,
+          vertical: UIConstants.spacingL,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── Encabezado ────────────────────────────────────────────────
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                TextFielSearchWeb(
-                  onChanged: (String value) {
-                    ref.read(queryEntityProvider.notifier).state =
-                        value.toLowerCase().trim();
-                  },
-                  hintText: 'Buscar por nombre o dirección...',
-                ),
-                Row(
+                const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(
-                      width: 150,
-                      child: FilterButton(
-                        label: 'Filtrar',
-                        value: selectedService,
-                        options: services,
-                        onChanged: (String? value) {
-                          ref
-                              .read(selectedServiceFilterProvider.notifier)
-                              .state = value ?? services[0];
-                        },
+                    Text(
+                      'Entidades',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(width: UIConstants.spacingM),
-                    ExportButtonWidget(label: 'Exportar', onPressed: () {
-                       ExportService.exportEntities(entitiesState.value ?? []);
-                    }),
+                    Text('Gestiona las entidades registradas en el sistema'),
                   ],
+                ),
+                AddButtonWidget(
+                  text: 'Registrar entidad',
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const ModalFormEntity(),
+                    );
+                  },
                 ),
               ],
             ),
-          ),
-          const SizedBox(height: UIConstants.spacingM),
-
-          // ── Tabla ─────────────────────────────────────────────────────
-          entitiesState.when(
-            data: (entities) {
-              final rows = EntityDatatable(listEntities: entities);
-
-              return BuildTable(
-                rows: rows,
-                emptyIcon: Icons.business_outlined,
-                emptyTitle: 'No hay entidades',
-                emptySubtitle:
-                    'No se encontraron entidades registradas en el sistema',
-                sortColumnIndex: _sortColumnIndex,
-                sortAscending: _sortAscending,
-                columns: [
-                  DataColumn2(
-                    label: DataTableUtils.buildHeaderCell('Nombre'),
-                    size: ColumnSize.L,
-                    onSort: _onSort,
+            const SizedBox(height: UIConstants.spacingM),
+      
+            // ── Barra de búsqueda + filtro + exportar ─────────────────────
+            SizedBox(
+              height: 40,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextFielSearchWeb(
+                    onChanged: (String value) {
+                      ref.read(queryEntityProvider.notifier).state =
+                          value.toLowerCase().trim();
+                    },
+                    hintText: 'Buscar por nombre o dirección...',
                   ),
-                  DataColumn2(
-                    label: DataTableUtils.buildHeaderCell('Dirección'),
-                    size: ColumnSize.L,
-                    onSort: _onSort,
-                  ),
-                  DataColumn2(
-                    label: DataTableUtils.buildHeaderCell('Servicios'),
-                    size: ColumnSize.L,
-                  ),
-                  DataColumn2(
-                    label: DataTableUtils.buildHeaderCell('Valoración'),
-                    fixedWidth: 100,
-                  ),
-                  DataColumn2(
-                    label: DataTableUtils.buildHeaderCell('Acciones'),
-                    fixedWidth: 150,
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 150,
+                        child: FilterButton(
+                          label: 'Filtrar',
+                          value: selectedService,
+                          options: services,
+                          onChanged: (String? value) {
+                            ref
+                                .read(selectedServiceFilterProvider.notifier)
+                                .state = value ?? services[0];
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: UIConstants.spacingM),
+                      ExportButtonWidget(label: 'Exportar', onPressed: () {
+                         ExportService.exportEntities(entitiesState.value ?? []);
+                      }),
+                    ],
                   ),
                 ],
-              );
-            },
-            error: (error, _) => Center(child: Text('Error: $error')),
-            loading: () => const Expanded(
-              child: Center(child: CircularProgressIndicator()),
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: UIConstants.spacingM),
+      
+            // ── Tabla ─────────────────────────────────────────────────────
+            entitiesState.when(
+              data: (entities) {
+                final rows = EntityDatatable(listEntities: entities);
+      
+                return BuildTable(
+                  rows: rows,
+                  emptyIcon: Icons.business_outlined,
+                  emptyTitle: 'No hay entidades',
+                  emptySubtitle:
+                      'No se encontraron entidades registradas en el sistema',
+                  sortColumnIndex: _sortColumnIndex,
+                  sortAscending: _sortAscending,
+                  columns: [
+                    DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('Nombre'),
+                      size: ColumnSize.L,
+                      onSort: _onSort,
+                    ),
+                    DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('Dirección'),
+                      size: ColumnSize.L,
+                      onSort: _onSort,
+                    ),
+                    DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('Servicios'),
+                      size: ColumnSize.L,
+                    ),
+                    DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('Valoración'),
+                      fixedWidth: 100,
+                    ),
+                    DataColumn2(
+                      label: DataTableUtils.buildHeaderCell('Acciones'),
+                      fixedWidth: 150,
+                    ),
+                  ],
+                );
+              },
+              error: (error, _) => Center(child: Text('Error: $error')),
+              loading: () => const Expanded(
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

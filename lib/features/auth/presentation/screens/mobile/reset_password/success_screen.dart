@@ -1,4 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_screen.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 
@@ -96,11 +99,16 @@ class SuccessScreen extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
+                  if(kIsWasm){
+                    context.go('/login');
+                  }else{
+
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                         builder: (context) => const LoginScreen(),
                       ));
+                  }
                 },
                 child: Text(
                   l10n.backToLoginButton,

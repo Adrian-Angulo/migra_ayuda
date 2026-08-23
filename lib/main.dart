@@ -10,6 +10,7 @@ import 'package:migra_ayuda/core/router/app_router_mobile.dart';
 import 'package:migra_ayuda/features/language/presentation/providers/language_provider.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 import 'core/config/firebase_options.dart';
+import 'package:flutter_web_plugins/url_strategy.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,9 +19,11 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  usePathUrlStrategy();
   if (!kIsWeb) {
     await Loadtoken.setup(); //preparar token de mapa
   }
+
   runApp(const ProviderScope(child: MainApp()));
 }
 

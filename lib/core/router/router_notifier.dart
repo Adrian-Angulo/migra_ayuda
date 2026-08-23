@@ -37,6 +37,11 @@ class RouterNotifier extends AsyncNotifier<void> implements Listenable {
 
     final user = authState.value;
     final isGoingToLogin = state.matchedLocation == '/login';
+    final isGoingToResetPassword = state.matchedLocation == '/reset-password';
+
+    if (user == null && isGoingToResetPassword) {
+      return '/reset-password';
+    }
 
     if (user == null) {
       if (isGoingToLogin) {

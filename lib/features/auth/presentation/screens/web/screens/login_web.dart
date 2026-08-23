@@ -47,8 +47,8 @@ class _LoginWebState extends ConsumerState<LoginWeb> {
             }
           },
           error: (error, stackTrace) {
-            SnackbarWebWidget.error(
-                context, ErrorMappers.getAuthErrorMessage(error.toString(), context));
+            SnackbarWebWidget.error(context,
+                ErrorMappers.getAuthErrorMessage(error.toString(), context));
           },
         );
       });
@@ -251,9 +251,7 @@ class _LoginWebState extends ConsumerState<LoginWeb> {
                                     children: [
                                       TextButton(
                                         onPressed: () {
-                                          /*  context.push(
-                                            Routes.sendEmail,
-                                          ); */
+                                          context.push('/reset-password');
                                         },
                                         child: const Text(
                                           "¿Olvidaste tu contraseña?",

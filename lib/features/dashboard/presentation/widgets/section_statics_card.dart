@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/dashboard/presentation/providers/dashboard_providers.dart';
@@ -30,19 +31,26 @@ class SectionStaticsCard extends ConsumerWidget {
         StatisticCard(
             title: 'Usuarios Registrados',
             value: usersState,
-            icon: Icons.group_sharp),
+            icon: Icons.group_sharp,
+            ),
         StatisticCard(
             title: 'Entidades registradas',
             value: entityState,
-            icon: Icons.business),
+            icon: Icons.business,
+          
+            ),
         StatisticCard(
             title: 'Reseñas realizadas',
             value: reviewState,
-            icon: Icons.comment),
+            icon: Icons.comment,
+        
+            ),
         StatisticCard(
             title: 'Acciones ruta solicitada',
             value: servicesState,
-            icon: Icons.filter_alt)
+            icon: Icons.filter_alt,
+           
+            )
       ],
     );
   }
