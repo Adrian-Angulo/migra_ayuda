@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/constants/list_countries.dart';
 import 'package:migra_ayuda/core/utils/validators/email_validator.dart';
+import 'package:migra_ayuda/core/widgets/legal/privacy_policy_widget.dart';
+import 'package:migra_ayuda/core/widgets/legal/terms_and_conditions_widget.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/register_notifier.dart';
@@ -195,20 +197,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               TextSpan(
                                 text: l10n.termsAndConditions,
                                 style:
-                                    const TextStyle(color: Color(0xFF64999A)),
+                                    const TextStyle(color: Color(0xFF64999A), fontWeight: FontWeight.bold),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
-                                    // Lógica para abrir términos y condiciones
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const TermsAndConditionsWidget(),));
                                   },
                               ),
                               TextSpan(text: " ${l10n.and} "),
                               TextSpan(
                                 text: l10n.privacyPolicy,
                                 style:
-                                    const TextStyle(color: Color(0xFF64999A)),
+                                     const TextStyle(color: Color(0xFF64999A), fontWeight: FontWeight.bold),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
-                                    // Lógica para abrir política de privacidad
+                                     Navigator.push(context, MaterialPageRoute(builder: (context) => const PrivacyPolicyWidget(),));
                                   },
                               ),
                             ],

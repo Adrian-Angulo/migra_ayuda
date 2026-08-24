@@ -40,7 +40,7 @@ class _TextFieldNumericWidgetState extends State<TextFieldNumericWidget> {
               return l10n.errorAgeRequired;
             }
             final age = int.tryParse(value);
-            if (age == null || age < 18 || age > 100) {
+            if (age == null || age < 15 || age > 100) {
               return l10n.errorAgeRange;
             }
             return null;

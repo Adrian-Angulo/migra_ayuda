@@ -63,181 +63,183 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
     
     Widget form = Form(
       key: _formKey,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const SizedBox(height: 60),
-          // Logo
-          Hero(
-            tag: 'app-logo',
-            child: Image.asset(
-              'assets/logo/Logo.png',
-              width: 110,
-              height: 110,
-              fit: BoxFit.contain,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(height: 60),
+            // Logo
+            Hero(
+              tag: 'app-logo',
+              child: Image.asset(
+                'assets/logo/Logo.png',
+                width: 110,
+                height: 110,
+                fit: BoxFit.contain,
+              ),
             ),
-          ),
-          const SizedBox(
-            height: 9,
-          ),
-          Hero(
-            tag: 'app-logo2',
-            child: Image.asset(
-              'assets/logo/MigraAyuda.png',
-              width: 180,
-              fit: BoxFit.contain,
+            const SizedBox(
+              height: 9,
             ),
-          ),
-
-          const SizedBox(height: 30),
-
-          Text(
-            l10n.resetPasswordTitle,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
+            Hero(
+              tag: 'app-logo2',
+              child: Image.asset(
+                'assets/logo/MigraAyuda.png',
+                width: 180,
+                fit: BoxFit.contain,
+              ),
             ),
-          ),
-
-          const SizedBox(height: 15),
-
-          Text(
-            l10n.resetPasswordEmailHint,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.grey),
-          ),
-
-          const SizedBox(height: 30),
-
-          // Label del campo
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              l10n.emailText,
+        
+            const SizedBox(height: 30),
+        
+            Text(
+              l10n.resetPasswordTitle,
+              textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.black87,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-
-          const SizedBox(height: 8),
-
-          // Campo de correo con validación
-          TextFormField(
-            controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
-            enabled: !_isLoading,
-            decoration: InputDecoration(
-              hintText: l10n.emailResetHint,
-              filled: true,
-              fillColor: const Color(0xFFFFFFFF),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide:
-                    const BorderSide(color: Colors.grey, width: 1.5),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide:
-                    const BorderSide(color: Colors.grey, width: 1.5),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(
-                  color: Color(0xFF6FA3A1),
-                  width: 2,
-                ),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.red, width: 1),
-              ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.red, width: 2),
-              ),
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return l10n.errorEnterEmail;
-              }
-              // Validación de formato mejorada
-              final emailRegex = RegExp(
-                r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-              );
-
-              if (!emailRegex.hasMatch(value)) {
-                return l10n.errorEmailFormat;
-              }
-
-              return null;
-            },
-          ),
-
-          const SizedBox(height: 25),
-
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6FA3A1),
-              foregroundColor: Colors.white,
-              minimumSize: const Size(double.infinity, 50),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            onPressed: _isLoading ? null : handleSubmit,
-            child: _isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  )
-                : Text(
-                    l10n.sendLinkButton,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // Volver al inicio de sesión con flecha
-          TextButton.icon(
-            onPressed: _isLoading
-                ? null
-                : () {
-                  if(kIsWeb){
-                    context.go(Routes.login);
-                  } else{
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen(),));
-                  }
-
-                },
-                   
-            icon: const Icon(
-              Icons.arrow_back,
-              size: 18,
-              color: Colors.grey,
-            ),
-            label: Text(
-              l10n.backToLoginButton,
+        
+            const SizedBox(height: 15),
+        
+            Text(
+              l10n.resetPasswordEmailHint,
+              textAlign: TextAlign.center,
               style: const TextStyle(color: Colors.grey),
             ),
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.zero,
+        
+            const SizedBox(height: 30),
+        
+            // Label del campo
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                l10n.emailText,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black87,
+                ),
+              ),
             ),
-          ),
-        ],
+        
+            const SizedBox(height: 8),
+        
+            // Campo de correo con validación
+            TextFormField(
+              controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
+              enabled: !_isLoading,
+              decoration: InputDecoration(
+                hintText: l10n.emailResetHint,
+                filled: true,
+                fillColor: const Color(0xFFFFFFFF),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide:
+                      const BorderSide(color: Colors.grey, width: 1.5),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide:
+                      const BorderSide(color: Colors.grey, width: 1.5),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(
+                    color: Color(0xFF6FA3A1),
+                    width: 2,
+                  ),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Colors.red, width: 1),
+                ),
+                focusedErrorBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Colors.red, width: 2),
+                ),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return l10n.errorEnterEmail;
+                }
+                // Validación de formato mejorada
+                final emailRegex = RegExp(
+                  r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                );
+        
+                if (!emailRegex.hasMatch(value)) {
+                  return l10n.errorEmailFormat;
+                }
+        
+                return null;
+              },
+            ),
+        
+            const SizedBox(height: 25),
+        
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF6FA3A1),
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              onPressed: _isLoading ? null : handleSubmit,
+              child: _isLoading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : Text(
+                      l10n.sendLinkButton,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+            ),
+        
+            const SizedBox(height: 20),
+        
+            // Volver al inicio de sesión con flecha
+            TextButton.icon(
+              onPressed: _isLoading
+                  ? null
+                  : () {
+                    if(kIsWeb){
+                      context.go(Routes.login);
+                    } else{
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen(),));
+                    }
+        
+                  },
+                     
+              icon: const Icon(
+                Icons.arrow_back,
+                size: 18,
+                color: Colors.grey,
+              ),
+              label: Text(
+                l10n.backToLoginButton,
+                style: const TextStyle(color: Colors.grey),
+              ),
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+              ),
+            ),
+          ],
+        ),
       ),
     );
 

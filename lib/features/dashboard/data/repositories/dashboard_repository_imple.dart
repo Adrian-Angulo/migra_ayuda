@@ -77,14 +77,14 @@ class DashboardRepositoryImple implements DashboardRepository {
         }
       }
 
-      // Crear la lista de DestinationData ordenada de mayor a menor cantidad
+      // Crear la lista de DestinationData ordenada de mayor a menor cantidad y tomar solo los 5 mayores
       final List<DestinationData> destinations = destinationsCount.entries
           .map((entry) =>
               DestinationData(nombre: entry.key, cantidad: entry.value))
           .toList()
         ..sort((a, b) => b.cantidad.compareTo(a.cantidad));
 
-      return destinations;
+      return destinations.take(5).toList();
     });
   }
 
