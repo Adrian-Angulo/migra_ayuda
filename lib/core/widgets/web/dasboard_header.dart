@@ -1,29 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/export_button_widget.dart';
 
 class DashboardHeader extends StatelessWidget {
-  const DashboardHeader({super.key});
+  final String title;
+  final String subTitle;
+  const DashboardHeader({super.key, required this.title, required this.subTitle});
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Dashboard',
+          title,
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 32,
             fontWeight: FontWeight.bold,
           ),
         ),
-        SizedBox(height: 4),
-        Text(
-          'Resumen general',
-          style: TextStyle(
-            color: Colors.grey,
-            fontSize: 13,
-          ),
-        ),
+        Text(subTitle),
       ],
     );
   }

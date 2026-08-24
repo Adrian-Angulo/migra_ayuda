@@ -13,22 +13,22 @@ class Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
+    return const SafeArea(
       child: SingleChildScrollView(
         child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16),
             child: Column(
               spacing: 24,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 //header-----------------
-                const DashboardHeader(),
+                DashboardHeader( title: 'Dasboard', subTitle: 'Resumen general'),
 
                 //secciones de cards------
-                const SectionStaticsCard(),
+                SectionStaticsCard(),
 
                 //seccion de activis
-                const Row(
+                Row(
                   spacing: 16,
                   children: [
                     Expanded(flex: 2, child: ActivityChartCard()),
@@ -40,7 +40,7 @@ class Dashboard extends StatelessWidget {
                   spacing: 16,
                   children: [
                     Expanded(child: CategoryChart()),
-                    const Expanded(child: ServiceMoreFilterContainer())
+                    Expanded(child: ServiceMoreFilterContainer())
                   ],
                 )
               ],

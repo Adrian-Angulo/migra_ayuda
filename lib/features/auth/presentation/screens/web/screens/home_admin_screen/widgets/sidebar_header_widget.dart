@@ -9,28 +9,15 @@ class SidebarHeaderWidget extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Spacer(),
-              IconButton(
-                onPressed: () {
-                  // TODO: Cerrar sidebar en mobile
-                },
-                icon: const Icon(Icons.close, color: Colors.white70, size: 20),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-            ],
-          ),
+            
           const SizedBox(height: 8),
           // Logo circular
           Container(
-            width: 64,
-            height: 64,
+            width: 90,
+            height: 90,
             decoration: BoxDecoration(
               color: Colors.white,
-              shape: BoxShape.circle,
+              borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.1),
@@ -42,8 +29,8 @@ class SidebarHeaderWidget extends StatelessWidget {
             child: Center(
               child: Image.asset(
                 'assets/logo/logo.png',
-                width: 40,
-                height: 40,
+                width: 80,
+                height: 80,
                 fit: BoxFit.contain,
               ),
             ),

@@ -6,6 +6,7 @@ import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/dataTable/widgets/build_header_cell.dart';
 import 'package:migra_ayuda/core/dataTable/widgets/build_table.dart';
 import 'package:migra_ayuda/core/services/export/export_services.dart';
+import 'package:migra_ayuda/core/widgets/web/dasboard_header.dart';
 import 'package:migra_ayuda/core/widgets/web/text_fiel_search_web.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/export_button_widget.dart';
 import 'package:migra_ayuda/features/audit/domain/entities/audit_datatable.dart';
@@ -18,105 +19,90 @@ class UserActivityWebScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final activitiesState = ref.watch(auditFilterProvider);
 
-    return FadeIn(
-      delay: const Duration(seconds: 1),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: UIConstants.spacingL,
-          vertical: UIConstants.spacingL,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Encabezado ────────────────────────────────────────────────
-            const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: UIConstants.spacingL,
+        vertical: UIConstants.spacingL,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ── Encabezado ────────────────────────────────────────────────
+          const DashboardHeader( title: 'Acciones de usuarios', subTitle: 'Registro de acciones realiadas por los usuarios'),
+          const SizedBox(height: UIConstants.spacingM),
+    
+          // ── Barra de búsqueda + exportar ──────────────────────────────
+          SizedBox(
+            height: 40,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Actividad de usuarios',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                  ),
+                TextFielSearchWeb(
+                  onChanged: (String value) {
+                    ref.read(queryAuditProvider.notifier).state =
+                        value.toLowerCase().trim();
+                  },
+                  hintText: 'Buscar por usuario, correo o acción...',
                 ),
-                Text('Registros de acciones realizadas por los usuarios'),
+                ExportButtonWidget(label: 'Exportar', onPressed: () {
+                 
+                  ExportService.exportActivities(activitiesState.value!);
+                }),
               ],
             ),
-            const SizedBox(height: UIConstants.spacingM),
-      
-            // ── Barra de búsqueda + exportar ──────────────────────────────
-            SizedBox(
-              height: 40,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextFielSearchWeb(
-                    onChanged: (String value) {
-                      ref.read(queryAuditProvider.notifier).state =
-                          value.toLowerCase().trim();
-                    },
-                    hintText: 'Buscar por usuario, correo o acción...',
+          ),
+          const SizedBox(height: UIConstants.spacingM),
+    
+          // ── Tabla ─────────────────────────────────────────────────────
+          activitiesState.when(
+            data: (activities) {
+              final rows = AuditDatatable(listActivities: activities);
+    
+              return BuildTable(
+                rows: rows,
+                emptyIcon: Icons.history_rounded,
+                emptyTitle: 'Sin actividad registrada',
+                emptySubtitle: 'Aún no se han registrado acciones de usuarios',
+                columns: [
+                  DataColumn2(
+                    label: DataTableUtils.buildHeaderCell('#'),
+                    fixedWidth: 50,
                   ),
-                  ExportButtonWidget(label: 'Exportar', onPressed: () {
-                   
-                    ExportService.exportActivities(activitiesState.value!);
-                  }),
+                  DataColumn2(
+                    label: DataTableUtils.buildHeaderCell('Usuario'),
+                    size: ColumnSize.M,
+                  ),
+                  DataColumn2(
+                    label: DataTableUtils.buildHeaderCell('Correo'),
+                    size: ColumnSize.L,
+                  ),
+                  DataColumn2(
+                    label: DataTableUtils.buildHeaderCell('País'),
+                    size: ColumnSize.S,
+                  ),
+                  DataColumn2(
+                    label: DataTableUtils.buildHeaderCell('Acción'),
+                    size: ColumnSize.M,
+                  ),
+                  DataColumn2(
+                    label: DataTableUtils.buildHeaderCell('Metadata'),
+                    size: ColumnSize.S,
+                  ),
+                  DataColumn2(
+                    label: DataTableUtils.buildHeaderCell('Fecha'),
+                    size: ColumnSize.M,
+                  ),
                 ],
-              ),
+              );
+            },
+            error: (error, stackTrace) => Center(
+              child: Text('Error: $error'),
             ),
-            const SizedBox(height: UIConstants.spacingM),
-      
-            // ── Tabla ─────────────────────────────────────────────────────
-            activitiesState.when(
-              data: (activities) {
-                final rows = AuditDatatable(listActivities: activities);
-      
-                return BuildTable(
-                  rows: rows,
-                  emptyIcon: Icons.history_rounded,
-                  emptyTitle: 'Sin actividad registrada',
-                  emptySubtitle: 'Aún no se han registrado acciones de usuarios',
-                  columns: [
-                    DataColumn2(
-                      label: DataTableUtils.buildHeaderCell('#'),
-                      fixedWidth: 50,
-                    ),
-                    DataColumn2(
-                      label: DataTableUtils.buildHeaderCell('Usuario'),
-                      size: ColumnSize.M,
-                    ),
-                    DataColumn2(
-                      label: DataTableUtils.buildHeaderCell('Correo'),
-                      size: ColumnSize.L,
-                    ),
-                    DataColumn2(
-                      label: DataTableUtils.buildHeaderCell('País'),
-                      size: ColumnSize.S,
-                    ),
-                    DataColumn2(
-                      label: DataTableUtils.buildHeaderCell('Acción'),
-                      size: ColumnSize.M,
-                    ),
-                    DataColumn2(
-                      label: DataTableUtils.buildHeaderCell('Metadata'),
-                      size: ColumnSize.S,
-                    ),
-                    DataColumn2(
-                      label: DataTableUtils.buildHeaderCell('Fecha'),
-                      size: ColumnSize.M,
-                    ),
-                  ],
-                );
-              },
-              error: (error, stackTrace) => Center(
-                child: Text('Error: $error'),
-              ),
-              loading: () => const Expanded(
-                child: Center(child: CircularProgressIndicator()),
-              ),
+            loading: () => const Expanded(
+              child: Center(child: CircularProgressIndicator()),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

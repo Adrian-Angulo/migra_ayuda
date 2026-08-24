@@ -10,7 +10,7 @@ import 'package:migra_ayuda/features/users/presentation/providers/datatable_prov
 import 'package:migra_ayuda/features/auth/presentation/screens/web/widgets/register_admin_dialog.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/add_button_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/export_button_widget.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/filter_button.dart';
+
 
 // Pantalla principal para la gestión de usuarios en la versión web.
 class UsersScreen extends ConsumerWidget {
@@ -77,30 +77,7 @@ class UsersScreen extends ConsumerWidget {
                   },
                   hintText: 'Buscar usuario...',
                 ),
-                Row(
-                  children: [
-                    // Botón desplegable para filtro por rol
-                    SizedBox(
-                      width: 200,
-                      child: FilterButton(
-                        label: 'Filtrar',
-                        value: ref.watch(userRoleFilterProvider),
-                        options: const [
-                          'Todos',
-                          'Migrante',
-                          'Admin',
-                        ],
-                        onChanged: (String? value) {
-                          ref.read(userRoleFilterProvider.notifier).state =
-                              value ?? 'Todos';
-                        },
-                      ),
-                    ),
-                    const SizedBox(width: UIConstants.spacingM),
-                    // Botón para exportar usuarios
-                    ExportButtonWidget(label: 'Exportar', onPressed: () {})
-                  ],
-                ),
+                ExportButtonWidget(label: 'Exportar', onPressed: () {}),
               ],
             ),
           ),
