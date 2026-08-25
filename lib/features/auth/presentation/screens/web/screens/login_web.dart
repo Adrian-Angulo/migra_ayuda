@@ -86,8 +86,7 @@ class _LoginWebState extends ConsumerState<LoginWeb> {
               child: Container(
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                    
                     colors: [
                       Color.fromARGB(255, 21, 192, 69),
                       Color(0xFF42A5F5),

@@ -131,7 +131,9 @@ class DestinoBarRow extends StatelessWidget {
           SizedBox(
             width: 40,
             child: Text(
-              '${porcentaje * 100} %',
+              '${(porcentaje * 100).round()} %',
+         
+         
               textAlign: TextAlign.right,
               style: const TextStyle(
                 fontSize: 14,
