@@ -20,7 +20,7 @@ class EntityCardWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncRating = ref.watch(meanReviewByEntity(entity.id));
+    
 
     return GestureDetector(
       onTap: () async {
@@ -116,7 +116,6 @@ class EntityCardWidget extends ConsumerWidget {
                   ),
                   const SizedBox(height: 6),
                   DistanceAndRating(
-                    asyncRating: asyncRating,
                     entity: entity,
                   ),
                   const SizedBox(height: 8),
@@ -140,15 +139,13 @@ class EntityCardWidget extends ConsumerWidget {
 class DistanceAndRating extends ConsumerWidget {
   const DistanceAndRating({
     super.key,
-    required this.asyncRating,
     required this.entity,
   });
-
-  final AsyncValue<Map<String, dynamic>> asyncRating;
   final EntityEntity entity;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final asyncRating = ref.watch(meanReviewByEntity(entity.id));
     final distanceState = ref.watch(distanceProvider(entity));
     return Row(
       spacing: 5,

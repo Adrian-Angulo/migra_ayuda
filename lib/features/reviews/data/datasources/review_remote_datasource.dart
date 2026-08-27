@@ -62,8 +62,7 @@ class ReviewRemoteDataSource {
 
       // Convierte los documentos a ReviewModel
       final reviews = snapshot.docs.map((doc) {
-        /* return _fromFirestore(doc); */
-        return ReviewModel.fromFirebase(doc.data());
+        return _fromFirestore(doc);
       }).toList();
 
       return reviews;

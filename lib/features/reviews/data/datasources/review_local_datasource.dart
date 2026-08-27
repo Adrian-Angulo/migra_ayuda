@@ -110,7 +110,7 @@ class ReviewLocalDataSource {
 
       // Marca como eliminada (soft delete)
       final updatedRecord = Map<String, dynamic>.from(record);
-      updatedRecord['deletedAt'] = DateTime.now().millisecondsSinceEpoch;
+      updatedRecord['deletedAt'] = DateTime.now().toUtc().toIso8601String();
       updatedRecord['isSynced'] = false; // Marca como no sincronizada
 
       // Actualiza el registro

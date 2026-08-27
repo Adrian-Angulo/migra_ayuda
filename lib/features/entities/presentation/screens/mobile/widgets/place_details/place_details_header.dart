@@ -37,8 +37,7 @@ class PlaceDetailsHeader extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 6),
-            ratingMeanAndLengt.when(
-              data: (data) => Row(
+            Row(
                 children: [
                   Text(
                     "${l10n.rating}: ",
@@ -46,7 +45,7 @@ class PlaceDetailsHeader extends ConsumerWidget {
                         const TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
                   ),
                   Text(
-                    '${data['mean']}',
+                    '${entity.averageRating}',
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -58,7 +57,7 @@ class PlaceDetailsHeader extends ConsumerWidget {
                       size: 16, color: Color(0xFFFBBF24)),
                   const SizedBox(width: 4),
                   Text(
-                    '(${data['count']})',
+                    '(${entity.totalReviews})',
                     style: const TextStyle(
                         fontSize: 14,
                         color: Color(0xFF6B7280),
@@ -66,10 +65,6 @@ class PlaceDetailsHeader extends ConsumerWidget {
                   ),
                 ],
               ),
-              error: (Object error, StackTrace stackTrace) =>
-                  const Text('Error'),
-              loading: () => const Text('-----'),
-            ),
             const SizedBox(height: 12),
             Wrap(
               spacing: 5,

@@ -201,16 +201,20 @@ class MapNotifier extends StateNotifier<MapState> {
       final double lineWidth;
 
       switch (routeResult.sourceType) {
-        case RouteSourceType.online:
-          lineColor = 0xFF1E88E5; // Azul estándar online
+        case RouteSourceType.localAstar:
+          lineColor = 0xFF1E88E5; // Azul: ruta completa calculada localmente (A*)
+          lineWidth = 5.0;
+          break;
+        case RouteSourceType.mapboxApi:
+          lineColor = 0xFF1565C0; // Azul oscuro: ruta completa vía Mapbox API
           lineWidth = 5.0;
           break;
         case RouteSourceType.cached:
-          lineColor = 0xFF00897B; // Verde azulado / Teal para caché
+          lineColor = 0xFF00897B; // Teal: ruta desde historial local
           lineWidth = 5.0;
           break;
         case RouteSourceType.directFallback:
-          lineColor = 0xFFFF6D00; // Naranja intenso para rumbo directo
+          lineColor = 0xFFFF6D00; // Naranja: línea de orientación directa
           lineWidth = 4.5;
           break;
       }

@@ -11,18 +11,11 @@ class AppDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Drawer(
-      
       child: SafeArea(
         child: Column(
           children: [
             // Header con información del usuario
-            const DrawerUserHeader(
-              userName: "Adrian Angulo",
-              userEmail: "adrianangulo1080@gmail.com",
-              origin: "México",
-              destination: "España",
-              age: "28 años",
-            ),
+            const DrawerUserHeader(),
 
             // Opciones del menú
             Expanded(

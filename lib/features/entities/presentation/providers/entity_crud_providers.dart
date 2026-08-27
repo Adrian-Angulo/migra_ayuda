@@ -64,6 +64,34 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
       return CrudOperation.delete;
     });
   }
+
+  Future<void> actualizarTotalYPromedioEntidad(String entidadId) async {
+    final repository = ref.read(entityRepositoryProvider);
+
+    // Obtener la entidad actual por ID
+    final EntityEntity? entidad = await repository.getEntityById(entidadId);
+    if (entidad == null) {
+      throw Exception('Entidad no encontrada con el id: $entidadId');
+    }
+
+    // Obtener las reseñas relacionadas a la entidad
+    final reviewRepo = ref.read(reviewRepositoryProvider);
+    final List<ReviewEntity> reviews = await reviewRepo.getReviewsByEntity(entidadId);
+
+    int totalReviews = reviews.length;
+    double totalRating = reviews.fold(0.0, (sum, r) => sum + r.rating);
+    double promedio = totalReviews > 0 ? totalRating / totalReviews : 0.0;
+
+    // Actualizar los campos de la entidad (asumiendo que tiene campos para esto)
+    final EntityEntity entidadActualizada = entidad.copyWith(
+      totalReviews: totalReviews,
+      averageRating: promedio,
+    );
+
+    await repository.updateEntity(entity: entidadActualizada);
+
+    // Opcionalmente devolver o notificar el resultado si tu modelo lo requiere
+  }
 }
 
 final entitiesCrudProvider =

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/localitation/graph/osm_graph_service.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
@@ -30,5 +31,14 @@ class SyncNotifier extends AsyncNotifier<SyncState> {
     await ref.read(entityRepositoryProvider).syncAllFromFirebase();    //sincronizar entidades
     await ref.read(reviewRepositoryProvider).syncPendingReviews(); //sincronizar reseñas
     await ref.read(auditRepositoryProvider).synchronize(); //sincronizar acciones del usuario
+
+    // Descargar el grafo vial de OSM si aún no existe localmente.
+    // Se descarga solo la primera vez; en usos posteriores se usa el
+    // grafo almacenado en Sembast directamente desde memoria.
+    final hasGraph = await OsmGraphService.hasGraph();
+    if (!hasGraph) {
+      await OsmGraphService.downloadAndSave();
+    }
   }
 }
+

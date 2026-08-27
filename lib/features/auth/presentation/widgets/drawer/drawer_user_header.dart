@@ -1,92 +1,90 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 
-class DrawerUserHeader extends StatelessWidget {
-  final String userName;
-  final String userEmail;
-  final String origin;
-  final String destination;
-  final String age;
-
+class DrawerUserHeader extends ConsumerWidget {
   const DrawerUserHeader({
     super.key,
-    required this.userName,
-    required this.userEmail,
-    required this.origin,
-    required this.destination,
-    required this.age,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asynUser = ref.watch(authNotifierProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final l10n = AppLocalizations.of(context)!;
 
-    return Column(
-      children: [
-        // Header con gradiente
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                colorScheme.primary,
-                colorScheme.primary.withValues(alpha: 0.75),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+    return asynUser.when(
+      error: (error, stackTrace) => Text('error ${error.toString()}'),
+      loading: () => const CircularProgressIndicator(),
+      data: (user) {
+        return Column(
+          children: [
+            // Header con gradiente
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    colorScheme.primary,
+                    colorScheme.primary.withValues(alpha: 0.75),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 12),
+                  Text(
+                    user?.name ?? 'no data',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: colorScheme.onPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    user?.email ?? 'No data',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: colorScheme.onPrimary.withValues(alpha: 0.85),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 12),
-              Text(
-                userName,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  color: colorScheme.onPrimary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                userEmail,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colorScheme.onPrimary.withValues(alpha: 0.85),
-                ),
-              ),
-            ],
-          ),
-        ),
 
-        // Información del usuario
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-          child: Column(
-            children: [
-              _InfoTile(
-                icon: Icons.flight_takeoff_rounded,
-                label: l10n.originLabel,
-                value: origin,
+            // Información del usuario
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+              child: Column(
+                children: [
+                  _InfoTile(
+                    icon: Icons.flight_takeoff_rounded,
+                    label: l10n.originLabel,
+                    value: user?.originCountry ?? 'No data',
+                  ),
+                  const SizedBox(height: 8),
+                  _InfoTile(
+                    icon: Icons.flight_land_rounded,
+                    label: l10n.destinationLabel,
+                    value: user?.destinationCountry ?? 'No Data',
+                  ),
+                  const SizedBox(height: 8),
+                  _InfoTile(
+                    icon: Icons.cake_rounded,
+                    label: l10n.age,
+                    value: user?.age ?? 'No data ',
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
-              _InfoTile(
-                icon: Icons.flight_land_rounded,
-                label: l10n.destinationLabel,
-                value: destination,
-              ),
-              const SizedBox(height: 8),
-              _InfoTile(
-                icon: Icons.cake_rounded,
-                label: l10n.age,
-                value: age,
-              ),
-            ],
-          ),
-        ),
-      ],
+            ),
+          ],
+        );
+      },
     );
   }
 }

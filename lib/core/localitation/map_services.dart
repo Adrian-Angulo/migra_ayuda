@@ -4,11 +4,18 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:migra_ayuda/core/config/sembast_database.dart';
+import 'package:migra_ayuda/core/localitation/graph/osm_graph_service.dart';
+import 'package:migra_ayuda/core/localitation/graph/route_calculator.dart';
 import 'package:sembast/sembast.dart';
 
 enum RouteSourceType {
-  online,
+  /// Ruta calculada localmente con el grafo OSM y algoritmo A*
+  localAstar,
+  /// Ruta obtenida de la API de Mapbox Directions (online, fallback)
+  mapboxApi,
+  /// Ruta cargada desde el historial local en Sembast
   cached,
+  /// Línea recta directa de orientación (último recurso)
   directFallback,
 }
 
@@ -23,9 +30,20 @@ class RouteResult {
     required this.message,
   });
 
-  bool get isOffline => sourceType != RouteSourceType.online;
+  /// La ruta está disponible y sigue calles reales
+  bool get isStreetRoute =>
+      sourceType == RouteSourceType.localAstar ||
+      sourceType == RouteSourceType.mapboxApi;
+
+  /// La ruta es de calidad reducida (caché viejo o línea directa)
+  bool get isOffline => sourceType == RouteSourceType.cached ||
+      sourceType == RouteSourceType.directFallback;
+
   bool get isFallback => sourceType == RouteSourceType.directFallback;
   bool get isCached => sourceType == RouteSourceType.cached;
+
+  // Retrocompatibilidad con código existente
+  bool get isOnline => !isOffline;
 }
 
 class MapServices {
@@ -84,10 +102,12 @@ class MapServices {
     return null;
   }
 
-  /// Obtiene la ruta usando estrategia híbrida:
-  /// 1. Mapbox Directions API (Online)
-  /// 2. Caché local Sembast (Offline con historial)
-  /// 3. Línea geodésica directa (Offline fallback de orientación)
+  /// Obtiene la ruta usando estrategia híbrida de 4 niveles:
+  ///
+  /// 1. 🧭 Motor A* local sobre grafo OSM (funciona 100% offline)
+  /// 2. 🌐 API de Mapbox Directions (cuando no hay grafo OSM local)
+  /// 3. 💾 Caché Sembast (ruta guardada previamente)
+  /// 4. 📍 Línea directa (último recurso de orientación)
   static Future<RouteResult> fetchRoute({
     required double originLng,
     required double originLat,
@@ -97,8 +117,48 @@ class MapServices {
   }) async {
     final routeKey = _buildKey(entityId, destLng, destLat);
 
+    // ──────────────────────────────────────────────────────────────
+    // NIVEL 1: Motor A* local con grafo OSM (offline first)
+    // ──────────────────────────────────────────────────────────────
     try {
-      // 1. Intento Online vía Mapbox Directions API
+      final graph = await OsmGraphService.getGraph();
+      if (graph != null && !graph.isEmpty) {
+        final calculator = RouteCalculator(graph);
+        final route = calculator.calculate(
+          originLat: originLat,
+          originLng: originLng,
+          destLat: destLat,
+          destLng: destLng,
+        );
+
+        if (route != null && route.length >= 2) {
+          debugPrint("🧭 Ruta calculada localmente (A*): ${route.length} puntos");
+
+          // Guardar en caché Sembast para historial
+          await _saveRouteToCache(
+            key: routeKey,
+            originLng: originLng,
+            originLat: originLat,
+            destLng: destLng,
+            destLat: destLat,
+            coordinates: route.map((p) => [p.lng, p.lat]).toList(),
+          );
+
+          return RouteResult(
+            points: route,
+            sourceType: RouteSourceType.localAstar,
+            message: 'Ruta calculada localmente',
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint("⚠️ Motor A* no disponible: $e");
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // NIVEL 2: API de Mapbox Directions (fallback online)
+    // ──────────────────────────────────────────────────────────────
+    try {
       final token = await MapboxOptions.getAccessToken();
       final url = 'https://api.mapbox.com/directions/v5/mapbox/walking/'
           '$originLng,$originLat;$destLng,$destLat'
@@ -114,7 +174,6 @@ class MapServices {
         if ((data['routes'] as List).isNotEmpty) {
           final List coords = data['routes'][0]['geometry']['coordinates'];
 
-          // Guardar en caché para uso sin conexión futuro
           await _saveRouteToCache(
             key: routeKey,
             originLng: originLng,
@@ -131,39 +190,42 @@ class MapServices {
                   ))
               .toList();
 
+          debugPrint("🌐 Ruta obtenida de Mapbox API: ${positions.length} puntos");
           return RouteResult(
             points: positions,
-            sourceType: RouteSourceType.online,
+            sourceType: RouteSourceType.mapboxApi,
             message: 'Ruta trazada correctamente',
           );
         }
       }
     } catch (e) {
-      debugPrint("⚠️ Falló la obtención de ruta online ($e). Intentando modo offline...");
+      debugPrint("⚠️ Mapbox API no disponible ($e). Intentando caché...");
     }
 
-    // 2. Intento Offline vía Caché Local Sembast
+    // ──────────────────────────────────────────────────────────────
+    // NIVEL 3: Caché Sembast (ruta guardada previamente)
+    // ──────────────────────────────────────────────────────────────
     final cachedPoints = await _getRouteFromCache(routeKey);
     if (cachedPoints != null && cachedPoints.isNotEmpty) {
-      debugPrint("✅ Usando ruta en caché local (${cachedPoints.length} puntos)");
+      debugPrint("💾 Usando ruta en caché local (${cachedPoints.length} puntos)");
       return RouteResult(
         points: cachedPoints,
         sourceType: RouteSourceType.cached,
-        message: 'Modo sin conexión: Mostrando ruta guardada',
+        message: 'Sin conexión: Mostrando ruta guardada',
       );
     }
 
-    // 3. Fallback de Rumbo / Línea Directa hacia la entidad
-    debugPrint("🧭 Generando línea directa de orientación (fallback)");
-    final directPoints = [
-      Position(originLng, originLat),
-      Position(destLng, destLat),
-    ];
-
+    // ──────────────────────────────────────────────────────────────
+    // NIVEL 4: Línea directa de orientación (último recurso)
+    // ──────────────────────────────────────────────────────────────
+    debugPrint("📍 Generando línea directa de orientación (fallback)");
     return RouteResult(
-      points: directPoints,
+      points: [
+        Position(originLng, originLat),
+        Position(destLng, destLat),
+      ],
       sourceType: RouteSourceType.directFallback,
-      message: 'Modo sin conexión: Línea de orientación directa hacia el destino',
+      message: 'Sin conexión: Línea de orientación directa al destino',
     );
   }
 
@@ -185,4 +247,6 @@ class MapServices {
     return result.points;
   }
 }
+
+
 
