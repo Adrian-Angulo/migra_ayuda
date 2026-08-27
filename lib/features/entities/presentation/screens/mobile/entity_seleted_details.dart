@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/services/google_maps/google_maps_controllers.dart';
+import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/map_state.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/map_provider.dart';
@@ -54,7 +55,22 @@ class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
                           .read(mapProvider.notifier)
                           .drawRouteToEntity(widget.map.selectEntity!);
 
-                      
+                      if (context.mounted) {
+                        final currentMapState = ref.read(mapProvider);
+                        if (currentMapState.routeMessage != null) {
+                          if (currentMapState.isFallbackRoute) {
+                            SnackbarWidget.warning(
+                              context,
+                              currentMapState.routeMessage!,
+                            );
+                          } else if (currentMapState.isOfflineRoute) {
+                            SnackbarWidget.info(
+                              context,
+                              currentMapState.routeMessage!,
+                            );
+                          }
+                        }
+                      }
 
                       await ref.read(auditNotifierProvider.notifier).create(
                           accion: ActivityActions.routeRequested(),

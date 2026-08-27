@@ -85,7 +85,7 @@ class MapNotifier extends StateNotifier<MapState> {
   /// 📍 Agrega marcadores al mapa desde una lista de ubicaciones
   Future<void> addMarkers(List<EntityEntity> entities) async {
     if (_mapboxMap == null) {
-      print("⚠️ El mapa aún no está listo");
+      debugPrint("⚠️ El mapa aún no está listo");
       return;
     }
 
@@ -166,46 +166,79 @@ class MapNotifier extends StateNotifier<MapState> {
     );
   }
 
-  /// 🗺️ Dibujar ruta desde ubicación actual hasta una entidad
+  /// 🗺️ Dibujar ruta desde ubicación actual hasta una entidad con soporte offline
   Future<void> drawRouteToEntity(EntityEntity entity) async {
     if (_mapboxMap == null ||
         _polylineAnnotationManager == null ||
         _lastKnownPosition == null) {
-      print("⚠️ Mapa o ubicación no disponible");
+      debugPrint("⚠️ Mapa o ubicación no disponible para trazar ruta");
       return;
     }
 
+    state = state.copyWith(isDrawingRoute: true);
+
     try {
-      // Obtener puntos de la ruta usando el servicio
-      final routePoints = await MapServices.fetchRoutePoints(
+      // Obtener puntos de la ruta usando el servicio híbrido (API -> Caché -> Fallback Directo)
+      final routeResult = await MapServices.fetchRoute(
         originLng: _lastKnownPosition!.lng.toDouble(),
         originLat: _lastKnownPosition!.lat.toDouble(),
         destLng: entity.localitation.longitude,
         destLat: entity.localitation.latitude,
+        entityId: entity.id,
       );
 
-      if (routePoints.isEmpty) {
-        print("⚠️ No se encontró ruta disponible");
+      if (routeResult.points.isEmpty) {
+        debugPrint("⚠️ No se encontró ruta disponible");
+        state = state.copyWith(isDrawingRoute: false);
         return;
       }
 
       // Limpiar rutas anteriores
       await _polylineAnnotationManager!.deleteAll();
 
-      // Crear la polilínea
+      // Definir color y grosor según el tipo de ruta
+      final int lineColor;
+      final double lineWidth;
+
+      switch (routeResult.sourceType) {
+        case RouteSourceType.online:
+          lineColor = 0xFF1E88E5; // Azul estándar online
+          lineWidth = 5.0;
+          break;
+        case RouteSourceType.cached:
+          lineColor = 0xFF00897B; // Verde azulado / Teal para caché
+          lineWidth = 5.0;
+          break;
+        case RouteSourceType.directFallback:
+          lineColor = 0xFFFF6D00; // Naranja intenso para rumbo directo
+          lineWidth = 4.5;
+          break;
+      }
+
+      // Crear la polilínea en Mapbox
       final polylineOptions = PolylineAnnotationOptions(
-        geometry: LineString(coordinates: routePoints),
-        lineColor: Colors.blueAccent.value,
-        lineWidth: 5.0,
+        geometry: LineString(coordinates: routeResult.points),
+        lineColor: lineColor,
+        lineWidth: lineWidth,
         lineJoin: LineJoin.ROUND,
       );
 
       // Dibujar en el mapa
       await _polylineAnnotationManager!.create(polylineOptions);
 
-      print("✅ Ruta dibujada con ${routePoints.length} puntos");
+      state = state.copyWith(
+        isOfflineRoute: routeResult.isOffline,
+        isFallbackRoute: routeResult.isFallback,
+        routeMessage: routeResult.message,
+        isDrawingRoute: false,
+        hasActiveRoute: true,
+      );
+
+      debugPrint(
+          "✅ Ruta trazada (${routeResult.sourceType.name}) con ${routeResult.points.length} puntos: ${routeResult.message}");
     } catch (e) {
-      print("❌ Error al trazar ruta: $e");
+      debugPrint("❌ Error al trazar ruta: $e");
+      state = state.copyWith(isDrawingRoute: false);
     }
   }
 
@@ -214,6 +247,7 @@ class MapNotifier extends StateNotifier<MapState> {
     if (_polylineAnnotationManager != null) {
       await _polylineAnnotationManager!.deleteAll();
     }
+    state = state.copyWith(clearRouteState: true);
   }
 }
 

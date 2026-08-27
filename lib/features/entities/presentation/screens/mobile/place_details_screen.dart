@@ -63,8 +63,24 @@ class PlaceDetails extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: FloatingMainButton(
                 onTap: () async {
-                  ref.read(mapProvider.notifier).drawRouteToEntity(entity);
-                  Navigator.pop(context);
+                  await ref.read(mapProvider.notifier).drawRouteToEntity(entity);
+                  if (context.mounted) {
+                    final currentMapState = ref.read(mapProvider);
+                    if (currentMapState.routeMessage != null) {
+                      if (currentMapState.isFallbackRoute) {
+                        SnackbarWidget.warning(
+                          context,
+                          currentMapState.routeMessage!,
+                        );
+                      } else if (currentMapState.isOfflineRoute) {
+                        SnackbarWidget.info(
+                          context,
+                          currentMapState.routeMessage!,
+                        );
+                      }
+                    }
+                    Navigator.pop(context);
+                  }
                 },
                 text: 'Como llegar',
                 icon: Icons.directions,
