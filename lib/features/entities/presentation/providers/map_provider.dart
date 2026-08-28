@@ -161,7 +161,7 @@ class MapNotifier extends StateNotifier<MapState> {
     final targetPoint = Point(coordinates: gpsPosition);
 
     _mapboxMap!.easeTo(
-      CameraOptions(center: targetPoint),
+      CameraOptions(center: targetPoint, zoom: 14),
       MapAnimationOptions(duration: 1500),
     );
   }
@@ -202,7 +202,8 @@ class MapNotifier extends StateNotifier<MapState> {
 
       switch (routeResult.sourceType) {
         case RouteSourceType.localAstar:
-          lineColor = 0xFF1E88E5; // Azul: ruta completa calculada localmente (A*)
+          lineColor =
+              0xFF1E88E5; // Azul: ruta completa calculada localmente (A*)
           lineWidth = 5.0;
           break;
         case RouteSourceType.mapboxApi:

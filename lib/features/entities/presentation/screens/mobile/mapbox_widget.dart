@@ -6,11 +6,30 @@ import 'package:migra_ayuda/features/entities/presentation/providers/entity_prov
 import 'package:migra_ayuda/features/entities/presentation/providers/map_provider.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/list_Entities_home.dart';
 
-class MapboxWidget extends ConsumerWidget {
+class MapboxWidget extends ConsumerStatefulWidget {
   const MapboxWidget({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MapboxWidget> createState() => _MapboxWidgetState();
+}
+
+class _MapboxWidgetState extends ConsumerState<MapboxWidget> {
+  late final DraggableScrollableController _sheetController;
+
+  @override
+  void initState() {
+    super.initState();
+    _sheetController = DraggableScrollableController();
+  }
+
+  @override
+  void dispose() {
+    _sheetController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     ref.listen(
       liveLocationProvider,
       (previous, next) {
@@ -35,6 +54,8 @@ class MapboxWidget extends ConsumerWidget {
       },
     );
 
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Stack(children: [
       MapWidget(
         onMapCreated: (controller) {
@@ -52,10 +73,32 @@ class MapboxWidget extends ConsumerWidget {
           zoom: 12.5,
         ),
       ),
-      const ListEntitesHome(),
-      Positioned(
-        bottom: 80,
-        right: 10,
+      ListEntitesHome(sheetController: _sheetController),
+      AnimatedBuilder(
+        animation: _sheetController,
+        builder: (context, child) {
+          final currentSize =
+              _sheetController.isAttached ? _sheetController.size : 0.3;
+
+          // Si el sheet cubre el 95% o más de la pantalla, desaparece por completo
+          if (currentSize >= 0.95) {
+            return const SizedBox.shrink();
+          }
+
+          // Desvanecimiento gradual entre 70% y 95% de altura
+          final opacity =
+              ((0.95 - currentSize) / (0.95 - 0.70)).clamp(0.0, 1.0);
+          final bottomOffset = (screenHeight * currentSize);
+
+          return Positioned(
+            bottom: bottomOffset,
+            right: 10,
+            child: Opacity(
+              opacity: opacity,
+              child: child,
+            ),
+          );
+        },
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

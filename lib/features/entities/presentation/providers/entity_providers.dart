@@ -101,7 +101,3 @@ final getAllEntitiesProvider =
     AsyncNotifierProvider<EntityListNotifier, List<EntityEntity>>(
         EntityListNotifier.new);
 
-final degradableScrollControllerProvider = StateProvider<DraggableScrollableController>(
-  (ref) => DraggableScrollableController(),
-);
-

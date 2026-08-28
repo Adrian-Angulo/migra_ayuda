@@ -99,6 +99,9 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
             return const SizedBox(
                 height: 300, child: Center(child: Text("Cargando...")));
           },
+        ),
+        const SizedBox(
+          height: 60,
         )
       ],
     );

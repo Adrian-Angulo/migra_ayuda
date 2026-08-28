@@ -8,28 +8,23 @@ import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widget
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/text_result.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
 
-class ListEntitesHome extends ConsumerStatefulWidget {
+class ListEntitesHome extends ConsumerWidget {
   const ListEntitesHome({
     super.key,
+    required this.sheetController,
   });
 
-  @override
-  ConsumerState<ListEntitesHome> createState() => _ListEntitesHomeState();
-}
-
-class _ListEntitesHomeState extends ConsumerState<ListEntitesHome> {
-  
+  final DraggableScrollableController sheetController;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     String selectedFiltro = ref.watch(filterProvider);
     final listEntity = ref.watch(getAllEntitiesProvider);
     final map = ref.watch(mapProvider);
     final l10n = AppLocalizations.of(context)!;
-    final controllerD = ref.watch(degradableScrollControllerProvider);
 
     return DraggableScrollableSheet(
-      controller: controllerD,
+      controller: sheetController,
       initialChildSize: 0.3,
       minChildSize: 0.15,
       maxChildSize: 1,
@@ -114,7 +109,7 @@ class _ListEntitesHomeState extends ConsumerState<ListEntitesHome> {
                             child: CircularProgressIndicator(),
                           ))
                 else
-                  EntitySeletedDetails(map: map, controllerD: controllerD),
+                  EntitySeletedDetails(map: map, controllerD: sheetController),
               ],
             ));
       },

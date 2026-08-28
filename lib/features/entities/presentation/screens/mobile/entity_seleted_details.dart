@@ -79,11 +79,14 @@ class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
                             'entidad': widget.map.selectEntity!.name
                           });
 
-                      ref.read(degradableScrollControllerProvider).animateTo(
-                            0.3,
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.easeInOut,
-                          );
+                      if (widget.controllerD != null &&
+                          widget.controllerD!.isAttached) {
+                        widget.controllerD!.animateTo(
+                          0.3,
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeInOut,
+                        );
+                      }
                       
                     },
                     text: l10n.howToGetThere,
@@ -133,11 +136,14 @@ class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
               // limpiamos la ruta trazada
               ref.read(mapProvider.notifier).clearRoute();
               //volver a la altura iniciar
-              ref.read(degradableScrollControllerProvider).animateTo(
-                    0.3,
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeInOut,
-                  );
+              if (widget.controllerD != null &&
+                  widget.controllerD!.isAttached) {
+                widget.controllerD!.animateTo(
+                  0.3,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.easeInOut,
+                );
+              }
             },
           ),
         ),

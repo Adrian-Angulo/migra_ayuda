@@ -1,45 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/constants/list_countries.dart';
+import 'package:migra_ayuda/core/network/network_provider.dart';
+import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/dropdown_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_numeric_widget.dart';
 import 'package:migra_ayuda/l10n/app_localizations.dart';
-
-const _countries = [
-  'Afghanistan',
-  'Albania',
-  'Algeria',
-  'Argentina',
-  'Australia',
-  'Bolivia',
-  'Brasil',
-  'Canada',
-  'Chile',
-  'China',
-  'Colombia',
-  'Costa Rica',
-  'Cuba',
-  'Ecuador',
-  'El Salvador',
-  'España',
-  'Estados Unidos',
-  'Francia',
-  'Guatemala',
-  'Haiti',
-  'Honduras',
-  'Italia',
-  'Jamaica',
-  'México',
-  'Nicaragua',
-  'Panamá',
-  'Paraguay',
-  'Perú',
-  'Portugal',
-  'Puerto Rico',
-  'República Dominicana',
-  'Uruguay',
-  'Venezuela',
-];
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
@@ -61,11 +28,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     super.initState();
     final user = ref.read(authNotifierProvider).value;
     if (user != null) {
-      _originCountry =
-          _countries.contains(user.originCountry) ? user.originCountry : null;
-      _destinationCountry = _countries.contains(user.destinationCountry)
-          ? user.destinationCountry
+      _originCountry = ListCountries.contries().contains(user.originCountry)
+          ? user.originCountry
           : null;
+      _destinationCountry =
+          ListCountries.contries().contains(user.destinationCountry)
+              ? user.destinationCountry
+              : null;
       _ageController.text = user.age ?? '';
     }
   }
@@ -77,6 +46,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   Future<void> _save() async {
+    final isConnected = await ref.read(networkInfoProvider).isConnected;
+    if (!isConnected) {
+      if (mounted) {
+        SnackbarWidget.warning(
+          context,
+          'No tienes conexión a internet para editar tu perfil',
+        );
+      }
+      return;
+    }
+
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _loading = true);
@@ -88,30 +68,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           );
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Row(
-              children: [
-                Icon(Icons.check_circle_outline, color: Colors.white, size: 18),
-                SizedBox(width: 10),
-                Text('Perfil actualizado correctamente'),
-              ],
-            ),
-            backgroundColor: Color(0xFF10B981),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        SnackbarWidget.success(context, 'Perfil actualizado correctamente');
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        SnackbarWidget.error(context, 'Error al actualizar perfil: $e');
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -164,7 +126,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               DropdownFieldWidget(
                 title: '',
                 value: _originCountry,
-                items: _countries,
+                items: ListCountries.contries(),
                 hint: l10n.chooseAnOption,
                 onChanged: (v) => setState(() => _originCountry = v),
               ),
@@ -177,7 +139,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               DropdownFieldWidget(
                 title: '',
                 value: _destinationCountry,
-                items: _countries,
+                items: ListCountries.contries(),
                 hint: l10n.chooseAnOption,
                 onChanged: (v) => setState(() => _destinationCountry = v),
               ),
