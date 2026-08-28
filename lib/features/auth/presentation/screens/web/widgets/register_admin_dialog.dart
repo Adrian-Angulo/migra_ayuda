@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:migra_ayuda/core/widgets/mobil/snackbar_web_widget.dart';
 import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/register_notifier.dart';
@@ -26,37 +27,22 @@ class _RegisterAdminDialogState extends ConsumerState<RegisterAdminDialog> {
     final colors = Theme.of(context).colorScheme;
     final registerState = ref.watch(registerProvider);
 
-    // ✅ Escuchar cambios de estado
     ref.listen(
       registerProvider,
       (previous, next) {
-        // Solo reaccionar si el estado anterior era loading
-        if (previous?.isLoading == true) {
+        if (previous?.isLoading == true && !next.isLoading) {
           next.when(
             data: (success) {
               if (success == true) {
                 // ✅ Registro exitoso
                 ref.read(usersNotifierProvider.notifier).refresh();
                 context.pop(); // Cerrar el diálogo
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content:
-                        Text('✅ Usuario administrador registrado exitosamente'),
-                    backgroundColor: Colors.green,
-                    duration: Duration(seconds: 3),
-                  ),
-                );
+                // Éxito manejado aquí o mediante notificación global
               }
             },
             error: (error, stack) {
               // ❌ Error en el registro
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('❌ Error: $error'),
-                  backgroundColor: Colors.red,
-                  duration: const Duration(seconds: 4),
-                ),
-              );
+              SnackbarWebWidget.error(context, error);
             },
             loading: () {
               // No hacer nada mientras carga

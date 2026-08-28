@@ -48,7 +48,7 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
               if (context.mounted) Navigator.pop(context);
             });
           } else if (next.hasError) {
-            SnackbarWidget.error(context, next.error.toString());
+            SnackbarWidget.error(context, next.error);
           }
         }
       },

@@ -67,7 +67,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       }
     } catch (e) {
       if (mounted) {
-        SnackbarWidget.error(context, 'Error al actualizar perfil: $e');
+        SnackbarWidget.error(context, e);
       }
     } finally {
       if (mounted) setState(() => _loading = false);

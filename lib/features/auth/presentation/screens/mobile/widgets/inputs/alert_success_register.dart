@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_screen.dart';
 
 class AlertSuccessRegister extends StatelessWidget {
   const AlertSuccessRegister({
@@ -53,7 +53,10 @@ class AlertSuccessRegister extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () =>
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => const LoginScreen(),
+              )),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF64999A),
                 foregroundColor: Colors.white,

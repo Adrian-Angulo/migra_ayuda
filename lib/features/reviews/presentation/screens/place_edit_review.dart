@@ -51,7 +51,7 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
         // Solo reacciona cuando termina de cargar (igual que en place_add_review)
         if (previous?.isLoading == true && !next.isLoading) {
           if (next.hasError) {
-            SnackbarWidget.error(context, next.error.toString());
+            SnackbarWidget.error(context, next.error);
           } else if( next.value == ReviewState.updating) {
             SnackbarWidget.success(context, 'Reseña actualizada exitosamente');
             await Future.delayed(const Duration(seconds: 1));

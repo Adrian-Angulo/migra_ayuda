@@ -38,7 +38,7 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
           if (next.value == ReviewState.deleting) {
             SnackbarWidget.success(context, "Comentario eliminado con éxito");
           } else if (next.hasError) {
-            SnackbarWidget.error(context, next.error.toString());
+            SnackbarWidget.error(context, next.error);
           }
         }
       },

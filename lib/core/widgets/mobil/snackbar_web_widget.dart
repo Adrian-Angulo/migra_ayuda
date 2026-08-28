@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:migra_ayuda/core/errors/error_mappers.dart';
 
 enum SnackbarPosition {
   topLeft,
@@ -28,13 +29,15 @@ class SnackbarWebWidget {
 
   static void error(
     BuildContext context,
-    String message, {
+    dynamic errorOrMessage, {
     SnackbarPosition position = SnackbarPosition.bottomRight,
     Duration duration = const Duration(seconds: 5),
   }) {
+    final String friendlyMessage =
+        ErrorMappers.getFriendlyErrorMessage(errorOrMessage);
     _show(
       context,
-      message,
+      friendlyMessage,
       backgroundColor: const Color(0xFFC62828),
       icon: Icons.error_rounded,
       position: position,

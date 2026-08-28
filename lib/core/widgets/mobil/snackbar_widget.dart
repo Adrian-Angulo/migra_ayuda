@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:migra_ayuda/core/errors/error_mappers.dart';
 
 class SnackbarWidget {
   static void success(
@@ -15,11 +16,13 @@ class SnackbarWidget {
 
   static void error(
     BuildContext context,
-    String message,
+    dynamic errorOrMessage,
   ) {
+    final String friendlyMessage =
+        ErrorMappers.getFriendlyErrorMessage(errorOrMessage);
     _show(
       context,
-      message,
+      friendlyMessage,
       backgroundColor: Colors.red,
       icon: Icons.error,
     );
