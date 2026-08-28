@@ -1,5 +1,6 @@
 class ActivityActions {
   static String login() => "Iniciar de Sesión";
+  static String loginGoogle() => "Iniciar Sesión con Google";
   static String logout() => "Cerrar sesión";
   static String entityViewed() => "Ver entidad";
   static String routeRequested() => "Como llegar";
@@ -11,6 +12,7 @@ class ActivityActions {
   static String changeLanguaje() => "Cambiar Idioma";
   static List<String> types() => [
     login(),
+    loginGoogle(),
     logout(),
     entityViewed(),
     routeRequested(),
@@ -21,5 +23,4 @@ class ActivityActions {
     filter(),
     changeLanguaje(),
   ];
-
 }

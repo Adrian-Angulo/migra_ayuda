@@ -1,14 +1,10 @@
 
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class AlertSuccessRegister extends StatelessWidget {
   const AlertSuccessRegister({
     super.key,
-    required this.l10n,
   });
-
-  final AppLocalizations l10n;
 
   @override
   Widget build(BuildContext context) {
@@ -28,18 +24,28 @@ class AlertSuccessRegister extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: const Icon(
-              Icons.check_circle_outline_rounded,
+              Icons.mark_email_read_outlined,
               color: Color(0xFF64999A),
               size: 40,
             ),
           ),
           const SizedBox(height: 16),
-          Text(
-            l10n.successRegistration,
-            style: const TextStyle(
+          const Text(
+            '¡Registro Exitoso!',
+            style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Color(0xFF2C2C2C),
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Hemos enviado un enlace de confirmación a tu correo electrónico. Por favor verifica tu cuenta antes de iniciar sesión.',
+            style: TextStyle(
+              fontSize: 14,
+              color: Color(0xFF6B7280),
+              height: 1.4,
             ),
             textAlign: TextAlign.center,
           ),
@@ -56,9 +62,9 @@ class AlertSuccessRegister extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: Text(
-                l10n.continueButton,
-                style: const TextStyle(
+              child: const Text(
+                'Entendido',
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),

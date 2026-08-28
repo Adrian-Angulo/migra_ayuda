@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class DrawerUserHeader extends ConsumerWidget {
   const DrawerUserHeader({
@@ -13,7 +12,6 @@ class DrawerUserHeader extends ConsumerWidget {
     final asynUser = ref.watch(authNotifierProvider);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final l10n = AppLocalizations.of(context)!;
 
     return asynUser.when(
       error: (error, stackTrace) => Text('error ${error.toString()}'),
@@ -40,7 +38,7 @@ class DrawerUserHeader extends ConsumerWidget {
                 children: [
                   const SizedBox(height: 12),
                   Text(
-                    user?.name ?? 'no data',
+                    user?.name ?? 'Sin datos',
                     style: theme.textTheme.titleLarge?.copyWith(
                       color: colorScheme.onPrimary,
                       fontWeight: FontWeight.bold,
@@ -48,7 +46,7 @@ class DrawerUserHeader extends ConsumerWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    user?.email ?? 'No data',
+                    user?.email ?? 'Sin datos',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: colorScheme.onPrimary.withValues(alpha: 0.85),
                     ),
@@ -64,20 +62,20 @@ class DrawerUserHeader extends ConsumerWidget {
                 children: [
                   _InfoTile(
                     icon: Icons.flight_takeoff_rounded,
-                    label: l10n.originLabel,
-                    value: user?.originCountry ?? 'No data',
+                    label: 'Origen',
+                    value: user?.originCountry ?? 'Sin datos',
                   ),
                   const SizedBox(height: 8),
                   _InfoTile(
                     icon: Icons.flight_land_rounded,
-                    label: l10n.destinationLabel,
-                    value: user?.destinationCountry ?? 'No Data',
+                    label: 'Destino',
+                    value: user?.destinationCountry ?? 'Sin datos',
                   ),
                   const SizedBox(height: 8),
                   _InfoTile(
                     icon: Icons.cake_rounded,
-                    label: l10n.age,
-                    value: user?.age ?? 'No data ',
+                    label: 'Edad',
+                    value: user?.age ?? 'Sin datos',
                   ),
                 ],
               ),

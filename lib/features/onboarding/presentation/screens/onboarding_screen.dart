@@ -5,7 +5,6 @@ import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/features/onboarding/domain/entities/onboarding_entity.dart';
 import 'package:migra_ayuda/features/onboarding/presentation/providers/onboarding_provider.dart';
 import 'package:migra_ayuda/features/onboarding/presentation/widgets/onboarding_widget.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -26,24 +25,26 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final isLast = _currentPage == 2;
 
-    final pages = [
+    const pages = [
       OnboardingEntity(
         imagePath: 'assets/onboarding/onboardingOne.png',
-        title: l10n.onboardingTitle1,
-        subtitle: l10n.onboardingSubtitle1,
+        title: '¡Bienvenido a MigraAyuda!',
+        subtitle:
+            'Estamos aquí para apoyarte en tu camino.\nEncuentra la ayuda que necesitas.',
       ),
       OnboardingEntity(
         imagePath: 'assets/onboarding/onboardingTwo.png',
-        title: l10n.onboardingTitle2,
-        subtitle: l10n.onboardingSubtitle2,
+        title: 'Encuentra ayuda cerca de ti',
+        subtitle:
+            'Localiza comedores, refugios y centros de salud en tiempo real usando tu ubicación GPS.',
       ),
       OnboardingEntity(
         imagePath: 'assets/onboarding/onbardingThree.png',
-        title: l10n.onboardingTitle3,
-        subtitle: l10n.onboardingSubtitle3,
+        title: 'Estamos contigo',
+        subtitle:
+            'Puedes ver los comentarios de otros para que ingreses seguro y mires la experiencia.',
       ),
     ];
 
@@ -74,9 +75,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                   ),
-                  child: Text(
-                    l10n.skipButton,
-                    style: const TextStyle(color: Colors.black87, fontSize: 13),
+                  child: const Text(
+                    'Omitir',
+                    style: TextStyle(color: Colors.black87, fontSize: 13),
                   ),
                 ),
               ),
@@ -143,7 +144,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     ),
                   ),
                   child: Text(
-                    isLast ? l10n.startButton : l10n.nextButton,
+                    isLast ? 'Empezar' : 'Siguiente',
                     style: const TextStyle(fontSize: 16),
                   ),
                 ),

@@ -74,7 +74,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               /* SnackbarWidget.success(context, l10n.successRegistration); */
               showDialog(
                 context: context,
-                builder: (context) => AlertSuccessRegister(l10n: l10n),
+                builder: (context) => const AlertSuccessRegister(),
               );
             }
           },

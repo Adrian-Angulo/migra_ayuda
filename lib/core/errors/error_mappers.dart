@@ -1,33 +1,38 @@
 import 'package:flutter/cupertino.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class ErrorMappers {
   /// Obtener mensaje de error amigable
   static String getAuthErrorMessage(String error, BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    if (error.contains('email-not-verified') ||
+        error.contains('email_not_verified')) {
+      return 'Debes verificar tu correo electrónico antes de iniciar sesión. Por favor revisa tu bandeja de entrada.';
+    }
+
     switch (error) {
       case 'user-not-found':
-        return l10n.authErrorUserNotFoundCode;
+      case 'user_not_found':
+        return 'Usuario no encontrado. Por favor regístrate.';
       case 'wrong-password':
-        return l10n.authErrorWrongPassword;
+        return 'Contraseña incorrecta.';
       case 'invalid-email':
-        return l10n.authErrorInvalidEmailCode;
+        return 'El correo electrónico no es válido.';
       case 'user-disabled':
-        return l10n.authErrorUserDisabled;
+        return 'Esta cuenta de usuario ha sido inhabilitada.';
       case 'email-already-in-use':
-        return l10n.authErrorEmailAlreadyInUse;
+      case 'email_already_in_use':
+        return 'Este correo ya se encuentra registrado.';
       case 'operation-not-allowed':
-        return l10n.authErrorOperationNotAllowedCode;
+        return 'Operación no permitida.';
       case 'weak-password':
-        return l10n.authErrorWeakPasswordCode;
+        return 'La contraseña debe tener al menos 6 caracteres.';
       case 'account-exists-with-different-credential':
-        return l10n.authErrorAccountExistsWithDifferentCredential;
+        return 'Ya existe una cuenta con una credencial diferente.';
       case 'invalid-credential':
-        return l10n.authErrorInvalidCredentialCode;
+        return 'Credenciales inválidas. Verifica tu correo y contraseña.';
       case 'network-request-failed':
-        return l10n.authErrorNetworkRequestFailed;
+        return 'Error de conexión. Verifica tu conexión a internet.';
       default:
-        return l10n.authErrorDefault;
+        return 'Error al iniciar sesión. Intenta nuevamente.';
     }
   }
 }

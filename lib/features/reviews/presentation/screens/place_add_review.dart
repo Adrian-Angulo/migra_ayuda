@@ -8,7 +8,6 @@ import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/floating_main_button.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class PlaceAddReview extends ConsumerStatefulWidget {
   final EntityEntity entity;
@@ -24,7 +23,7 @@ class PlaceAddReview extends ConsumerStatefulWidget {
 }
 
 class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
-  double rating = 1;
+  double rating = 3;
   final formkey = GlobalKey<FormState>();
   final commetController = TextEditingController();
 
@@ -37,7 +36,6 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
   @override
   Widget build(BuildContext context) {
     UserModel user = widget.user!;
-    final l10n = AppLocalizations.of(context)!;
     // Escucha el estado de creación de review
     ref.listen(
       reviewNotifierProvider,
@@ -45,7 +43,7 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
         if (previous?.isLoading == true && !next.isLoading) {
           if (next.value == ReviewState.creating) {
             SnackbarWidget.success(
-                context, l10n.comentarioPublicadoExitosamenteReview);
+                context, '¡Reseña publicada exitosamente!');
             Future.delayed(const Duration(seconds: 1), () {
               if (context.mounted) Navigator.pop(context);
             });
@@ -133,9 +131,9 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                   const SizedBox(
                     height: 16,
                   ),
-                  Text(
-                    l10n.howWouldYouRateThisEntity,
-                    style: const TextStyle(
+                  const Text(
+                    '¿Cómo calificarías esta entidad?',
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1A1A),
@@ -161,9 +159,9 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                       },
                     ),
                   ),
-                  Text(
-                    l10n.describeYourExperienceToHelpOtherUsers,
-                    style: const TextStyle(
+                  const Text(
+                    'Describe tu experiencia para ayudar a otros usuarios',
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1A1A),
@@ -175,13 +173,13 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                   TextFormField(
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
-                        return l10n.porFavorEscribeUnComentarioReview;
+                        return 'Por favor escribe un comentario';
                       }
                       if (value.trim().length < 10) {
-                        return l10n.comentarioMenorA10Caracteres;
+                        return 'El comentario debe tener al menos 10 caracteres';
                       }
                       if (value.trim().length > 200) {
-                        return l10n.comentarioNoPuedeExcederlos200;
+                        return 'El comentario no puede exceder los 200 caracteres';
                       }
                       return null;
                     },
@@ -195,7 +193,7 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                       color: Color(0xFF1A1A1A),
                     ),
                     decoration: InputDecoration(
-                      hintText: l10n.writeComment,
+                      hintText: 'Escribe tu comentario...',
                       hintStyle: const TextStyle(
                         color: Color(0xFF9CA3AF),
                         fontSize: 14,
@@ -257,7 +255,7 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                           .read(reviewNotifierProvider.notifier)
                           .createReview(review);
                     },
-                    text: isLoading ? l10n.submitLoad : l10n.submitReview,
+                    text: isLoading ? 'Enviando...' : 'Enviar reseña',
                   )
                 ],
               ),

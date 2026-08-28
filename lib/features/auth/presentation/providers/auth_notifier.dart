@@ -16,6 +16,13 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
       if (user == null) return null;
       // Obtener los datos completos del usuario
       final userData = await repository.getUserData(user.uid);
+      if (!kIsWeb) {
+        Future.microtask(() {
+          ref.read(auditNotifierProvider.notifier).create(
+                accion: ActivityActions.login(),
+              );
+        });
+      }
       return userData;
     } catch (e) {
       debugPrint('❌ Error al construir AuthNotifier: $e');
@@ -52,7 +59,11 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
       ref.read(routerMovilNotifierProvider).refresh();
     } catch (e, stack) {
       debugPrint('❌ Error inesperado en login: $e');
-      state = AsyncValue.error('Error al iniciar sesión: $e', stack);
+      final errorMsg = e.toString().contains('email-not-verified') ||
+              e.toString().contains('email_not_verified')
+          ? 'email-not-verified'
+          : 'Error al iniciar sesión: $e';
+      state = AsyncValue.error(errorMsg, stack);
       ref.read(routerMovilNotifierProvider).refresh();
     }
   }
@@ -87,11 +98,13 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
       final userData = await repository.verifyOrCreateGoogleUser(credential);
 
       state = AsyncValue.data(userData);
-      ref.read(auditNotifierProvider.notifier).create(
-            accion: ActivityActions.login(),
-          );
+      if (!kIsWeb) {
+        ref.read(auditNotifierProvider.notifier).create(
+              accion: ActivityActions.loginGoogle(),
+            );
+      }
       ref.read(routerMovilNotifierProvider).refresh();
-      debugPrint('Inicio de sesion con login');
+      debugPrint('Inicio de sesión con Google exitoso');
     } on FirebaseAuthException catch (e, stack) {
       debugPrint('❌ Error de autenticación con Google: ${e.message}');
       state = AsyncValue.error(e.code, stack);

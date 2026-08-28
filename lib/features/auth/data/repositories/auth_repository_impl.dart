@@ -124,14 +124,19 @@ class AuthRepositoryImpl implements AuthRepository {
     );
 
     if (credential.user == null) {
-      throw Exception('user_not_found');
+      throw Exception('user-not-found');
     }
 
-    if (!credential.user!.emailVerified) {
-      throw Exception('email_not_verified');
+    // Recargar usuario para refrescar el estado de emailVerified desde Firebase
+    await credential.user!.reload();
+    final refreshedUser = _auth.currentUser ?? credential.user!;
+
+    if (!refreshedUser.emailVerified) {
+      await _auth.signOut();
+      throw Exception('email-not-verified');
     }
 
-    return credential.user!;
+    return refreshedUser;
   }
 
   @override

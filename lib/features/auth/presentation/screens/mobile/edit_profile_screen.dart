@@ -6,7 +6,6 @@ import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/dropdown_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_numeric_widget.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
@@ -28,13 +27,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     super.initState();
     final user = ref.read(authNotifierProvider).value;
     if (user != null) {
-      _originCountry = ListCountries.contries().contains(user.originCountry)
-          ? user.originCountry
-          : null;
-      _destinationCountry =
-          ListCountries.contries().contains(user.destinationCountry)
-              ? user.destinationCountry
-              : null;
+      _originCountry = user.originCountry;
+      _destinationCountry = user.destinationCountry;
       _ageController.text = user.age ?? '';
     }
   }
@@ -82,11 +76,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
-      appBar: _EditProfileAppBar(title: l10n.editProfile),
+      appBar: const _EditProfileAppBar(title: 'Editar Perfil'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(
@@ -119,37 +111,35 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               ),
               const SizedBox(height: 28),
 
-              _SectionLabel(
-                  label: l10n.originCountry,
-                  icon: Icons.flight_takeoff_rounded),
+              const _SectionLabel(
+                  label: 'País de origen', icon: Icons.flight_takeoff_rounded),
               const SizedBox(height: 8),
               DropdownFieldWidget(
                 title: '',
                 value: _originCountry,
                 items: ListCountries.contries(),
-                hint: l10n.chooseAnOption,
+                hint: 'Elige una opción',
                 onChanged: (v) => setState(() => _originCountry = v),
               ),
               const SizedBox(height: 24),
 
-              _SectionLabel(
-                  label: l10n.destinationCountry,
-                  icon: Icons.flight_land_rounded),
+              const _SectionLabel(
+                  label: 'País de destino', icon: Icons.flight_land_rounded),
               const SizedBox(height: 8),
               DropdownFieldWidget(
                 title: '',
                 value: _destinationCountry,
                 items: ListCountries.contries(),
-                hint: l10n.chooseAnOption,
+                hint: 'Elige una opción',
                 onChanged: (v) => setState(() => _destinationCountry = v),
               ),
               const SizedBox(height: 24),
 
-              _SectionLabel(label: l10n.age, icon: Icons.cake_rounded),
+              const _SectionLabel(label: 'Edad', icon: Icons.cake_rounded),
               const SizedBox(height: 8),
               TextFieldNumericWidget(
                 title: '',
-                hintText: l10n.ageHint,
+                hintText: 'Ej. 24',
                 controller: _ageController,
               ),
               const SizedBox(height: 40),
@@ -237,7 +227,6 @@ class _SaveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       height: 54,
@@ -259,15 +248,14 @@ class _SaveButton extends StatelessWidget {
                 child: CircularProgressIndicator(
                     strokeWidth: 2.5, color: Colors.white),
               )
-            : Row(
+            : const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.save_outlined, size: 20),
-                  const SizedBox(width: 8),
+                  Icon(Icons.save_outlined, size: 20),
+                  SizedBox(width: 8),
                   Text(
-                    l10n.editProfile,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w600),
+                    'Guardar cambios',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ],
               ),

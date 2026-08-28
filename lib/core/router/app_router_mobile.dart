@@ -10,8 +10,6 @@ import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_scre
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/complete_info_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/register_screen.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/home_screen.dart';
-import 'package:migra_ayuda/features/language/presentation/providers/language_provider.dart';
-import 'package:migra_ayuda/features/language/presentation/screens/language_screen.dart';
 import 'package:migra_ayuda/features/onboarding/presentation/providers/onboarding_provider.dart';
 import 'package:migra_ayuda/features/onboarding/presentation/screens/onboarding_screen.dart';
 
@@ -37,17 +35,11 @@ final routerMobile = Provider<GoRouter>(
       initialLocation: Routes.splashInit,
       refreshListenable: ref.read(routerMovilNotifierProvider),
       redirect: (context, state) {
-        final languageAsync = ref.read(languageProvider);
         final seeOnboarding = ref.read(onboardingProvider);
         final authAsync = ref.read(authNotifierProvider);
 
         // Si estamos en splashInit o splash, no redirigir
         if (state.matchedLocation == Routes.splashInit) return null;
-
-        // Si no hay idioma seleccionado, ir a selección de idioma
-        final hasNoLanguage =
-            languageAsync.value == null || languageAsync.hasError;
-        if (hasNoLanguage) return Routes.selectLanguaje;
 
         // Si el usuario no ha visto el onboarding, mostrarlo
         final hasNotSeenOnboarding =
@@ -75,10 +67,6 @@ final routerMobile = Provider<GoRouter>(
           path: Routes.splashInit,
           builder: (context, state) => const FadeIn(
               duration: Duration(seconds: 2), child: SplashScreenInit()),
-        ),
-        GoRoute(
-          path: Routes.selectLanguaje,
-          builder: (context, state) => const LanguageScreen(),
         ),
         GoRoute(
           path: Routes.onboarding,

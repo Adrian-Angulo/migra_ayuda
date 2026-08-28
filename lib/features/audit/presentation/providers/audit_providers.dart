@@ -91,7 +91,7 @@ class AuditNotifier extends AsyncNotifier<ActivityState> {
         nombre: user.name,
         correo: user.email,
         metadata: metadata,
-        pais: user.originCountry!);
+        pais: user.originCountry ?? 'Sin país');
 
     // guard. captura errores automaticamente
     state = await AsyncValue.guard(() async {

@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/core/constants/activity_actions.dart';
-import 'package:migra_ayuda/features/language/presentation/providers/language_provider.dart';
-import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class DrawerMenuItems extends ConsumerWidget {
   final VoidCallback onEditProfile;
@@ -17,9 +13,6 @@ class DrawerMenuItems extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
-    final currentLocale = ref.watch(languageProvider);
-
     return Column(
       children: [
         const Padding(
@@ -30,16 +23,8 @@ class DrawerMenuItems extends ConsumerWidget {
         // Opciones del menú
         _DrawerOption(
           icon: Icons.edit_outlined,
-          label: l10n.editProfile,
+          label: 'Editar Perfil',
           onTap: onEditProfile,
-        ),
-        _DrawerOption(
-          icon: Icons.language_rounded,
-          label: l10n.changeLanguage,
-          onTap: () {
-            Navigator.pop(context);
-            _showLanguagePicker(context, ref, l10n, currentLocale.value);
-          },
         ),
 
         const Spacer(),
@@ -51,41 +36,12 @@ class DrawerMenuItems extends ConsumerWidget {
 
         _DrawerOption(
           icon: Icons.logout_rounded,
-          label: l10n.logout,
+          label: 'Cerrar Sesión',
           color: Colors.redAccent,
           onTap: onLogout,
         ),
         const SizedBox(height: 12),
       ],
-    );
-  }
-
-  void _showLanguagePicker(
-    BuildContext context,
-    WidgetRef ref,
-    AppLocalizations l10n,
-    Locale? currentLocale,
-  ) {
-    // Capturar el notifier ANTES de mostrar el bottom sheet
-    final languageNotifier = ref.read(languageProvider.notifier);
-
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) => _LanguagePickerSheet(
-        currentLocale: currentLocale,
-        l10n: l10n,
-        onLanguageSelected: (code) async {
-          Navigator.pop(ctx);
-          // Usar el notifier capturado en lugar de ref
-          await languageNotifier.changeLanguage(code);
-          await ref.read(auditNotifierProvider.notifier).create(
-              accion: ActivityActions.changeLanguaje(),
-              metadata: {'languaje': code});
-        },
-      ),
     );
   }
 }
@@ -120,140 +76,6 @@ class _DrawerOption extends StatelessWidget {
       trailing: const Icon(Icons.keyboard_arrow_right_outlined),
       horizontalTitleGap: 4,
       onTap: onTap,
-    );
-  }
-}
-
-class _LanguagePickerSheet extends StatelessWidget {
-  final Locale? currentLocale;
-  final AppLocalizations l10n;
-  final Future<void> Function(String code) onLanguageSelected;
-
-  const _LanguagePickerSheet({
-    required this.currentLocale,
-    required this.l10n,
-    required this.onLanguageSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: const Color(0xFFD1D5DB),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            l10n.selectLanguageTitle,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1A1A1A),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            l10n.chooseLanguageHint,
-            style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
-          ),
-          const SizedBox(height: 20),
-          _LanguageOption(
-            flag: '🇪🇸',
-            name: l10n.spanish,
-            subtitle: 'Spanish',
-            isSelected: currentLocale?.languageCode == 'es',
-            onTap: () => onLanguageSelected('es'),
-          ),
-          const SizedBox(height: 12),
-          _LanguageOption(
-            flag: '🇬🇧',
-            name: l10n.english,
-            subtitle: 'Inglés',
-            isSelected: currentLocale?.languageCode == 'en',
-            onTap: () => onLanguageSelected('en'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _LanguageOption extends StatelessWidget {
-  final String flag;
-  final String name;
-  final String subtitle;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _LanguageOption({
-    required this.flag,
-    required this.name,
-    required this.subtitle,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF5F9EA0).withValues(alpha: 0.08)
-              : const Color(0xFFF8F9FA),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color:
-                isSelected ? const Color(0xFF5F9EA0) : const Color(0xFFE5E7EB),
-            width: isSelected ? 2 : 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Text(flag, style: const TextStyle(fontSize: 28)),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: isSelected
-                          ? const Color(0xFF5F9EA0)
-                          : const Color(0xFF1A1A1A),
-                    ),
-                  ),
-                  Text(
-                    subtitle,
-                    style:
-                        const TextStyle(fontSize: 12, color: Color(0xFF9CA3AF)),
-                  ),
-                ],
-              ),
-            ),
-            if (isSelected)
-              const Icon(Icons.check_circle_rounded,
-                  color: Color(0xFF5F9EA0), size: 22),
-          ],
-        ),
-      ),
     );
   }
 }

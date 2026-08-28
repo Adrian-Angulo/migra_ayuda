@@ -1,11 +1,13 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/config/sembast_database.dart';
 import 'package:migra_ayuda/core/network/network_provider.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/reviews/data/datasources/review_local_datasource.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
 import 'package:migra_ayuda/features/reviews/domain/repositories/review_repository.dart';
@@ -85,12 +87,25 @@ class ReviewsNotifier extends AsyncNotifier<ReviewState> {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await ref.read(reviewRepositoryProvider).createReview(review);
-      await ref.read(entitiesCrudProvider.notifier).actualizarTotalYPromedioEntidad(review.id);
-      await ref
-          .read(auditNotifierProvider.notifier)
-          .create(accion: ActivityActions.addComment());
+      
+      try {
+        await ref
+            .read(entitiesCrudProvider.notifier)
+            .actualizarTotalYPromedioEntidad(review.idEntity);
+      } catch (e) {
+        debugPrint('⚠️ Error actualizando total y promedio de entidad: $e');
+      }
+
+      try {
+        await ref
+            .read(auditNotifierProvider.notifier)
+            .create(accion: ActivityActions.addComment());
+      } catch (e) {
+        debugPrint('⚠️ Error creando registro de auditoría: $e');
+      }
       
       ref.invalidate(getReviewsByEntity(review.idEntity));
+      ref.invalidate(getAllEntitiesProvider);
       return ReviewState.creating;
     });
   }
@@ -99,10 +114,25 @@ class ReviewsNotifier extends AsyncNotifier<ReviewState> {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await ref.read(reviewRepositoryProvider).updateReview(review);
-      await ref
-          .read(auditNotifierProvider.notifier)
-          .create(accion: ActivityActions.updateComment());
+
+      try {
+        await ref
+            .read(entitiesCrudProvider.notifier)
+            .actualizarTotalYPromedioEntidad(review.idEntity);
+      } catch (e) {
+        debugPrint('⚠️ Error actualizando total y promedio de entidad: $e');
+      }
+
+      try {
+        await ref
+            .read(auditNotifierProvider.notifier)
+            .create(accion: ActivityActions.updateComment());
+      } catch (e) {
+        debugPrint('⚠️ Error creando registro de auditoría: $e');
+      }
+
       ref.invalidate(getReviewsByEntity(review.idEntity));
+      ref.invalidate(getAllEntitiesProvider);
       return ReviewState.updating;
     });
   }
@@ -111,10 +141,25 @@ class ReviewsNotifier extends AsyncNotifier<ReviewState> {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       await ref.read(reviewRepositoryProvider).deleteReview(review.id);
-      await ref
-          .read(auditNotifierProvider.notifier)
-          .create(accion: ActivityActions.deleteComment());
+
+      try {
+        await ref
+            .read(entitiesCrudProvider.notifier)
+            .actualizarTotalYPromedioEntidad(review.idEntity);
+      } catch (e) {
+        debugPrint('⚠️ Error actualizando total y promedio de entidad: $e');
+      }
+
+      try {
+        await ref
+            .read(auditNotifierProvider.notifier)
+            .create(accion: ActivityActions.deleteComment());
+      } catch (e) {
+        debugPrint('⚠️ Error creando registro de auditoría: $e');
+      }
+
       ref.invalidate(getReviewsByEntity(review.idEntity));
+      ref.invalidate(getAllEntitiesProvider);
       return ReviewState.deleting;
     });
   }
