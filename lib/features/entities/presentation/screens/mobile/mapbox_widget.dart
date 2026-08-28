@@ -69,9 +69,9 @@ class _MapboxWidgetState extends ConsumerState<MapboxWidget> {
           ref.read(mapProvider.notifier).pauseTracking();
         },
         cameraOptions: CameraOptions(
-          center: Point(coordinates: Position(-77.2811, 1.2136)),
-          zoom: 12.5,
-        ),
+            center: Point(coordinates: Position(-77.2811, 1.2136)),
+            zoom: 12.5,
+            ),
       ),
       ListEntitesHome(sheetController: _sheetController),
       AnimatedBuilder(

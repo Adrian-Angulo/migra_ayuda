@@ -161,7 +161,7 @@ class MapNotifier extends StateNotifier<MapState> {
     final targetPoint = Point(coordinates: gpsPosition);
 
     _mapboxMap!.easeTo(
-      CameraOptions(center: targetPoint, zoom: 16),
+      CameraOptions(center: targetPoint, zoom: 16, pitch: 55),
       MapAnimationOptions(duration: 1500),
     );
   }
