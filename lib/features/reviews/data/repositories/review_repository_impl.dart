@@ -44,13 +44,6 @@ class ReviewRepositoryImpl implements ReviewRepository {
   @override
   Future<List<ReviewEntity>> getReviewsByEntity(String entityId) async {
     try {
-      List<ReviewModel> cachedReviews = [];
-      try {
-        cachedReviews = await localDataSource.getReviewsByEntity(entityId);
-      } catch (e) {
-        cachedReviews = [];
-      }
-
       final isConnected = await networkInfo.isConnected;
       if (isConnected) {
         try {
@@ -58,15 +51,13 @@ class ReviewRepositoryImpl implements ReviewRepository {
               await remoteDataSource.getReviewsByEntity(entityId);
 
           await localDataSource.cacheReviews(remoteReviews);
-          return remoteReviews.map((r) => r.toEntity()).toList();
         } on ServerException catch (e) {
-          if (cachedReviews.isNotEmpty) {
-            return cachedReviews.map((r) => r.toEntity()).toList();
-          }
-          throw Exception('Error del servidor: ${e.message}');
+          debugPrint('⚠️ Error del servidor al obtener reviews: ${e.message}');
         }
       }
 
+      final cachedReviews =
+          await localDataSource.getReviewsByEntity(entityId);
       return cachedReviews.map((r) => r.toEntity()).toList();
     } catch (e) {
       if (e is Exception) rethrow;
@@ -77,47 +68,24 @@ class ReviewRepositoryImpl implements ReviewRepository {
   @override
   Future<List<ReviewEntity>> getAllReviews() async {
     try {
-      // Lista para almacenar reviews en caché local
-      List<ReviewModel> cachedReviews = [];
-
-      // Intentamos cargar las reviews en caché local
-      try {
-        cachedReviews = await localDataSource.getCachedReviews();
-      } catch (e) {
-        // Si hay algún error al obtener la caché, continuamos con lista vacía
-        cachedReviews = [];
-      }
-
       // Verificamos si hay conexión a internet
       final isConnected = await networkInfo.isConnected;
 
-      // Si hay internet, intentamos obtener las reviews más recientes del servidor
+      // Si hay internet, intentamos sincronizar las reviews más recientes del servidor
       if (isConnected) {
         try {
-          // Obtenemos las reviews desde el origen remoto (ej: Firebase)
           final remoteReviews = await remoteDataSource.getAllReviews();
-
-          // Guardamos/cachéamos las reviews obtenidas remotamente en el almacenamiento local
           await localDataSource.cacheReviews(remoteReviews);
-
-          // Convertimos y devolvemos la lista de modelos a entidades de dominio
-          return remoteReviews.map((r) => r.toEntity()).toList();
         } on ServerException catch (e) {
-          // En caso de error del servidor y si hay reviews en caché, devolvemos la caché
-          if (cachedReviews.isNotEmpty) {
-            return cachedReviews.map((r) => r.toEntity()).toList();
-          }
-          // Si no hay reviews en caché, lanzamos excepción específica de servidor
-          throw Exception('Error del servidor: ${e.message}');
+          debugPrint('⚠️ Error del servidor al obtener reviews: ${e.message}');
         }
       }
 
-      // Si no hay internet, devolvemos los datos en caché local (incluso si está vacía)
+      // Retornamos las reviews de caché local (excluye las marcadas como eliminadas)
+      final cachedReviews = await localDataSource.getCachedReviews();
       return cachedReviews.map((r) => r.toEntity()).toList();
     } catch (e) {
-      // Si la excepción ya es del tipo Exception, volvemos a lanzarla
       if (e is Exception) rethrow;
-      // Cualquier otro error inesperado se encapsula en una Exception custom
       throw Exception('Error al obtener las reviews: ${e.toString()}');
     }
   }
@@ -158,7 +126,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
           await remoteDataSource.deleteReview(reviewId);
           await localDataSource.deleteLocalRecord(reviewId);
         } catch (e) {
-          return;
+          debugPrint('⚠️ Error al eliminar en Firebase: $e');
         }
       }
     } catch (e) {

@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
 import 'package:sembast/sembast.dart';
 import 'package:migra_ayuda/core/config/sembast_database.dart';
 import 'package:migra_ayuda/features/reviews/data/models/review_model.dart';
@@ -58,7 +58,7 @@ class ReviewLocalDataSource {
         return ReviewModel.fromSembastMap(record.key, record.value);
       }).toList();
     } catch (e) {
-      print('❌ Error en getReviewsByEntity: $e');
+      debugPrint('❌ Error en getReviewsByEntity: $e');
       throw 'Error al obtener reviews de la entidad del caché: $e';
     }
   }
@@ -69,6 +69,16 @@ class ReviewLocalDataSource {
 
     try {
       final db = await _db;
+
+      // No sobreescribir si el registro local tiene cambios pendientes o está eliminado
+      final localRecord = await _store.record(review.id).get(db);
+      if (localRecord != null) {
+        final isLocalSynced = localRecord['isSynced'] as bool? ?? true;
+        final isLocalDeleted = localRecord['deletedAt'] != null;
+        if (!isLocalSynced || isLocalDeleted) {
+          return;
+        }
+      }
 
       // Guarda o actualiza la review
       await _store.record(review.id).put(db, review.toMap());
@@ -84,8 +94,16 @@ class ReviewLocalDataSource {
     try {
       final db = await _db;
 
-      // Guarda todas las reviews usando _toSembastMap para consistencia
+      // Guarda las reviews sin sobreescribir registros con cambios pendientes locales
       for (final review in reviews) {
+        final localRecord = await _store.record(review.id).get(db);
+        if (localRecord != null) {
+          final isLocalSynced = localRecord['isSynced'] as bool? ?? true;
+          final isLocalDeleted = localRecord['deletedAt'] != null;
+          if (!isLocalSynced || isLocalDeleted) {
+            continue;
+          }
+        }
         await _store.record(review.id).put(db, review.toMap());
       }
     } catch (e) {
@@ -102,7 +120,7 @@ class ReviewLocalDataSource {
 
       // Obtiene la review actual
       final record = await _store.record(reviewId).get(db);
-      print('record a eliminar $record');
+      debugPrint('record a eliminar $record');
 
       if (record == null) {
         throw 'Review no encontrada en caché';
