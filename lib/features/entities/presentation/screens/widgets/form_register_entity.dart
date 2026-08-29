@@ -50,7 +50,7 @@ class FormEntityState extends ConsumerState<FormEntity> {
       _scheduleController.text = entity.schedule;
       // Preselecciona servicios si tiene entidad
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(listSelectedServicesFormProviders.notifier).state = List<String>.from(entity.services ?? []);
+        ref.read(listSelectedServicesFormProviders.notifier).state = List<String>.from(entity.services);
         ref.read(geocodingProvider.notifier).setCoordinate(LatLng(entity.localitation.latitude, entity.localitation.longitude));
       });
     }
@@ -63,12 +63,12 @@ class FormEntityState extends ConsumerState<FormEntity> {
     if (widget.entity != null && oldWidget.entity != widget.entity) {
       final entity = widget.entity!;
       _nameController.text = entity.name;
-      _descriptionController.text = entity.description ?? '';
+      _descriptionController.text = entity.description;
       _addressController.text = entity.address;
       _latitudController.text = entity.localitation.latitude.toString();
       _longitudController.text = entity.localitation.longitude.toString();
-      _phoneController.text = entity.phone ?? '';
-      _scheduleController.text = entity.schedule ?? '';
+      _phoneController.text = entity.phone ;
+      _scheduleController.text = entity.schedule;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ref.read(listSelectedServicesFormProviders.notifier).state = entity.services;
 

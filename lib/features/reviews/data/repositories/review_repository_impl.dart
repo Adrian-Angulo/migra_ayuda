@@ -51,6 +51,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
               await remoteDataSource.getReviewsByEntity(entityId);
 
           await localDataSource.cacheReviews(remoteReviews);
+          return remoteReviews.map((r) => r.toEntity()).toList();
         } on ServerException catch (e) {
           debugPrint('⚠️ Error del servidor al obtener reviews: ${e.message}');
         }
@@ -76,6 +77,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
         try {
           final remoteReviews = await remoteDataSource.getAllReviews();
           await localDataSource.cacheReviews(remoteReviews);
+          return remoteReviews.map((r) => r.toEntity()).toList();
         } on ServerException catch (e) {
           debugPrint('⚠️ Error del servidor al obtener reviews: ${e.message}');
         }

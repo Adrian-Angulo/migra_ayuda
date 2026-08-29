@@ -1,4 +1,4 @@
-import 'package:animate_do/animate_do.dart';
+
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,9 +47,12 @@ class ReviewsScreen extends ConsumerWidget {
                   },
                   hintText: 'Buscar por usuario, entidad o país...',
                 ),
-                ExportButtonWidget(label: 'Exportar', onPressed: () {
-                  ExportService.exportReviews(reviewsState.value!);
-                }),
+                ExportButtonWidget(
+                  label: 'Exportar',
+                  onPressed: reviewsState.value != null && reviewsState.value!.isNotEmpty
+                      ? () => ExportService.exportReviews(reviewsState.value!)
+                      : () {},
+                ),
               ],
             ),
           ),
@@ -98,8 +101,10 @@ class ReviewsScreen extends ConsumerWidget {
                 ],
               );
             },
-            error: (error, stackTrace) => Center(
-              child: Text('Error: $error'),
+            error: (error, stackTrace) => Expanded(
+              child: Center(
+                child: Text('Error: $error'),
+              ),
             ),
             loading: () => const Expanded(
               child: Center(child: CircularProgressIndicator()),

@@ -1,9 +1,8 @@
-import 'package:animate_do/animate_do.dart';
+
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
-import 'package:migra_ayuda/core/constants/services_utils.dart';
 import 'package:migra_ayuda/core/dataTable/widgets/build_header_cell.dart';
 import 'package:migra_ayuda/core/dataTable/widgets/build_table.dart';
 import 'package:migra_ayuda/core/services/export/export_services.dart';
@@ -39,7 +38,7 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
   @override
   Widget build(BuildContext context) {
     final entitiesState = ref.watch(entitiesFilterProvider);
-    final selectedService = ref.watch(selectedServiceFilterProvider);
+   /*  final selectedService = ref.watch(selectedServiceFilterProvider); */
 
     // Snackbar de feedback para operaciones CRUD
     ref.listen<AsyncValue<CrudOperation>>(entitiesCrudProvider,

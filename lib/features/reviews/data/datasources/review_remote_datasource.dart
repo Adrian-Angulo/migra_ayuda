@@ -119,7 +119,7 @@ class ReviewRemoteDataSource {
 
   /// Convierte un documento de Firestore a ReviewModel
   ReviewModel _fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
+    final data = (doc.data() as Map<String, dynamic>?) ?? {};
     return ReviewModel(
       id: doc.id,
       idMigrante: data['idMigrante'] ?? '',
@@ -128,15 +128,33 @@ class ReviewRemoteDataSource {
       userCountry: data['userCountry'] ?? '',
       rating: (data['rating'] as num?)?.toDouble() ?? 0.0,
       comment: data['comment'] ?? '',
-      createdAt: data['createdAt'] != null
-          ? DateTime.parse(data['createdAt'])
-          : DateTime.now(),
-      updatedAt:
-          data['updatedAt'] != null ? DateTime.parse(data['updatedAt']) : null,
-      deletedAt:
-          data['deletedAt'] != null ? DateTime.parse(data['deletedAt']) : null,
+      createdAt: _parseDateTime(data['createdAt']),
+      updatedAt: _parseNullableDateTime(data['updatedAt']),
+      deletedAt: _parseNullableDateTime(data['deletedAt']),
       isSynced: data['isSynced'] ?? true,
-      nameEntity: data['nameEntity'],
+      nameEntity: data['nameEntity'] ?? '',
     );
+  }
+
+  static DateTime _parseDateTime(dynamic value) {
+    if (value == null) return DateTime.now();
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+    if (value is String) {
+      return DateTime.tryParse(value) ?? DateTime.now();
+    }
+    return DateTime.now();
+  }
+
+  static DateTime? _parseNullableDateTime(dynamic value) {
+    if (value == null) return null;
+    if (value is Timestamp) return value.toDate();
+    if (value is DateTime) return value;
+    if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+    if (value is String) {
+      return DateTime.tryParse(value);
+    }
+    return null;
   }
 }
