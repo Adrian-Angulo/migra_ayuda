@@ -30,9 +30,9 @@ void main() {
       );
     });
 
-    // =========================================================================
+
     // getAllEntities
-    // =========================================================================
+
 
     group('getAllEntities', () {
       test('deberia retornar lista de entidades cuando es exitoso', () async {
@@ -58,9 +58,9 @@ void main() {
       });
     });
 
-    // =========================================================================
+
     // getEntityById
-    // =========================================================================
+
 
     group('getEntityById', () {
       test('deberia retornar la entidad cuando el ID existe', () async {
@@ -85,9 +85,8 @@ void main() {
       });
     });
 
-    // =========================================================================
     // registerEntity
-    // =========================================================================
+
 
     group('registerEntity', () {
       test('deberia retornar registro exitoso', () async {
@@ -132,9 +131,9 @@ void main() {
       });
     });
 
-    // =========================================================================
+
     // updateEntity
-    // =========================================================================
+
 
     group('updateEntity', () {
       test('deberia realizar la actualizacion de forma exitosa', () async {
@@ -169,9 +168,7 @@ void main() {
       });
     });
 
-    // =========================================================================
     // deleteEntity
-    // =========================================================================
 
     group('deleteEntity', () {
       test('deberia realizar la eliminacion de forma exitosa', () async {

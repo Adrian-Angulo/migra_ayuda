@@ -4,12 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:migra_ayuda/core/constants/list_countries.dart';
 import 'package:migra_ayuda/core/router/routes.dart';
+import 'package:migra_ayuda/core/widgets/legal/privacy_policy_widget.dart';
+import 'package:migra_ayuda/core/widgets/legal/terms_and_conditions_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/dropdown_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_numeric_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/button_widget.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class CompleteInfoScreen extends ConsumerStatefulWidget {
   const CompleteInfoScreen({super.key});
@@ -36,7 +37,6 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
     ref.listen(
       authNotifierProvider,
       (previous, next) {
@@ -59,7 +59,7 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.completeInfoTitle),
+        title: const Text('Completar información'),
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
@@ -73,10 +73,10 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
                 children: [
                   const SizedBox(height: 16),
                   DropdownFieldWidget(
-                    title: l10n.originCountry,
+                    title: 'País de origen',
                     value: originCountry,
                     items: countries,
-                    hint: l10n.chooseAnOption,
+                    hint: 'Elige una opción',
                     onChanged: (value) {
                       setState(() {
                         originCountry = value;
@@ -85,10 +85,10 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
                   ),
                   const SizedBox(height: 16),
                   DropdownFieldWidget(
-                    title: l10n.destinationCountry,
+                    title: 'País de destino',
                     value: destinationCountry,
                     items: countries,
-                    hint: l10n.chooseAnOption,
+                    hint: 'Elige una opción',
                     onChanged: (value) {
                       setState(() {
                         destinationCountry = value;
@@ -97,8 +97,8 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
                   ),
                   const SizedBox(height: 16),
                   TextFieldNumericWidget(
-                    title: l10n.age,
-                    hintText: l10n.ageHint,
+                    title: 'Edad',
+                    hintText: 'Ej. 24',
                     controller: _edadController,
                   ),
                   const SizedBox(height: 16),
@@ -118,21 +118,37 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
                             style: const TextStyle(
                                 fontSize: 14, color: Colors.black),
                             children: [
-                              TextSpan(text: "${l10n.iAccept} "),
+                              const TextSpan(text: "Acepto los "),
                               TextSpan(
-                                text: l10n.termsAndConditions,
+                                text: 'términos y condiciones de uso',
                                 style:
-                                    const TextStyle(color: Color(0xFF64999A)),
+                                    const TextStyle(color: Color(0xFF64999A), fontWeight: FontWeight.bold),
                                 recognizer: TapGestureRecognizer()
-                                  ..onTap = () {},
+                                  ..onTap = () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const TermsAndConditionsWidget(),
+                                      ),
+                                    );
+                                  },
                               ),
-                              TextSpan(text: " ${l10n.and} "),
+                              const TextSpan(text: " y la "),
                               TextSpan(
-                                text: l10n.privacyPolicy,
+                                text: 'política de privacidad',
                                 style:
-                                    const TextStyle(color: Color(0xFF64999A)),
+                                    const TextStyle(color: Color(0xFF64999A), fontWeight: FontWeight.bold),
                                 recognizer: TapGestureRecognizer()
-                                  ..onTap = () {},
+                                  ..onTap = () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const PrivacyPolicyWidget(),
+                                      ),
+                                    );
+                                  },
                               ),
                             ],
                           ),
@@ -143,15 +159,15 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
                   const SizedBox(height: 16),
                   ButtonWidget(
                     formKey: _formKey,
-                    text: l10n.completeInfoButton,
+                    text: 'Completar Información',
                     loading: _loading,
                     onPressed: () async {
                       if (!_formKey.currentState!.validate()) return;
 
                       if (!acceptTerms) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(l10n.errorAcceptTerms),
+                          const SnackBar(
+                            content: Text('Debes aceptar los términos y condiciones'),
                             backgroundColor: Colors.orange,
                           ),
                         );
@@ -186,7 +202,7 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
                       onPressed: () async {
                         await ref.read(authNotifierProvider.notifier).logout();
                       },
-                      child: Text(l10n.cancelButton))
+                      child: const Text('Cancelar'))
                 ],
               ),
             ),

@@ -6,7 +6,6 @@ import 'package:migra_ayuda/features/entities/presentation/providers/map_provide
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/entity_seleted_details.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/entity_card_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/text_result.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class ListEntitesHome extends ConsumerWidget {
   const ListEntitesHome({
@@ -21,7 +20,6 @@ class ListEntitesHome extends ConsumerWidget {
     String selectedFiltro = ref.watch(filterProvider);
     final listEntity = ref.watch(getAllEntitiesProvider);
     final map = ref.watch(mapProvider);
-    final l10n = AppLocalizations.of(context)!;
 
     return DraggableScrollableSheet(
       controller: sheetController,
@@ -68,8 +66,7 @@ class ListEntitesHome extends ConsumerWidget {
                                     size: 48, color: Colors.grey),
                                 const SizedBox(height: 12),
                                 Text(
-                                  //entitiesEmpyList
-                                  '${l10n.entitesEmpyList} ${getServicel10n(selectedFiltro, context)}',
+                                  'No se encontraron entidades proveedoras de servicio: $selectedFiltro',
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(color: Colors.grey),
                                 ),
@@ -97,8 +94,7 @@ class ListEntitesHome extends ConsumerWidget {
                                     color: Colors.red, size: 48),
                                 const SizedBox(height: 12),
                                 Text(
-                                  //entitesError
-                                  l10n.entitesError,
+                                  'Ocurrió un error al cargar los servicios',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(color: Colors.red[700]),
                                 ),

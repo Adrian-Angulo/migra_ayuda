@@ -2,15 +2,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_screen.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class SuccessScreen extends StatelessWidget {
   const SuccessScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
-
     Widget content = Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -29,18 +26,18 @@ class SuccessScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 30),
-        Text(
-          l10n.linkSentTitle,
-          style: const TextStyle(
+        const Text(
+          '¡Enlace enviado!',
+          style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 20),
-        Text(
-          l10n.linkSentMessage,
+        const Text(
+          'Te hemos enviado un enlace para restablecer tu contraseña. Revisa tu bandeja de entrada y también tu carpeta de spam. Recuerda que el correo debe estar registrado en el sistema',
           textAlign: TextAlign.center,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.grey,
             fontSize: 16,
             height: 1.5,
@@ -57,18 +54,18 @@ class SuccessScreen extends StatelessWidget {
               width: 1,
             ),
           ),
-          child: Row(
+          child: const Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.info_outline,
                 color: Color(0xFF856404),
                 size: 20,
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  l10n.spamReminder,
-                  style: const TextStyle(
+                  'Si no encuentras el correo, revisa tu carpeta de spam o correo no deseado.',
+                  style: TextStyle(
                     color: Color(0xFF856404),
                     fontSize: 14,
                   ),
@@ -99,9 +96,9 @@ class SuccessScreen extends StatelessWidget {
               );
             }
           },
-          child: Text(
-            l10n.backToLoginButton,
-            style: const TextStyle(
+          child: const Text(
+            'Volver al inicio de sesión',
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: Colors.white,

@@ -7,7 +7,6 @@ import 'package:migra_ayuda/core/config/loadToken.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/router/app_router.dart';
 import 'package:migra_ayuda/core/router/app_router_mobile.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 import 'core/config/firebase_options.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 
@@ -36,7 +35,6 @@ class MainApp extends ConsumerWidget {
     return MaterialApp.router(
       locale: const Locale('es'),
       localizationsDelegates: const [
-        AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,

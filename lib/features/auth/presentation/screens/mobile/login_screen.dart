@@ -11,7 +11,6 @@ import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/in
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_password_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/register_card.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 // Pantalla principal de autenticación que alterna entre login y registro
 class LoginScreen extends ConsumerStatefulWidget {
@@ -29,8 +28,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
-
     final authState = ref.watch(authNotifierProvider);
 
     // Escucha cambios en el estado de autenticación para reaccionar
@@ -57,7 +54,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               // Usuario NO es Migrante (Admin u otro rol)
               if (!context.mounted) return;
               // Mostrar mensaje de error
-              SnackbarWidget.info(context, l10n.alerMessageAdmin);
+              SnackbarWidget.info(
+                  context, '¡Eres administrador, ingresa al panel web!');
 
               // Esperar 2 segundos para que el usuario vea el mensaje
               await Future.delayed(const Duration(seconds: 2));
@@ -167,31 +165,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       children: [
                         const SizedBox(height: 16),
                         TextFieldWidget(
-                          title: l10n.emailText,
+                          title: 'Correo electrónico',
                           hintText: "correo@ejemplo.com",
                           controller: emailController,
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
-                              return l10n.errorEmailRequired;
+                              return 'El correo es obligatorio';
                             }
                             final emailRegex =
                                 RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$');
                             if (!emailRegex.hasMatch(value.trim())) {
-                              return l10n.errorEmailInvalid;
+                              return 'Ingresa un correo válido';
                             }
                             return null;
                           },
                         ),
                         const SizedBox(height: 16),
                         TextFieldPaswordWidget(
-                          title: l10n.password,
+                          title: 'Contraseña',
                           controller: passController,
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
-                              return l10n.errorPasswordRequired;
+                              return 'La contraseña es obligatoria';
                             }
                             if (value.length < 8) {
-                              return l10n.errorPasswordMinLength;
+                              return 'La contraseña debe tener al menos 8 caracteres';
                             }
 
                             return null;
@@ -209,14 +207,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                           const SendEmailScreen(),
                                     ));
                               },
-                              child: Text(l10n.resetPassword),
+                              child: const Text('¿Olvidaste tu contraseña?'),
                             ),
                           ],
                         ),
                         ButtonWidget(
                           formKey: formKey,
                           loading: authState.isLoading,
-                          text: l10n.loginButton,
+                          text: 'Iniciar Sesión',
                           onPressed: () async {
                             if (formKey.currentState!.validate()) {
                               await ref

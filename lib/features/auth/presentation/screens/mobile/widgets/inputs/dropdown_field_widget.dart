@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class DropdownFieldWidget extends StatelessWidget {
   final String title;
@@ -19,7 +18,6 @@ class DropdownFieldWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -32,7 +30,7 @@ class DropdownFieldWidget extends StatelessWidget {
           initialValue: value,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return l10n.errorSelectOption;
+              return 'Por favor selecciona una opción';
             }
             return null;
           },
@@ -40,7 +38,7 @@ class DropdownFieldWidget extends StatelessWidget {
             return DropdownMenuItem<String>(value: item, child: Text(item));
           }).toList(),
           onChanged: onChanged,
-          hint: Text(hint.isEmpty ? l10n.chooseAnOption : hint),
+          hint: Text(hint.isEmpty ? 'Elige una opción' : hint),
           decoration: InputDecoration(
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
           ),

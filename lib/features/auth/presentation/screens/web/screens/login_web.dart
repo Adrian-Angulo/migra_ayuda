@@ -100,7 +100,7 @@ class _LoginWebState extends ConsumerState<LoginWeb> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Image.asset(
-                          "assets/logo/logo.png",
+                          "assets/logo/Logo.png",
                           height: 120,
                           fit: BoxFit.contain,
                         ),
@@ -161,7 +161,7 @@ class _LoginWebState extends ConsumerState<LoginWeb> {
                             child: Column(
                               children: [
                                 Image.asset(
-                                  "assets/logo/logo.png",
+                                  "assets/logo/Logo.png",
                                   height: 72,
                                   fit: BoxFit.contain,
                                 ),

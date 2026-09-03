@@ -64,9 +64,8 @@ flutter_launcher_icons:
 flutter:
   generate: true
   uses-material-design: true
-  assets: 
-   - assets/logo/
-   - assets/icons/
-   - assets/onboarding/
-   - .env
-   - assets/
+  assets:
+    - assets/logo/
+    - assets/icons/
+    - assets/onboarding/
+    - .env

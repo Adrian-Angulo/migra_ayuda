@@ -26,7 +26,7 @@ class FilterContainer extends ConsumerWidget {
             return FilterChip(
               avatar: Icon(getServiceIcon(service)),
               showCheckmark: false,
-              label: Text(getServicel10n(service, context)),
+              label: Text(service),
               selected: isSelected,
               onSelected: (value) async {
                 if (value) {

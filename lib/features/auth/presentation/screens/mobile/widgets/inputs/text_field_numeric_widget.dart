@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class TextFieldNumericWidget extends StatefulWidget {
   final String title;
@@ -22,7 +21,6 @@ class TextFieldNumericWidget extends StatefulWidget {
 class _TextFieldNumericWidgetState extends State<TextFieldNumericWidget> {
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
     return Column(
       spacing: 5,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,11 +35,11 @@ class _TextFieldNumericWidgetState extends State<TextFieldNumericWidget> {
           controller: widget.controller,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return l10n.errorAgeRequired;
+              return 'Por favor ingresa tu edad';
             }
             final age = int.tryParse(value);
             if (age == null || age < 15 || age > 100) {
-              return l10n.errorAgeRange;
+              return 'Edad debe ser entre 18 y 100 años';
             }
             return null;
           },

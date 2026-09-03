@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 final services = [
   'Todos',
@@ -10,29 +9,6 @@ final services = [
   'Inserción Laboral',
   'Movilidad y Transporte'
 ];
-
-String getServicel10n(String service, BuildContext context) {
-  final l10n = AppLocalizations.of(context)!;
-
-  switch (service.trim()) {
-    case 'Todos':
-      return l10n.filterStateAll;
-    case 'Asesoría Jurídica':
-      return l10n.filterStateLegal;
-    case 'Atención Médica':
-      return l10n.filterStateMedical;
-    case 'Apoyo Alimentario':
-      return l10n.filterStateFoodSupport;
-    case 'Hospedaje Temporal':
-      return l10n.filterStateTemporaryLodging;
-    case 'Inserción Laboral':
-      return l10n.filterStateLaborInsertion;
-    case 'Movilidad y Transporte':
-      return l10n.filterStateMobility;
-    default:
-      return 'None';
-  }
-}
 
 MaterialColor getServiceColor(String service) {
   switch (service.toLowerCase()) {

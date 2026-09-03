@@ -13,13 +13,10 @@ final repositoryProvider =
     Provider<AuthRepository>((ref) => AuthRepositoryImpl());
 
 /// Provider del stream de cambios de estado de autenticación
-///
-/// Este provider observa en tiempo real los cambios de sesión del usuario
-/// (login, logout, cambios en Firestore, etc.)
 final authStateProvider = StreamProvider<UserModel?>((ref) {
   return ref.read(repositoryProvider).authStateChanges();
 });
-
+ 
 class UsersNotifier extends AsyncNotifier<List<UserModel>> {
   @override
   Future<List<UserModel>> build() {

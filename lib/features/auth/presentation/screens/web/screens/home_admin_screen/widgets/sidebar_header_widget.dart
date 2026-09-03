@@ -28,10 +28,14 @@ class SidebarHeaderWidget extends StatelessWidget {
             ),
             child: Center(
               child: Image.asset(
-                'assets/logo/logo.png',
+                'assets/logo/Logo.png',
                 width: 80,
                 height: 80,
                 fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  debugPrint('Error cargando Logo.png en sidebar: $error');
+                  return const Icon(Icons.broken_image, color: Colors.red, size: 40);
+                },
               ),
             ),
           ),

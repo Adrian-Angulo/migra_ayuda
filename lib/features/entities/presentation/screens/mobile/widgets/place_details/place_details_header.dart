@@ -76,7 +76,7 @@ class PlaceDetailsHeader extends ConsumerWidget {
                 ...entity.services.map(
                   (service) => PlaceInfoChip(
                     icon: getServiceIcon(service),
-                    label: getServicel10n(service, context),
+                    label: service,
                   ),
                 ),
               ],

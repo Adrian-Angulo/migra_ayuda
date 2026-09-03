@@ -16,7 +16,6 @@ import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/in
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_numeric_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/button_widget.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -62,8 +61,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
-
     ref.listen(
       registerProvider,
       (previous, next) {
@@ -71,7 +68,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           data: (success) {
             if (success == true) {
               _clearControllers();
-              /* SnackbarWidget.success(context, l10n.successRegistration); */
+              /* SnackbarWidget.success(context, '¡Registro exitoso! Verifica tu correo para iniciar sesión. Si no lo encuentras, revisa tu carpeta de spam.'); */
               showDialog(
                 context: context,
                 builder: (context) => const AlertSuccessRegister(),
@@ -104,7 +101,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     controller: _nameController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return l10n.errorLastNameRequired;
+                        return 'Por favor ingresa tu nombre completo';
                       }
                       return null;
                     },
@@ -116,15 +113,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       Expanded(
                         flex: 3,
                         child: TextFieldWidget(
-                            title: l10n.emailText,
-                            hintText: l10n.emailHint,
+                            title: 'Correo electrónico',
+                            hintText: 'Ej. usuario@gmail.com',
                             controller: _emailController,
                             validator: EmailValidator.validateFormat),
                       ),
                       Expanded(
                         child: TextFieldNumericWidget(
-                          title: l10n.age,
-                          hintText: l10n.ageHint,
+                          title: 'Edad',
+                          hintText: 'Ej. 24',
                           controller: _ageController,
                         ),
                       ),
@@ -134,29 +131,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                   const SizedBox(height: UIConstants.spacingM),
                   TextFieldPaswordWidget(
-                    title: l10n.password,
+                    title: 'Contraseña',
                     controller: _passwordController,
                   ),
                   const SizedBox(height: UIConstants.spacingM),
                   TextFieldPaswordWidget(
-                    title: l10n.confirmPassword,
+                    title: 'Confirmar contraseña',
                     controller: _confirmPasswordController,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return l10n.errorConfirmPasswordRequired;
+                        return 'Por favor confirma tu contraseña';
                       }
                       if (value != _passwordController.text) {
-                        return l10n.errorPasswordsNotMatch;
+                        return 'Las contraseñas no coinciden';
                       }
                       return null;
                     },
                   ),
                   const SizedBox(height: UIConstants.spacingM),
                   DropdownFieldWidget(
-                    title: l10n.originCountry,
+                    title: 'País de origen',
                     value: selectedOriginCountry,
                     items: ListCountries.contries(),
-                    hint: l10n.chooseAnOption,
+                    hint: 'Elige una opción',
                     onChanged: (value) {
                       setState(() {
                         selectedOriginCountry = value;
@@ -165,10 +162,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   const SizedBox(height: UIConstants.spacingM),
                   DropdownFieldWidget(
-                    title: l10n.destinationCountry,
+                    title: 'País de destino',
                     value: selectedDestinationCountry,
                     items: ListCountries.contries(),
-                    hint: l10n.chooseAnOption,
+                    hint: 'Elige una opción',
                     onChanged: (value) {
                       setState(() {
                         selectedDestinationCountry = value;
@@ -193,9 +190,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             style: const TextStyle(
                                 fontSize: 14, color: Colors.black),
                             children: [
-                              TextSpan(text: "${l10n.iAccept} "),
+                              const TextSpan(text: "Acepto los "),
                               TextSpan(
-                                text: l10n.termsAndConditions,
+                                text: 'términos y condiciones de uso',
                                 style:
                                     const TextStyle(color: Color(0xFF64999A), fontWeight: FontWeight.bold),
                                 recognizer: TapGestureRecognizer()
@@ -203,9 +200,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                     Navigator.push(context, MaterialPageRoute(builder: (context) => const TermsAndConditionsWidget(),));
                                   },
                               ),
-                              TextSpan(text: " ${l10n.and} "),
+                              const TextSpan(text: " y la "),
                               TextSpan(
-                                text: l10n.privacyPolicy,
+                                text: 'política de privacidad',
                                 style:
                                      const TextStyle(color: Color(0xFF64999A), fontWeight: FontWeight.bold),
                                 recognizer: TapGestureRecognizer()
@@ -222,15 +219,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   const SizedBox(height: UIConstants.spacingM),
                   ButtonWidget(
                       formKey: _formKey,
-                      text: l10n.registerTab,
+                      text: 'Registrarse',
                       loading: registerState.isLoading,
                       onPressed: () async {
                         if (!_formKey.currentState!.validate()) return;
 
                         if (!acceptTerms) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(l10n.errorAcceptTerms),
+                            const SnackBar(
+                              content: Text('Debes aceptar los términos y condiciones'),
                               backgroundColor: Colors.orange,
                             ),
                           );

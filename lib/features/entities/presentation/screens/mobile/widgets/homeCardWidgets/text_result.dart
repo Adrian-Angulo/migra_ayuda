@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
-
 
 class TextResult extends ConsumerWidget {
   const TextResult({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
     final lista = ref.watch(getAllEntitiesProvider);
     return lista.when(
       data: (entidades) {
@@ -22,7 +19,7 @@ class TextResult extends ConsumerWidget {
               color: Theme.of(context).colorScheme.primary,
             ),
             Text(
-              '${entidades.length} ${entidades.length == 1 ? l10n.entitiesSearchOne : l10n.entitiesSearch}',
+              '${entidades.length} ${entidades.length == 1 ? "entidad encontrada" : "entidades encontradas"}',
               textAlign: TextAlign.left,
             ),
           ],

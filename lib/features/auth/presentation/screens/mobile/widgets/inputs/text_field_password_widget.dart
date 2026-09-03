@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class TextFieldPaswordWidget extends StatefulWidget {
   final String title;
@@ -40,7 +39,6 @@ class _TextFieldPaswordWidgetState extends State<TextFieldPaswordWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -55,16 +53,16 @@ class _TextFieldPaswordWidgetState extends State<TextFieldPaswordWidget> {
           validator: widget.validator ??
               (value) {
                 if (value == null || value.isEmpty) {
-                  return l10n.errorPasswordRequired;
+                  return 'La contraseña es obligatoria';
                 }
                 if (value.length < 8) {
-                  return l10n.errorPasswordMinLength2;
+                  return 'Debe tener mínimo 8 caracteres';
                 }
                 return null;
               },
           decoration: InputDecoration(
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-            hintText: l10n.passwordHint,
+            hintText: '••••••••',
             suffixIcon: AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
               child: _showEye

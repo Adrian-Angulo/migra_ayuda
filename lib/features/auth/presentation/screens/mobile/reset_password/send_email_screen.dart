@@ -7,7 +7,6 @@ import 'package:migra_ayuda/core/widgets/mobil/snackbar_web_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/reset_password_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/reset_password/success_screen.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class SendEmailScreen extends ConsumerStatefulWidget {
   const SendEmailScreen({super.key});
@@ -58,9 +57,6 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
-
-    
     Widget form = Form(
       key: _formKey,
       child: SingleChildScrollView(
@@ -92,10 +88,10 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
         
             const SizedBox(height: 30),
         
-            Text(
-              l10n.resetPasswordTitle,
+            const Text(
+              '¿Olvidaste tu contraseña?',
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
@@ -103,20 +99,20 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
         
             const SizedBox(height: 15),
         
-            Text(
-              l10n.resetPasswordEmailHint,
+            const Text(
+              'Introduce tu correo para recibir un enlace y restablecer tu contraseña',
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.grey),
+              style: TextStyle(color: Colors.grey),
             ),
         
             const SizedBox(height: 30),
         
             // Label del campo
-            Align(
+            const Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                l10n.emailText,
-                style: const TextStyle(
+                'Correo electrónico',
+                style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: Colors.black87,
@@ -132,7 +128,7 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
               keyboardType: TextInputType.emailAddress,
               enabled: !_isLoading,
               decoration: InputDecoration(
-                hintText: l10n.emailResetHint,
+                hintText: 'migraAyuda@correo.com',
                 filled: true,
                 fillColor: const Color(0xFFFFFFFF),
                 border: OutlineInputBorder(
@@ -163,7 +159,7 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return l10n.errorEnterEmail;
+                  return 'Por favor ingresa tu correo electrónico';
                 }
                 // Validación de formato mejorada
                 final emailRegex = RegExp(
@@ -171,7 +167,7 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
                 );
         
                 if (!emailRegex.hasMatch(value)) {
-                  return l10n.errorEmailFormat;
+                  return 'Formato de correo inválido';
                 }
         
                 return null;
@@ -200,9 +196,9 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
                             AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     )
-                  : Text(
-                      l10n.sendLinkButton,
-                      style: const TextStyle(
+                  : const Text(
+                      'Enviar enlace',
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
@@ -230,9 +226,9 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
                 size: 18,
                 color: Colors.grey,
               ),
-              label: Text(
-                l10n.backToLoginButton,
-                style: const TextStyle(color: Colors.grey),
+              label: const Text(
+                'Volver al inicio de sesión',
+                style: TextStyle(color: Colors.grey),
               ),
               style: TextButton.styleFrom(
                 padding: EdgeInsets.zero,

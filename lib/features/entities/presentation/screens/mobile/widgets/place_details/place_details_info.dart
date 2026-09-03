@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/localitation/location_provider.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class PlaceDetailsInfo extends ConsumerWidget {
   final EntityEntity entity;
@@ -15,7 +14,6 @@ class PlaceDetailsInfo extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
     final distance = kIsWeb ? null : ref.watch(distanceProvider(entity));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -23,9 +21,9 @@ class PlaceDetailsInfo extends ConsumerWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              l10n.description,
-              style: const TextStyle(
+            const Text(
+              'Descripción',
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF1A1A1A),
@@ -62,9 +60,9 @@ class PlaceDetailsInfo extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    l10n.attentionSchedule.toUpperCase(),
-                    style: const TextStyle(
+                  const Text(
+                    'HORARIO DE ATENCIÓN',
+                    style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF9CA3AF),
@@ -96,15 +94,15 @@ class PlaceDetailsInfo extends ConsumerWidget {
         const SizedBox(height: 16),
         _PlaceContactCard(
           icon: Icons.phone_outlined,
-          label: l10n.phone,
+          label: 'Teléfono',
           value: entity.phone,
         ),
         const SizedBox(height: 12),
         _PlaceContactCard(
           icon: Icons.location_on_outlined,
-          label: l10n.address,
+          label: 'Dirección',
           value: entity.address,
-          subtitle: kIsWeb ? null : 'A $distance ${l10n.fromYourLocation}',
+          subtitle: kIsWeb ? null : 'A $distance De tu ubicación',
         ),
       ],
     );

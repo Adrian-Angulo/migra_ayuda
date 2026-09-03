@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class ButtonGoogleWidget extends ConsumerWidget {
   const ButtonGoogleWidget({
@@ -10,7 +9,6 @@ class ButtonGoogleWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AppLocalizations l10n = AppLocalizations.of(context)!;
     return ElevatedButton.icon(
       onPressed: () async {
         await ref.read(authNotifierProvider.notifier).authWithGoogle();
@@ -20,9 +18,9 @@ class ButtonGoogleWidget extends ConsumerWidget {
         height: 24,
         width: 24,
       ),
-      label: Text(
-        l10n.googleText,
-        style: const TextStyle(
+      label: const Text(
+        'Continuar con Google',
+        style: TextStyle(
           color: Colors.black87,
           fontSize: 16,
           fontWeight: FontWeight.w500,

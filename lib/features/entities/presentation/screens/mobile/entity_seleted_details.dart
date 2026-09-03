@@ -10,7 +10,6 @@ import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widget
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/place_details_info.dart';
 import 'package:migra_ayuda/features/reviews/presentation/screens/section_review_screen.dart';
 import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
-import 'package:migra_ayuda/l10n/app_localizations.dart';
 
 class EntitySeletedDetails extends ConsumerStatefulWidget {
   const EntitySeletedDetails({
@@ -30,7 +29,6 @@ class EntitySeletedDetails extends ConsumerStatefulWidget {
 class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     return Stack(
       children: [
         Column(
@@ -88,7 +86,7 @@ class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
                       }
                       
                     },
-                    text: l10n.howToGetThere,
+                    text: 'Cómo llegar',
                     icon: Icons.directions,
                     variant: FloatingMainButtonVariant.secondary,
                   ),
@@ -109,7 +107,7 @@ class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
                             'entidad': widget.map.selectEntity!.name
                           });
                     },
-                    text: l10n.startTrip,
+                    text: 'Iniciar viaje',
                     icon: Icons.navigation,
                     variant: FloatingMainButtonVariant.primary,
                   ),
