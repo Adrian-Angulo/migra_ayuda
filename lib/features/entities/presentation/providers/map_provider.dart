@@ -15,6 +15,8 @@ class MapNotifier extends StateNotifier<MapState> {
 
   PolylineAnnotationManager? _polylineAnnotationManager; // para dibujar rutas
 
+  List<EntityEntity> _currentEntities = [];
+
   void selectEntity(EntityEntity entity) {
     state = state.copyWith(selectEntity: entity);
   }
@@ -84,6 +86,8 @@ class MapNotifier extends StateNotifier<MapState> {
 
   /// 📍 Agrega marcadores al mapa desde una lista de ubicaciones
   Future<void> addMarkers(List<EntityEntity> entities) async {
+    _currentEntities = entities;
+
     if (_mapboxMap == null) {
       debugPrint("⚠️ El mapa aún no está listo");
       return;
@@ -109,10 +113,10 @@ class MapNotifier extends StateNotifier<MapState> {
 
       _pointAnnotationManager?.tapEvents(
         onTap: (PointAnnotation anotation) {
-          // Buscar la entidad que coincida con el texto del marcador
+          // Buscar la entidad que coincida con el texto del marcador en la lista actualizada
           try {
-            final getEntity = entities.firstWhere(
-              (entity) => entity.name == anotation.textField,
+            final getEntity = _currentEntities.firstWhere(
+              (entity) => entity.name.trim() == anotation.textField?.trim(),
             );
             state = state.copyWith(selectEntity: getEntity);
           } catch (e) {
