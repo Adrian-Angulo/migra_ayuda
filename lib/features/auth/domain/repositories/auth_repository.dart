@@ -1,21 +1,14 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:migra_ayuda/features/auth/data/models/auth_model.dart';
+import 'package:migra_ayuda/features/auth/domain/entities/auth_user.dart';
 
 abstract class AuthRepository {
-  Future<void> registerUser(AuthModel user);
-  Future<UserCredential> authWithGoogle();
-  Future<User> login(String email, String password);
+  Future<AuthUser> loginWithEmail(String email, String password);
+  Future<AuthUser> registerWithEmail(String email, String password);
+  Future<AuthUser> authWithGoogle();
   Future<void> logout();
-  Future<User?> getAuthenticatedUser();
-  Future<AuthModel> getUserData(String uid);
   Future<void> resetPassword(String email);
-  Future<void> completeProfile({
-    required String originCountry,
-    required String destinationCountry,
-    required int age,
-  });
-  Future<AuthModel> verifyOrCreateGoogleUser(UserCredential credential);
-
-  Stream<AuthModel?> authStateChanges();
-  Future<List<AuthModel>> getAllUsers();
+  Future<AuthUser?> getCurrentUser();
+  Stream<AuthUser?> watchAuthState();
+  Future<void> deleteCurrentUser();
 }
+
+

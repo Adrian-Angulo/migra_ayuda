@@ -28,10 +28,13 @@ class MapNotifier extends StateNotifier<MapState> {
     // 🔄 Reseteamos el gestor de anotaciones cuando se crea un nuevo mapa
     _pointAnnotationManager = null;
 
+    // Desactivamos gestos 3D (pitch) para mantener el mapa en 2D
+    _mapboxMap!.gestures.updateSettings(GesturesSettings(pitchEnabled: false));
+
     // Ocultamos la barra de escala del mapa
     _mapboxMap!.scaleBar.updateSettings(ScaleBarSettings(enabled: false));
 
-    // Definimos los límites geográficos y de zoom permitidos en el mapa
+    // Definimos los límites geográficos, de zoom y bloqueamos la inclinación (pitch) en 2D (0°)
     _mapboxMap!.setBounds(CameraBoundsOptions(
       bounds: CoordinateBounds(
           // Esquina suroeste del área permitida
@@ -41,6 +44,8 @@ class MapNotifier extends StateNotifier<MapState> {
           infiniteBounds: false),
       minZoom: 12, // Zoom mínimo permitido
       maxZoom: 18, // Zoom máximo permitido
+      minPitch: 0.0,
+      maxPitch: 0.0,
     ));
 
     _mapboxMap!.location.updateSettings(LocationComponentSettings(
@@ -50,6 +55,11 @@ class MapNotifier extends StateNotifier<MapState> {
         await _mapboxMap!.annotations.createPolylineAnnotationManager();
 
     state = state.copyWith(isMapReady: true, hasMarkers: false);
+
+    // Si ya teníamos entidades cargadas en memoria, colocamos los marcadores de inmediato
+    if (_currentEntities.isNotEmpty) {
+      await addMarkers(_currentEntities);
+    }
   }
 
   /// Apaga el seguimiento cuando el usuario arrastra el mapa de forma manual
@@ -160,12 +170,12 @@ class MapNotifier extends StateNotifier<MapState> {
     state = state.copyWith(hasMarkers: true);
   }
 
-  // Método privado para evitar duplicar código de animación de cámara
+  // Método privado para evitar duplicar código de animación de cámara (2D plano)
   void _moveCamera(Position gpsPosition) {
     final targetPoint = Point(coordinates: gpsPosition);
 
     _mapboxMap!.easeTo(
-      CameraOptions(center: targetPoint, zoom: 16, pitch: 55),
+      CameraOptions(center: targetPoint, zoom: 16, pitch: 0),
       MapAnimationOptions(duration: 1500),
     );
   }

@@ -1,235 +1,171 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:migra_ayuda/features/auth/data/models/auth_model.dart';
+import 'package:migra_ayuda/features/auth/domain/entities/auth_user.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
+import 'package:migra_ayuda/features/auth/domain/usecases/login_with_google_usecase.dart';
+import 'package:migra_ayuda/features/auth/domain/usecases/register_with_email_usecase.dart';
+import 'package:migra_ayuda/features/users/domain/entities/migrant.dart';
+import 'package:migra_ayuda/features/users/domain/repository/user_repository.dart';
 import 'package:mocktail/mocktail.dart';
 
-/// Simula el repositorio de autenticación para pruebas sin tocar servicios externos
+
+
+/// Simula el repositorio de autenticación
 class MockAuthRepository extends Mock implements AuthRepository {}
 
-/// Simula un objeto User de Firebase Auth
-class FakeUser extends Fake implements User {
-  @override
-  String get uid => 'test-uid-123';
+/// Simula el repositorio de usuarios
+class MockUserRepository extends Mock implements UserRepository {}
 
-  @override
-  String get email => 'test@email.com';
-}
+/// Entidad de usuario autenticado ficticio
+const fakeAuthUser = AuthUser(
+  id: 'test-uid-123',
+  email: 'juan@email.com',
+  displayName: 'Juan Perez',
+  isEmailVerified: true,
+);
 
-/// Simula la credencial devuelta al autenticarse con Google
-class FakeUserCredential extends Fake implements UserCredential {}
-
-/// Modelo de usuario ficticio reutilizable en los tests
-final fakeUserModel = AuthModel(
+/// Entidad de perfil ficticio
+final fakeMigrant = Migrant(
   id: 'test-uid-123',
   name: 'Juan Perez',
   email: 'juan@email.com',
   originCountry: 'Colombia',
   destinationCountry: 'España',
   age: '28',
-  password: 'password123',
   role: 'Migrante',
   profileComplete: true,
 );
 
 void main() {
-  // Registramos valores de fallback para que mocktail acepte any() con estos tipos
   setUpAll(() {
-    registerFallbackValue(fakeUserModel);
-    registerFallbackValue(FakeUserCredential());
+    registerFallbackValue(fakeAuthUser);
+    registerFallbackValue(fakeMigrant);
   });
 
-  // 1. PRUEBAS DEL MODELO DE USUARIO (UserModel)
-
-  group('UserModel - Validación de datos y estructura', () {
-    test('toMap() convierte las propiedades del usuario a un Map correctamente',
-        () {
-      // 1. Convertimos el modelo a Map
-      final map = fakeUserModel.toMap();
-
-      // 2. Verificamos que contenga exactamente los campos requeridos
-      expect(map['name'], 'Juan Perez');
-      expect(map['email'], 'juan@email.com');
-      expect(map['originCountry'], 'Colombia');
-      expect(map['destinationCountry'], 'España');
-      expect(map['age'], '28');
-      expect(map['role'], 'Migrante');
-      expect(map['profileComplete'], true);
-      expect(map['createdAt'], isA<String>());
-    });
-
-    test(
-        'Debe asignar valores por defecto correctos (rol Migrante y perfil incompleto)',
-        () {
-      // 1. Creamos un usuario solo con los campos obligatorios
-      final defaultUser = AuthModel(
+  // 1. PRUEBAS DE LA ENTIDAD MIGRANTE
+  group('Migrant Entity - Validación de datos y estructura', () {
+    test('Crea una entidad Migrant correctamente con valores por defecto', () {
+      final defaultMigrant = Migrant(
+        id: '123',
         name: 'Ana Gomez',
         email: 'ana@email.com',
-        password: 'password123',
+        originCountry: '-',
+        destinationCountry: '-',
+        age: '-',
       );
 
-      // 2. Comprobamos los valores asignados por defecto
-      expect(defaultUser.role, 'Migrante');
-      expect(defaultUser.profileComplete, false);
-      expect(defaultUser.originCountry, isNull);
-      expect(defaultUser.destinationCountry, isNull);
+      expect(defaultMigrant.role, 'Migrante');
+      expect(defaultMigrant.profileComplete, false);
+      expect(defaultMigrant.name, 'Ana Gomez');
+    });
+
+    test('copyWith crea una copia con campos actualizados', () {
+      final updated = fakeMigrant.copyWith(
+        originCountry: 'Perú',
+        age: '30',
+      );
+
+      expect(updated.originCountry, 'Perú');
+      expect(updated.age, '30');
+      expect(updated.name, fakeMigrant.name);
     });
   });
 
-  // 2. PRUEBAS DE ACCIONES DEL REPOSITORIO (AuthRepository)
-
-  group('AuthRepository - Acciones principales de autenticación', () {
-    late MockAuthRepository mockRepository;
-    late FakeUser fakeUser;
-    late FakeUserCredential fakeCredential;
+  // 2. PRUEBAS DE ACCIONES DEL REPOSITORIO DE AUTENTICACIÓN (AuthRepository)
+  group('AuthRepository - Acciones de autenticación', () {
+    late MockAuthRepository mockAuthRepository;
 
     setUp(() {
-      mockRepository = MockAuthRepository();
-      fakeUser = FakeUser();
-      fakeCredential = FakeUserCredential();
+      mockAuthRepository = MockAuthRepository();
     });
 
-    // --- ACCIÓN: INICIAR SESIÓN (LOGIN) ---
-    group('login', () {
-      test('debe retornar un usuario cuando las credenciales son correctas',
+    // --- ACCIÓN: LOGIN CON EMAIL ---
+    group('loginWithEmail', () {
+      test('debe retornar un AuthUser cuando las credenciales son correctas',
           () async {
-        // Simulamos respuesta exitosa del repositorio
-        when(() => mockRepository.login('juan@email.com', 'password123'))
-            .thenAnswer((_) async => fakeUser);
+        when(() => mockAuthRepository.loginWithEmail(
+              'juan@email.com',
+              'password123',
+            )).thenAnswer((_) async => fakeAuthUser);
 
-        // Ejecutamos login
-        final result =
-            await mockRepository.login('juan@email.com', 'password123');
+        final result = await mockAuthRepository.loginWithEmail(
+          'juan@email.com',
+          'password123',
+        );
 
-        // Validaciones
-        expect(result, equals(fakeUser));
-        expect(result.email, 'test@email.com');
-        verify(() => mockRepository.login('juan@email.com', 'password123'))
-            .called(1);
+        expect(result, equals(fakeAuthUser));
+        expect(result.email, 'juan@email.com');
+        verify(() => mockAuthRepository.loginWithEmail(
+              'juan@email.com',
+              'password123',
+            )).called(1);
       });
 
       test('debe lanzar excepción cuando la contraseña es incorrecta',
           () async {
-        // Simulamos error de autenticación por contraseña errónea
-        when(() => mockRepository.login(any(), any()))
-            .thenThrow(FirebaseAuthException(code: 'wrong-password'));
+        when(() => mockAuthRepository.loginWithEmail(any(), any()))
+            .thenThrow(Exception('wrong-password'));
 
-        // Verificamos que se propague la excepción
         expect(
-          () => mockRepository.login('juan@email.com', 'clave_invalida'),
-          throwsA(isA<FirebaseAuthException>()),
+          () => mockAuthRepository.loginWithEmail(
+            'juan@email.com',
+            'clave_invalida',
+          ),
+          throwsA(isA<Exception>()),
         );
       });
     });
 
-    // --- ACCIÓN: REGISTRAR USUARIO ---
-    group('registerUser', () {
-      test('debe completar el registro de usuario satisfactoriamente',
-          () async {
-        // Simulamos registro exitoso sin retorno
-        when(() => mockRepository.registerUser(any())).thenAnswer((_) async {});
+    // --- ACCIÓN: REGISTRAR CREDENCIALES ---
+    group('registerWithEmail', () {
+      test('debe registrar y retornar AuthUser satisfactoriamente', () async {
+        when(() => mockAuthRepository.registerWithEmail(any(), any()))
+            .thenAnswer((_) async => fakeAuthUser);
 
-        // Validamos que complete la operación sin lanzar error
-        await expectLater(
-          mockRepository.registerUser(fakeUserModel),
-          completes,
+        final result = await mockAuthRepository.registerWithEmail(
+          'juan@email.com',
+          'password123',
         );
 
-        verify(() => mockRepository.registerUser(fakeUserModel)).called(1);
-      });
-
-      test('debe fallar si el correo electrónico ya se encuentra registrado',
-          () async {
-        // Simulamos excepción de email duplicado
-        when(() => mockRepository.registerUser(any()))
-            .thenThrow(FirebaseAuthException(code: 'email-already-in-use'));
-
-        expect(
-          () => mockRepository.registerUser(fakeUserModel),
-          throwsA(isA<FirebaseAuthException>()),
-        );
+        expect(result, equals(fakeAuthUser));
+        verify(() => mockAuthRepository.registerWithEmail(
+              'juan@email.com',
+              'password123',
+            )).called(1);
       });
     });
 
     // --- ACCIÓN: AUTENTICACIÓN CON GOOGLE ---
     group('authWithGoogle', () {
-      test('debe retornar credencial al autenticarse con Google con éxito',
+      test('debe retornar AuthUser al autenticarse con Google con éxito',
           () async {
-        when(() => mockRepository.authWithGoogle())
-            .thenAnswer((_) async => fakeCredential);
+        when(() => mockAuthRepository.authWithGoogle())
+            .thenAnswer((_) async => fakeAuthUser);
 
-        final result = await mockRepository.authWithGoogle();
+        final result = await mockAuthRepository.authWithGoogle();
 
-        expect(result, equals(fakeCredential));
-        verify(() => mockRepository.authWithGoogle()).called(1);
+        expect(result, equals(fakeAuthUser));
+        verify(() => mockAuthRepository.authWithGoogle()).called(1);
       });
 
       test('debe lanzar excepción si el usuario cancela la ventana de Google',
           () async {
-        when(() => mockRepository.authWithGoogle())
-            .thenThrow(FirebaseAuthException(code: 'popup-closed-by-user'));
+        when(() => mockAuthRepository.authWithGoogle())
+            .thenThrow(Exception('operation_cancelled'));
 
         expect(
-          () => mockRepository.authWithGoogle(),
-          throwsA(isA<FirebaseAuthException>()),
+          () => mockAuthRepository.authWithGoogle(),
+          throwsA(isA<Exception>()),
         );
       });
-
-      test('verifyOrCreateGoogleUser debe retornar los datos del UserModel',
-          () async {
-        when(() => mockRepository.verifyOrCreateGoogleUser(any()))
-            .thenAnswer((_) async => fakeUserModel);
-
-        final result =
-            await mockRepository.verifyOrCreateGoogleUser(fakeCredential);
-
-        expect(result.id, 'test-uid-123');
-        expect(result.email, 'juan@email.com');
-        verify(() => mockRepository.verifyOrCreateGoogleUser(any())).called(1);
-      });
     });
 
-    // --- ACCIÓN: CERRAR SESIÓN (LOGOUT) ---
+    // --- ACCIÓN: CERRAR SESIÓN ---
     group('logout', () {
-      test('debe cerrar la sesión del usuario correctamente', () async {
-        when(() => mockRepository.logout()).thenAnswer((_) async {});
+      test('debe cerrar la sesión correctamente', () async {
+        when(() => mockAuthRepository.logout()).thenAnswer((_) async {});
 
-        await expectLater(mockRepository.logout(), completes);
-        verify(() => mockRepository.logout()).called(1);
-      });
-    });
-
-    // --- ACCIÓN: CONSULTAR SESIÓN Y PERFIL ---
-    group('getAuthenticatedUser y getUserData', () {
-      test('getAuthenticatedUser retorna el usuario si existe sesión activa',
-          () async {
-        when(() => mockRepository.getAuthenticatedUser())
-            .thenAnswer((_) async => fakeUser);
-
-        final user = await mockRepository.getAuthenticatedUser();
-
-        expect(user, isNotNull);
-        expect(user?.uid, 'test-uid-123');
-      });
-
-      test('getAuthenticatedUser retorna null si no hay sesión activa',
-          () async {
-        when(() => mockRepository.getAuthenticatedUser())
-            .thenAnswer((_) async => null);
-
-        final user = await mockRepository.getAuthenticatedUser();
-
-        expect(user, isNull);
-      });
-
-      test('getUserData retorna el perfil del usuario según su UID', () async {
-        when(() => mockRepository.getUserData('test-uid-123'))
-            .thenAnswer((_) async => fakeUserModel);
-
-        final data = await mockRepository.getUserData('test-uid-123');
-
-        expect(data.name, 'Juan Perez');
-        expect(data.role, 'Migrante');
+        await expectLater(mockAuthRepository.logout(), completes);
+        verify(() => mockAuthRepository.logout()).called(1);
       });
     });
 
@@ -237,71 +173,223 @@ void main() {
     group('resetPassword', () {
       test('debe solicitar el restablecimiento de contraseña exitosamente',
           () async {
-        when(() => mockRepository.resetPassword(any()))
+        when(() => mockAuthRepository.resetPassword(any()))
             .thenAnswer((_) async {});
 
         await expectLater(
-          mockRepository.resetPassword('recuperar@email.com'),
+          mockAuthRepository.resetPassword('recuperar@email.com'),
           completes,
         );
 
-        verify(() => mockRepository.resetPassword('recuperar@email.com'))
+        verify(() => mockAuthRepository.resetPassword('recuperar@email.com'))
             .called(1);
-      });
-
-      test('debe lanzar error cuando el email no existe en la base de datos',
-          () async {
-        when(() => mockRepository.resetPassword(any()))
-            .thenThrow(FirebaseAuthException(code: 'user-not-found'));
-
-        expect(
-          () => mockRepository.resetPassword('noexiste@email.com'),
-          throwsA(isA<FirebaseAuthException>()),
-        );
       });
     });
 
-    // --- ACCIÓN: COMPLETAR PERFIL ---
-    group('completeProfile', () {
-      test('debe actualizar los datos de perfil exitosamente', () async {
-        when(() => mockRepository.completeProfile(
-              originCountry: any(named: 'originCountry'),
-              destinationCountry: any(named: 'destinationCountry'),
-              age: any(named: 'age'),
-            )).thenAnswer((_) async {});
+    // --- ACCIÓN: SESIÓN ACTUAL ---
+    group('getCurrentUser', () {
+      test('retorna el usuario si existe sesión activa', () async {
+        when(() => mockAuthRepository.getCurrentUser())
+            .thenAnswer((_) async => fakeAuthUser);
 
-        await expectLater(
-          mockRepository.completeProfile(
-            originCountry: 'Colombia',
-            destinationCountry: 'España',
-            age: 28,
-          ),
-          completes,
-        );
+        final user = await mockAuthRepository.getCurrentUser();
 
-        verify(() => mockRepository.completeProfile(
-              originCountry: 'Colombia',
-              destinationCountry: 'España',
-              age: 28,
-            )).called(1);
+        expect(user, isNotNull);
+        expect(user?.id, 'test-uid-123');
       });
 
-      test('debe fallar si los datos requeridos son inválidos', () async {
-        when(() => mockRepository.completeProfile(
-              originCountry: any(named: 'originCountry'),
-              destinationCountry: any(named: 'destinationCountry'),
-              age: any(named: 'age'),
-            )).thenThrow(Exception('Campos requeridos vacíos'));
+      test('retorna null si no hay sesión activa', () async {
+        when(() => mockAuthRepository.getCurrentUser())
+            .thenAnswer((_) async => null);
 
-        expect(
-          () => mockRepository.completeProfile(
-            originCountry: '',
-            destinationCountry: '',
-            age: 0,
-          ),
-          throwsA(isA<Exception>()),
-        );
+        final user = await mockAuthRepository.getCurrentUser();
+
+        expect(user, isNull);
       });
     });
   });
+
+  // 3. PRUEBAS DEL REPOSITORIO DE USUARIOS (UserRepository)
+  group('UserRepository - Gestión de perfiles y usuarios', () {
+    late MockUserRepository mockUserRepository;
+
+    setUp(() {
+      mockUserRepository = MockUserRepository();
+    });
+
+    test('getUserById retorna el perfil según el UID', () async {
+      when(() => mockUserRepository.getUserById('test-uid-123'))
+          .thenAnswer((_) async => fakeMigrant);
+
+      final result = await mockUserRepository.getUserById('test-uid-123');
+
+      expect(result, isNotNull);
+      expect(result?.name, 'Juan Perez');
+      expect(result?.role, 'Migrante');
+    });
+
+    test('createUser crea el perfil de usuario correctamente', () async {
+      when(() => mockUserRepository.createUser(any()))
+          .thenAnswer((_) async {});
+
+      await expectLater(
+        mockUserRepository.createUser(fakeMigrant),
+        completes,
+      );
+
+      verify(() => mockUserRepository.createUser(fakeMigrant)).called(1);
+    });
+
+    test('completeProfile actualiza los campos de origen, destino y edad',
+        () async {
+      when(() => mockUserRepository.completeProfile(
+            id: any(named: 'id'),
+            originCountry: any(named: 'originCountry'),
+            destinationCountry: any(named: 'destinationCountry'),
+            age: any(named: 'age'),
+          )).thenAnswer((_) async {});
+
+      await expectLater(
+        mockUserRepository.completeProfile(
+          id: 'test-uid-123',
+          originCountry: 'Colombia',
+          destinationCountry: 'España',
+          age: 28,
+        ),
+        completes,
+      );
+
+      verify(() => mockUserRepository.completeProfile(
+            id: 'test-uid-123',
+            originCountry: 'Colombia',
+            destinationCountry: 'España',
+            age: 28,
+          )).called(1);
+    });
+  });
+
+  // 4. PRUEBAS DEL CASO DE USO DE REGISTRO (Coordinación Auth + Users)
+  group('RegisterWithEmailUseCase - Coordinación de Auth y Users en el caso de uso', () {
+    late MockAuthRepository mockAuthRepository;
+    late MockUserRepository mockUserRepository;
+    late RegisterWithEmailUseCase registerUseCase;
+
+    setUp(() {
+      mockAuthRepository = MockAuthRepository();
+      mockUserRepository = MockUserRepository();
+      registerUseCase = RegisterWithEmailUseCase(
+        mockAuthRepository,
+        mockUserRepository,
+      );
+    });
+
+    test('registra credenciales en Auth y crea el perfil en Users', () async {
+      when(() => mockAuthRepository.registerWithEmail(any(), any()))
+          .thenAnswer((_) async => fakeAuthUser);
+      when(() => mockUserRepository.createUser(any()))
+          .thenAnswer((_) async {});
+      when(() => mockAuthRepository.logout())
+          .thenAnswer((_) async {});
+
+      final params = RegisterUserParams(
+        name: 'Juan Perez',
+        email: 'juan@email.com',
+        password: 'password123',
+        originCountry: 'Colombia',
+        destinationCountry: 'España',
+        age: '28',
+        role: 'Migrante',
+        profileComplete: true,
+      );
+
+      final result = await registerUseCase(params);
+
+      expect(result.id, fakeAuthUser.id);
+      expect(result.email, fakeAuthUser.email);
+      verify(() => mockAuthRepository.registerWithEmail('juan@email.com', 'password123')).called(1);
+      verify(() => mockUserRepository.createUser(any())).called(1);
+      verify(() => mockAuthRepository.logout()).called(1);
+    });
+
+    test('elimina el usuario en Auth (rollback) si la creación en Users falla', () async {
+      when(() => mockAuthRepository.registerWithEmail(any(), any()))
+          .thenAnswer((_) async => fakeAuthUser);
+      when(() => mockUserRepository.createUser(any()))
+          .thenThrow(Exception('Firestore write failed'));
+      when(() => mockAuthRepository.deleteCurrentUser())
+          .thenAnswer((_) async {});
+
+      const params = RegisterUserParams(
+        name: 'Juan Perez',
+        email: 'juan@email.com',
+        password: 'password123',
+        originCountry: 'Colombia',
+        destinationCountry: 'España',
+        age: '28',
+        role: 'Migrante',
+        profileComplete: true,
+      );
+
+      await expectLater(
+        registerUseCase(params),
+        throwsA(isA<Exception>()),
+      );
+
+      verify(() => mockAuthRepository.registerWithEmail('juan@email.com', 'password123')).called(1);
+      verify(() => mockUserRepository.createUser(any())).called(1);
+      verify(() => mockAuthRepository.deleteCurrentUser()).called(1);
+    });
+  });
+
+  // 5. PRUEBAS DEL CASO DE USO DE LOGIN CON GOOGLE
+  group('LoginWithGoogleUseCase - Login y creación automática de perfil si no existe', () {
+    late MockAuthRepository mockAuthRepository;
+    late MockUserRepository mockUserRepository;
+    late LoginWithGoogleUseCase loginGoogleUseCase;
+
+    setUp(() {
+      mockAuthRepository = MockAuthRepository();
+      mockUserRepository = MockUserRepository();
+      loginGoogleUseCase = LoginWithGoogleUseCase(
+        mockAuthRepository,
+        mockUserRepository,
+      );
+    });
+
+    test('retorna perfil existente si el usuario ya está en Firestore', () async {
+      when(() => mockAuthRepository.authWithGoogle())
+          .thenAnswer((_) async => fakeAuthUser);
+      when(() => mockUserRepository.getUserById('test-uid-123'))
+          .thenAnswer((_) async => fakeMigrant);
+
+      final result = await loginGoogleUseCase();
+
+      expect(result.id, 'test-uid-123');
+      expect(result.name, 'Juan Perez');
+      verify(() => mockAuthRepository.authWithGoogle()).called(1);
+      verify(() => mockUserRepository.getUserById('test-uid-123')).called(1);
+      verifyNever(() => mockUserRepository.createUser(any()));
+    });
+
+    test('crea nuevo perfil en Firestore si es la primera vez que inicia sesión', () async {
+      when(() => mockAuthRepository.authWithGoogle())
+          .thenAnswer((_) async => fakeAuthUser);
+      when(() => mockUserRepository.getUserById('test-uid-123'))
+          .thenAnswer((_) async => null);
+      when(() => mockUserRepository.createUser(any()))
+          .thenAnswer((_) async {});
+
+      final result = await loginGoogleUseCase();
+
+      expect(result.id, 'test-uid-123');
+      expect(result.email, 'juan@email.com');
+      verify(() => mockAuthRepository.authWithGoogle()).called(1);
+      verify(() => mockUserRepository.getUserById('test-uid-123')).called(1);
+      verify(() => mockUserRepository.createUser(any())).called(1);
+    });
+  });
 }
+
+
+
+

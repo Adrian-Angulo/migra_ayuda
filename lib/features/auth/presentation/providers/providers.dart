@@ -1,36 +1,70 @@
-import 'dart:async';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/features/auth/data/models/auth_model.dart';
+import 'package:migra_ayuda/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:migra_ayuda/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:migra_ayuda/features/auth/domain/entities/auth_user.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
+import 'package:migra_ayuda/features/auth/domain/usecases/get_current_user_usecase.dart';
+import 'package:migra_ayuda/features/auth/domain/usecases/login_with_email_usecase.dart';
+import 'package:migra_ayuda/features/auth/domain/usecases/login_with_google_usecase.dart';
+import 'package:migra_ayuda/features/auth/domain/usecases/logout_usecase.dart';
+import 'package:migra_ayuda/features/auth/domain/usecases/register_with_email_usecase.dart';
+import 'package:migra_ayuda/features/auth/domain/usecases/reset_password_usecase.dart';
+import 'package:migra_ayuda/features/auth/domain/usecases/watch_auth_state_usecase.dart';
+import 'package:migra_ayuda/features/users/presentation/providers/users_providers.dart';
 
-/// Provider del repositorio de autenticación
-///
-/// Este es el único provider necesario para acceder a todas las
-/// funcionalidades de autenticación.
-final repositoryProvider =
-    Provider<AuthRepository>((ref) => AuthRepositoryImpl());
+// DataSource
+final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>(
+  (ref) => AuthRemoteDataSource(),
+);
 
-/// Provider del stream de cambios de estado de autenticación
-final authStateProvider = StreamProvider<AuthModel?>((ref) {
-  return ref.read(repositoryProvider).authStateChanges();
+// Repository
+final authRepositoryProvider = Provider<AuthRepository>(
+  (ref) => AuthRepositoryImpl(remoteDataSource: ref.read(authRemoteDataSourceProvider)),
+);
+
+// Backward-compatibility alias
+final repositoryProvider = authRepositoryProvider;
+
+
+// Use Cases
+final loginWithEmailUseCaseProvider = Provider<LoginWithEmailUseCase>(
+  (ref) => LoginWithEmailUseCase(ref.read(authRepositoryProvider)),
+);
+
+final registerWithEmailUseCaseProvider = Provider<RegisterWithEmailUseCase>(
+  (ref) => RegisterWithEmailUseCase(
+    ref.read(authRepositoryProvider),
+    ref.read(userRepositoryProvider),
+  ),
+);
+
+
+final loginWithGoogleUseCaseProvider = Provider<LoginWithGoogleUseCase>(
+  (ref) => LoginWithGoogleUseCase(
+    ref.read(authRepositoryProvider),
+    ref.read(userRepositoryProvider),
+  ),
+);
+
+
+final logoutUseCaseProvider = Provider<LogoutUseCase>(
+  (ref) => LogoutUseCase(ref.read(authRepositoryProvider)),
+);
+
+final resetPasswordUseCaseProvider = Provider<ResetPasswordUseCase>(
+  (ref) => ResetPasswordUseCase(ref.read(authRepositoryProvider)),
+);
+
+final getCurrentUserUseCaseProvider = Provider<GetCurrentUserUseCase>(
+  (ref) => GetCurrentUserUseCase(ref.read(authRepositoryProvider)),
+);
+
+final watchAuthStateUseCaseProvider = Provider<WatchAuthStateUseCase>(
+  (ref) => WatchAuthStateUseCase(ref.read(authRepositoryProvider)),
+);
+
+// Auth state stream provider
+final authStateProvider = StreamProvider<AuthUser?>((ref) {
+  return ref.read(watchAuthStateUseCaseProvider)();
 });
 
-class UsersNotifier extends AsyncNotifier<List<AuthModel>> {
-  @override
-  Future<List<AuthModel>> build() {
-    return ref.read(repositoryProvider).getAllUsers();
-  }
-
-  Future<void> refresh() async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(
-      () => ref.read(repositoryProvider).getAllUsers(),
-    );
-  }
-}
-
-final usersNotifierProvider =
-    AsyncNotifierProvider.autoDispose<UsersNotifier, List<AuthModel>>(
-        UsersNotifier.new);

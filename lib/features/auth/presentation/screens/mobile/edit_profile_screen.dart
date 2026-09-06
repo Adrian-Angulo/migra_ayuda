@@ -29,7 +29,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (user != null) {
       _originCountry = user.originCountry;
       _destinationCountry = user.destinationCountry;
-      _ageController.text = user.age ?? '';
+      _ageController.text = user.age;
     }
   }
 

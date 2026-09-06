@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_web_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/reset_password_notifier.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/reset_password/success_screen.dart';
 
 class SendEmailScreen extends ConsumerStatefulWidget {
@@ -85,9 +84,9 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
                 fit: BoxFit.contain,
               ),
             ),
-        
+
             const SizedBox(height: 30),
-        
+
             const Text(
               '¿Olvidaste tu contraseña?',
               textAlign: TextAlign.center,
@@ -96,17 +95,17 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-        
+
             const SizedBox(height: 15),
-        
+
             const Text(
               'Introduce tu correo para recibir un enlace y restablecer tu contraseña',
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey),
             ),
-        
+
             const SizedBox(height: 30),
-        
+
             // Label del campo
             const Align(
               alignment: Alignment.centerLeft,
@@ -119,9 +118,9 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
                 ),
               ),
             ),
-        
+
             const SizedBox(height: 8),
-        
+
             // Campo de correo con validación
             TextFormField(
               controller: _emailController,
@@ -133,13 +132,11 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
                 fillColor: const Color(0xFFFFFFFF),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide:
-                      const BorderSide(color: Colors.grey, width: 1.5),
+                  borderSide: const BorderSide(color: Colors.grey, width: 1.5),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide:
-                      const BorderSide(color: Colors.grey, width: 1.5),
+                  borderSide: const BorderSide(color: Colors.grey, width: 1.5),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -165,17 +162,17 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
                 final emailRegex = RegExp(
                   r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
                 );
-        
+
                 if (!emailRegex.hasMatch(value)) {
                   return 'Formato de correo inválido';
                 }
-        
+
                 return null;
               },
             ),
-        
+
             const SizedBox(height: 25),
-        
+
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF6FA3A1),
@@ -192,8 +189,7 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
                       width: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(Colors.white),
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     )
                   : const Text(
@@ -205,22 +201,20 @@ class _SendEmailScreenState extends ConsumerState<SendEmailScreen> {
                       ),
                     ),
             ),
-        
+
             const SizedBox(height: 20),
-        
+
             // Volver al inicio de sesión con flecha
             TextButton.icon(
               onPressed: _isLoading
                   ? null
                   : () {
-                    if(kIsWeb){
-                      context.go(Routes.login);
-                    } else{
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen(),));
-                    }
-        
-                  },
-                     
+                      if (kIsWeb) {
+                        context.go(Routes.login);
+                      } else {
+                        context.go(Routes.loginMovil);
+                      }
+                    },
               icon: const Icon(
                 Icons.arrow_back,
                 size: 18,

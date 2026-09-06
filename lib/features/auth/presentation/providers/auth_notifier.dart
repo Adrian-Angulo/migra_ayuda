@@ -3,20 +3,24 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/router/app_router_mobile.dart';
-import 'package:migra_ayuda/features/auth/data/models/auth_model.dart';
-import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
+import 'package:migra_ayuda/features/users/domain/entities/migrant.dart';
+import 'package:migra_ayuda/features/users/presentation/providers/users_providers.dart';
 
-class AuthNotifier extends AsyncNotifier<AuthModel?> {
+class AuthNotifier extends AsyncNotifier<Migrant?> {
   @override
-  Future<AuthModel?> build() async {
+  Future<Migrant?> build() async {
     try {
-      final repository = ref.read(repositoryProvider);
-      final user = await repository.getAuthenticatedUser();
-      if (user == null) return null;
-      // Obtener los datos completos del usuario
-      final userData = await repository.getUserData(user.uid);
-      if (!kIsWeb) {
+      final getCurrentUserUseCase = ref.read(getCurrentUserUseCaseProvider);
+      final getUserProfileUseCase = ref.read(getUserProfileUseCaseProvider);
+
+      final authUser = await getCurrentUserUseCase();
+      if (authUser == null) return null;
+
+      // Obtener el perfil completo del usuario desde users
+      final userData = await getUserProfileUseCase(authUser.id);
+      if (!kIsWeb && userData != null) {
         Future.microtask(() {
           ref.read(auditNotifierProvider.notifier).create(
                 accion: ActivityActions.login(),
@@ -34,18 +38,19 @@ class AuthNotifier extends AsyncNotifier<AuthModel?> {
     state = const AsyncValue.loading();
 
     try {
-      final repository = ref.read(repositoryProvider);
+      final loginUseCase = ref.read(loginWithEmailUseCaseProvider);
+      final getUserProfileUseCase = ref.read(getUserProfileUseCaseProvider);
       final activity = ref.read(auditNotifierProvider.notifier);
 
-      // Ejecutar login
-      final user = await repository.login(email, password);
+      // 1. Autenticar credenciales
+      final authUser = await loginUseCase(email, password);
 
-      // Obtener datos completos del usuario
-      final userData = await repository.getUserData(user.uid);
+      // 2. Obtener datos completos del perfil de usuario
+      final userData = await getUserProfileUseCase(authUser.id);
 
       state = AsyncValue.data(userData);
 
-      debugPrint('✅ Login exitoso: ${userData.name}');
+      debugPrint('✅ Login exitoso: ${userData?.name ?? authUser.email}');
 
       ref.read(routerMovilNotifierProvider).refresh();
       if (!kIsWeb) {
@@ -72,8 +77,8 @@ class AuthNotifier extends AsyncNotifier<AuthModel?> {
     state = const AsyncValue.loading();
 
     try {
-      final repository = ref.read(repositoryProvider);
-      await repository.logout();
+      final logoutUseCase = ref.read(logoutUseCaseProvider);
+      await logoutUseCase();
 
       state = const AsyncValue.data(null);
       ref.read(routerMovilNotifierProvider).refresh();
@@ -89,13 +94,10 @@ class AuthNotifier extends AsyncNotifier<AuthModel?> {
     state = const AsyncValue.loading();
 
     try {
-      final repository = ref.read(repositoryProvider);
+      final loginWithGoogleUseCase = ref.read(loginWithGoogleUseCaseProvider);
 
-      // Autenticar con Google
-      final credential = await repository.authWithGoogle();
-
-      // Verificar o crear usuario en Firestore
-      final userData = await repository.verifyOrCreateGoogleUser(credential);
+      // Autenticar y obtener/crear perfil de usuario vía Caso de Uso
+      final userData = await loginWithGoogleUseCase();
 
       state = AsyncValue.data(userData);
       if (!kIsWeb) {
@@ -106,6 +108,7 @@ class AuthNotifier extends AsyncNotifier<AuthModel?> {
       ref.read(routerMovilNotifierProvider).refresh();
       debugPrint('Inicio de sesión con Google exitoso');
     } on FirebaseAuthException catch (e, stack) {
+
       debugPrint('❌ Error de autenticación con Google: ${e.message}');
       state = AsyncValue.error(e.code, stack);
       ref.read(routerMovilNotifierProvider).refresh();
@@ -124,28 +127,33 @@ class AuthNotifier extends AsyncNotifier<AuthModel?> {
     state = const AsyncValue.loading();
 
     try {
-      final repository = ref.read(repositoryProvider);
+      final getCurrentUserUseCase = ref.read(getCurrentUserUseCaseProvider);
+      final completeProfileUseCase = ref.read(completeProfileUseCaseProvider);
+      final getUserProfileUseCase = ref.read(getUserProfileUseCaseProvider);
 
-      // Completar perfil
-      await repository.completeProfile(
+      final authUser = await getCurrentUserUseCase();
+      if (authUser == null) {
+        throw Exception('user_not_found');
+      }
+
+      // Completar perfil en Users
+      await completeProfileUseCase(
+        id: authUser.id,
         originCountry: originCountry,
         destinationCountry: destinationCountry,
         age: age,
       );
 
       // Obtener usuario actualizado
-      final user = await repository.getAuthenticatedUser();
-      if (user != null) {
-        final userData = await repository.getUserData(user.uid);
-        state = AsyncValue.data(userData);
-        ref.read(routerMovilNotifierProvider).refresh();
-      }
+      final userData = await getUserProfileUseCase(authUser.id);
+      state = AsyncValue.data(userData);
+      ref.read(routerMovilNotifierProvider).refresh();
     } on FirebaseAuthException catch (e, stack) {
-      print('❌ Error al completar perfil: ${e.message}');
+      debugPrint('❌ Error al completar perfil: ${e.message}');
       state = AsyncValue.error(e.code, stack);
       ref.read(routerMovilNotifierProvider).refresh();
     } catch (e, stack) {
-      print('❌ Error inesperado al completar perfil: $e');
+      debugPrint('❌ Error inesperado al completar perfil: $e');
       state = AsyncValue.error('Error al completar perfil: $e', stack);
       ref.read(routerMovilNotifierProvider).refresh();
     }
@@ -153,4 +161,5 @@ class AuthNotifier extends AsyncNotifier<AuthModel?> {
 }
 
 final authNotifierProvider =
-    AsyncNotifierProvider<AuthNotifier, AuthModel?>(AuthNotifier.new);
+    AsyncNotifierProvider<AuthNotifier, Migrant?>(AuthNotifier.new);
+

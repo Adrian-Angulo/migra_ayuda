@@ -11,11 +11,12 @@ class ResetPasswordNotifier extends AsyncNotifier<void> {
     state = const AsyncValue.loading();
 
     try {
-      final repository = ref.read(repositoryProvider);
-      await repository.resetPassword(email);
+      final resetPasswordUseCase = ref.read(resetPasswordUseCaseProvider);
+      await resetPasswordUseCase(email);
 
       state = const AsyncValue.data(null);
       debugPrint('✅ Correo de recuperación enviado a: $email');
+
     } on FirebaseAuthException catch (e, stack) {
       debugPrint('❌ Error al enviar correo de recuperación: ${e.message}');
       state = AsyncValue.error(_getAuthErrorMessage(e), stack);

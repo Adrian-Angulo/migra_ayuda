@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/utils/format/time_formatter.dart';
-import 'package:migra_ayuda/features/auth/data/models/auth_model.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
 import 'package:migra_ayuda/features/reviews/presentation/screens/place_edit_review.dart';
+import 'package:migra_ayuda/features/users/domain/entities/migrant.dart';
 
 import '../providers/review_providers.dart';
 
 class ReviewItem extends ConsumerWidget {
   final ReviewEntity review;
-  final AuthModel user;
+  final Migrant user;
   final EntityEntity entity;
 
   const ReviewItem(
@@ -18,6 +18,7 @@ class ReviewItem extends ConsumerWidget {
       required this.review,
       required this.user,
       required this.entity});
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_screen.dart';
+import 'package:migra_ayuda/core/router/routes.dart';
 
 class SuccessScreen extends StatelessWidget {
   const SuccessScreen({super.key});
@@ -86,14 +86,9 @@ class SuccessScreen extends StatelessWidget {
           ),
           onPressed: () {
             if (kIsWeb) {
-              context.go('/login');
+              context.go(Routes.login);
             } else {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const LoginScreen(),
-                ),
-              );
+              context.go(Routes.loginMovil);
             }
           },
           child: const Text(

@@ -10,12 +10,12 @@ class UserMigrantMapper {
       originCountry: model.originCountry,
       destinationCountry: model.destinationCountry,
       age: model.age,
-      password: '',
       role: model.role,
       profileComplete: model.profileComplete,
       createdAt: model.createdAt,
     );
   }
+
 
   static MigrantModel toModel(Migrant entity) {
     return MigrantModel(

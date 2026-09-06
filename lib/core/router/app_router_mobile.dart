@@ -49,14 +49,28 @@ final routerMobile = Provider<GoRouter>(
         // Si no hay sesión activa, ir al login
         final user = authAsync.value;
 
-        if (user == null) return Routes.loginMovil;
+        if (user == null) {
+          final isAuthRoute = state.matchedLocation == Routes.loginMovil ||
+              state.matchedLocation == Routes.registerMovil;
+          if (!isAuthRoute) return Routes.loginMovil;
+          return null;
+        }
 
         // Si el perfil está incompleto, solicitar completarlo
-        if (!user.profileComplete) return Routes.completeProfile;
+        if (!user.profileComplete) {
+          if (state.matchedLocation != Routes.completeProfile) {
+            return Routes.completeProfile;
+          }
+          return null;
+        }
 
-        // Redirigir según el rol del usuario
-        if (user.role == 'Migrante' &&
-            state.matchedLocation == Routes.loginMovil) {
+        // Si el perfil está completo y está en login, register o completeProfile, redirigir a home
+        final isAuthOrCompleteRoute =
+            state.matchedLocation == Routes.loginMovil ||
+            state.matchedLocation == Routes.registerMovil ||
+            state.matchedLocation == Routes.completeProfile;
+
+        if (user.role == 'Migrante' && isAuthOrCompleteRoute) {
           return Routes.home;
         }
 

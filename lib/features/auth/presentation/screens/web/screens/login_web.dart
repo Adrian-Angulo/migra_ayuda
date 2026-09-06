@@ -4,11 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:migra_ayuda/core/errors/error_mappers.dart';
 import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_web_widget.dart';
-import 'package:migra_ayuda/features/auth/data/models/auth_model.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/widgets/button_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/widgets/text_fiel_pasword_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/widgets/text_fiel_widget.dart';
+import 'package:migra_ayuda/features/users/domain/entities/migrant.dart';
 
 class LoginWeb extends ConsumerStatefulWidget {
   const LoginWeb({super.key});
@@ -27,8 +27,9 @@ class _LoginWebState extends ConsumerState<LoginWeb> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _authSubscription = ref.listenManual<AsyncValue<AuthModel?>>(
+      _authSubscription = ref.listenManual<AsyncValue<Migrant?>>(
           authNotifierProvider, (previous, next) {
+
         next.whenOrNull(
           data: (user) {
             if (previous?.value == user) return;

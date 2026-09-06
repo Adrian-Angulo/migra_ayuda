@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/features/auth/data/models/auth_model.dart';
+import 'package:migra_ayuda/features/auth/domain/usecases/register_with_email_usecase.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 
 class RegisterNotifier extends AsyncNotifier<bool?> {
@@ -10,15 +10,15 @@ class RegisterNotifier extends AsyncNotifier<bool?> {
     return null;
   }
 
-  Future<void> registerUser(AuthModel user) async {
+  Future<void> registerUser(RegisterUserParams params) async {
     state = const AsyncValue.loading();
 
     try {
-      final repository = ref.read(repositoryProvider);
-      await repository.registerUser(user);
+      final registerUseCase = ref.read(registerWithEmailUseCaseProvider);
+      await registerUseCase(params);
 
       state = const AsyncValue.data(true);
-      debugPrint('✅ Usuario registrado exitosamente: ${user.email}');
+      debugPrint('✅ Usuario registrado exitosamente: ${params.email}');
     } on FirebaseAuthException catch (e, stack) {
       debugPrint('❌ Error de autenticación al registrar: ${e.message}');
       state = AsyncValue.error(_getAuthErrorMessage(e), stack);
@@ -27,6 +27,7 @@ class RegisterNotifier extends AsyncNotifier<bool?> {
       state = AsyncValue.error('Error al registrar usuario: $e', stack);
     }
   }
+
 
   /// Obtener mensaje de error amigable
   String _getAuthErrorMessage(FirebaseAuthException e) {
@@ -49,3 +50,4 @@ class RegisterNotifier extends AsyncNotifier<bool?> {
 
 final registerProvider =
     AsyncNotifierProvider<RegisterNotifier, bool?>(RegisterNotifier.new);
+

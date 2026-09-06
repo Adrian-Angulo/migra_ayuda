@@ -5,7 +5,6 @@ import 'package:migra_ayuda/features/auth/presentation/widgets/drawer/app_drawer
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/mapbox_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/filter_container.dart';
 
-
 class HomeScreen extends ConsumerWidget {
   HomeScreen({super.key});
 

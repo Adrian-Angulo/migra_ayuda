@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:migra_ayuda/core/errors/error_mappers.dart';
+import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/mobile/complete_info_screen.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/mobile/register_screen.dart';
+
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/reset_password/send_email_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/button_google_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/button_widget.dart';
@@ -44,11 +45,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               // Redirige según el estado del perfil y el rol del usuario
               if (user.profileComplete == false) {
                 // El usuario aún no ha completado su perfil
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CompleteInfoScreen(),
-                    ));
+                context.go(Routes.completeProfile);
+              } else {
+                context.go(Routes.home);
               }
             } else {
               // Usuario NO es Migrante (Admin u otro rol)
@@ -242,11 +241,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           height: 16,
                         ),
                         RegisterCard(onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const RegisterScreen(),
-                              ));
+                          context.push(Routes.registerMovil);
                         })
                       ],
                     ),

@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "230355024122-agkj5261o9piaju5it3v43itoo6jlljv.apps.googleusercontent.com",
+          "client_id": "230355024122-vdlkkvqbrkt46caodg0bia57jo9fa8et.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.migra_ayuda",
-            "certificate_hash": "7dfda93e8d4ccb296ba0a2cde2311f85e1b7cb8c"
+            "certificate_hash": "80a583fd342bd5afe0fe67d9a885e088bcf8843b"
           }
         },
         {

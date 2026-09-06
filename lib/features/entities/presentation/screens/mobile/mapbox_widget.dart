@@ -58,8 +58,12 @@ class _MapboxWidgetState extends ConsumerState<MapboxWidget> {
 
     return Stack(children: [
       MapWidget(
-        onMapCreated: (controller) {
-          ref.read(mapProvider.notifier).setMapController(controller);
+        onMapCreated: (controller) async {
+          await ref.read(mapProvider.notifier).setMapController(controller);
+          final entities = ref.read(getAllEntitiesProvider).value;
+          if (entities != null && entities.isNotEmpty) {
+            ref.read(mapProvider.notifier).addMarkers(entities);
+          }
         },
         styleUri: "mapbox://styles/migrayuda/cmqcwpgo0009g01s34h3ifybo",
         onScrollListener: (context) {
@@ -69,9 +73,11 @@ class _MapboxWidgetState extends ConsumerState<MapboxWidget> {
           ref.read(mapProvider.notifier).pauseTracking();
         },
         cameraOptions: CameraOptions(
-            center: Point(coordinates: Position(-77.2811, 1.2136)),
-            zoom: 12.5,
-            ),
+          center: Point(coordinates: Position(-77.2811, 1.2136)),
+          zoom: 12.5,
+          pitch: 0.0,
+          bearing: 0.0,
+        ),
       ),
       ListEntitesHome(sheetController: _sheetController),
       AnimatedBuilder(

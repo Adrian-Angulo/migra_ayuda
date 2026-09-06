@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_web_widget.dart';
-import 'package:migra_ayuda/features/auth/data/models/auth_model.dart';
-import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
+import 'package:migra_ayuda/features/auth/domain/usecases/register_with_email_usecase.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/register_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/widgets/input_field_web.dart';
+
+
 
 class RegisterAdminDialog extends ConsumerStatefulWidget {
   const RegisterAdminDialog({super.key});
@@ -35,11 +36,11 @@ class _RegisterAdminDialogState extends ConsumerState<RegisterAdminDialog> {
             data: (success) {
               if (success == true) {
                 // ✅ Registro exitoso
-                ref.read(usersNotifierProvider.notifier).refresh();
                 context.pop(); // Cerrar el diálogo
                 // Éxito manejado aquí o mediante notificación global
               }
             },
+
             error: (error, stack) {
               // ❌ Error en el registro
               SnackbarWebWidget.error(context, error);
@@ -215,13 +216,15 @@ class _RegisterAdminDialogState extends ConsumerState<RegisterAdminDialog> {
                               if (_formkey.currentState?.validate() ?? false) {
                                 await ref
                                     .read(registerProvider.notifier)
-                                    .registerUser(AuthModel(
+                                    .registerUser(RegisterUserParams(
                                       name: _nameController.text.trim(),
                                       email: _emailController.text.trim(),
                                       password: _passwordController.text.trim(),
                                       role: 'Admin',
+                                      profileComplete: true,
                                     ));
                               }
+
                             },
                       child: registerState.isLoading
                           ? const SizedBox(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_screen.dart';
+import 'package:go_router/go_router.dart';
+import 'package:migra_ayuda/core/router/routes.dart';
 
 class AlertSuccessRegister extends StatelessWidget {
   const AlertSuccessRegister({
@@ -41,7 +42,7 @@ class AlertSuccessRegister extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           const Text(
-            'Hemos enviado un enlace de confirmación a tu correo electrónico. Por favor verifica tu cuenta antes de iniciar sesión.',
+            'Te hemos enviado un enlace de confirmación a tu correo. Verifica tu cuenta antes de iniciar sesión. Si no lo encuentras, revisa también la carpeta de spam o correo no deseado.',
             style: TextStyle(
               fontSize: 14,
               color: Color(0xFF6B7280),
@@ -53,10 +54,10 @@ class AlertSuccessRegister extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
-              onPressed: () =>
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => const LoginScreen(),
-              )),
+              onPressed: () {
+                Navigator.of(context).pop();
+                context.go(Routes.loginMovil);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF64999A),
                 foregroundColor: Colors.white,

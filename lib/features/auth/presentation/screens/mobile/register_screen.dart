@@ -7,7 +7,7 @@ import 'package:migra_ayuda/core/utils/validators/email_validator.dart';
 import 'package:migra_ayuda/core/widgets/legal/privacy_policy_widget.dart';
 import 'package:migra_ayuda/core/widgets/legal/terms_and_conditions_widget.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
-import 'package:migra_ayuda/features/auth/data/models/auth_model.dart';
+import 'package:migra_ayuda/features/auth/domain/usecases/register_with_email_usecase.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/register_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/header_form_auth.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/alert_success_register.dart';
@@ -16,6 +16,7 @@ import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/in
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_numeric_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/button_widget.dart';
+
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -248,14 +249,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         }
 
                         ref.read(registerProvider.notifier).registerUser(
-                            AuthModel(
-                                name: _nameController.text,
-                                email: _emailController.text,
-                                password: _passwordController.text,
-                                age: _ageController.text,
-                                originCountry: selectedOriginCountry,
-                                destinationCountry: selectedDestinationCountry,
-                                profileComplete: true));
+                          RegisterUserParams(
+                            name: _nameController.text.trim(),
+                            email: _emailController.text.trim(),
+                            password: _passwordController.text.trim(),
+                            age: _ageController.text.trim(),
+                            originCountry: selectedOriginCountry ?? '-',
+                            destinationCountry: selectedDestinationCountry ?? '-',
+                            profileComplete: true,
+                          ),
+                        );
+
 
                         if (!context.mounted) return;
                       }),

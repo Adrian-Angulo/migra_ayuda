@@ -6,7 +6,6 @@ import 'package:migra_ayuda/core/constants/list_countries.dart';
 import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/core/widgets/legal/privacy_policy_widget.dart';
 import 'package:migra_ayuda/core/widgets/legal/terms_and_conditions_widget.dart';
-import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/dropdown_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_numeric_widget.dart';
@@ -43,13 +42,8 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
         next.whenData(
           (usu) {
             if (usu == null) {
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LoginScreen(),
-                  ));
-            }
-            if (usu!.profileComplete) {
+              context.go(Routes.loginMovil);
+            } else if (usu.profileComplete) {
               context.go(Routes.home);
             }
           },
@@ -60,7 +54,6 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Completar información'),
-        centerTitle: true,
         automaticallyImplyLeading: false,
       ),
       body: SafeArea(
@@ -121,8 +114,9 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
                               const TextSpan(text: "Acepto los "),
                               TextSpan(
                                 text: 'términos y condiciones de uso',
-                                style:
-                                    const TextStyle(color: Color(0xFF64999A), fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    color: Color(0xFF64999A),
+                                    fontWeight: FontWeight.bold),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
                                     Navigator.push(
@@ -137,8 +131,9 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
                               const TextSpan(text: " y la "),
                               TextSpan(
                                 text: 'política de privacidad',
-                                style:
-                                    const TextStyle(color: Color(0xFF64999A), fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    color: Color(0xFF64999A),
+                                    fontWeight: FontWeight.bold),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
                                     Navigator.push(
@@ -167,7 +162,8 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
                       if (!acceptTerms) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('Debes aceptar los términos y condiciones'),
+                            content: Text(
+                                'Debes aceptar los términos y condiciones'),
                             backgroundColor: Colors.orange,
                           ),
                         );

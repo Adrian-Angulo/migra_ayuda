@@ -51,6 +51,7 @@ dependencies:
   csv: ^8.0.0
   flutter_web_plugins:
     sdk: flutter
+  riverpod: ^3.4.3
 
 
 dev_dependencies:
