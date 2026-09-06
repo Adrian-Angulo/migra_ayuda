@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
+import 'package:migra_ayuda/features/auth/data/models/auth_model.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -70,7 +70,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<UserModel> verifyOrCreateGoogleUser(UserCredential credential) async {
+  Future<AuthModel> verifyOrCreateGoogleUser(UserCredential credential) async {
     final uid = credential.user?.uid;
 
     if (uid == null) {
@@ -81,9 +81,9 @@ class AuthRepositoryImpl implements AuthRepository {
     final doc = await docRef.get();
 
     if (doc.exists) {
-      return UserModel.fromMap(doc);
+      return AuthModel.fromMap(doc);
     } else {
-      final newUser = UserModel(
+      final newUser = AuthModel(
         id: uid,
         name: credential.user!.displayName ?? 'Usuario',
         email: credential.user!.email ?? '',
@@ -99,12 +99,12 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<UserModel> getUserData(String uid) async {
+  Future<AuthModel> getUserData(String uid) async {
     final doc = await _firestore.collection('users').doc(uid).get();
     if (!doc.exists) {
       throw Exception('user_data_not_found');
     }
-    return UserModel.fromMap(doc);
+    return AuthModel.fromMap(doc);
   }
 
   Future<bool> emailExists(String email) async {
@@ -140,7 +140,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> registerUser(UserModel user) async {
+  Future<void> registerUser(AuthModel user) async {
     final existingMethods = await emailExists(user.email);
 
     if (existingMethods == true) {
@@ -169,13 +169,13 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Stream<UserModel?> authStateChanges() {
+  Stream<AuthModel?> authStateChanges() {
     return _auth.authStateChanges().asyncMap((usu) async {
       if (usu == null) return null;
       try {
         final doc = await _firestore.collection('users').doc(usu.uid).get();
         if (!doc.exists || doc.data() == null) return null;
-        return UserModel.fromMap(doc);
+        return AuthModel.fromMap(doc);
       } catch (_) {
         return null;
       }
@@ -183,9 +183,9 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<List<UserModel>> getAllUsers() async {
+  Future<List<AuthModel>> getAllUsers() async {
     final snapshot = await _firestore.collection('users').get();
-    return snapshot.docs.map((doc) => UserModel.fromMap(doc)).toList();
+    return snapshot.docs.map((doc) => AuthModel.fromMap(doc)).toList();
   }
 
   @override

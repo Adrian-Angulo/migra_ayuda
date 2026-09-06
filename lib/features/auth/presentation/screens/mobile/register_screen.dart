@@ -7,7 +7,7 @@ import 'package:migra_ayuda/core/utils/validators/email_validator.dart';
 import 'package:migra_ayuda/core/widgets/legal/privacy_policy_widget.dart';
 import 'package:migra_ayuda/core/widgets/legal/terms_and_conditions_widget.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
-import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
+import 'package:migra_ayuda/features/auth/data/models/auth_model.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/register_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/header_form_auth.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/alert_success_register.dart';
@@ -193,21 +193,33 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               const TextSpan(text: "Acepto los "),
                               TextSpan(
                                 text: 'términos y condiciones de uso',
-                                style:
-                                    const TextStyle(color: Color(0xFF64999A), fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    color: Color(0xFF64999A),
+                                    fontWeight: FontWeight.bold),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => const TermsAndConditionsWidget(),));
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const TermsAndConditionsWidget(),
+                                        ));
                                   },
                               ),
                               const TextSpan(text: " y la "),
                               TextSpan(
                                 text: 'política de privacidad',
-                                style:
-                                     const TextStyle(color: Color(0xFF64999A), fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    color: Color(0xFF64999A),
+                                    fontWeight: FontWeight.bold),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
-                                     Navigator.push(context, MaterialPageRoute(builder: (context) => const PrivacyPolicyWidget(),));
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const PrivacyPolicyWidget(),
+                                        ));
                                   },
                               ),
                             ],
@@ -227,7 +239,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         if (!acceptTerms) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Debes aceptar los términos y condiciones'),
+                              content: Text(
+                                  'Debes aceptar los términos y condiciones'),
                               backgroundColor: Colors.orange,
                             ),
                           );
@@ -235,7 +248,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         }
 
                         ref.read(registerProvider.notifier).registerUser(
-                            UserModel(
+                            AuthModel(
                                 name: _nameController.text,
                                 email: _emailController.text,
                                 password: _passwordController.text,

@@ -3,13 +3,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/router/app_router_mobile.dart';
-import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
+import 'package:migra_ayuda/features/auth/data/models/auth_model.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
 
-class AuthNotifier extends AsyncNotifier<UserModel?> {
+class AuthNotifier extends AsyncNotifier<AuthModel?> {
   @override
-  Future<UserModel?> build() async {
+  Future<AuthModel?> build() async {
     try {
       final repository = ref.read(repositoryProvider);
       final user = await repository.getAuthenticatedUser();
@@ -153,4 +153,4 @@ class AuthNotifier extends AsyncNotifier<UserModel?> {
 }
 
 final authNotifierProvider =
-    AsyncNotifierProvider<AuthNotifier, UserModel?>(AuthNotifier.new);
+    AsyncNotifierProvider<AuthNotifier, AuthModel?>(AuthNotifier.new);

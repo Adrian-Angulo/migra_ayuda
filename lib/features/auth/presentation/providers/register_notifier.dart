@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
+import 'package:migra_ayuda/features/auth/data/models/auth_model.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 
 class RegisterNotifier extends AsyncNotifier<bool?> {
@@ -10,7 +10,7 @@ class RegisterNotifier extends AsyncNotifier<bool?> {
     return null;
   }
 
-  Future<void> registerUser(UserModel user) async {
+  Future<void> registerUser(AuthModel user) async {
     state = const AsyncValue.loading();
 
     try {

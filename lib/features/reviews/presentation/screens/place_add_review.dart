@@ -3,7 +3,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/widgets/mobil/app_bar_widget.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
-import 'package:migra_ayuda/features/auth/data/models/user_model.dart';
+import 'package:migra_ayuda/features/auth/data/models/auth_model.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/floating_main_button.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
@@ -11,7 +11,7 @@ import 'package:migra_ayuda/features/reviews/presentation/providers/review_provi
 
 class PlaceAddReview extends ConsumerStatefulWidget {
   final EntityEntity entity;
-  final UserModel? user;
+  final AuthModel? user;
   const PlaceAddReview({
     super.key,
     required this.entity,
@@ -35,15 +35,14 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
 
   @override
   Widget build(BuildContext context) {
-    UserModel user = widget.user!;
+    AuthModel user = widget.user!;
     // Escucha el estado de creación de review
     ref.listen(
       reviewNotifierProvider,
       (previous, next) {
         if (previous?.isLoading == true && !next.isLoading) {
           if (next.value == ReviewState.creating) {
-            SnackbarWidget.success(
-                context, '¡Reseña publicada exitosamente!');
+            SnackbarWidget.success(context, '¡Reseña publicada exitosamente!');
             Future.delayed(const Duration(seconds: 1), () {
               if (context.mounted) Navigator.pop(context);
             });

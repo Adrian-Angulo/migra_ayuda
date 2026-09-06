@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
-class UserModel {
+class AuthModel {
   final String id;
   final String name;
   final String? originCountry;
@@ -13,7 +13,7 @@ class UserModel {
   final bool profileComplete;
   final DateTime createdAt;
 
-  UserModel({
+  AuthModel({
     this.id = '',
     required this.name,
     this.originCountry,
@@ -39,9 +39,9 @@ class UserModel {
     };
   }
 
-  factory UserModel.fromMap(DocumentSnapshot doc) {
+  factory AuthModel.fromMap(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    return UserModel(
+    return AuthModel(
       id: doc.id,
       name: data['name'] ?? '-',
       originCountry: data['originCountry'] ?? '-',
@@ -51,23 +51,20 @@ class UserModel {
       password: data['password'] ?? '',
       role: data['role'] ?? 'Migrante',
       profileComplete: data['profileComplete'] ?? false,
-      
       createdAt: _parseDate(data['createdAt']),
     );
   }
 
   static DateTime _parseDate(dynamic value) {
-   
     if (value == null) {
       debugPrint('⚠️  [UserModel] Campo de fecha es null, usando fecha actual');
       return DateTime.now();
     }
 
-    
     if (value is Timestamp) {
       return value.toDate();
     }
-    
+
     if (value is String) {
       final parsed = DateTime.tryParse(value);
       if (parsed != null) {
@@ -78,7 +75,8 @@ class UserModel {
       }
     }
 
-    debugPrint('⚠️  [UserModel] Tipo de fecha desconocido: ${value.runtimeType}');
+    debugPrint(
+        '⚠️  [UserModel] Tipo de fecha desconocido: ${value.runtimeType}');
     return DateTime.now();
   }
 }
