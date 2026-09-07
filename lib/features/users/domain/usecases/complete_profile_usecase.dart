@@ -1,3 +1,5 @@
+import 'package:fpdart/fpdart.dart';
+import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/users/domain/repository/user_repository.dart';
 
 class CompleteProfileUseCase {
@@ -5,7 +7,7 @@ class CompleteProfileUseCase {
 
   CompleteProfileUseCase(this._repository);
 
-  Future<void> call({
+  Future<Either<Failure, void>> call({
     required String id,
     required String originCountry,
     required String destinationCountry,

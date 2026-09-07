@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,7 +23,8 @@ class FormEntity extends ConsumerStatefulWidget {
 
 class FormEntityState extends ConsumerState<FormEntity> {
   final _formKey = GlobalKey<FormState>();
-  final GlobalKey<FormFieldState> _addressFieldKey = GlobalKey<FormFieldState>();
+  final GlobalKey<FormFieldState> _addressFieldKey =
+      GlobalKey<FormFieldState>();
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
@@ -50,8 +50,10 @@ class FormEntityState extends ConsumerState<FormEntity> {
       _scheduleController.text = entity.schedule;
       // Preselecciona servicios si tiene entidad
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(listSelectedServicesFormProviders.notifier).state = List<String>.from(entity.services);
-        ref.read(geocodingProvider.notifier).setCoordinate(LatLng(entity.localitation.latitude, entity.localitation.longitude));
+        ref.read(listSelectedServicesFormProviders.notifier).state =
+            List<String>.from(entity.services);
+        ref.read(geocodingProvider.notifier).setCoordinate(LatLng(
+            entity.localitation.latitude, entity.localitation.longitude));
       });
     }
   }
@@ -67,11 +69,11 @@ class FormEntityState extends ConsumerState<FormEntity> {
       _addressController.text = entity.address;
       _latitudController.text = entity.localitation.latitude.toString();
       _longitudController.text = entity.localitation.longitude.toString();
-      _phoneController.text = entity.phone ;
+      _phoneController.text = entity.phone;
       _scheduleController.text = entity.schedule;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(listSelectedServicesFormProviders.notifier).state = entity.services;
-
+        ref.read(listSelectedServicesFormProviders.notifier).state =
+            entity.services;
       });
     }
   }
@@ -99,31 +101,35 @@ class FormEntityState extends ConsumerState<FormEntity> {
     final isEdit = widget.entity != null;
 
     final entity = EntityEntity(
-      id: isEdit ? widget.entity!.id : '', // Usa el id si es edición, si no, vacío para registro nuevo
+      id: isEdit
+          ? widget.entity!.id
+          : '', // Usa el id si es edición, si no, vacío para registro nuevo
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
       services: selectServices,
       address: _addressController.text.trim(),
       localitation: GeoPoint(cordinates!.latitude, cordinates.longitude),
       phone: _phoneController.text.trim(),
-      imageUrl: isEdit ? widget.entity!.imageUrl : '', // Conserva url imagen existente en edición
+      imageUrl: isEdit
+          ? widget.entity!.imageUrl
+          : '', // Conserva url imagen existente en edición
       schedule: _scheduleController.text.trim(),
     );
 
     if (isEdit) {
       // Lógica de edición
       ref.read(entitiesCrudProvider.notifier).updateEntity(
-        entity: entity,
-        imagenBytes: imagenbytes, // Puede ser null si no cambió la imagen
-        fileName: 'Abc${_nameController.text}',
-      );
+            entity: entity,
+            imagenBytes: imagenbytes, // Puede ser null si no cambió la imagen
+            fileName: 'Abc${_nameController.text}',
+          );
     } else {
       // Lógica de registro
       ref.read(entitiesCrudProvider.notifier).registerEntity(
-        entity: entity,
-        imagenBytes: imagenbytes!,
-        fileName: 'Abc${_nameController.text}',
-      );
+            entity: entity,
+            imagenBytes: imagenbytes!,
+            fileName: 'Abc${_nameController.text}',
+          );
     }
   }
 
@@ -144,7 +150,9 @@ class FormEntityState extends ConsumerState<FormEntity> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // ── Imagen ───────────────────────────────────────────────
-                    ImagePickerWidget(imagenUrl: widget.entity?.imageUrl ,),
+                    ImagePickerWidget(
+                      imagenUrl: widget.entity?.imageUrl,
+                    ),
 
                     const SizedBox(height: 32),
 
@@ -189,9 +197,9 @@ class FormEntityState extends ConsumerState<FormEntity> {
                     ),
                     const SizedBox(height: 16),
 
-                    const ServiceTypeChecklistWidget(), 
-                    
-                    const SizedBox(height: 32), 
+                    const ServiceTypeChecklistWidget(),
+
+                    const SizedBox(height: 32),
 
                     // ── Ubicación y contacto ─────────────────────────────────
                     const BuildSectionTitle(
@@ -219,18 +227,20 @@ class FormEntityState extends ConsumerState<FormEntity> {
                             child: Material(
                               color: Colors.transparent,
                               child: InkWell(
-                                onTap: ()  {
-                                  //TODO: IMPLEMENTAR FUNCION DE BUSQUEDA
-                                  ref.read(geocodingProvider.notifier).search(_addressController.text.trim());
+                                onTap: () {
+                                  ref
+                                      .read(geocodingProvider.notifier)
+                                      .search(_addressController.text.trim());
                                   _addressFieldKey.currentState!.validate();
-                                  
                                 },
-                                child:  SizedBox(
+                                child: SizedBox(
                                   width: 48,
                                   height: 48,
-                                  child:  Center(
-                                    child: cordinates.isLoading ? const CircularProgressIndicator()  :
-                                        const Icon(Icons.search, color: Colors.white),
+                                  child: Center(
+                                    child: cordinates.isLoading
+                                        ? const CircularProgressIndicator()
+                                        : const Icon(Icons.search,
+                                            color: Colors.white),
                                   ),
                                 ),
                               ),
@@ -238,27 +248,28 @@ class FormEntityState extends ConsumerState<FormEntity> {
                           );
                         },
                       ),
-                      
-                      validator: cordinates.hasValue ? null : (v) {
-                        // Validar formato
-                        final regExp = RegExp(
-                          r'^(Calle|Carrera)\s+\d+\s*#\d+-\d+,\s*Pasto$',
-                          caseSensitive: false,
-                        );
-                        if (v == null || v.isEmpty ) {
-                          return 'La dirección es requerida';
-                        } else if (!regExp.hasMatch(v.trim())) {
-                          return 'La dirección debe tener el formato: Calle/Carrera 123 #45-67, Pasto';
-                        } else if (cordinates.value == null) {
-                          return 'No se encontró la ubicación para esta dirección. Por favor, verifica que esté escrita correctamente e intenta de nuevo.';
-                        } else if(cordinates.hasError){
-                          return 'Ha ocurrido un error inesperado';
-                        }
-                        return null;
-                      },
+                      validator: cordinates.hasValue
+                          ? null
+                          : (v) {
+                              // Validar formato
+                              final regExp = RegExp(
+                                r'^(Calle|Carrera)\s+\d+\s*#\d+-\d+,\s*Pasto$',
+                                caseSensitive: false,
+                              );
+                              if (v == null || v.isEmpty) {
+                                return 'La dirección es requerida';
+                              } else if (!regExp.hasMatch(v.trim())) {
+                                return 'La dirección debe tener el formato: Calle/Carrera 123 #45-67, Pasto';
+                              } else if (cordinates.value == null) {
+                                return 'No se encontró la ubicación para esta dirección. Por favor, verifica que esté escrita correctamente e intenta de nuevo.';
+                              } else if (cordinates.hasError) {
+                                return 'Ha ocurrido un error inesperado';
+                              }
+                              return null;
+                            },
                     ),
                     const SizedBox(height: 12),
-                    
+
                     if (cordinates.value != null)
                       ContainerMapAddress(location: cordinates.value),
 

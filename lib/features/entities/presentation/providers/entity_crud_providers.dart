@@ -20,7 +20,7 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
     required String fileName,
   }) async {
     state = const AsyncValue.loading();
-    
+
     state = await AsyncValue.guard(
       () async {
         final repository = ref.read(entityRepositoryProvider);
@@ -69,14 +69,12 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
     final repository = ref.read(entityRepositoryProvider);
 
     // Obtener la entidad actual por ID
-    final EntityEntity? entidad = await repository.getEntityById(entidadId);
-    if (entidad == null) {
-      throw Exception('Entidad no encontrada con el id: $entidadId');
-    }
+    final EntityEntity entidad = await repository.getEntityById(entidadId);
 
     // Obtener las reseñas relacionadas a la entidad
     final reviewRepo = ref.read(reviewRepositoryProvider);
-    final List<ReviewEntity> reviews = await reviewRepo.getReviewsByEntity(entidadId);
+    final List<ReviewEntity> reviews =
+        await reviewRepo.getReviewsByEntity(entidadId);
 
     int totalReviews = reviews.length;
     double totalRating = reviews.fold(0.0, (sum, r) => sum + r.rating);

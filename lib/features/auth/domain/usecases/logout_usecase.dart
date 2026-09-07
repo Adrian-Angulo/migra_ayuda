@@ -1,3 +1,5 @@
+import 'package:fpdart/fpdart.dart';
+import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
 
 class LogoutUseCase {
@@ -5,7 +7,7 @@ class LogoutUseCase {
 
   LogoutUseCase(this._repository);
 
-  Future<void> call() {
+  Future<Either<Failure, void>> call() {
     return _repository.logout();
   }
 }

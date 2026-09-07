@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/auth/domain/usecases/register_with_email_usecase.dart';
@@ -13,41 +12,23 @@ class RegisterNotifier extends AsyncNotifier<bool?> {
   Future<void> registerUser(RegisterUserParams params) async {
     state = const AsyncValue.loading();
 
-    try {
-      final registerUseCase = ref.read(registerWithEmailUseCaseProvider);
-      await registerUseCase(params);
+    final registerUseCase = ref.read(registerWithEmailUseCaseProvider);
+    final result = await registerUseCase(params);
 
-      state = const AsyncValue.data(true);
-      debugPrint('✅ Usuario registrado exitosamente: ${params.email}');
-    } on FirebaseAuthException catch (e, stack) {
-      debugPrint('❌ Error de autenticación al registrar: ${e.message}');
-      state = AsyncValue.error(_getAuthErrorMessage(e), stack);
-    } catch (e, stack) {
-      debugPrint('❌ Error inesperado al registrar: $e');
-      state = AsyncValue.error('Error al registrar usuario: $e', stack);
-    }
-  }
-
-
-  /// Obtener mensaje de error amigable
-  String _getAuthErrorMessage(FirebaseAuthException e) {
-    switch (e.code) {
-      case 'email-already-in-use':
-        return 'Este correo ya está registrado';
-      case 'invalid-email':
-        return 'Correo electrónico inválido';
-      case 'operation-not-allowed':
-        return 'Operación no permitida';
-      case 'weak-password':
-        return 'La contraseña debe tener al menos 6 caracteres';
-      case 'network-request-failed':
-        return 'Error de conexión. Verifica tu internet';
-      default:
-        return e.message ?? 'Error al registrar usuario';
-    }
+    result.fold(
+      (failure) {
+        debugPrint('❌ Error al registrar: ${failure.message}');
+        state = AsyncValue.error(failure.message, StackTrace.current);
+      },
+      (authUser) {
+        state = const AsyncValue.data(true);
+        debugPrint('✅ Usuario registrado exitosamente: ${params.email}');
+      },
+    );
   }
 }
 
 final registerProvider =
     AsyncNotifierProvider<RegisterNotifier, bool?>(RegisterNotifier.new);
+
 

@@ -1,3 +1,5 @@
+import 'package:fpdart/fpdart.dart';
+import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/auth/domain/entities/auth_user.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
 
@@ -6,7 +8,7 @@ class GetCurrentUserUseCase {
 
   GetCurrentUserUseCase(this._repository);
 
-  Future<AuthUser?> call() {
+  Future<Either<Failure, AuthUser?>> call() {
     return _repository.getCurrentUser();
   }
 }
