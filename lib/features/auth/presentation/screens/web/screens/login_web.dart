@@ -5,6 +5,7 @@ import 'package:migra_ayuda/core/errors/error_mappers.dart';
 import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_web_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/login_rate_limiter_provider.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/widgets/button_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/widgets/text_fiel_pasword_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/widgets/text_fiel_widget.dart';
@@ -34,6 +35,7 @@ class _LoginWebState extends ConsumerState<LoginWeb> {
           data: (user) {
             if (previous?.value == user) return;
             if (user == null) return;
+            ref.read(loginRateLimiterProvider.notifier).reset();
             if (!mounted) return;
             final role = user.role;
             if (role != "Admin") {
@@ -48,6 +50,7 @@ class _LoginWebState extends ConsumerState<LoginWeb> {
             }
           },
           error: (error, stackTrace) {
+            ref.read(loginRateLimiterProvider.notifier).recordFailedAttempt();
             SnackbarWebWidget.error(context,
                 ErrorMappers.getAuthErrorMessage(error.toString(), context));
           },
@@ -75,6 +78,7 @@ class _LoginWebState extends ConsumerState<LoginWeb> {
     final isWide = screenWidth > 600;
     final isDesktop = screenWidth > 1024;
     final authState = ref.watch(authNotifierProvider);
+    final rateLimiter = ref.watch(loginRateLimiterProvider);
     final horizontalPadding = isDesktop ? 36.0 : (isWide ? 28.0 : 20.0);
 
     return Scaffold(
@@ -258,29 +262,68 @@ class _LoginWebState extends ConsumerState<LoginWeb> {
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 4),
+                                  if (rateLimiter.isLocked) ...[
+                                    Container(
+                                      margin: const EdgeInsets.only(bottom: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red.shade50,
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
+                                            color: Colors.red.shade200),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Icon(Icons.timer_outlined,
+                                              color: Colors.red.shade700,
+                                              size: 18),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            'Demasiados intentos. Espera ${rateLimiter.cooldownSeconds}s',
+                                            style: TextStyle(
+                                              color: Colors.red.shade700,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
                                   ButtonWidget(
                                     formKey: formKey,
                                     loading: authState.isLoading,
-                                    text: "Iniciar sesión",
-                                    onPressed: () async {
-                                      if (formKey.currentState!.validate()) {
-                                        final email = emailController.text;
-                                        final password = passController.text;
-                                        await ref
-                                            .read(authNotifierProvider.notifier)
-                                            .login(email, password);
-                                        final state =
-                                            ref.read(authNotifierProvider);
-                                        final loginSucceeded = state.hasValue &&
-                                            state.value != null &&
-                                            !state.hasError;
+                                    text: rateLimiter.isLocked
+                                        ? 'Bloqueado (${rateLimiter.cooldownSeconds}s)'
+                                        : "Iniciar sesión",
+                                    onPressed: rateLimiter.isLocked
+                                        ? null
+                                        : () async {
+                                            if (formKey.currentState!
+                                                .validate()) {
+                                              final email =
+                                                  emailController.text;
+                                              final password =
+                                                  passController.text;
+                                              await ref
+                                                  .read(authNotifierProvider
+                                                      .notifier)
+                                                  .login(email, password);
+                                              final state = ref.read(
+                                                  authNotifierProvider);
+                                              final loginSucceeded =
+                                                  state.hasValue &&
+                                                      state.value != null &&
+                                                      !state.hasError;
 
-                                        if (loginSucceeded) {
-                                          _cleanControllers();
-                                        }
-                                      }
-                                    },
+                                              if (loginSucceeded) {
+                                                _cleanControllers();
+                                              }
+                                            }
+                                          },
                                   ),
                                   const SizedBox(height: 24),
                                 ],

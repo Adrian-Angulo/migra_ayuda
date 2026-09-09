@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:migra_ayuda/core/router/router_notifier.dart';
+import 'package:migra_ayuda/core/router/app_router_notifier.dart';
+import 'package:migra_ayuda/core/router/guards/web_redirect_guard.dart';
 import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/core/widgets/web/not_found_page.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/reset_password/send_email_screen.dart';
@@ -13,12 +14,12 @@ import 'package:migra_ayuda/features/audit/presentation/screens/web/user_activit
 import 'package:migra_ayuda/features/users/presentation/screens/users_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
-  final notifier = ref.read(routerNotifierProvider.notifier);
+  final notifier = ref.watch(appRouterNotifierProvider);
 
   return GoRouter(
     initialLocation: Routes.login,
     refreshListenable: notifier,
-    redirect: notifier.redirect,
+    redirect: (context, state) => webRedirectGuard(context, state, ref),
     errorBuilder: (context, state) => const NotFoundPage(),
     routes: [
       GoRoute(
@@ -26,29 +27,36 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const LoginWeb(),
       ),
       GoRoute(
-        path: '/reset-password',
+        path: Routes.resetPassword,
         builder: (context, state) => const SendEmailScreen(),
       ),
       ShellRoute(
         builder: (context, state, child) => HomeScreen(child: child),
         routes: [
-          GoRoute(path: '/dashboard', redirect: (_, __) => '/dashboard/home'),
           GoRoute(
-            path: '/dashboard/home',
+            path: Routes.dashboard,
+            redirect: (_, __) => Routes.dashboardHome,
+          ),
+          GoRoute(
+            path: Routes.dashboardHome,
             builder: (context, state) => const Dashboard(),
           ),
           GoRoute(
-              path: '/dashboard/userActivity',
-              builder: (context, state) => const UserActivityWebScreen()),
+            path: Routes.userActivity,
+            builder: (context, state) => const UserActivityWebScreen(),
+          ),
           GoRoute(
-              path: '/dashboard/users',
-              builder: (context, state) => const UsersScreen()),
+            path: Routes.users,
+            builder: (context, state) => const UsersScreen(),
+          ),
           GoRoute(
-              path: '/dashboard/reviews',
-              builder: (context, state) => const ReviewsScreen()),
+            path: Routes.reviews,
+            builder: (context, state) => const ReviewsScreen(),
+          ),
           GoRoute(
-              path: '/dashboard/entities',
-              builder: (context, state) => const EntitiesScreen()),
+            path: Routes.entities,
+            builder: (context, state) => const EntitiesScreen(),
+          ),
         ],
       ),
     ],

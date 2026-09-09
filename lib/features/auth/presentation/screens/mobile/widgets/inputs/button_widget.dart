@@ -17,12 +17,7 @@ class ButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: loading
-          ? null
-          : (onPressed ??
-              () {
-                if (_formKey.currentState!.validate()) {}
-              }),
+      onPressed: loading ? null : onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.teal,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

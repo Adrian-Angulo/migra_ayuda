@@ -4,10 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/constants/list_countries.dart';
 import 'package:migra_ayuda/core/utils/validators/email_validator.dart';
+import 'package:migra_ayuda/core/utils/validators/password_validator.dart';
 import 'package:migra_ayuda/core/widgets/legal/privacy_policy_widget.dart';
 import 'package:migra_ayuda/core/widgets/legal/terms_and_conditions_widget.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
-import 'package:migra_ayuda/features/auth/domain/usecases/register_with_email_usecase.dart';
+import 'package:migra_ayuda/features/auth/domain/usecases/auth_usecasas.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/register_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/header_form_auth.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/alert_success_register.dart';
@@ -134,6 +135,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   TextFieldPaswordWidget(
                     title: 'Contraseña',
                     controller: _passwordController,
+                    validator: PasswordValidator.validate,
                   ),
                   const SizedBox(height: UIConstants.spacingM),
                   TextFieldPaswordWidget(

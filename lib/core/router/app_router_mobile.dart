@@ -3,16 +3,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:migra_ayuda/core/router/app_router_notifier.dart';
+import 'package:migra_ayuda/core/router/guards/mobile_redirect_guard.dart';
 import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/core/widgets/mobil/splash_init.dart';
-import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/login_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/complete_info_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/register_screen.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/mobile/reset_password/send_email_screen.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/home_screen.dart';
-import 'package:migra_ayuda/features/onboarding/presentation/providers/onboarding_provider.dart';
 import 'package:migra_ayuda/features/onboarding/presentation/screens/onboarding_screen.dart';
 
+/// Provider de compatibilidad (los refrescos ahora son automáticos y reactivos).
+@Deprecated('Usar appRouterNotifierProvider en su lugar')
 class RouterMovilNotifier extends ChangeNotifier {
   static final RouterMovilNotifier _instance = RouterMovilNotifier._internal();
 
@@ -25,62 +28,26 @@ class RouterMovilNotifier extends ChangeNotifier {
   }
 }
 
+@Deprecated('Usar appRouterNotifierProvider en su lugar')
 final routerMovilNotifierProvider = Provider<RouterMovilNotifier>(
   (ref) => RouterMovilNotifier(),
 );
 
 final routerMobile = Provider<GoRouter>(
   (ref) {
+    final notifier = ref.watch(appRouterNotifierProvider);
+
     return GoRouter(
       initialLocation: Routes.splashInit,
-      refreshListenable: ref.read(routerMovilNotifierProvider),
-      redirect: (context, state) {
-        final seeOnboarding = ref.read(onboardingProvider);
-        final authAsync = ref.read(authNotifierProvider);
-
-        // Si estamos en splashInit o splash, no redirigir
-        if (state.matchedLocation == Routes.splashInit) return null;
-
-        // Si el usuario no ha visto el onboarding, mostrarlo
-        final hasNotSeenOnboarding =
-            seeOnboarding.value == false || seeOnboarding.hasError;
-        if (hasNotSeenOnboarding) return Routes.onboarding;
-
-        // Si no hay sesión activa, ir al login
-        final user = authAsync.value;
-
-        if (user == null) {
-          final isAuthRoute = state.matchedLocation == Routes.loginMovil ||
-              state.matchedLocation == Routes.registerMovil;
-          if (!isAuthRoute) return Routes.loginMovil;
-          return null;
-        }
-
-        // Si el perfil está incompleto, solicitar completarlo
-        if (!user.profileComplete) {
-          if (state.matchedLocation != Routes.completeProfile) {
-            return Routes.completeProfile;
-          }
-          return null;
-        }
-
-        // Si el perfil está completo y está en login, register o completeProfile, redirigir a home
-        final isAuthOrCompleteRoute =
-            state.matchedLocation == Routes.loginMovil ||
-            state.matchedLocation == Routes.registerMovil ||
-            state.matchedLocation == Routes.completeProfile;
-
-        if (user.role == 'Migrante' && isAuthOrCompleteRoute) {
-          return Routes.home;
-        }
-
-        return null;
-      },
+      refreshListenable: notifier,
+      redirect: (context, state) => mobileRedirectGuard(context, state, ref),
       routes: [
         GoRoute(
           path: Routes.splashInit,
           builder: (context, state) => const FadeIn(
-              duration: Duration(seconds: 2), child: SplashScreenInit()),
+            duration: Duration(seconds: 2),
+            child: SplashScreenInit(),
+          ),
         ),
         GoRoute(
           path: Routes.onboarding,
@@ -102,6 +69,10 @@ final routerMobile = Provider<GoRouter>(
           path: Routes.completeProfile,
           builder: (context, state) => const CompleteInfoScreen(),
         ),
+        GoRoute(
+          path: Routes.resetPassword,
+          builder: (context, state) => const SendEmailScreen(),
+        )
       ],
     );
   },

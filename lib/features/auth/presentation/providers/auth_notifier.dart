@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/activity_actions.dart';
-import 'package:migra_ayuda/core/router/app_router_mobile.dart';
 import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 import 'package:migra_ayuda/features/users/domain/entities/migrant.dart';
@@ -58,7 +57,6 @@ class AuthNotifier extends AsyncNotifier<Migrant?> {
       (failure) async {
         debugPrint('❌ Error de autenticación: ${failure.message}');
         state = AsyncValue.error(failure.code ?? failure.message, StackTrace.current);
-        ref.read(routerMovilNotifierProvider).refresh();
       },
       (authUser) async {
         // 2. Obtener datos completos del perfil de usuario
@@ -68,12 +66,10 @@ class AuthNotifier extends AsyncNotifier<Migrant?> {
           (failure) {
             debugPrint('❌ Error al obtener perfil: ${failure.message}');
             state = AsyncValue.error(failure.message, StackTrace.current);
-            ref.read(routerMovilNotifierProvider).refresh();
           },
           (userData) {
             state = AsyncValue.data(userData);
             debugPrint('✅ Login exitoso: ${userData?.name ?? authUser.email}');
-            ref.read(routerMovilNotifierProvider).refresh();
 
             if (!kIsWeb) {
               activity.create(
@@ -96,11 +92,9 @@ class AuthNotifier extends AsyncNotifier<Migrant?> {
       (failure) {
         debugPrint('❌ Error en logout: ${failure.message}');
         state = AsyncValue.error(failure.message, StackTrace.current);
-        ref.read(routerMovilNotifierProvider).refresh();
       },
       (_) {
         state = const AsyncValue.data(null);
-        ref.read(routerMovilNotifierProvider).refresh();
         debugPrint('✅ Logout exitoso');
       },
     );
@@ -118,7 +112,6 @@ class AuthNotifier extends AsyncNotifier<Migrant?> {
       (failure) {
         debugPrint('❌ Error de autenticación con Google: ${failure.message}');
         state = AsyncValue.error(failure.code ?? failure.message, StackTrace.current);
-        ref.read(routerMovilNotifierProvider).refresh();
       },
       (userData) {
         state = AsyncValue.data(userData);
@@ -127,7 +120,6 @@ class AuthNotifier extends AsyncNotifier<Migrant?> {
                 accion: ActivityActions.loginGoogle(),
               );
         }
-        ref.read(routerMovilNotifierProvider).refresh();
         debugPrint('✅ Inicio de sesión con Google exitoso');
       },
     );
@@ -149,12 +141,10 @@ class AuthNotifier extends AsyncNotifier<Migrant?> {
     await authResult.fold(
       (failure) async {
         state = AsyncValue.error(failure.message, StackTrace.current);
-        ref.read(routerMovilNotifierProvider).refresh();
       },
       (authUser) async {
         if (authUser == null) {
           state = AsyncValue.error('Usuario no autenticado', StackTrace.current);
-          ref.read(routerMovilNotifierProvider).refresh();
           return;
         }
 
@@ -170,7 +160,6 @@ class AuthNotifier extends AsyncNotifier<Migrant?> {
           (failure) async {
             debugPrint('❌ Error al completar perfil: ${failure.message}');
             state = AsyncValue.error(failure.message, StackTrace.current);
-            ref.read(routerMovilNotifierProvider).refresh();
           },
           (_) async {
             // Obtener usuario actualizado
@@ -178,11 +167,9 @@ class AuthNotifier extends AsyncNotifier<Migrant?> {
             profileResult.fold(
               (failure) {
                 state = AsyncValue.error(failure.message, StackTrace.current);
-                ref.read(routerMovilNotifierProvider).refresh();
               },
               (userData) {
                 state = AsyncValue.data(userData);
-                ref.read(routerMovilNotifierProvider).refresh();
               },
             );
           },
@@ -194,4 +181,3 @@ class AuthNotifier extends AsyncNotifier<Migrant?> {
 
 final authNotifierProvider =
     AsyncNotifierProvider<AuthNotifier, Migrant?>(AuthNotifier.new);
-

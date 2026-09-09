@@ -3,13 +3,8 @@ import 'package:migra_ayuda/features/auth/data/datasources/auth_remote_datasourc
 import 'package:migra_ayuda/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:migra_ayuda/features/auth/domain/entities/auth_user.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
-import 'package:migra_ayuda/features/auth/domain/usecases/get_current_user_usecase.dart';
-import 'package:migra_ayuda/features/auth/domain/usecases/login_with_email_usecase.dart';
-import 'package:migra_ayuda/features/auth/domain/usecases/login_with_google_usecase.dart';
-import 'package:migra_ayuda/features/auth/domain/usecases/logout_usecase.dart';
-import 'package:migra_ayuda/features/auth/domain/usecases/register_with_email_usecase.dart';
-import 'package:migra_ayuda/features/auth/domain/usecases/reset_password_usecase.dart';
-import 'package:migra_ayuda/features/auth/domain/usecases/watch_auth_state_usecase.dart';
+import 'package:migra_ayuda/features/auth/domain/usecases/auth_usecasas.dart';
+
 import 'package:migra_ayuda/features/users/presentation/providers/users_providers.dart';
 
 // DataSource
@@ -19,12 +14,12 @@ final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>(
 
 // Repository
 final authRepositoryProvider = Provider<AuthRepository>(
-  (ref) => AuthRepositoryImpl(remoteDataSource: ref.read(authRemoteDataSourceProvider)),
+  (ref) => AuthRepositoryImpl(
+      remoteDataSource: ref.read(authRemoteDataSourceProvider)),
 );
 
 // Backward-compatibility alias
 final repositoryProvider = authRepositoryProvider;
-
 
 // Use Cases
 final loginWithEmailUseCaseProvider = Provider<LoginWithEmailUseCase>(
@@ -38,14 +33,12 @@ final registerWithEmailUseCaseProvider = Provider<RegisterWithEmailUseCase>(
   ),
 );
 
-
 final loginWithGoogleUseCaseProvider = Provider<LoginWithGoogleUseCase>(
   (ref) => LoginWithGoogleUseCase(
     ref.read(authRepositoryProvider),
     ref.read(userRepositoryProvider),
   ),
 );
-
 
 final logoutUseCaseProvider = Provider<LogoutUseCase>(
   (ref) => LogoutUseCase(ref.read(authRepositoryProvider)),
@@ -67,4 +60,3 @@ final watchAuthStateUseCaseProvider = Provider<WatchAuthStateUseCase>(
 final authStateProvider = StreamProvider<AuthUser?>((ref) {
   return ref.read(watchAuthStateUseCaseProvider)();
 });
-

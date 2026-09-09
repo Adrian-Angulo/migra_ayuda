@@ -85,6 +85,9 @@ class SuccessScreen extends StatelessWidget {
             ),
           ),
           onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            }
             if (kIsWeb) {
               context.go(Routes.login);
             } else {

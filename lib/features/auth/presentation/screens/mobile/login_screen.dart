@@ -5,6 +5,7 @@ import 'package:migra_ayuda/core/errors/error_mappers.dart';
 import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/login_rate_limiter_provider.dart';
 
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/reset_password/send_email_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/button_google_widget.dart';
@@ -30,6 +31,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
+    final rateLimiter = ref.watch(loginRateLimiterProvider);
 
     // Escucha cambios en el estado de autenticación para reaccionar
     // cuando el usuario inicia sesión correctamente o hay un error
@@ -38,6 +40,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       (previous, next) {
         next.whenOrNull(data: (user) async {
           if (user != null) {
+            ref.read(loginRateLimiterProvider.notifier).reset();
+
             if (user.role == 'Migrante') {
               // Registra la actividad de inicio de sesión en la auditoría
 
@@ -66,6 +70,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             }
           }
         }, error: (error, stackTrace) {
+          ref.read(loginRateLimiterProvider.notifier).recordFailedAttempt();
           // Muestra el error de autenticación en un snackbar
           SnackbarWidget.error(context,
               ErrorMappers.getAuthErrorMessage(error.toString(), context));
@@ -199,30 +204,56 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           children: [
                             TextButton(
                               onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const SendEmailScreen(),
-                                    ));
+                                context.push(Routes.resetPassword);
                               },
                               child: const Text('¿Olvidaste tu contraseña?'),
                             ),
                           ],
                         ),
+                        if (rateLimiter.isLocked) ...[
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade50,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.red.shade200),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.timer_outlined,
+                                    color: Colors.red.shade700, size: 18),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Demasiados intentos. Espera ${rateLimiter.cooldownSeconds}s',
+                                  style: TextStyle(
+                                    color: Colors.red.shade700,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                         ButtonWidget(
                           formKey: formKey,
                           loading: authState.isLoading,
-                          text: 'Iniciar Sesión',
-                          onPressed: () async {
-                            if (formKey.currentState!.validate()) {
-                              await ref
-                                  .read(authNotifierProvider.notifier)
-                                  .login(emailController.text,
-                                      passController.text);
-                              /* cleanControllar(); */
-                            }
-                          },
+                          text: rateLimiter.isLocked
+                              ? 'Bloqueado (${rateLimiter.cooldownSeconds}s)'
+                              : 'Iniciar Sesión',
+                          onPressed: rateLimiter.isLocked
+                              ? null
+                              : () async {
+                                  if (formKey.currentState!.validate()) {
+                                    await ref
+                                        .read(authNotifierProvider.notifier)
+                                        .login(emailController.text,
+                                            passController.text);
+                                  }
+                                },
                         ),
                         const SizedBox(height: 16),
                         const Row(
