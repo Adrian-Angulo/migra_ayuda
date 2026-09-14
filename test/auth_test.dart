@@ -3,7 +3,8 @@ import 'package:fpdart/fpdart.dart';
 import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/auth/domain/entities/auth_user.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
-import 'package:migra_ayuda/features/auth/domain/usecases/auth_usecasas.dart';
+import 'package:migra_ayuda/features/auth/domain/usecases/auth_usecases.dart';
+
 import 'package:migra_ayuda/features/users/domain/entities/migrant.dart';
 import 'package:migra_ayuda/features/users/domain/repository/user_repository.dart';
 import 'package:migra_ayuda/features/users/domain/usecases/complete_profile_usecase.dart';
@@ -129,6 +130,8 @@ void main() {
     test(
         'debería revertir el registro eliminando el usuario en autenticación si ocurre un error al guardar el perfil',
         () async {
+
+         
       when(() => mockAuthRepository.registerWithEmail(any(), any()))
           .thenAnswer((_) async => const Right(fakeAuthUser));
       when(() => mockUserRepository.createUser(any())).thenAnswer(
@@ -136,6 +139,7 @@ void main() {
       when(() => mockAuthRepository.deleteCurrentUser())
           .thenAnswer((_) async => const Right(null));
 
+      // Act: ejecución del caso de uso de registro
       final result = await useCase(params);
 
       expect(result.isLeft(), isTrue);

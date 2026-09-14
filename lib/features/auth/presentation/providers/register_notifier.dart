@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/features/auth/domain/usecases/auth_usecasas.dart';
+import 'package:migra_ayuda/features/auth/domain/usecases/auth_usecases.dart';
+
 import 'package:migra_ayuda/features/auth/presentation/providers/providers.dart';
 
 class RegisterNotifier extends AsyncNotifier<bool?> {

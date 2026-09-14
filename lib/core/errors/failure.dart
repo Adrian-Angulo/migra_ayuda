@@ -125,3 +125,24 @@ class GenericUserFailure extends UserFailure {
     super.code,
   });
 }
+
+// -------------------------------------------------------------
+// ERRORES ESPECÍFICOS DE ONBOARDING (OnboardingFailure)
+// -------------------------------------------------------------
+abstract class OnboardingFailure extends Failure {
+  const OnboardingFailure({required super.message, super.code});
+}
+
+class OnboardingStorageFailure extends OnboardingFailure {
+  const OnboardingStorageFailure({
+    super.message = 'Error al guardar el estado del onboarding',
+    super.code = 'onboarding-storage-failed',
+  });
+}
+
+class GenericOnboardingFailure extends OnboardingFailure {
+  const GenericOnboardingFailure({
+    required super.message,
+    super.code,
+  });
+}

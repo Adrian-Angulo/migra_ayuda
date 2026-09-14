@@ -31,7 +31,7 @@ class LoginRateLimiterNotifier extends Notifier<RateLimiterState> {
   Timer? _timer;
 
   static const int maxAllowedAttempts = 5;
-  static const int defaultCooldownDuration = 30; // 30 segundos
+  static const int defaultCooldownDuration = 120;
 
   @override
   RateLimiterState build() {

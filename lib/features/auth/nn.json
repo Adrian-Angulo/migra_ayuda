@@ -1,0 +1,10 @@
+users (Collection)
+ └── {userId} (Document)
+      ├── name: String
+      ├── email: String
+      ├── originCountry: String
+      ├── destinationCountry: String
+      ├── age: String
+      ├── role: String ("Migrante" | "Admin")
+      ├── profileComplete: Boolean
+      └── createdAt: Timestamp

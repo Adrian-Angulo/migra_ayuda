@@ -14,8 +14,7 @@ import 'package:migra_ayuda/features/auth/presentation/screens/mobile/reset_pass
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/home_screen.dart';
 import 'package:migra_ayuda/features/onboarding/presentation/screens/onboarding_screen.dart';
 
-/// Provider de compatibilidad (los refrescos ahora son automáticos y reactivos).
-@Deprecated('Usar appRouterNotifierProvider en su lugar')
+
 class RouterMovilNotifier extends ChangeNotifier {
   static final RouterMovilNotifier _instance = RouterMovilNotifier._internal();
 
@@ -28,20 +27,25 @@ class RouterMovilNotifier extends ChangeNotifier {
   }
 }
 
-@Deprecated('Usar appRouterNotifierProvider en su lugar')
+
+// Proveedor para RouterMovilNotifier, permite actualizar la navegación desde providers/notifiers Riverpod
 final routerMovilNotifierProvider = Provider<RouterMovilNotifier>(
   (ref) => RouterMovilNotifier(),
 );
 
+// Proveedor de GoRouter configurado para la app móvil
 final routerMobile = Provider<GoRouter>(
   (ref) {
+    // Observa cambios del notificador de router
     final notifier = ref.watch(appRouterNotifierProvider);
 
+    // Configuración de las rutas principales
     return GoRouter(
-      initialLocation: Routes.splashInit,
-      refreshListenable: notifier,
-      redirect: (context, state) => mobileRedirectGuard(context, state, ref),
+      initialLocation: Routes.splashInit, // Ruta inicial al abrir la app
+      refreshListenable: notifier, // El router se actualizará si notifier notifica cambios
+      redirect: (context, state) => mobileRedirectGuard(context, state, ref), // Redirección basada en lógica de guardas
       routes: [
+        // Ruta pantalla Splash, con animación de FadeIn
         GoRoute(
           path: Routes.splashInit,
           builder: (context, state) => const FadeIn(
@@ -49,26 +53,32 @@ final routerMobile = Provider<GoRouter>(
             child: SplashScreenInit(),
           ),
         ),
+        // Ruta de pantalla de Onboarding (presentación inicial)
         GoRoute(
           path: Routes.onboarding,
           builder: (context, state) => const OnboardingScreen(),
         ),
+        // Ruta de Login
         GoRoute(
           path: Routes.loginMovil,
           builder: (context, state) => const LoginScreen(),
         ),
+        // Ruta de Registro de usuario
         GoRoute(
           path: Routes.registerMovil,
           builder: (context, state) => const RegisterScreen(),
         ),
+        // Ruta de pantalla principal (Home)
         GoRoute(
           path: Routes.home,
           builder: (context, state) => HomeScreen(),
         ),
+        // Ruta para completar el perfil de usuario
         GoRoute(
           path: Routes.completeProfile,
           builder: (context, state) => const CompleteInfoScreen(),
         ),
+        // Ruta para el proceso de recuperación de contraseña
         GoRoute(
           path: Routes.resetPassword,
           builder: (context, state) => const SendEmailScreen(),

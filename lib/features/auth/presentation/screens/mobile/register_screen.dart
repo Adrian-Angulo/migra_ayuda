@@ -8,7 +8,7 @@ import 'package:migra_ayuda/core/utils/validators/password_validator.dart';
 import 'package:migra_ayuda/core/widgets/legal/privacy_policy_widget.dart';
 import 'package:migra_ayuda/core/widgets/legal/terms_and_conditions_widget.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
-import 'package:migra_ayuda/features/auth/domain/usecases/auth_usecasas.dart';
+import 'package:migra_ayuda/features/auth/domain/usecases/auth_usecases.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/register_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/header_form_auth.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/alert_success_register.dart';

@@ -1,0 +1,84 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Funciones auxiliares de autenticación y roles
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (
+          request.auth.token.admin == true ||
+          (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
+           getUserData().role == 'Admin')
+        );
+    }
+
+    // ----------------------------------------------------------------------
+    // 1. Colección: users (Migrantes y Administradores)
+    // ----------------------------------------------------------------------
+    match /users/{userId} {
+      // Lectura: El propio usuario o un Administrador (dashboard / admin web)
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      
+      // Creación: Al registrarse con su propio UID
+      allow create: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      
+      // Actualización: El propio usuario puede editar su perfil o el Admin
+      allow update: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      
+      // Eliminación: Solo Administradores
+      allow delete: if isAdmin();
+    }
+
+    // ----------------------------------------------------------------------
+    // 2. Colección: entities (Organizaciones y puntos de ayuda)
+    // ----------------------------------------------------------------------
+    match /entities/{entityId} {
+      // Lectura: Cualquier usuario autenticado puede ver el catálogo de entidades
+      allow read: if isAuthenticated();
+      
+      // Escritura/Gestión: Solo administradores pueden crear, modificar o eliminar
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ----------------------------------------------------------------------
+    // 3. Colección: reviews (Reseñas y valoraciones)
+    // ----------------------------------------------------------------------
+    match /reviews/{reviewId} {
+      // Lectura: Disponible para todos los usuarios autenticados
+      allow read: if isAuthenticated();
+      
+      // Creación: El usuario solo puede crear una reseña a su propio nombre
+      allow create: if isAuthenticated() && request.resource.data.idMigrante == request.auth.uid;
+      
+      // Actualización y Eliminación: El autor de la reseña o un Administrador
+      allow update, delete: if isAuthenticated() && (resource.data.idMigrante == request.auth.uid || isAdmin());
+    }
+
+    // ----------------------------------------------------------------------
+    // 4. Colección: user_activities (Auditoría y trazabilidad)
+    // ----------------------------------------------------------------------
+    match /user_activities/{activityId} {
+      // Lectura: Los administradores ven la actividad global; los usuarios su propio historial
+      allow read: if isAuthenticated() && (resource.data.idUser == request.auth.uid || isAdmin());
+      
+      // Creación: El usuario registra su propia actividad
+      allow create: if isAuthenticated() && request.resource.data.idUser == request.auth.uid;
+      
+      // Actualización / Eliminación: Exclusivo para Administradores
+      allow update, delete: if isAdmin();
+    }
+  }
+}

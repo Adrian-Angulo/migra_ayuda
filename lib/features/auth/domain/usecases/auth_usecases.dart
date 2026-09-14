@@ -38,7 +38,7 @@ class LoginWithGoogleUseCase {
     return authResult.fold(
       (failure) => Left(failure),
       (authUser) async {
-        // 2. Verificar o crear perfil de usuario en base de datos (Users)
+      
         final profileResult = await _userRepository.getUserById(authUser.id);
 
         return profileResult.fold(
@@ -105,6 +105,7 @@ class RegisterUserParams {
   });
 }
 
+//lib/features/auth/usecases/auth_usecases.dart
 class RegisterWithEmailUseCase {
   final AuthRepository _authRepository;
   final UserRepository _userRepository;

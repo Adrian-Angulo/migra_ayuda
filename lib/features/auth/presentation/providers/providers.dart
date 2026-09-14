@@ -3,7 +3,8 @@ import 'package:migra_ayuda/features/auth/data/datasources/auth_remote_datasourc
 import 'package:migra_ayuda/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:migra_ayuda/features/auth/domain/entities/auth_user.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
-import 'package:migra_ayuda/features/auth/domain/usecases/auth_usecasas.dart';
+import 'package:migra_ayuda/features/auth/domain/usecases/auth_usecases.dart';
+
 
 import 'package:migra_ayuda/features/users/presentation/providers/users_providers.dart';
 

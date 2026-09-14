@@ -28,18 +28,6 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
-  @override
-  Future<Either<Failure, AuthUser>> registerWithEmail(
-      String email, String password) async {
-    try {
-      final user = await _remoteDataSource.registerWithEmail(email, password);
-      return Right(user);
-    } on FirebaseAuthException catch (e) {
-      return Left(AuthExceptionMapper.fromFirebaseAuthException(e));
-    } catch (e) {
-      return const Left(UnexpectedFailure());
-    }
-  }
 
   @override
   Future<Either<Failure, AuthUser>> authWithGoogle() async {
@@ -53,6 +41,18 @@ class AuthRepositoryImpl implements AuthRepository {
           e.toString().contains('google-sign-in-cancelled')) {
         return const Left(GoogleSignInCancelledFailure());
       }
+      return const Left(UnexpectedFailure());
+    }
+  }
+  @override
+  Future<Either<Failure, AuthUser>> registerWithEmail(
+      String email, String password) async {
+    try {
+      final user = await _remoteDataSource.registerWithEmail(email, password);
+      return Right(user);
+    } on FirebaseAuthException catch (e) {
+      return Left(AuthExceptionMapper.fromFirebaseAuthException(e));
+    } catch (e) {
       return const Left(UnexpectedFailure());
     }
   }

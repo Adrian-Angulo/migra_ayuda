@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +13,7 @@ import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/in
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/button_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_password_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/rate_limiter_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/register_card.dart';
 
 // Pantalla principal de autenticación que alterna entre login y registro
@@ -162,6 +164,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ],
                   ),
+                  if (rateLimiter.isLocked) ...[
+                    FadeInUp(
+                        child: RateLimiterWidget(rateLimiter: rateLimiter)),
+                  ],
 
                   Form(
                     key: formKey,
@@ -210,40 +216,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ],
                         ),
-                        if (rateLimiter.isLocked) ...[
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.red.shade50,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.red.shade200),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.timer_outlined,
-                                    color: Colors.red.shade700, size: 18),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Demasiados intentos. Espera ${rateLimiter.cooldownSeconds}s',
-                                  style: TextStyle(
-                                    color: Colors.red.shade700,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
                         ButtonWidget(
                           formKey: formKey,
                           loading: authState.isLoading,
-                          text: rateLimiter.isLocked
-                              ? 'Bloqueado (${rateLimiter.cooldownSeconds}s)'
-                              : 'Iniciar Sesión',
+                          text: 'Iniciar Sesión',
                           onPressed: rateLimiter.isLocked
                               ? null
                               : () async {

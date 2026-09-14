@@ -39,8 +39,8 @@
   "firestore": {
     "database": "(default)",
     "location": "nam5",
-    "rules": "n",
-    "indexes": "n"
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
   },
   "auth": {
     "providers": {
