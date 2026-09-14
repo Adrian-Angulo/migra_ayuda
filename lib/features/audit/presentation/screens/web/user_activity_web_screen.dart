@@ -8,7 +8,7 @@ import 'package:migra_ayuda/core/dataTable/widgets/build_table.dart';
 import 'package:migra_ayuda/core/services/export/export_services.dart';
 import 'package:migra_ayuda/core/widgets/web/dasboard_header.dart';
 import 'package:migra_ayuda/core/widgets/web/text_fiel_search_web.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/export_button_widget.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/export_button_widget.dart';
 import 'package:migra_ayuda/features/audit/domain/entities/audit_datatable.dart';
 import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
 

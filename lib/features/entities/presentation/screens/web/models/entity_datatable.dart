@@ -1,9 +1,9 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/action_buttons.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/rating_widget.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/service_chip.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/action_buttons.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/rating_widget.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/service_chip.dart';
 
 class EntityDatatable extends DataTableSource {
   final List<EntityEntity> listEntities;

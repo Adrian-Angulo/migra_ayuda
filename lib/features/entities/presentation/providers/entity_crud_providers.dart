@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
+import 'package:migra_ayuda/features/entities/domain/usecases/entities_usecases.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
@@ -24,8 +25,13 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
     state = await AsyncValue.guard(
       () async {
         final repository = ref.read(entityRepositoryProvider);
-        await repository.registerEntity(
-            entity: entity, imagenBytes: imagenBytes, fileName: fileName);
+
+        final registerEntityUseCase = RegisterEntityUseCase(repository);
+        await registerEntityUseCase(
+          entity: entity,
+          imagenBytes: imagenBytes,
+          fileName: fileName,
+        );
         return CrudOperation.register;
       },
     );
@@ -41,7 +47,9 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
 
     state = await AsyncValue.guard(() async {
       final repository = ref.read(entityRepositoryProvider);
-      await repository.updateEntity(
+
+      final updateEntityUseCase = UpdateEntityUseCase(repository);
+      await updateEntityUseCase(
         entity: entity,
         imagenBytes: imagenBytes,
         fileName: fileName,
@@ -55,9 +63,12 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
 
     state = await AsyncValue.guard(() async {
       final repository = ref.read(entityRepositoryProvider);
+      final deleteEntityUseCase = DeleteEntityUseCase(repository);
+
       final reviewR = ref.read(reviewRepositoryProvider);
       final List<ReviewEntity> reviews = await reviewR.getReviewsByEntity(id);
-      await repository.deleteEntity(id);
+
+      await deleteEntityUseCase(id);
       await Future.wait(
         reviews.map((review) => reviewR.deleteReview(review.id)),
       );
@@ -67,9 +78,10 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
 
   Future<void> actualizarTotalYPromedioEntidad(String entidadId) async {
     final repository = ref.read(entityRepositoryProvider);
+    final getEntityByIdUseCase = GetEntityByIdUseCase(repository);
 
     // Obtener la entidad actual por ID
-    final EntityEntity entidad = await repository.getEntityById(entidadId);
+    final EntityEntity entidad = await getEntityByIdUseCase(entidadId);
 
     // Obtener las reseñas relacionadas a la entidad
     final reviewRepo = ref.read(reviewRepositoryProvider);
@@ -86,7 +98,8 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
       averageRating: promedio,
     );
 
-    await repository.updateEntity(entity: entidadActualizada);
+    final updateEntityUseCase = UpdateEntityUseCase(repository);
+    await updateEntityUseCase(entity: entidadActualizada);
 
     // Opcionalmente devolver o notificar el resultado si tu modelo lo requiere
   }

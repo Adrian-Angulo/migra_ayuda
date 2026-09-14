@@ -4,13 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/providers/form_add_providers.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/button_save_widget.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/image_picker_widget.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/service_type_checklist_widget.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/widgets/build_section_title.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/widgets/build_text_field.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/widgets/container_map_address.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/form_add_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/button_save_widget.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/image_picker_widget.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/service_type_checklist_widget.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/build_section_title.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/build_text_field.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/container_map_address.dart';
 
 class FormEntity extends ConsumerStatefulWidget {
   /// Si se proporciona, el formulario opera en modo edición prellenando los campos.

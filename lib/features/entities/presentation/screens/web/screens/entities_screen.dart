@@ -9,11 +9,11 @@ import 'package:migra_ayuda/core/services/export/export_services.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_web_widget.dart';
 import 'package:migra_ayuda/core/widgets/web/dasboard_header.dart';
 import 'package:migra_ayuda/core/widgets/web/text_fiel_search_web.dart';
-import 'package:migra_ayuda/features/entities/domain/entities/entity_datatable.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/models/entity_datatable.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/tabla_providers.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/export_button_widget.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/widgets/widgets.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/export_button_widget.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/widgets.dart';
 
 class EntitiesScreen extends ConsumerStatefulWidget {
   const EntitiesScreen({super.key});

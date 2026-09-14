@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
 
-import 'package:migra_ayuda/features/entities/presentation/screens/web/providers/form_add_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/form_add_providers.dart';
 
 /// Widget personalizado para seleccionar e indicar imágenes mediante la galería del dispositivo.
 /// Puede manejar una imagen local seleccionada, bytes de imagen, o una URL de imagen remota existente.

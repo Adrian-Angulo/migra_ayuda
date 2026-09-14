@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/services_utils.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/providers/form_add_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/form_add_providers.dart';
 
 /// Widget para mostrar una lista de servicios en formato de checklist,
 /// permitiendo seleccionar hasta dos servicios, usando el provider global.
