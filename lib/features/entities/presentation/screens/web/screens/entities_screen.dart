@@ -1,4 +1,3 @@
-
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,9 +37,7 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
   @override
   Widget build(BuildContext context) {
     final entitiesState = ref.watch(entitiesFilterProvider);
-   /*  final selectedService = ref.watch(selectedServiceFilterProvider); */
 
-    // Snackbar de feedback para operaciones CRUD
     ref.listen<AsyncValue<CrudOperation>>(entitiesCrudProvider,
         (previous, next) {
       if (previous?.isLoading == true && !next.isLoading) {
@@ -58,8 +55,7 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
             }
           },
           loading: () {},
-          error: (error, _) =>
-              SnackbarWebWidget.error(context, '$error'),
+          error: (error, _) => SnackbarWebWidget.error(context, '$error'),
         );
       }
     });
@@ -73,11 +69,13 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── Encabezado ────────────────────────────────────────────────
-        
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const DashboardHeader(title: 'Gestion de entidades', subTitle: 'Gestiona las entidades registradas en el sistema'),
+              const HeaderWeb(
+                  title: 'Gestión de entidades',
+                  subTitle: 'Gestiona las entidades registradas en el sistema'),
               AddButtonWidget(
                 text: 'Registrar entidad',
                 onTap: () {
@@ -90,7 +88,7 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
             ],
           ),
           const SizedBox(height: UIConstants.spacingM),
-    
+
           // ── Barra de búsqueda + filtro + exportar ─────────────────────
           SizedBox(
             height: 40,
@@ -104,19 +102,21 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
                   },
                   hintText: 'Buscar por nombre o dirección...',
                 ),
-                ExportButtonWidget(label: 'Exportar', onPressed: () {
-                   ExportService.exportEntities(entitiesState.value ?? []);
-                }),
+                ExportButtonWidget(
+                    label: 'Exportar',
+                    onPressed: () {
+                      ExportService.exportEntities(entitiesState.value ?? []);
+                    }),
               ],
             ),
           ),
           const SizedBox(height: UIConstants.spacingM),
-    
+
           // ── Tabla ─────────────────────────────────────────────────────
           entitiesState.when(
             data: (entities) {
               final rows = EntityDatatable(listEntities: entities);
-    
+
               return BuildTable(
                 rows: rows,
                 emptyIcon: Icons.business_outlined,

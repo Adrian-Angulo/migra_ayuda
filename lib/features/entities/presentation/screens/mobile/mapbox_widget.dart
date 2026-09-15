@@ -76,8 +76,6 @@ class _MapboxWidgetState extends ConsumerState<MapboxWidget> {
         cameraOptions: CameraOptions(
           center: Point(coordinates: Position(-77.2811, 1.2136)),
           zoom: 12.5,
-          pitch: 0.0,
-          bearing: 0.0,
         ),
       ),
       ListEntitesHome(sheetController: _sheetController),

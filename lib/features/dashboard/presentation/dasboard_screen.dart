@@ -22,7 +22,7 @@ class Dashboard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 //header-----------------
-                DashboardHeader( title: 'Dasboard', subTitle: 'Resumen general'),
+                HeaderWeb(title: 'Dashboard', subTitle: 'Resumen general'),
 
                 //secciones de cards------
                 SectionStaticsCard(),

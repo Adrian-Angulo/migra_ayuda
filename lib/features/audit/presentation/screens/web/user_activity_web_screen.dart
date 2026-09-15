@@ -1,4 +1,3 @@
-
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,9 +27,11 @@ class UserActivityWebScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── Encabezado ────────────────────────────────────────────────
-          const DashboardHeader( title: 'Acciones de usuarios', subTitle: 'Registro de acciones realiadas por los usuarios'),
+          const HeaderWeb(
+              title: 'Acciones de usuarios',
+              subTitle: 'Registro de acciones realiadas por los usuarios'),
           const SizedBox(height: UIConstants.spacingM),
-    
+
           // ── Barra de búsqueda + exportar ──────────────────────────────
           SizedBox(
             height: 40,
@@ -44,20 +45,21 @@ class UserActivityWebScreen extends ConsumerWidget {
                   },
                   hintText: 'Buscar por usuario, correo o acción...',
                 ),
-                ExportButtonWidget(label: 'Exportar', onPressed: () {
-                 
-                  ExportService.exportActivities(activitiesState.value!);
-                }),
+                ExportButtonWidget(
+                    label: 'Exportar',
+                    onPressed: () {
+                      ExportService.exportActivities(activitiesState.value!);
+                    }),
               ],
             ),
           ),
           const SizedBox(height: UIConstants.spacingM),
-    
+
           // ── Tabla ─────────────────────────────────────────────────────
           activitiesState.when(
             data: (activities) {
               final rows = AuditDatatable(listActivities: activities);
-    
+
               return BuildTable(
                 rows: rows,
                 emptyIcon: Icons.history_rounded,

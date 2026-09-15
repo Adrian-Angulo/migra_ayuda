@@ -1,7 +1,9 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
+import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/core/utils/format/time_formatter.dart';
 import 'package:migra_ayuda/features/audit/domain/entities/audit_entity.dart';
 import 'package:migra_ayuda/features/dashboard/presentation/providers/dashboard_providers.dart';
@@ -52,7 +54,9 @@ class RecentActivities extends ConsumerWidget {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      context.go(Routes.reviews);
+                    },
                     child: const Text(
                       'Ver todas',
                       style: TextStyle(
@@ -74,10 +78,11 @@ class RecentActivities extends ConsumerWidget {
                                   icon: Icons.person_outline,
                                   title: _mapAccion(audit.accion),
                                   subtitle: _getMetadatos(audit)!,
-                                  time:
-                                      TimeFormatter.formatDate(audit.createdAt));
+                                  time: TimeFormatter.formatDate(
+                                      audit.createdAt));
                             },
-                            separatorBuilder: (context, index) => const SizedBox(
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(
                                   height: 5,
                                 ),
                             itemCount: list.length);

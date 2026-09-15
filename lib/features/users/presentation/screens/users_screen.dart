@@ -1,4 +1,3 @@
-
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,7 +10,6 @@ import 'package:migra_ayuda/core/widgets/web/text_fiel_search_web.dart';
 import 'package:migra_ayuda/features/users/presentation/providers/datatable_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/export_button_widget.dart';
 import 'package:migra_ayuda/features/users/presentation/widgets/users_datatable_source.dart';
-
 
 // Pantalla principal para la gestión de usuarios en la versión web.
 class UsersScreen extends ConsumerWidget {
@@ -29,9 +27,10 @@ class UsersScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Encabezado con el título y el botón para registrar administrador
-          const DashboardHeader(title: "Gestión de usuarios", subTitle: "Gestiona los usuarios registrados en el sistema"),
+          const HeaderWeb(
+              title: "Gestión de usuarios",
+              subTitle: "Gestiona los usuarios registrados en el sistema"),
 
-          
           const SizedBox(
             height: UIConstants.spacingM,
           ),
@@ -50,9 +49,11 @@ class UsersScreen extends ConsumerWidget {
                   },
                   hintText: 'Buscar usuario...',
                 ),
-                ExportButtonWidget(label: 'Exportar', onPressed: () {
-                   ExportService.exportUsers(usersState.value ?? []);
-                }),
+                ExportButtonWidget(
+                    label: 'Exportar',
+                    onPressed: () {
+                      ExportService.exportUsers(usersState.value ?? []);
+                    }),
               ],
             ),
           ),
@@ -64,7 +65,7 @@ class UsersScreen extends ConsumerWidget {
             data: (users) {
               // Creamos las filas de la tabla con los usuarios
               final rows = UsersDatatableSource(listUsers: users);
-              
+
               // Tabla personalizada mostrando los usuarios y sus propiedades
               return BuildTable(
                 rows: rows,

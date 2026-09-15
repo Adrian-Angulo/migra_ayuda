@@ -15,7 +15,7 @@ class MapState {
 
   MapState({
     this.isMapReady = false,
-    this.isTracking = true,
+    this.isTracking = false,
     this.cameraState,
     this.hasMarkers = false,
     this.selectEntity,
@@ -45,14 +45,17 @@ class MapState {
         isTracking: isTracking ?? this.isTracking,
         cameraState: cameraState ?? this.cameraState,
         hasMarkers: hasMarkers ?? this.hasMarkers,
-        selectEntity: clearSelectEntity
-            ? null
-            : (selectEntity ?? this.selectEntity),
-        isOfflineRoute: clearRouteState ? false : (isOfflineRoute ?? this.isOfflineRoute),
-        isFallbackRoute: clearRouteState ? false : (isFallbackRoute ?? this.isFallbackRoute),
-        routeMessage: clearRouteState ? null : (routeMessage ?? this.routeMessage),
-        isDrawingRoute: clearRouteState ? false : (isDrawingRoute ?? this.isDrawingRoute),
-        hasActiveRoute: clearRouteState ? false : (hasActiveRoute ?? this.hasActiveRoute),
+        selectEntity:
+            clearSelectEntity ? null : (selectEntity ?? this.selectEntity),
+        isOfflineRoute:
+            clearRouteState ? false : (isOfflineRoute ?? this.isOfflineRoute),
+        isFallbackRoute:
+            clearRouteState ? false : (isFallbackRoute ?? this.isFallbackRoute),
+        routeMessage:
+            clearRouteState ? null : (routeMessage ?? this.routeMessage),
+        isDrawingRoute:
+            clearRouteState ? false : (isDrawingRoute ?? this.isDrawingRoute),
+        hasActiveRoute:
+            clearRouteState ? false : (hasActiveRoute ?? this.hasActiveRoute),
       );
 }
-

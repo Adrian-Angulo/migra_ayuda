@@ -1,4 +1,3 @@
-
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,10 +28,13 @@ class ReviewsScreen extends ConsumerWidget {
         children: [
           // ── Encabezado ────────────────────────────────────────────────
 
-          const DashboardHeader(title: 'Gestion de reseñas', subTitle: 'Gestiona los comentarios y valoraciones de los usuarios'),
-         
+          const HeaderWeb(
+              title: 'Gestión de reseñas',
+              subTitle:
+                  'Gestiona los comentarios y valoraciones de los usuarios'),
+
           const SizedBox(height: UIConstants.spacingM),
-    
+
           // ── Barra de búsqueda + exportar ──────────────────────────────
           SizedBox(
             height: 40,
@@ -43,13 +45,13 @@ class ReviewsScreen extends ConsumerWidget {
                   onChanged: (String value) {
                     ref.read(queryReviewProvider.notifier).state =
                         value.toLowerCase().trim();
-                    
                   },
                   hintText: 'Buscar por usuario, entidad o país...',
                 ),
                 ExportButtonWidget(
                   label: 'Exportar',
-                  onPressed: reviewsState.value != null && reviewsState.value!.isNotEmpty
+                  onPressed: reviewsState.value != null &&
+                          reviewsState.value!.isNotEmpty
                       ? () => ExportService.exportReviews(reviewsState.value!)
                       : () {},
                 ),
@@ -57,12 +59,12 @@ class ReviewsScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: UIConstants.spacingM),
-    
+
           // ── Tabla ─────────────────────────────────────────────────────
           reviewsState.when(
             data: (reviews) {
               final rows = ReviewDatatable(listReviews: reviews);
-    
+
               return BuildTable(
                 rows: rows,
                 emptyIcon: Icons.rate_review_outlined,
