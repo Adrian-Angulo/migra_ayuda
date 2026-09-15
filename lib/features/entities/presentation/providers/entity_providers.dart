@@ -82,13 +82,14 @@ class EntityListNotifier extends AsyncNotifier<List<EntityEntity>> {
   void filter({String query = 'Todos'}) {
     ref.read(filterProvider.notifier).state = query;
     if (query == 'Todos') {
-      state = AsyncValue.data(_allEntities);
+      state = AsyncValue.data(List<EntityEntity>.from(_allEntities));
       return;
     }
 
+    final cleanQuery = query.trim().toLowerCase();
     final filtered = _allEntities.where((entity) {
       return entity.services.any(
-        (s) => s == query,
+        (s) => s.trim().toLowerCase() == cleanQuery,
       );
     }).toList();
 
@@ -99,4 +100,3 @@ class EntityListNotifier extends AsyncNotifier<List<EntityEntity>> {
 final getAllEntitiesProvider =
     AsyncNotifierProvider<EntityListNotifier, List<EntityEntity>>(
         EntityListNotifier.new);
-

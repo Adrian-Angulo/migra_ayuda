@@ -34,7 +34,7 @@ class HomeScreen extends ConsumerWidget {
         endDrawer: const AppDrawer(),
         body: const Column(
           children: [
-            FilterContainer(),
+            
             Expanded(
               child: MapboxWidget(
                 key: ValueKey('mapbox_main'),

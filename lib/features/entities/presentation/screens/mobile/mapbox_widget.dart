@@ -5,6 +5,7 @@ import 'package:migra_ayuda/core/localitation/location_provider.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/map_provider.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/list_Entities_home.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/filter_container.dart';
 
 class MapboxWidget extends ConsumerStatefulWidget {
   const MapboxWidget({super.key});
@@ -86,12 +87,10 @@ class _MapboxWidgetState extends ConsumerState<MapboxWidget> {
           final currentSize =
               _sheetController.isAttached ? _sheetController.size : 0.3;
 
-          // Si el sheet cubre el 95% o más de la pantalla, desaparece por completo
           if (currentSize >= 0.95) {
             return const SizedBox.shrink();
           }
 
-          // Desvanecimiento gradual entre 70% y 95% de altura
           final opacity =
               ((0.95 - currentSize) / (0.95 - 0.70)).clamp(0.0, 1.0);
           final bottomOffset = (screenHeight * currentSize);
@@ -122,6 +121,7 @@ class _MapboxWidgetState extends ConsumerState<MapboxWidget> {
           ],
         ),
       ),
+      const FilterContainer(),
     ]);
   }
 }
