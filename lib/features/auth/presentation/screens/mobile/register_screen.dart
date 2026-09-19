@@ -233,7 +233,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   const SizedBox(height: UIConstants.spacingM),
                   ButtonWidget(
-                      formKey: _formKey,
+                     
                       text: 'Registrarse',
                       loading: registerState.isLoading,
                       onPressed: () async {

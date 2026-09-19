@@ -7,7 +7,7 @@ import 'package:migra_ayuda/features/audit/domain/entities/audit_entity.dart';
 import 'package:migra_ayuda/features/audit/domain/repositories/audit_repository.dart';
 import 'package:uuid/uuid.dart';
 
-class AuditRepositoryImpl implements UserActivityRepository {
+class AuditRepositoryImpl implements AuditRepository {
   final AuditRemoteDataSource remoteDataSource;
   final AuditLocalDataSource localDataSource;
   final NetworkInfo networkInfo;

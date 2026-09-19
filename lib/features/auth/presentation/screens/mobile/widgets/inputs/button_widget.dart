@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class ButtonWidget extends StatelessWidget {
   const ButtonWidget({
     super.key,
-    required GlobalKey<FormState> formKey,
+   
     required this.text,
     this.onPressed,
     this.loading = false,
-  }) : _formKey = formKey;
+  }) ;
 
-  final GlobalKey<FormState> _formKey;
+ 
   final String text;
   final VoidCallback? onPressed;
   final bool loading;

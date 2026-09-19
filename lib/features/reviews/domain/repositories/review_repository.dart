@@ -16,8 +16,5 @@ abstract class ReviewRepository {
     String entityId,
   );
 
-  /// Sincroniza las reviews pendientes con el servidor.
-  ///
-  /// Sube las reviews que tienen isSynced=false.
   Future<void> syncPendingReviews();
 }

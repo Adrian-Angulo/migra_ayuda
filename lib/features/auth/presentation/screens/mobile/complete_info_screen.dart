@@ -153,7 +153,7 @@ class _CompleteInfoScreenState extends ConsumerState<CompleteInfoScreen> {
                   ),
                   const SizedBox(height: 16),
                   ButtonWidget(
-                    formKey: _formKey,
+                   
                     text: 'Completar Información',
                     loading: _loading,
                     onPressed: () async {

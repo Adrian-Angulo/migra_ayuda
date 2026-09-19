@@ -43,7 +43,7 @@ final auditFilterProvider =
       loading: () => const AsyncValue.loading());
 });
 
-final auditRepositoryProvider = Provider<UserActivityRepository>(
+final auditRepositoryProvider = Provider<AuditRepository>(
   (ref) {
     final network = ref.read(networkInfoProvider);
     return AuditRepositoryImpl(
@@ -56,8 +56,7 @@ final getAllAuditProvider =
     StreamProvider((ref) => ref.read(auditRepositoryProvider).getAll());
 
 final auditNotifierProvider =
-    AsyncNotifierProvider<AuditNotifier, ActivityState>(
-        AuditNotifier.new);
+    AsyncNotifierProvider<AuditNotifier, ActivityState>(AuditNotifier.new);
 
 class AuditNotifier extends AsyncNotifier<ActivityState> {
   @override

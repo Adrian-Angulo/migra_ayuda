@@ -14,7 +14,16 @@ import 'package:migra_ayuda/features/reviews/domain/repositories/review_reposito
 import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
 import '../../data/datasources/review_remote_datasource.dart';
 import '../../data/repositories/review_repository_impl.dart';
+import 'package:migra_ayuda/features/reviews/domain/usecases/review_usecases.dart';
 
+enum ReviewState {
+  initial,
+  creating,
+  updating,
+  deleting,
+}
+
+// Repository Provider
 final reviewRepositoryProvider = Provider<ReviewRepository>((ref) {
   final remoteDatasource = ReviewRemoteDataSource();
   final localDatasource =
@@ -27,52 +36,62 @@ final reviewRepositoryProvider = Provider<ReviewRepository>((ref) {
       networkInfo: networkInfo);
 });
 
-/// Provider que obtiene la lista de reviews asociadas a una entidad específica.
-/// Utiliza FutureProvider.autoDispose.family para recibir el ID de la entidad como parámetro (entityId).
-/// Los resultados se ordenan de más reciente a más antiguo según el campo 'createdAt'.
+// Use Case Providers
+final createReviewUseCaseProvider = Provider<CreateReviewUseCase>(
+  (ref) => CreateReviewUseCase(ref.watch(reviewRepositoryProvider)),
+);
+
+final getReviewsByEntityUseCaseProvider = Provider<GetReviewsByEntityUseCase>(
+  (ref) => GetReviewsByEntityUseCase(ref.watch(reviewRepositoryProvider)),
+);
+
+final getAllReviewsUseCaseProvider = Provider<GetAllReviewsUseCase>(
+  (ref) => GetAllReviewsUseCase(ref.watch(reviewRepositoryProvider)),
+);
+
+final updateReviewUseCaseProvider = Provider<UpdateReviewUseCase>(
+  (ref) => UpdateReviewUseCase(ref.watch(reviewRepositoryProvider)),
+);
+
+final deleteReviewUseCaseProvider = Provider<DeleteReviewUseCase>(
+  (ref) => DeleteReviewUseCase(ref.watch(reviewRepositoryProvider)),
+);
+
+final getUserReviewByEntityUseCaseProvider =
+    Provider<GetUserReviewByEntityUseCase>(
+  (ref) => GetUserReviewByEntityUseCase(ref.watch(reviewRepositoryProvider)),
+);
+
+final syncPendingReviewsUseCaseProvider = Provider<SyncPendingReviewsUseCase>(
+  (ref) => SyncPendingReviewsUseCase(ref.watch(reviewRepositoryProvider)),
+);
+
+// FutureProvider para reviews de una entidad usando usecase provider
 final getReviewsByEntity =
     FutureProvider.autoDispose.family<List<ReviewEntity>, String>(
   (ref, entityId) async {
-    // Se obtiene el repositorio de reviews usando Riverpod
-    final repo = ref.watch(reviewRepositoryProvider);
-
-    // Se obtienen las reviews asociadas a la entidad cuyo id es 'entityId'
-    final reviews = await repo.getReviewsByEntity(entityId);
-
-    // Se devuelve la lista ordenada por fecha de creación descendente (más reciente primero)
+    final useCase = ref.watch(getReviewsByEntityUseCaseProvider);
+    final reviews = await useCase(entityId);
     return reviews.toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   },
 );
 
-// Provider que calcula el promedio ('mean') y la cantidad ('count') de reviews de una entidad específica.
-// Utiliza el provider 'getReviewsByEntity' para obtener la lista de reviews de la entidad.
 final meanReviewByEntity =
     FutureProvider.autoDispose.family<Map<String, dynamic>, String>(
   (ref, idEntity) async {
-    // Espera a que se carguen las reviews de la entidad
     final reviews = await ref.watch(getReviewsByEntity(idEntity).future);
 
-    // Si no hay reviews, retorna promedio 0.0 y cantidad 0
     if (reviews.isEmpty) return {'mean': 0.0, 'count': 0.0};
-    
-    // Calcula la sumatoria del rating de todas las reviews
+
     final total = reviews.fold<double>(0.0, (sum, r) => sum + r.rating);
-    
-    // Retorna un mapa con el promedio y el conteo de reviews
     return {
-      // El promedio es el total dividido entre la cantidad de reviews, con un decimal
       'mean': (total / reviews.length).toDouble().toStringAsFixed(1),
       'count': reviews.length
     };
   },
 );
 
-enum ReviewState {
-  initial,
-  creating,
-  updating,
-  deleting,
-}
+
 
 final reviewNotifierProvider =
     AsyncNotifierProvider<ReviewsNotifier, ReviewState>(ReviewsNotifier.new);
@@ -86,8 +105,8 @@ class ReviewsNotifier extends AsyncNotifier<ReviewState> {
   Future<void> createReview(ReviewEntity review) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await ref.read(reviewRepositoryProvider).createReview(review);
-      
+      final createReview = ref.read(createReviewUseCaseProvider);
+      await createReview(review);
       try {
         await ref
             .read(entitiesCrudProvider.notifier)
@@ -95,7 +114,6 @@ class ReviewsNotifier extends AsyncNotifier<ReviewState> {
       } catch (e) {
         debugPrint('⚠️ Error actualizando total y promedio de entidad: $e');
       }
-
       try {
         await ref
             .read(auditNotifierProvider.notifier)
@@ -103,7 +121,6 @@ class ReviewsNotifier extends AsyncNotifier<ReviewState> {
       } catch (e) {
         debugPrint('⚠️ Error creando registro de auditoría: $e');
       }
-      
       ref.invalidate(getReviewsByEntity(review.idEntity));
       ref.invalidate(getAllEntitiesProvider);
       return ReviewState.creating;
@@ -113,8 +130,8 @@ class ReviewsNotifier extends AsyncNotifier<ReviewState> {
   Future<void> updateReview(ReviewEntity review) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await ref.read(reviewRepositoryProvider).updateReview(review);
-
+      final updateReview = ref.read(updateReviewUseCaseProvider);
+      await updateReview(review);
       try {
         await ref
             .read(entitiesCrudProvider.notifier)
@@ -140,7 +157,8 @@ class ReviewsNotifier extends AsyncNotifier<ReviewState> {
   Future<void> deleteReview(ReviewEntity review) async {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
-      await ref.read(reviewRepositoryProvider).deleteReview(review.id);
+      final deleteReview = ref.read(deleteReviewUseCaseProvider);
+      await deleteReview(review.id);
 
       try {
         await ref
@@ -169,48 +187,36 @@ class ReviewsNotifier extends AsyncNotifier<ReviewState> {
 // Providers para la tabla web de reseñas
 // ---------------------------------------------------------------------------
 
-/// Texto de búsqueda ingresado en la barra de la tabla
+
 final queryReviewProvider = StateProvider<String>((ref) => '');
 
-/// Todas las reseñas sin filtro de entidad (para la vista web admin)
+
 final getAllReviewsProvider =
     FutureProvider.autoDispose<List<ReviewEntity>>((ref) {
-  return ref.watch(reviewRepositoryProvider).getAllReviews();
+  final useCase = ref.watch(getAllReviewsUseCaseProvider);
+  return useCase();
 });
 
-/// Lista de reseñas filtrada según [queryReviewProvider]
-/// Provider para obtener la lista filtrada de reseñas según el texto de búsqueda.
-/// Utiliza el valor de [queryReviewProvider] para filtrar la lista traida por [getAllReviewsProvider].
+
 final reviewsFilterProvider =
     StateProvider.autoDispose<AsyncValue<List<ReviewEntity>>>((ref) {
-  // Obtiene el texto de búsqueda actual
   final query = ref.watch(queryReviewProvider);
-  // Obtiene el estado (cargando, error o datos) de la lista de todas las reseñas
   final reviews = ref.watch(getAllReviewsProvider);
 
-  // Maneja los diferentes estados del proveedor de reseñas
   return reviews.when(
     data: (reviewsList) {
-      // Por defecto todas las reseñas
       List<ReviewEntity> filteredReviews = reviewsList;
-      // Si hay texto de búsqueda, filtra la lista
       if (query.isNotEmpty) {
         filteredReviews = reviewsList
             .where((r) =>
-                // Filtra por nombre de usuario
                 r.userName.toLowerCase().contains(query.toLowerCase()) ||
-                // Filtra por nombre de la entidad
                 r.nameEntity.toLowerCase().contains(query.toLowerCase()) ||
-                // Filtra por país del usuario
                 r.userCountry.toLowerCase().contains(query.toLowerCase()))
             .toList();
       }
-      // Retorna la lista filtrada envuelta en un AsyncValue.data
       return AsyncValue.data(filteredReviews);
     },
-    // Si hay error al cargar las reseñas
     error: (error, stackTrace) => AsyncValue.error(error, stackTrace),
-    // Si las reseñas están cargando
     loading: () => const AsyncValue.loading(),
   );
 });

@@ -32,7 +32,7 @@ class ReviewLocalDataSource {
         return ReviewModel.fromSembastMap(record.key, record.value);
       }).toList();
     } catch (e) {
-      throw 'Error al obtener reviews del caché: $e';
+      throw 'Error al obtener reviews del caché';
     }
   }
 
