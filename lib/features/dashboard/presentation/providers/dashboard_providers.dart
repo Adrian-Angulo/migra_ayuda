@@ -1,5 +1,6 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:migra_ayuda/features/audit/domain/entities/audit_entity.dart';
 import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
 import 'package:migra_ayuda/features/dashboard/data/repositories/dashboard_repository_imple.dart';
@@ -58,8 +59,21 @@ final getUserLength = Provider.autoDispose<int>(
   },
 );
 
-final activityChartProvider = FutureProvider.autoDispose<ActivityChartResult>((ref) async {
-  final service = ref.read(dashboardRespositoryProvider);
-  return service.getActivityData();
+final activityDateRangeProvider =
+    StateProvider.autoDispose<DateTimeRange>((ref) {
+  final now = DateTime.now();
+  return DateTimeRange(
+    start: now.subtract(const Duration(days: 15)),
+    end: now,
+  );
 });
 
+final activityChartProvider =
+    FutureProvider.autoDispose<ActivityChartResult>((ref) async {
+  final range = ref.watch(activityDateRangeProvider);
+  final service = ref.read(dashboardRespositoryProvider);
+  return service.getActivityData(
+    startDate: range.start,
+    endDate: range.end,
+  );
+});

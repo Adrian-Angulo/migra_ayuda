@@ -3,6 +3,8 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
+import 'package:migra_ayuda/core/errors/failure.dart';
+
 
 class StatisticCard extends StatelessWidget {
   final String title;
@@ -74,8 +76,11 @@ class StatisticCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   value.when(
                     data: (data) => StaticTitle(value: data.toString()),
-                    error: (error, stackTrace) =>
-                        StaticTitle(value: error.toString()),
+                    error: (error, stackTrace) => Tooltip(
+                      message:
+                          error is Failure ? error.message : 'Error al cargar',
+                      child: const StaticTitle(value: '-'),
+                    ),
                     loading: () => const SizedBox(
                       width: 30,
                       height: 20,
@@ -84,6 +89,7 @@ class StatisticCard extends StatelessWidget {
                       ),
                     ),
                   )
+
                 ],
               ),
             ),

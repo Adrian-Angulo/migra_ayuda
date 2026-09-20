@@ -2,6 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
+import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/dashboard/domain/entities/destination_data.dart';
 import 'package:migra_ayuda/features/dashboard/presentation/providers/dashboard_providers.dart';
 
@@ -16,9 +17,21 @@ class ServiceMoreFilterContainer extends ConsumerWidget {
     final userLength = ref.watch(getUserLength);
 
     return stateDestianations.when(
-      error: (error, stackTrace) => Center(
-        child: Text('Ha ocurrido un error inesperado: ${error.toString()}'),
+      error: (error, stackTrace) => FadeInUp(
+        child: Container(
+          decoration: ContainerDecorationBorder.decorationBox(),
+          height: 350,
+          child: Center(
+            child: Text(
+              error is Failure
+                  ? error.message
+                  : 'No se pudo cargar la información de destinos',
+              style: const TextStyle(color: Colors.grey),
+            ),
+          ),
+        ),
       ),
+
       loading: () => FadeInUp(
         child: Container(
            decoration: ContainerDecorationBorder.decorationBox(),

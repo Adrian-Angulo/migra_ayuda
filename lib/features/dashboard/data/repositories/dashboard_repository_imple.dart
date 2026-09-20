@@ -1,28 +1,36 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/utils/utils.dart';
 import 'package:migra_ayuda/features/dashboard/domain/entities/activity_chart_result.dart';
 import 'package:migra_ayuda/features/dashboard/domain/entities/category_data.dart';
 import 'package:migra_ayuda/features/dashboard/domain/entities/destination_data.dart';
+import 'package:migra_ayuda/features/dashboard/domain/failures/dashboard_failures.dart';
 import 'package:migra_ayuda/features/dashboard/domain/repositories/dashboard_repository.dart';
 
 class DashboardRepositoryImple implements DashboardRepository {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<int> _getCountColletion(String colletionName) async {
-    final snapshot = await _firestore.collection(colletionName).count().get();
-    return snapshot.count ?? 0;
+    try {
+      final snapshot = await _firestore.collection(colletionName).count().get();
+      return snapshot.count ?? 0;
+    } catch (_) {
+      throw const DashboardMetricsFetchFailure();
+    }
   }
 
   @override
   Future<int> getUsersCount() async {
-    final snapshot = await _firestore
-        .collection('users')
-        .where('role', isEqualTo: 'Migrante')
-        .count()
-        .get();
-    return snapshot.count ?? 0;
+    try {
+      final snapshot = await _firestore
+          .collection('users')
+          .where('role', isEqualTo: 'Migrante')
+          .count()
+          .get();
+      return snapshot.count ?? 0;
+    } catch (_) {
+      throw const DashboardMetricsFetchFailure();
+    }
   }
 
   @override
@@ -37,34 +45,41 @@ class DashboardRepositoryImple implements DashboardRepository {
 
   @override
   Future<int> getServicesCount() async {
-    final snapshot = await _firestore
-        .collection('user_activities')
-        .where('accion', isEqualTo: 'Como llegar')
-        .count()
-        .get();
-    return snapshot.count ?? 0;
+    try {
+      final snapshot = await _firestore
+          .collection('user_activities')
+          .where('accion', isEqualTo: 'Como llegar')
+          .count()
+          .get();
+      return snapshot.count ?? 0;
+    } catch (_) {
+      throw const DashboardMetricsFetchFailure();
+    }
   }
 
   @override
   Future<List<CategoryData>> getCategoryData() async {
-    final snapshot = await _firestore.collection('entities').get();
-    Map<String, int> serviceCount = {};
+    try {
+      final snapshot = await _firestore.collection('entities').get();
+      Map<String, int> serviceCount = {};
 
-    for (var doc in snapshot.docs) {
-      for (var service in doc['services']) {
-        serviceCount[service] = (serviceCount[service] ?? 0) + 1;
+      for (var doc in snapshot.docs) {
+        for (var service in doc['services']) {
+          serviceCount[service] = (serviceCount[service] ?? 0) + 1;
+        }
       }
-    }
 
-    return serviceCount.entries
-        .map((entry) => CategoryData(name: entry.key, value: entry.value))
-        .toList();
+      return serviceCount.entries
+          .map((entry) => CategoryData(name: entry.key, value: entry.value))
+          .toList();
+    } catch (_) {
+      throw const DashboardChartDataFetchFailure();
+    }
   }
 
   @override
   Stream<List<DestinationData>> getDetinations() {
     return _firestore.collection('users').snapshots().map((snapshot) {
-      // Contar la cantidad por país de destino
       final Map<String, int> destinationsCount = {};
 
       for (var doc in snapshot.docs) {
@@ -77,7 +92,6 @@ class DashboardRepositoryImple implements DashboardRepository {
         }
       }
 
-      // Crear la lista de DestinationData ordenada de mayor a menor cantidad y tomar solo los 5 mayores
       final List<DestinationData> destinations = destinationsCount.entries
           .map((entry) =>
               DestinationData(nombre: entry.key, cantidad: entry.value))
@@ -85,58 +99,71 @@ class DashboardRepositoryImple implements DashboardRepository {
         ..sort((a, b) => b.cantidad.compareTo(a.cantidad));
 
       return destinations.take(5).toList();
+    }).handleError((_) {
+      throw const DashboardDestinationsFetchFailure();
     });
   }
 
-
-
-
-
-
   @override
-  Future<ActivityChartResult> getActivityData({int days = 31}) async {
-    final desde = DateTime.now().subtract(Duration(days: days));
+  Future<ActivityChartResult> getActivityData({
+    DateTime? startDate,
+    DateTime? endDate,
+    int? days,
+  }) async {
+    try {
+      final now = DateTime.now();
+      final DateTime desde = startDate ??
+          (days != null
+              ? now.subtract(Duration(days: days))
+              : now.subtract(const Duration(days: 15)));
+      final DateTime hasta = endDate != null
+          ? DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59, 999)
+          : now;
 
-    // createdAt se guarda como ISO-8601 (String), no como Timestamp.
-    final snapshot = await _firestore
-        .collection('user_activities')
-        .where(
-          'createdAt',
-          isGreaterThanOrEqualTo: desde.toUtc().toIso8601String(),
-        )
-        .orderBy('createdAt')
-        .get();
+      final snapshot = await _firestore
+          .collection('user_activities')
+          .where(
+            'createdAt',
+            isGreaterThanOrEqualTo: desde.toUtc().toIso8601String(),
+          )
+          .orderBy('createdAt')
+          .get();
 
-    final Map<String, Map<String, int>> agrupado = {};
+      final Map<String, Map<String, int>> agrupado = {};
 
-    for (final doc in snapshot.docs) {
-      final data = doc.data();
-      final createdAt = Utils.parseCreatedAt(data['createdAt']);
-      if (createdAt == null || createdAt.isBefore(desde)) continue;
+      for (final doc in snapshot.docs) {
+        final data = doc.data();
+        final createdAt = Utils.parseCreatedAt(data['createdAt']);
+        if (createdAt == null ||
+            createdAt.isBefore(desde) ||
+            createdAt.isAfter(hasta)) {
+          continue;
+        }
 
-      final diaLabel = Utils.formatDia(createdAt);
-      final tipo = data['accion'] as String? ?? '';
+        final diaLabel = Utils.formatDia(createdAt);
+        final tipo = data['accion'] as String? ?? '';
 
-      agrupado.putIfAbsent(
-        diaLabel,
-        () => {for (final t in ActivityActions.types()) t: 0},
-      );
-      if (agrupado[diaLabel]!.containsKey(tipo)) {
-        agrupado[diaLabel]![tipo] = agrupado[diaLabel]![tipo]! + 1;
+        agrupado.putIfAbsent(
+          diaLabel,
+          () => {for (final t in ActivityActions.types()) t: 0},
+        );
+        if (agrupado[diaLabel]!.containsKey(tipo)) {
+          agrupado[diaLabel]![tipo] = agrupado[diaLabel]![tipo]! + 1;
+        }
       }
+
+      final dias = agrupado.keys.toList();
+
+      return ActivityChartResult(
+        loginData: Utils.serie(dias, agrupado, ActivityActions.login()),
+        entityData: Utils.serie(dias, agrupado, ActivityActions.entityViewed()),
+        routeData: Utils.serie(dias, agrupado, ActivityActions.routeRequested()),
+        filterData: Utils.serie(dias, agrupado, ActivityActions.filter()),
+        googleMapData:
+            Utils.serie(dias, agrupado, ActivityActions.navigationMaps()),
+      );
+    } catch (_) {
+      throw const DashboardChartDataFetchFailure();
     }
-
-    final dias = agrupado.keys.toList();
-
-    return ActivityChartResult(
-      loginData: Utils.serie(dias, agrupado, ActivityActions.login()),
-      entityData: Utils.serie(dias, agrupado, ActivityActions.entityViewed()),
-      routeData: Utils.serie(dias, agrupado, ActivityActions.routeRequested()),
-      filterData: Utils.serie(dias, agrupado, ActivityActions.filter()),
-      googleMapData:
-          Utils.serie(dias, agrupado, ActivityActions.navigationMaps()),
-    );
   }
-
-
 }

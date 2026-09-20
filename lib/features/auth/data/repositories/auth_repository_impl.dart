@@ -4,6 +4,7 @@ import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:migra_ayuda/features/auth/data/mappers/auth_exception_mapper.dart';
 import 'package:migra_ayuda/features/auth/domain/entities/auth_user.dart';
+import 'package:migra_ayuda/features/auth/domain/failures/auth_failures.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {

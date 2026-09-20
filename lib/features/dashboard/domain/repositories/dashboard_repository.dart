@@ -9,5 +9,9 @@ abstract class DashboardRepository {
   Future<int> getServicesCount();
   Future<List<CategoryData>> getCategoryData();
   Stream<List<DestinationData>> getDetinations();
-   Future<ActivityChartResult> getActivityData({int days});
+  Future<ActivityChartResult> getActivityData({
+    DateTime? startDate,
+    DateTime? endDate,
+    int? days,
+  });
 }

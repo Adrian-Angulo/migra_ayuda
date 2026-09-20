@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
+import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/core/router/routes.dart';
 import 'package:migra_ayuda/core/utils/format/time_formatter.dart';
 import 'package:migra_ayuda/features/audit/domain/entities/audit_entity.dart';
 import 'package:migra_ayuda/features/dashboard/presentation/providers/dashboard_providers.dart';
+
 
 class RecentActivities extends ConsumerWidget {
   const RecentActivities({super.key});
@@ -91,14 +93,24 @@ class RecentActivities extends ConsumerWidget {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Text('Ha ocurrido un error:'),
-                                Text('Error: ${error.toString()}'),
+                                const Icon(Icons.info_outline,
+                                    color: Colors.grey),
+                                const SizedBox(height: 6),
+                                Text(
+                                  error is Failure
+                                      ? error.message
+                                      : 'No se pudieron cargar las actividades recientes',
+                                  style: const TextStyle(
+                                      fontSize: 12, color: Colors.grey),
+                                  textAlign: TextAlign.center,
+                                ),
                               ],
                             ),
                           ),
                       loading: () => const Center(
                             child: CircularProgressIndicator(),
                           ))),
+
             ],
           ),
         ),

@@ -1,11 +1,13 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/constants/services_utils.dart';
 import 'package:migra_ayuda/features/dashboard/domain/entities/category_data.dart';
 import 'package:migra_ayuda/features/dashboard/presentation/providers/dashboard_providers.dart';
+
 
 class CategoryChart extends ConsumerWidget {
   const CategoryChart({
@@ -172,13 +174,15 @@ class CategoryChart extends ConsumerWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline, color: Colors.red),
+                      const Icon(Icons.info_outline, color: Colors.grey),
                       const SizedBox(height: 8),
-                      const Text('Error al mostrar el gráfico'),
                       Text(
-                        'Error: ${error.toString()}',
-                        style: const TextStyle(
-                            fontSize: 12, color: Colors.redAccent),
+                        error is Failure
+                            ? error.message
+                            : 'No se pudieron cargar los datos por categoría',
+                        style:
+                            const TextStyle(fontSize: 12, color: Colors.grey),
+                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),
@@ -187,6 +191,7 @@ class CategoryChart extends ConsumerWidget {
                   child: CircularProgressIndicator(),
                 ),
               )
+
             ],
           ),
         ),

@@ -2,15 +2,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/auth/domain/entities/auth_user.dart';
+import 'package:migra_ayuda/features/auth/domain/failures/auth_failures.dart';
 import 'package:migra_ayuda/features/auth/domain/repositories/auth_repository.dart';
 import 'package:migra_ayuda/features/auth/domain/usecases/auth_usecases.dart';
 
 import 'package:migra_ayuda/features/users/domain/entities/migrant.dart';
+import 'package:migra_ayuda/features/users/domain/failures/users_failures.dart';
 import 'package:migra_ayuda/features/users/domain/repository/user_repository.dart';
 import 'package:migra_ayuda/features/users/domain/usecases/complete_profile_usecase.dart';
 import 'package:migra_ayuda/features/users/domain/usecases/create_user_profile_usecase.dart';
 import 'package:migra_ayuda/features/users/domain/usecases/get_user_profile_usecase.dart';
 import 'package:mocktail/mocktail.dart';
+
 
 /// Simula el repositorio de autenticación
 class MockAuthRepository extends Mock implements AuthRepository {}

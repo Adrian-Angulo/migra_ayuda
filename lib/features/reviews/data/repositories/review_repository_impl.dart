@@ -1,13 +1,14 @@
 import 'package:flutter/foundation.dart';
+import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/core/network/network_info.dart';
 import 'package:migra_ayuda/features/reviews/data/datasources/review_local_datasource.dart';
 import 'package:migra_ayuda/features/reviews/data/datasources/review_remote_datasource.dart';
 import 'package:migra_ayuda/features/reviews/data/models/review_model.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
+import 'package:migra_ayuda/features/reviews/domain/failures/review_failures.dart';
 import 'package:migra_ayuda/features/reviews/domain/repositories/review_repository.dart';
 import 'package:uuid/uuid.dart';
 
-/// Implementación del repositorio de reviews con estrategia Offline-First
 class ReviewRepositoryImpl implements ReviewRepository {
   final ReviewRemoteDataSource remoteDataSource;
   final ReviewLocalDataSource localDataSource;
@@ -36,8 +37,8 @@ class ReviewRepositoryImpl implements ReviewRepository {
         await localDataSource.cacheReview(reviewUpdate);
         await localDataSource.deleteLocalRecord(localId);
       }
-    } catch (e) {
-      throw Exception('Error al crear la review: ${e.toString()}');
+    } catch (_) {
+      throw const ReviewCreationFailedFailure();
     }
   }
 
@@ -52,43 +53,38 @@ class ReviewRepositoryImpl implements ReviewRepository {
 
           await localDataSource.cacheReviews(remoteReviews);
           return remoteReviews.map((r) => r.toEntity()).toList();
-        } on ServerException catch (e) {
-          debugPrint('⚠️ Error del servidor al obtener reviews: ${e.message}');
+        } on ServerException catch (_) {
+          // Si falla remoto, intentamos leer de local
         }
       }
 
       final cachedReviews =
           await localDataSource.getReviewsByEntity(entityId);
       return cachedReviews.map((r) => r.toEntity()).toList();
-    } catch (e) {
-      if (e is Exception) rethrow;
-      throw Exception('Error al obtener las reviews: ${e.toString()}');
+    } catch (_) {
+      throw const ReviewFetchFailedFailure();
     }
   }
 
   @override
   Future<List<ReviewEntity>> getAllReviews() async {
     try {
-      // Verificamos si hay conexión a internet
       final isConnected = await networkInfo.isConnected;
 
-      // Si hay internet, intentamos sincronizar las reviews más recientes del servidor
       if (isConnected) {
         try {
           final remoteReviews = await remoteDataSource.getAllReviews();
           await localDataSource.cacheReviews(remoteReviews);
           return remoteReviews.map((r) => r.toEntity()).toList();
-        } on ServerException catch (e) {
-          debugPrint('⚠️ Error del servidor al obtener reviews: ${e.message}');
+        } on ServerException catch (_) {
+          // Si falla remoto, intentamos leer de local
         }
       }
 
-      // Retornamos las reviews de caché local (excluye las marcadas como eliminadas)
       final cachedReviews = await localDataSource.getCachedReviews();
       return cachedReviews.map((r) => r.toEntity()).toList();
-    } catch (e) {
-      if (e is Exception) rethrow;
-      throw Exception('Error al obtener las reviews: ${e.toString()}');
+    } catch (_) {
+      throw const ReviewFetchFailedFailure();
     }
   }
 
@@ -108,12 +104,12 @@ class ReviewRepositoryImpl implements ReviewRepository {
         try {
           await remoteDataSource.updateReview(modelo);
           await localDataSource.markAsSynced(review.id);
-        } catch (e) {
+        } catch (_) {
           return;
         }
       }
-    } catch (e) {
-      throw Exception('Error al actualizar la review: ${e.toString()}');
+    } catch (_) {
+      throw const ReviewUpdateFailedFailure();
     }
   }
 
@@ -127,28 +123,25 @@ class ReviewRepositoryImpl implements ReviewRepository {
         try {
           await remoteDataSource.deleteReview(reviewId);
           await localDataSource.deleteLocalRecord(reviewId);
-        } catch (e) {
-          debugPrint('⚠️ Error al eliminar en Firebase: $e');
+        } catch (_) {
+          // Si falla en remoto, queda eliminado localmente
         }
       }
-    } catch (e) {
-      throw Exception('Error al eliminar la review: ${e.toString()}');
+    } catch (_) {
+      throw const ReviewDeletionFailedFailure();
     }
   }
 
   @override
   Future<void> syncPendingReviews() async {
     try {
-      debugPrint('incio sincronizacion de review');
       final isConnected = await networkInfo.isConnected;
       if (!isConnected) {
-        debugPrint('⚠️ No hay conexión a internet para sincronizar reviews');
         return;
       }
 
       final pendingReviews = await localDataSource.getPendingReviews();
       if (pendingReviews.isEmpty) {
-        debugPrint('No hay reviews pedientes');
         return;
       }
 
@@ -170,14 +163,12 @@ class ReviewRepositoryImpl implements ReviewRepository {
             await localDataSource.deleteLocalRecord(localId);
             continue;
           }
-        } catch (e) {
-          debugPrint('⚠️ Error al sincronizar review ${review.id}: $e');
+        } catch (_) {
           continue;
         }
       }
-    } catch (e) {
-      debugPrint('⚠️ Error al sincronizar reviews: ${e.toString()}');
-      throw Exception('Error al sincronizar las reviews');
+    } catch (_) {
+      throw const ReviewSyncFailedFailure();
     }
   }
 
@@ -192,7 +183,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
       try {
         cachedReview =
             await localDataSource.getUserReviewByEntity(userId, entityId);
-      } catch (e) {
+      } catch (_) {
         cachedReview = null;
       }
 
@@ -213,19 +204,17 @@ class ReviewRepositoryImpl implements ReviewRepository {
           }
 
           return null;
-        } on ServerException catch (e) {
+        } on ServerException catch (_) {
           if (cachedReview != null) {
             return cachedReview.toEntity();
           }
-          throw Exception('Error del servidor: ${e.message}');
+          throw const ReviewFetchFailedFailure();
         }
       }
 
       return cachedReview?.toEntity();
-    } catch (e) {
-      if (e is Exception) rethrow;
-      throw Exception(
-          'Error al obtener la review del usuario: ${e.toString()}');
+    } catch (_) {
+      throw const ReviewNotFoundFailure();
     }
   }
 }

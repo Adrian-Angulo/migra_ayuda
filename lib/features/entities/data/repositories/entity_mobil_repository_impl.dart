@@ -1,10 +1,12 @@
 import 'dart:typed_data';
 import 'package:flutter/rendering.dart';
+import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/core/network/network_info.dart';
 import 'package:migra_ayuda/features/entities/data/datasources/entity_local_datasource.dart';
 import 'package:migra_ayuda/features/entities/data/datasources/entity_remote_datasource.dart';
 import 'package:migra_ayuda/features/entities/data/models/entity_models.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
+import 'package:migra_ayuda/features/entities/domain/failures/entity_failures.dart';
 import 'package:migra_ayuda/features/entities/domain/repositories/entity_repository.dart';
 
 class EntityMobilRepositoryImpl implements EntityRepository {
@@ -38,17 +40,20 @@ class EntityMobilRepositoryImpl implements EntityRepository {
     final isConnected = await networkInfo.isConnected;
 
     if (isConnected) {
-      await remoteDataSource.registerEntity(
-        entityModel: modelo,
-        imageBytes: imagenBytes,
-        fileName: fileName,
-      );
+      try {
+        await remoteDataSource.registerEntity(
+          entityModel: modelo,
+          imageBytes: imagenBytes,
+          fileName: fileName,
+        );
 
-      final entities = await remoteDataSource.getAllEntities();
-      await localDataSource.cacheEntities(entities);
+        final entities = await remoteDataSource.getAllEntities();
+        await localDataSource.cacheEntities(entities);
+      } catch (_) {
+        throw const EntityCreationFailedFailure();
+      }
     } else {
-      throw Exception(
-          'No hay conexión a internet. Se requiere conexión para registrar entidades con imágenes.');
+      throw const NetworkFailure();
     }
   }
 
@@ -82,13 +87,10 @@ class EntityMobilRepositoryImpl implements EntityRepository {
           imageBytes: imagenBytes,
           fileName: fileName,
         );
-      } catch (e) {
-        // Si falla Firebase, los datos ya están en caché, pero avisamos mediante excepción
-        throw Exception(
-            'Actualizado localmente. Error al sincronizar: ${e.toString()}');
+      } catch (_) {
+        throw const EntityUpdateFailedFailure();
       }
     }
-    // Si no hay internet, solo se actualiza localmente
   }
 
   @override
@@ -100,18 +102,14 @@ class EntityMobilRepositoryImpl implements EntityRepository {
     if (isConnected) {
       try {
         await remoteDataSource.deleteEntity(entityId);
-      } catch (e) {
-        // Si falla Firebase, ya está eliminado localmente, pero avisamos mediante excepción
-        throw Exception(
-            'Eliminado localmente. Error al sincronizar: ${e.toString()}');
+      } catch (_) {
+        throw const EntityDeletionFailedFailure();
       }
     }
-    // Si no hay internet, solo se elimina localmente
   }
 
   @override
   Future<List<EntityEntity>> getAllEntities() async {
-    // Estrategia cache-first
     List<EntityModels> cachedEntities = [];
     try {
       cachedEntities = await localDataSource.getCachedEntities();
@@ -125,18 +123,16 @@ class EntityMobilRepositoryImpl implements EntityRepository {
       try {
         final remoteEntities = await remoteDataSource.getAllEntities();
         await localDataSource.cacheEntities(remoteEntities);
-        // Convertir a EntityEntity para el dominio
         return remoteEntities
             .map((e) => _entityModelsToEntityEntity(e))
             .toList();
-      } catch (e) {
-        // Si falla Firebase pero hay caché, retorna el caché
+      } catch (_) {
         if (cachedEntities.isNotEmpty) {
           return cachedEntities
               .map((e) => _entityModelsToEntityEntity(e))
               .toList();
         }
-        throw Exception('Error del servidor: ${e.toString()}');
+        throw const EntityFetchFailedFailure();
       }
     }
 
@@ -146,8 +142,7 @@ class EntityMobilRepositoryImpl implements EntityRepository {
           .toList();
     }
 
-    throw Exception(
-        'No hay datos disponibles. Verifica tu conexión a internet.');
+    throw const NetworkFailure();
   }
 
   @override
@@ -156,7 +151,7 @@ class EntityMobilRepositoryImpl implements EntityRepository {
 
     try {
       cachedEntity = await localDataSource.getEntityById(id);
-    } catch (e) {
+    } catch (_) {
       cachedEntity = null;
     }
 
@@ -167,11 +162,11 @@ class EntityMobilRepositoryImpl implements EntityRepository {
         final remoteEntity = await remoteDataSource.getEntityById(id);
         await localDataSource.cacheEntity(remoteEntity);
         return _entityModelsToEntityEntity(remoteEntity);
-      } catch (e) {
+      } catch (_) {
         if (cachedEntity != null) {
           return _entityModelsToEntityEntity(cachedEntity);
         }
-        throw Exception('Error del servidor: ${e.toString()}');
+        throw const EntityFetchFailedFailure();
       }
     }
 
@@ -179,25 +174,22 @@ class EntityMobilRepositoryImpl implements EntityRepository {
       return _entityModelsToEntityEntity(cachedEntity);
     }
 
-    throw Exception(
-        'Entidad no disponible offline. Verifica tu conexión a internet.');
+    throw const EntityNotFoundFailure();
   }
 
   @override
   Future<void> syncAllFromFirebase() async {
-    debugPrint('iniciando sincronizacion');
     final isConnected = await networkInfo.isConnected;
     if (!isConnected) {
-      debugPrint('sin conexion');
-      throw Exception('Sin conexión a internet para sincronizar');
+      throw const NetworkFailure();
     }
-    debugPrint('existe conexion');
-    final remoteEntities = await remoteDataSource.getAllEntities();
-    debugPrint('entidades descargadas');
-    await localDataSource.clearCache();
-    debugPrint('limpiando cache');
-    await localDataSource.cacheEntities(remoteEntities);
-    debugPrint('agregando entidades a cache');
+    try {
+      final remoteEntities = await remoteDataSource.getAllEntities();
+      await localDataSource.clearCache();
+      await localDataSource.cacheEntities(remoteEntities);
+    } catch (_) {
+      throw const EntityFetchFailedFailure();
+    }
   }
 
   @override
@@ -205,7 +197,6 @@ class EntityMobilRepositoryImpl implements EntityRepository {
     throw UnimplementedError();
   }
 
-  // Helper for conversion (puedes mover esto a otro sitio si lo prefieres)
   EntityEntity _entityModelsToEntityEntity(EntityModels modelo) {
     return EntityEntity(
       id: modelo.id,
