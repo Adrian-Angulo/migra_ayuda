@@ -95,9 +95,12 @@ class AuditNotifier extends AsyncNotifier<ActivityState> {
     // guard. captura errores automaticamente
     state = await AsyncValue.guard(() async {
       //crear la actividad
-      await ref.read(auditRepositoryProvider).createActivity(activity);
-
-      return ActivityState.success;
+      final result =
+          await ref.read(auditRepositoryProvider).createActivity(activity);
+      return result.fold(
+        (failure) => throw failure,
+        (_) => ActivityState.success,
+      );
     });
   }
 }

@@ -47,7 +47,11 @@ class DataTableUtils {
     );
   }
 
-  static Widget buildEmptyFrame({required IconData icon, required String title, required String subtitle}) {
+  static Widget buildEmptyFrame({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(48.0),

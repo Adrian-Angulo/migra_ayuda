@@ -1,20 +1,22 @@
+import 'package:dartz/dartz.dart';
+import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
 
 abstract class ReviewRepository {
-  Future<void> createReview(ReviewEntity review);
+  Future<Either<Failure, void>> createReview(ReviewEntity review);
 
-  Future<List<ReviewEntity>> getReviewsByEntity(String entityId);
+  Future<Either<Failure, List<ReviewEntity>>> getReviewsByEntity(String entityId);
 
-  Future<List<ReviewEntity>> getAllReviews();
+  Future<Either<Failure, List<ReviewEntity>>> getAllReviews();
 
-  Future<void> updateReview(ReviewEntity review);
+  Future<Either<Failure, void>> updateReview(ReviewEntity review);
 
-  Future<void> deleteReview(String reviewId);
+  Future<Either<Failure, void>> deleteReview(String reviewId);
 
-  Future<ReviewEntity?> getUserReviewByEntity(
+  Future<Either<Failure, ReviewEntity?>> getUserReviewByEntity(
     String userId,
     String entityId,
   );
 
-  Future<void> syncPendingReviews();
+  Future<Either<Failure, void>> syncPendingReviews();
 }

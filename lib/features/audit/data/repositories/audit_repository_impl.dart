@@ -1,9 +1,11 @@
-import 'package:flutter/foundation.dart';
+import 'package:dartz/dartz.dart';
+import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/core/network/network_info.dart';
 import 'package:migra_ayuda/features/audit/data/datasources/audit_local_datasource.dart';
 import 'package:migra_ayuda/features/audit/data/datasources/audit_remote_datasource.dart';
 import 'package:migra_ayuda/features/audit/data/mappers/audit_mappers.dart';
 import 'package:migra_ayuda/features/audit/domain/entities/audit_entity.dart';
+import 'package:migra_ayuda/features/audit/domain/failures/audit_failures.dart';
 import 'package:migra_ayuda/features/audit/domain/repositories/audit_repository.dart';
 import 'package:uuid/uuid.dart';
 
@@ -19,7 +21,7 @@ class AuditRepositoryImpl implements AuditRepository {
   });
 
   @override
-  Future<void> createActivity(AuditEntity activity) async {
+  Future<Either<Failure, void>> createActivity(AuditEntity activity) async {
     try {
       // 1. Genera un ID único local
       final localId = const Uuid().v4();
@@ -39,16 +41,16 @@ class AuditRepositoryImpl implements AuditRepository {
           // 5. Si hay internet, sube a Firebase
           await remoteDataSource.createActivity(modeloWithId);
 
-          //6. elimina local
+          // 6. elimina local
           await localDataSource.delete(localId);
-        } catch (e) {
+        } catch (_) {
           // Si falla Firebase, los datos ya están en caché local
-          debugPrint('⚠️ Error al sincronizar con Firebase: ${e.toString()}');
         }
       }
       // Si no hay internet, queda pendiente de sincronización
-    } catch (e) {
-      debugPrint('⚠️ Error inesperado: ${e.toString()}');
+      return const Right(null);
+    } catch (_) {
+      return const Left(AuditActivityCreationFailedFailure());
     }
   }
 
@@ -60,12 +62,17 @@ class AuditRepositoryImpl implements AuditRepository {
   }
 
   @override
-  Future<void> synchronize() async {
-    final list = await localDataSource.getPending();
-    if (list.isEmpty) return;
-    await remoteDataSource.synchronize(list);
-    for (final act in list) {
-      await localDataSource.delete(act.id);
+  Future<Either<Failure, void>> synchronize() async {
+    try {
+      final list = await localDataSource.getPending();
+      if (list.isEmpty) return const Right(null);
+      await remoteDataSource.synchronize(list);
+      for (final act in list) {
+        await localDataSource.delete(act.id);
+      }
+      return const Right(null);
+    } catch (_) {
+      return const Left(AuditSyncFailedFailure());
     }
   }
 }

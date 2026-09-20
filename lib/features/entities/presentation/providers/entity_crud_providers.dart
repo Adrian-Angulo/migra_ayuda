@@ -72,7 +72,9 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
       final deleteEntityUseCase = DeleteEntityUseCase(repository);
 
       final reviewR = ref.read(reviewRepositoryProvider);
-      final List<ReviewEntity> reviews = await reviewR.getReviewsByEntity(id);
+      final reviewsResult = await reviewR.getReviewsByEntity(id);
+      final List<ReviewEntity> reviews =
+          reviewsResult.fold((_) => [], (r) => r);
 
       final result = await deleteEntityUseCase(id);
       return await result.fold(
@@ -99,8 +101,10 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
       (entidad) async {
         // Obtener las reseñas relacionadas a la entidad
         final reviewRepo = ref.read(reviewRepositoryProvider);
-        final List<ReviewEntity> reviews =
+        final reviewsResult =
             await reviewRepo.getReviewsByEntity(entidadId);
+        final List<ReviewEntity> reviews =
+            reviewsResult.fold((_) => [], (r) => r);
 
         int totalReviews = reviews.length;
         double totalRating = reviews.fold(0.0, (sum, r) => sum + r.rating);

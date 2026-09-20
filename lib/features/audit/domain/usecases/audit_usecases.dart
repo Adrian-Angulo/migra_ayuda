@@ -1,3 +1,5 @@
+import 'package:dartz/dartz.dart';
+import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/audit/domain/entities/audit_entity.dart';
 import 'package:migra_ayuda/features/audit/domain/repositories/audit_repository.dart';
 
@@ -6,7 +8,7 @@ class RegisterActivityUsecase {
 
   RegisterActivityUsecase(this.repository);
 
-  Future<void> call(AuditEntity audit) {
+  Future<Either<Failure, void>> call(AuditEntity audit) {
     return repository.createActivity(audit);
   }
 }
@@ -26,7 +28,7 @@ class SyncronizeUsecase {
 
   SyncronizeUsecase(this.repository);
 
-  Future<void> call() {
+  Future<Either<Failure, void>> call() {
     return repository.synchronize();
   }
 }

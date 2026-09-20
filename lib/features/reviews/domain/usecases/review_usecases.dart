@@ -1,3 +1,5 @@
+import 'package:dartz/dartz.dart';
+import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
 import 'package:migra_ayuda/features/reviews/domain/repositories/review_repository.dart';
 
@@ -6,7 +8,7 @@ class CreateReviewUseCase {
 
   CreateReviewUseCase(this.repository);
 
-  Future<void> call(ReviewEntity review) {
+  Future<Either<Failure, void>> call(ReviewEntity review) {
     return repository.createReview(review);
   }
 }
@@ -16,7 +18,7 @@ class GetReviewsByEntityUseCase {
 
   GetReviewsByEntityUseCase(this.repository);
 
-  Future<List<ReviewEntity>> call(String entityId) {
+  Future<Either<Failure, List<ReviewEntity>>> call(String entityId) {
     return repository.getReviewsByEntity(entityId);
   }
 }
@@ -26,7 +28,7 @@ class GetAllReviewsUseCase {
 
   GetAllReviewsUseCase(this.repository);
 
-  Future<List<ReviewEntity>> call() {
+  Future<Either<Failure, List<ReviewEntity>>> call() {
     return repository.getAllReviews();
   }
 }
@@ -36,7 +38,7 @@ class UpdateReviewUseCase {
 
   UpdateReviewUseCase(this.repository);
 
-  Future<void> call(ReviewEntity review) {
+  Future<Either<Failure, void>> call(ReviewEntity review) {
     return repository.updateReview(review);
   }
 }
@@ -46,7 +48,7 @@ class DeleteReviewUseCase {
 
   DeleteReviewUseCase(this.repository);
 
-  Future<void> call(String reviewId) {
+  Future<Either<Failure, void>> call(String reviewId) {
     return repository.deleteReview(reviewId);
   }
 }
@@ -56,7 +58,7 @@ class GetUserReviewByEntityUseCase {
 
   GetUserReviewByEntityUseCase(this.repository);
 
-  Future<ReviewEntity?> call(String userId, String entityId) {
+  Future<Either<Failure, ReviewEntity?>> call(String userId, String entityId) {
     return repository.getUserReviewByEntity(userId, entityId);
   }
 }
@@ -66,7 +68,7 @@ class SyncPendingReviewsUseCase {
 
   SyncPendingReviewsUseCase(this.repository);
 
-  Future<void> call() {
+  Future<Either<Failure, void>> call() {
     return repository.syncPendingReviews();
   }
 }

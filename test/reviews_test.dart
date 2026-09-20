@@ -1,5 +1,7 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
+import 'package:migra_ayuda/features/reviews/domain/failures/review_failures.dart';
 import 'package:migra_ayuda/features/reviews/domain/repositories/review_repository.dart';
 import 'package:migra_ayuda/features/reviews/domain/usecases/review_usecases.dart';
 import 'package:mocktail/mocktail.dart';
@@ -40,25 +42,26 @@ void main() {
       'éxito: debería crear la reseña satisfactoriamente',
       () async {
         when(() => mockReviewRepository.createReview(fakeReview))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async => const Right(null));
 
-        await useCase(fakeReview);
+        final result = await useCase(fakeReview);
 
+        expect(result, const Right(null));
         verify(() => mockReviewRepository.createReview(fakeReview)).called(1);
         verifyNoMoreInteractions(mockReviewRepository);
       },
     );
 
     test(
-      'error: debería lanzar una excepción cuando falla la creación de la reseña',
+      'error: debería retornar Left(ReviewCreationFailedFailure) cuando falla la creación',
       () async {
-        when(() => mockReviewRepository.createReview(any()))
-            .thenThrow(Exception('Error al crear reseña'));
-
-        expect(
-          () async => await useCase(fakeReview),
-          throwsA(isA<Exception>()),
+        when(() => mockReviewRepository.createReview(any())).thenAnswer(
+          (_) async => const Left(ReviewCreationFailedFailure()),
         );
+
+        final result = await useCase(fakeReview);
+
+        expect(result, const Left(ReviewCreationFailedFailure()));
         verify(() => mockReviewRepository.createReview(fakeReview)).called(1);
         verifyNoMoreInteractions(mockReviewRepository);
       },
@@ -76,13 +79,18 @@ void main() {
       'éxito: debería retornar la lista de reseñas asociadas a una entidad',
       () async {
         when(() => mockReviewRepository.getReviewsByEntity('entity-123'))
-            .thenAnswer((_) async => [fakeReview]);
+            .thenAnswer((_) async => Right([fakeReview]));
 
         final result = await useCase('entity-123');
 
-        expect(result, isA<List<ReviewEntity>>());
-        expect(result.length, 1);
-        expect(result.first.id, 'review-123');
+        expect(result, isA<Right>());
+        result.fold(
+          (_) => fail('Debería retornar Right'),
+          (reviews) {
+            expect(reviews.length, 1);
+            expect(reviews.first.id, 'review-123');
+          },
+        );
         verify(() => mockReviewRepository.getReviewsByEntity('entity-123'))
             .called(1);
         verifyNoMoreInteractions(mockReviewRepository);
@@ -90,15 +98,15 @@ void main() {
     );
 
     test(
-      'error: debería lanzar una excepción cuando falla al obtener las reseñas de la entidad',
+      'error: debería retornar Left(ReviewFetchFailedFailure) cuando falla al obtener las reseñas',
       () async {
-        when(() => mockReviewRepository.getReviewsByEntity(any()))
-            .thenThrow(Exception('Error al obtener reseñas'));
-
-        expect(
-          () async => await useCase('entity-123'),
-          throwsA(isA<Exception>()),
+        when(() => mockReviewRepository.getReviewsByEntity(any())).thenAnswer(
+          (_) async => const Left(ReviewFetchFailedFailure()),
         );
+
+        final result = await useCase('entity-123');
+
+        expect(result, const Left(ReviewFetchFailedFailure()));
         verify(() => mockReviewRepository.getReviewsByEntity('entity-123'))
             .called(1);
         verifyNoMoreInteractions(mockReviewRepository);
@@ -117,28 +125,33 @@ void main() {
       'éxito: debería retornar todas las reseñas disponibles',
       () async {
         when(() => mockReviewRepository.getAllReviews())
-            .thenAnswer((_) async => [fakeReview]);
+            .thenAnswer((_) async => Right([fakeReview]));
 
         final result = await useCase();
 
-        expect(result, isA<List<ReviewEntity>>());
-        expect(result.length, 1);
-        expect(result.first.id, 'review-123');
+        expect(result, isA<Right>());
+        result.fold(
+          (_) => fail('Debería retornar Right'),
+          (reviews) {
+            expect(reviews.length, 1);
+            expect(reviews.first.id, 'review-123');
+          },
+        );
         verify(() => mockReviewRepository.getAllReviews()).called(1);
         verifyNoMoreInteractions(mockReviewRepository);
       },
     );
 
     test(
-      'error: debería lanzar una excepción cuando falla la consulta de todas las reseñas',
+      'error: debería retornar Left(ReviewFetchFailedFailure) cuando falla la consulta de reseñas',
       () async {
-        when(() => mockReviewRepository.getAllReviews())
-            .thenThrow(Exception('Error al obtener todas las reseñas'));
-
-        expect(
-          () async => await useCase(),
-          throwsA(isA<Exception>()),
+        when(() => mockReviewRepository.getAllReviews()).thenAnswer(
+          (_) async => const Left(ReviewFetchFailedFailure()),
         );
+
+        final result = await useCase();
+
+        expect(result, const Left(ReviewFetchFailedFailure()));
         verify(() => mockReviewRepository.getAllReviews()).called(1);
         verifyNoMoreInteractions(mockReviewRepository);
       },
@@ -156,25 +169,26 @@ void main() {
       'éxito: debería actualizar la reseña satisfactoriamente',
       () async {
         when(() => mockReviewRepository.updateReview(fakeReview))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async => const Right(null));
 
-        await useCase(fakeReview);
+        final result = await useCase(fakeReview);
 
+        expect(result, const Right(null));
         verify(() => mockReviewRepository.updateReview(fakeReview)).called(1);
         verifyNoMoreInteractions(mockReviewRepository);
       },
     );
 
     test(
-      'error: debería lanzar una excepción cuando falla la actualización de la reseña',
+      'error: debería retornar Left(ReviewUpdateFailedFailure) cuando falla la actualización',
       () async {
-        when(() => mockReviewRepository.updateReview(any()))
-            .thenThrow(Exception('Error al actualizar reseña'));
-
-        expect(
-          () async => await useCase(fakeReview),
-          throwsA(isA<Exception>()),
+        when(() => mockReviewRepository.updateReview(any())).thenAnswer(
+          (_) async => const Left(ReviewUpdateFailedFailure()),
         );
+
+        final result = await useCase(fakeReview);
+
+        expect(result, const Left(ReviewUpdateFailedFailure()));
         verify(() => mockReviewRepository.updateReview(fakeReview)).called(1);
         verifyNoMoreInteractions(mockReviewRepository);
       },
@@ -192,25 +206,26 @@ void main() {
       'éxito: debería eliminar la reseña satisfactoriamente',
       () async {
         when(() => mockReviewRepository.deleteReview('review-123'))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async => const Right(null));
 
-        await useCase('review-123');
+        final result = await useCase('review-123');
 
+        expect(result, const Right(null));
         verify(() => mockReviewRepository.deleteReview('review-123')).called(1);
         verifyNoMoreInteractions(mockReviewRepository);
       },
     );
 
     test(
-      'error: debería lanzar una excepción cuando falla la eliminación de la reseña',
+      'error: debería retornar Left(ReviewDeletionFailedFailure) cuando falla la eliminación',
       () async {
-        when(() => mockReviewRepository.deleteReview(any()))
-            .thenThrow(Exception('Error al eliminar reseña'));
-
-        expect(
-          () async => await useCase('review-123'),
-          throwsA(isA<Exception>()),
+        when(() => mockReviewRepository.deleteReview(any())).thenAnswer(
+          (_) async => const Left(ReviewDeletionFailedFailure()),
         );
+
+        final result = await useCase('review-123');
+
+        expect(result, const Left(ReviewDeletionFailedFailure()));
         verify(() => mockReviewRepository.deleteReview('review-123')).called(1);
         verifyNoMoreInteractions(mockReviewRepository);
       },
@@ -230,11 +245,11 @@ void main() {
         when(() => mockReviewRepository.getUserReviewByEntity(
               'migrante-123',
               'entity-123',
-            )).thenAnswer((_) async => fakeReview);
+            )).thenAnswer((_) async => Right(fakeReview));
 
         final result = await useCase('migrante-123', 'entity-123');
 
-        expect(result, fakeReview);
+        expect(result, Right(fakeReview));
         verify(() => mockReviewRepository.getUserReviewByEntity(
               'migrante-123',
               'entity-123',
@@ -244,15 +259,16 @@ void main() {
     );
 
     test(
-      'error: debería lanzar una excepción cuando falla al consultar la reseña del usuario para una entidad',
+      'error: debería retornar Left(ReviewNotFoundFailure) cuando falla al consultar la reseña',
       () async {
         when(() => mockReviewRepository.getUserReviewByEntity(any(), any()))
-            .thenThrow(Exception('Error al consultar reseña de usuario'));
-
-        expect(
-          () async => await useCase('migrante-123', 'entity-123'),
-          throwsA(isA<Exception>()),
+            .thenAnswer(
+          (_) async => const Left(ReviewNotFoundFailure()),
         );
+
+        final result = await useCase('migrante-123', 'entity-123');
+
+        expect(result, const Left(ReviewNotFoundFailure()));
         verify(() => mockReviewRepository.getUserReviewByEntity(
               'migrante-123',
               'entity-123',
@@ -273,25 +289,26 @@ void main() {
       'éxito: debería sincronizar las reseñas pendientes satisfactoriamente',
       () async {
         when(() => mockReviewRepository.syncPendingReviews())
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async => const Right(null));
 
-        await useCase();
+        final result = await useCase();
 
+        expect(result, const Right(null));
         verify(() => mockReviewRepository.syncPendingReviews()).called(1);
         verifyNoMoreInteractions(mockReviewRepository);
       },
     );
 
     test(
-      'error: debería lanzar una excepción cuando falla la sincronización de reseñas',
+      'error: debería retornar Left(ReviewSyncFailedFailure) cuando falla la sincronización',
       () async {
-        when(() => mockReviewRepository.syncPendingReviews())
-            .thenThrow(Exception('Error al sincronizar reseñas'));
-
-        expect(
-          () async => await useCase(),
-          throwsA(isA<Exception>()),
+        when(() => mockReviewRepository.syncPendingReviews()).thenAnswer(
+          (_) async => const Left(ReviewSyncFailedFailure()),
         );
+
+        final result = await useCase();
+
+        expect(result, const Left(ReviewSyncFailedFailure()));
         verify(() => mockReviewRepository.syncPendingReviews()).called(1);
         verifyNoMoreInteractions(mockReviewRepository);
       },

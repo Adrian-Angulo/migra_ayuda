@@ -2,10 +2,9 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 /// Interfaz abstracta para verificar el estado de la conexión de red
 abstract class NetworkInfo {
-  /// Verifica si hay conexión a internet
-  /// Retorna true si hay conexión WiFi o móvil, false en caso contrario
+
   Future<bool> get isConnected;
-  /// Stream que emite eventos cuando cambia el estado de la conexión
+
   Stream<bool> get onConnectivityChanged;
 }
 

@@ -1,7 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
-import 'package:migra_ayuda/core/dataTable/widgets/build_header_cell.dart';
+import 'package:migra_ayuda/core/widgets/tables/build_header_cell.dart';
 
 class BuildTable extends StatelessWidget {
   const BuildTable({

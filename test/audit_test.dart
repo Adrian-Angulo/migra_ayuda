@@ -1,5 +1,7 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:migra_ayuda/features/audit/domain/entities/audit_entity.dart';
+import 'package:migra_ayuda/features/audit/domain/failures/audit_failures.dart';
 import 'package:migra_ayuda/features/audit/domain/repositories/audit_repository.dart';
 import 'package:migra_ayuda/features/audit/domain/usecases/audit_usecases.dart';
 import 'package:mocktail/mocktail.dart';
@@ -37,25 +39,26 @@ void main() {
       'éxito: debería registrar la actividad satisfactoriamente',
       () async {
         when(() => mockAuditRepository.createActivity(fakeAudit))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async => const Right(null));
 
-        await useCase(fakeAudit);
+        final result = await useCase(fakeAudit);
 
+        expect(result, const Right(null));
         verify(() => mockAuditRepository.createActivity(fakeAudit)).called(1);
         verifyNoMoreInteractions(mockAuditRepository);
       },
     );
 
     test(
-      'error: debería lanzar una excepción cuando falla el registro de la actividad',
+      'error: debería retornar Left(AuditActivityCreationFailedFailure) cuando falla el registro',
       () async {
-        when(() => mockAuditRepository.createActivity(any()))
-            .thenThrow(Exception('Error al registrar actividad'));
-
-        expect(
-          () async => await useCase(fakeAudit),
-          throwsA(isA<Exception>()),
+        when(() => mockAuditRepository.createActivity(any())).thenAnswer(
+          (_) async => const Left(AuditActivityCreationFailedFailure()),
         );
+
+        final result = await useCase(fakeAudit);
+
+        expect(result, const Left(AuditActivityCreationFailedFailure()));
         verify(() => mockAuditRepository.createActivity(fakeAudit)).called(1);
         verifyNoMoreInteractions(mockAuditRepository);
       },
@@ -87,13 +90,13 @@ void main() {
     test(
       'error: debería emitir un error cuando el stream del repositorio falla',
       () async {
-        final exception = Exception('Error al obtener actividades');
+        final failure = const AuditFetchFailedFailure();
         when(() => mockAuditRepository.getAll())
-            .thenAnswer((_) => Stream.error(exception));
+            .thenAnswer((_) => Stream.error(failure));
 
         final stream = useCase();
 
-        await expectLater(stream, emitsError(isA<Exception>()));
+        await expectLater(stream, emitsError(isA<AuditFetchFailedFailure>()));
         verify(() => mockAuditRepository.getAll()).called(1);
         verifyNoMoreInteractions(mockAuditRepository);
       },
@@ -111,25 +114,26 @@ void main() {
       'éxito: debería sincronizar las actividades satisfactoriamente',
       () async {
         when(() => mockAuditRepository.synchronize())
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async => const Right(null));
 
-        await useCase();
+        final result = await useCase();
 
+        expect(result, const Right(null));
         verify(() => mockAuditRepository.synchronize()).called(1);
         verifyNoMoreInteractions(mockAuditRepository);
       },
     );
 
     test(
-      'error: debería lanzar una excepción cuando falla la sincronización de actividades',
+      'error: debería retornar Left(AuditSyncFailedFailure) cuando falla la sincronización',
       () async {
-        when(() => mockAuditRepository.synchronize())
-            .thenThrow(Exception('Error al sincronizar actividades'));
-
-        expect(
-          () async => await useCase(),
-          throwsA(isA<Exception>()),
+        when(() => mockAuditRepository.synchronize()).thenAnswer(
+          (_) async => const Left(AuditSyncFailedFailure()),
         );
+
+        final result = await useCase();
+
+        expect(result, const Left(AuditSyncFailedFailure()));
         verify(() => mockAuditRepository.synchronize()).called(1);
         verifyNoMoreInteractions(mockAuditRepository);
       },
