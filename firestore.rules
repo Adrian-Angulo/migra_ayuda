@@ -3,7 +3,9 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ======================================================================
     // Funciones auxiliares de autenticación y roles
+    // ======================================================================
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -25,59 +27,98 @@ service cloud.firestore {
         );
     }
 
-    // ----------------------------------------------------------------------
+    // ======================================================================
     // 1. Colección: users (Migrantes y Administradores)
-    // ----------------------------------------------------------------------
+    // ======================================================================
     match /users/{userId} {
-      // Lectura: El propio usuario o un Administrador (dashboard / admin web)
+      // Lectura: El propio usuario o un Administrador
       allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
       
-      // Creación: Al registrarse con su propio UID
-      allow create: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      // Creación: 
+      // - Un usuario regular solo puede registrarse con rol 'Migrante' (o sin rol de admin).
+      // - Solo un Admin puede crear usuarios con rol 'Admin'.
+      allow create: if isAuthenticated() && (
+        isAdmin() ||
+        (isOwner(userId) && (!('role' in request.resource.data) || request.resource.data.role != 'Admin'))
+      );
       
-      // Actualización: El propio usuario puede editar su perfil o el Admin
-      allow update: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      // Actualización: 
+      // - El Admin puede modificar cualquier campo incluyendo el rol.
+      // - El propio usuario puede editar su perfil, pero NUNCA puede auto-otorgarse rol de Admin ni cambiar su propio rol.
+      allow update: if isAuthenticated() && (
+        isAdmin() ||
+        (
+          isOwner(userId) && 
+          (!('role' in request.resource.data) || 
+           !('role' in resource.data) || 
+           request.resource.data.role == resource.data.role)
+        )
+      );
       
-      // Eliminación: Solo Administradores
+      // Eliminación: Exclusiva para Administradores
       allow delete: if isAdmin();
     }
 
-    // ----------------------------------------------------------------------
+    // ======================================================================
     // 2. Colección: entities (Organizaciones y puntos de ayuda)
-    // ----------------------------------------------------------------------
+    // ======================================================================
     match /entities/{entityId} {
-      // Lectura: Cualquier usuario autenticado puede ver el catálogo de entidades
+      // Lectura: Cualquier usuario autenticado puede ver el catálogo de organizaciones
       allow read: if isAuthenticated();
       
       // Escritura/Gestión: Solo administradores pueden crear, modificar o eliminar
       allow create, update, delete: if isAdmin();
     }
 
-    // ----------------------------------------------------------------------
+    // ======================================================================
     // 3. Colección: reviews (Reseñas y valoraciones)
-    // ----------------------------------------------------------------------
+    // ======================================================================
     match /reviews/{reviewId} {
       // Lectura: Disponible para todos los usuarios autenticados
       allow read: if isAuthenticated();
       
-      // Creación: El usuario solo puede crear una reseña a su propio nombre
-      allow create: if isAuthenticated() && request.resource.data.idMigrante == request.auth.uid;
+      // Creación:
+      // - El usuario solo puede crear una reseña a su propio nombre.
+      // - Validación de rating (1.0 a 5.0) y longitud razonable de comentario.
+      allow create: if isAuthenticated() && 
+        request.resource.data.idMigrante == request.auth.uid &&
+        request.resource.data.rating is number &&
+        request.resource.data.rating >= 1 &&
+        request.resource.data.rating <= 5 &&
+        (!('comment' in request.resource.data) || 
+         (request.resource.data.comment is string && request.resource.data.comment.size() <= 2000));
       
-      // Actualización y Eliminación: El autor de la reseña o un Administrador
-      allow update, delete: if isAuthenticated() && (resource.data.idMigrante == request.auth.uid || isAdmin());
+      // Actualización:
+      // - El autor puede actualizar su reseña manteniendo el idMigrante original y rating válido.
+      // - O un Administrador.
+      allow update: if isAuthenticated() && (
+        isAdmin() ||
+        (
+          resource.data.idMigrante == request.auth.uid &&
+          request.resource.data.idMigrante == resource.data.idMigrante &&
+          request.resource.data.rating is number &&
+          request.resource.data.rating >= 1 &&
+          request.resource.data.rating <= 5 &&
+          (!('comment' in request.resource.data) || 
+           (request.resource.data.comment is string && request.resource.data.comment.size() <= 2000))
+        )
+      );
+      
+      // Eliminación: El autor de la reseña o un Administrador
+      allow delete: if isAuthenticated() && (resource.data.idMigrante == request.auth.uid || isAdmin());
     }
 
-    // ----------------------------------------------------------------------
+    // ======================================================================
     // 4. Colección: user_activities (Auditoría y trazabilidad)
-    // ----------------------------------------------------------------------
+    // ======================================================================
     match /user_activities/{activityId} {
       // Lectura: Los administradores ven la actividad global; los usuarios su propio historial
       allow read: if isAuthenticated() && (resource.data.idUser == request.auth.uid || isAdmin());
       
-      // Creación: El usuario registra su propia actividad
+      // Creación: El usuario solo puede registrar eventos atribuidos a su propio UID
       allow create: if isAuthenticated() && request.resource.data.idUser == request.auth.uid;
       
-      // Actualización / Eliminación: Exclusivo para Administradores
+      // Inmutabilidad / Eliminación: Exclusivo para Administradores
       allow update, delete: if isAdmin();
     }
   }

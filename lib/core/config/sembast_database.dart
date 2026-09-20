@@ -1,71 +1,110 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 
-/// Clase Singleton para manejar la base de datos Sembast
-/// Proporciona una única instancia de la base de datos para toda la aplicación
+/// Convertidor para codificar y cifrar datos JSON antes de escribirlos en disco
+class _EncryptEncoder extends Converter<Object?, String> {
+  final String _key;
+  _EncryptEncoder(this._key);
+
+  @override
+  String convert(Object? input) {
+    final jsonStr = json.encode(input);
+    final bytes = utf8.encode(jsonStr);
+    final keyBytes = utf8.encode(_key);
+    final encrypted = List<int>.generate(
+      bytes.length,
+      (i) => bytes[i] ^ keyBytes[i % keyBytes.length],
+    );
+    return base64.encode(encrypted);
+  }
+}
+
+/// Convertidor para descifrar y decodificar datos desde el disco
+class _EncryptDecoder extends Converter<String, Object?> {
+  final String _key;
+  _EncryptDecoder(this._key);
+
+  @override
+  Object? convert(String input) {
+    final encrypted = base64.decode(input);
+    final keyBytes = utf8.encode(_key);
+    final decrypted = List<int>.generate(
+      encrypted.length,
+      (i) => encrypted[i] ^ keyBytes[i % keyBytes.length],
+    );
+    final jsonStr = utf8.decode(decrypted);
+    return json.decode(jsonStr);
+  }
+}
+
+/// Codec de cifrado compatible con Sembast
+class _EncryptCodec extends Codec<Object?, String> {
+  final String _key;
+  _EncryptCodec(this._key);
+
+  @override
+  Converter<String, Object?> get decoder => _EncryptDecoder(_key);
+
+  @override
+  Converter<Object?, String> get encoder => _EncryptEncoder(_key);
+}
+
+/// Singleton para manejar la base de datos local Sembast con soporte de cifrado
 class SembastDatabase {
-  // Singleton instance
   static final SembastDatabase _instance = SembastDatabase._internal();
 
-  // Database instance
   Database? _database;
-
-  // Completer para manejar la inicialización asíncrona
   Completer<Database>? _dbOpenCompleter;
 
-  // Nombre de la base de datos
   static const String _dbName = 'migra_ayuda.db';
+  static const String _encryptionKey = 'migra_ayuda_local_storage_key_2026';
 
-  // Constructor privado para Singleton
   SembastDatabase._internal();
 
-  // Getter para obtener la instancia única
   static SembastDatabase get instance => _instance;
 
-  /// Obtiene la instancia de la base de datos
-  /// Si no está inicializada, la inicializa automáticamente
+  static SembastCodec get _codec => SembastCodec(
+        signature: 'migra_ayuda_encrypted_codec',
+        codec: _EncryptCodec(_encryptionKey),
+      );
+
   Future<Database> get database async {
     if (_database != null) {
       return _database!;
     }
 
-    // Si ya hay una inicialización en progreso, espera a que termine
     if (_dbOpenCompleter != null) {
       return _dbOpenCompleter!.future;
     }
 
-    // Inicia la inicialización
     _dbOpenCompleter = Completer();
     await _initDatabase();
     return _dbOpenCompleter!.future;
   }
 
-  /// Inicializa la base de datos Sembast
   Future<void> _initDatabase() async {
     try {
-      // Obtiene el directorio de documentos de la aplicación
       final appDocumentDir = await getApplicationDocumentsDirectory();
-
-      // Crea la ruta completa para la base de datos
       final dbPath = join(appDocumentDir.path, _dbName);
 
-      // Abre la base de datos
-      _database = await databaseFactoryIo.openDatabase(dbPath);
+      // Abre la base de datos aplicando el codec de cifrado
+      _database = await databaseFactoryIo.openDatabase(
+        dbPath,
+        codec: _codec,
+      );
 
-      // Completa el Future
       _dbOpenCompleter?.complete(_database);
     } catch (e) {
-      // En caso de error, completa con error
       _dbOpenCompleter?.completeError(e);
       _dbOpenCompleter = null;
       rethrow;
     }
   }
 
-  /// Cierra la base de datos
-  /// Útil para testing o cuando se necesita cerrar explícitamente
   Future<void> close() async {
     if (_database != null) {
       await _database!.close();
@@ -74,17 +113,14 @@ class SembastDatabase {
     }
   }
 
-  /// Limpia toda la base de datos (útil para testing o reset)
   Future<void> clearAll() async {
     final db = await database;
     await db.close();
 
-    // Obtiene la ruta y elimina el archivo
     final appDocumentDir = await getApplicationDocumentsDirectory();
     final dbPath = join(appDocumentDir.path, _dbName);
     await databaseFactoryIo.deleteDatabase(dbPath);
 
-    // Reinicia las variables
     _database = null;
     _dbOpenCompleter = null;
   }
