@@ -1,5 +1,6 @@
 import 'dart:typed_data';
-
+import 'package:dartz/dartz.dart';
+import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/domain/repositories/entity_repository.dart';
 
@@ -8,7 +9,7 @@ class RegisterEntityUseCase {
 
   RegisterEntityUseCase(this.repository);
 
-  Future<void> call({
+  Future<Either<Failure, void>> call({
     required EntityEntity entity,
     required Uint8List imagenBytes,
     required String fileName,
@@ -26,7 +27,7 @@ class UpdateEntityUseCase {
 
   UpdateEntityUseCase(this.repository);
 
-  Future<void> call({
+  Future<Either<Failure, void>> call({
     required EntityEntity entity,
     Uint8List? imagenBytes,
     String? fileName,
@@ -44,7 +45,7 @@ class DeleteEntityUseCase {
 
   DeleteEntityUseCase(this.repository);
 
-  Future<void> call(String entityId) {
+  Future<Either<Failure, void>> call(String entityId) {
     return repository.deleteEntity(entityId);
   }
 }
@@ -64,7 +65,7 @@ class GetAllEntitiesUseCase {
 
   GetAllEntitiesUseCase(this.repository);
 
-  Future<List<EntityEntity>> call() {
+  Future<Either<Failure, List<EntityEntity>>> call() {
     return repository.getAllEntities();
   }
 }
@@ -74,7 +75,7 @@ class GetEntityByIdUseCase {
 
   GetEntityByIdUseCase(this.repository);
 
-  Future<EntityEntity> call(String id) {
+  Future<Either<Failure, EntityEntity>> call(String id) {
     return repository.getEntityById(id);
   }
 }
@@ -84,7 +85,7 @@ class SyncAllFromFirebaseUseCase {
 
   SyncAllFromFirebaseUseCase(this.repository);
 
-  Future<void> call() {
+  Future<Either<Failure, void>> call() {
     return repository.syncAllFromFirebase();
   }
 }

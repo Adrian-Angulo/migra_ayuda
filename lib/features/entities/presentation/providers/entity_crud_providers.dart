@@ -27,12 +27,15 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
         final repository = ref.read(entityRepositoryProvider);
 
         final registerEntityUseCase = RegisterEntityUseCase(repository);
-        await registerEntityUseCase(
+        final result = await registerEntityUseCase(
           entity: entity,
           imagenBytes: imagenBytes,
           fileName: fileName,
         );
-        return CrudOperation.register;
+        return result.fold(
+          (failure) => throw failure,
+          (_) => CrudOperation.register,
+        );
       },
     );
   }
@@ -49,12 +52,15 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
       final repository = ref.read(entityRepositoryProvider);
 
       final updateEntityUseCase = UpdateEntityUseCase(repository);
-      await updateEntityUseCase(
+      final result = await updateEntityUseCase(
         entity: entity,
         imagenBytes: imagenBytes,
         fileName: fileName,
       );
-      return CrudOperation.update;
+      return result.fold(
+        (failure) => throw failure,
+        (_) => CrudOperation.update,
+      );
     });
   }
 
@@ -68,11 +74,16 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
       final reviewR = ref.read(reviewRepositoryProvider);
       final List<ReviewEntity> reviews = await reviewR.getReviewsByEntity(id);
 
-      await deleteEntityUseCase(id);
-      await Future.wait(
-        reviews.map((review) => reviewR.deleteReview(review.id)),
+      final result = await deleteEntityUseCase(id);
+      return await result.fold(
+        (failure) => throw failure,
+        (_) async {
+          await Future.wait(
+            reviews.map((review) => reviewR.deleteReview(review.id)),
+          );
+          return CrudOperation.delete;
+        },
       );
-      return CrudOperation.delete;
     });
   }
 
@@ -81,27 +92,30 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
     final getEntityByIdUseCase = GetEntityByIdUseCase(repository);
 
     // Obtener la entidad actual por ID
-    final EntityEntity entidad = await getEntityByIdUseCase(entidadId);
+    final entityResult = await getEntityByIdUseCase(entidadId);
 
-    // Obtener las reseñas relacionadas a la entidad
-    final reviewRepo = ref.read(reviewRepositoryProvider);
-    final List<ReviewEntity> reviews =
-        await reviewRepo.getReviewsByEntity(entidadId);
+    await entityResult.fold(
+      (failure) => null,
+      (entidad) async {
+        // Obtener las reseñas relacionadas a la entidad
+        final reviewRepo = ref.read(reviewRepositoryProvider);
+        final List<ReviewEntity> reviews =
+            await reviewRepo.getReviewsByEntity(entidadId);
 
-    int totalReviews = reviews.length;
-    double totalRating = reviews.fold(0.0, (sum, r) => sum + r.rating);
-    double promedio = totalReviews > 0 ? totalRating / totalReviews : 0.0;
+        int totalReviews = reviews.length;
+        double totalRating = reviews.fold(0.0, (sum, r) => sum + r.rating);
+        double promedio = totalReviews > 0 ? totalRating / totalReviews : 0.0;
 
-    // Actualizar los campos de la entidad (asumiendo que tiene campos para esto)
-    final EntityEntity entidadActualizada = entidad.copyWith(
-      totalReviews: totalReviews,
-      averageRating: promedio,
+        // Actualizar los campos de la entidad
+        final EntityEntity entidadActualizada = entidad.copyWith(
+          totalReviews: totalReviews,
+          averageRating: promedio,
+        );
+
+        final updateEntityUseCase = UpdateEntityUseCase(repository);
+        await updateEntityUseCase(entity: entidadActualizada);
+      },
     );
-
-    final updateEntityUseCase = UpdateEntityUseCase(repository);
-    await updateEntityUseCase(entity: entidadActualizada);
-
-    // Opcionalmente devolver o notificar el resultado si tu modelo lo requiere
   }
 }
 

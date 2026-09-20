@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:dartz/dartz.dart';
 import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/entities/data/datasources/entity_remote_datasource.dart';
 import 'package:migra_ayuda/features/entities/data/models/entity_models.dart';
@@ -12,21 +13,22 @@ class EntityWebRepositoryImpl extends EntityRepository {
   EntityWebRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<void> registerEntity({
+  Future<Either<Failure, void>> registerEntity({
     required EntityEntity entity,
     required Uint8List imagenBytes,
     required String fileName,
   }) async {
     final modelo = EntityModels(
-        id: '',
-        name: entity.name,
-        description: entity.description,
-        services: entity.services,
-        address: entity.address,
-        localitation: entity.localitation,
-        phone: entity.phone,
-        imageUrl: '',
-        schedule: entity.schedule);
+      id: '',
+      name: entity.name,
+      description: entity.description,
+      services: entity.services,
+      address: entity.address,
+      localitation: entity.localitation,
+      phone: entity.phone,
+      imageUrl: '',
+      schedule: entity.schedule,
+    );
 
     try {
       await remoteDataSource.registerEntity(
@@ -34,29 +36,31 @@ class EntityWebRepositoryImpl extends EntityRepository {
         imageBytes: imagenBytes,
         fileName: fileName,
       );
+      return const Right(null);
     } catch (_) {
-      throw const EntityCreationFailedFailure();
+      return const Left(EntityCreationFailedFailure());
     }
   }
 
   @override
-  Future<void> updateEntity({
+  Future<Either<Failure, void>> updateEntity({
     required EntityEntity entity,
     Uint8List? imagenBytes,
     String? fileName,
   }) async {
     final modelo = EntityModels(
-        id: entity.id,
-        name: entity.name,
-        description: entity.description,
-        services: entity.services,
-        address: entity.address,
-        localitation: entity.localitation,
-        phone: entity.phone,
-        averageRating: entity.averageRating,
-        totalReviews: entity.totalReviews,
-        imageUrl: entity.imageUrl,
-        schedule: entity.schedule);
+      id: entity.id,
+      name: entity.name,
+      description: entity.description,
+      services: entity.services,
+      address: entity.address,
+      localitation: entity.localitation,
+      phone: entity.phone,
+      averageRating: entity.averageRating,
+      totalReviews: entity.totalReviews,
+      imageUrl: entity.imageUrl,
+      schedule: entity.schedule,
+    );
 
     try {
       await remoteDataSource.updateEntity(
@@ -64,45 +68,50 @@ class EntityWebRepositoryImpl extends EntityRepository {
         imageBytes: imagenBytes,
         fileName: fileName,
       );
+      return const Right(null);
     } catch (_) {
-      throw const EntityUpdateFailedFailure();
+      return const Left(EntityUpdateFailedFailure());
     }
   }
 
   @override
-  Future<void> deleteEntity(String entityId) async {
+  Future<Either<Failure, void>> deleteEntity(String entityId) async {
     try {
       await remoteDataSource.deleteEntity(entityId);
+      return const Right(null);
     } catch (_) {
-      throw const EntityDeletionFailedFailure();
+      return const Left(EntityDeletionFailedFailure());
     }
   }
 
   @override
-  Future<List<EntityEntity>> getAllEntities() async {
+  Future<Either<Failure, List<EntityEntity>>> getAllEntities() async {
     try {
       final entitiesModel = await remoteDataSource.getAllEntities();
-      return entitiesModel.map((e) => _entityModelsToEntityEntity(e)).toList();
+      final entities =
+          entitiesModel.map((e) => _entityModelsToEntityEntity(e)).toList();
+      return Right(entities);
     } catch (_) {
-      throw const EntityFetchFailedFailure();
+      return const Left(EntityFetchFailedFailure());
     }
   }
 
   @override
-  Future<EntityEntity> getEntityById(String id) async {
+  Future<Either<Failure, EntityEntity>> getEntityById(String id) async {
     try {
       final entityModel = await remoteDataSource.getEntityById(id);
-      return _entityModelsToEntityEntity(entityModel);
+      return Right(_entityModelsToEntityEntity(entityModel));
     } catch (_) {
-      throw const EntityNotFoundFailure();
+      return const Left(EntityNotFoundFailure());
     }
   }
 
   @override
-  Future<void> syncAllFromFirebase() {
-    throw UnimplementedError(
-      'syncAllFromFirebase no está disponible en la versión web. '
-      'En web, cada llamada a getAllEntities() ya obtiene datos frescos de Firebase.',
+  Future<Either<Failure, void>> syncAllFromFirebase() async {
+    return const Left(
+      UnexpectedFailure(
+       
+      ),
     );
   }
 

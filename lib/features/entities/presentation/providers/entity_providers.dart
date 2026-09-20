@@ -13,19 +13,16 @@ import 'package:migra_ayuda/features/entities/data/repositories/entity_web_repos
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/domain/repositories/entity_repository.dart';
 
-/// Provider para el datasource remoto (Firebase)
 final entityRemoteDataSourceProvider = Provider<EntityRemoteDataSource>((ref) {
   return EntityRemoteDataSource(firestore: FirebaseFirestore.instance);
 });
 
-/// Provider para el datasource local (Sembast)
+
 final entityLocalDataSourceProvider = Provider<EntityLocalDataSource>((ref) {
   final sembastDb = SembastDatabase.instance;
   return EntityLocalDataSource(sembastDatabase: sembastDb);
 });
 
-/// Provider del repositorio de entidades.
-/// Usa la implementación web o mobile según la plataforma.
 final entityRepositoryProvider = Provider<EntityRepository>((ref) {
   final remoteDataSource = ref.watch(entityRemoteDataSourceProvider);
   final localDataSource = ref.watch(entityLocalDataSourceProvider);
@@ -41,11 +38,10 @@ final entityRepositoryProvider = Provider<EntityRepository>((ref) {
   );
 });
 
-/// StreamProvider que emite la lista de entidades y se actualiza cada 30s.
+
 final entities2StreamProvider = StreamProvider<List<EntityEntity>>(
   (ref) {
     final repo = ref.watch(entityRepositoryProvider);
-    // Asumimos que getAllEntites2() ahora retorna directamente un Stream<List<EntityEntity>>.
     return repo.getAllEntites2();
   },
 );
@@ -64,14 +60,14 @@ class EntityListNotifier extends AsyncNotifier<List<EntityEntity>> {
 
   Future<List<EntityEntity>> _loadEntities() async {
     state = const AsyncValue.loading();
-    try {
-      final entities =
-          await ref.read(entityRepositoryProvider).getAllEntities();
-      _allEntities = entities;
-      return entities;
-    } catch (error) {
-      rethrow;
-    }
+    final result = await ref.read(entityRepositoryProvider).getAllEntities();
+    return result.fold(
+      (failure) => throw failure,
+      (entities) {
+        _allEntities = entities;
+        return entities;
+      },
+    );
   }
 
   Future<void> refresh() async {
