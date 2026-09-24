@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/onboarding/domain/failures/onboarding_failures.dart';
 import 'package:migra_ayuda/features/onboarding/domain/repositories/onboarding_repository.dart';
 import 'package:migra_ayuda/features/onboarding/domain/usecases/onboarding_usecases.dart';

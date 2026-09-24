@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -5,45 +7,105 @@ import 'package:migra_ayuda/core/localitation/map_services.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/map_state.dart';
 
+
+class MarkerIconGenerator {
+  static Uint8List? _cachedDefaultPin;
+  static Uint8List? _cachedSelectedPin;
+
+  static Future<Uint8List> getMarkerBytes({bool isSelected = false}) async {
+    if (isSelected && _cachedSelectedPin != null) return _cachedSelectedPin!;
+    if (!isSelected && _cachedDefaultPin != null) return _cachedDefaultPin!;
+
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    const size = 96.0;
+
+    
+    final shadowPaint = Paint()
+      ..color = Colors.black26
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
+    canvas.drawCircle(const Offset(48, 88), 9, shadowPaint);
+
+    
+    final paint = Paint()
+      ..color = isSelected ? const Color(0xFFE53935) : const Color(0xFF00897B)
+      ..style = PaintingStyle.fill;
+
+ 
+    final path = Path();
+    path.moveTo(48, 86);
+    path.cubicTo(
+      48 - 28, 48 + 8,
+      48 - 30, 48 - 22,
+      48, 48 - 32,
+    );
+    path.cubicTo(
+      48 + 30, 48 - 32,
+      48 + 28, 48 + 8,
+      48, 86,
+    );
+    path.close();
+
+    canvas.drawPath(path, paint);
+
+   
+    final borderPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.0;
+    canvas.drawPath(path, borderPaint);
+
+   
+    final centerCirclePaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(const Offset(48, 38), 9, centerCirclePaint);
+
+    final picture = recorder.endRecording();
+    final img = await picture.toImage(size.toInt(), size.toInt());
+    final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+    final bytes = byteData!.buffer.asUint8List();
+
+    if (isSelected) {
+      _cachedSelectedPin = bytes;
+    } else {
+      _cachedDefaultPin = bytes;
+    }
+
+    return bytes;
+  }
+}
+
 class MapNotifier extends StateNotifier<MapState> {
   MapNotifier() : super(MapState());
 
   MapboxMap? _mapboxMap;
   Position? _lastKnownPosition;
-  PointAnnotationManager?
-      _pointAnnotationManager; // 👈 Nuevo: gestor de marcadores
-
-  PolylineAnnotationManager? _polylineAnnotationManager; // para dibujar rutas
+  PointAnnotationManager? _pointAnnotationManager;
+  PolylineAnnotationManager? _polylineAnnotationManager;
 
   List<EntityEntity> _currentEntities = [];
 
   void selectEntity(EntityEntity entity) {
     state = state.copyWith(selectEntity: entity);
+    if (_currentEntities.isNotEmpty) {
+      addMarkers(_currentEntities);
+    }
   }
 
   Future<void> setMapController(MapboxMap? controller) async {
     if (controller == null) return;
     _mapboxMap = controller;
-
-    // 🔄 Reseteamos el gestor de anotaciones cuando se crea un nuevo mapa
     _pointAnnotationManager = null;
-
-    // Desactivamos gestos 3D (pitch) para mantener el mapa en 2D
-    _mapboxMap!.gestures.updateSettings(GesturesSettings(pitchEnabled: false));
-
-    // Ocultamos la barra de escala del mapa
+    _mapboxMap!.gestures.updateSettings(GesturesSettings(pitchEnabled: false)); 
     _mapboxMap!.scaleBar.updateSettings(ScaleBarSettings(enabled: false));
-
-    // Definimos los límites geográficos, de zoom y bloqueamos la inclinación (pitch) en 2D (0°)
     _mapboxMap!.setBounds(CameraBoundsOptions(
       bounds: CoordinateBounds(
-          // Esquina suroeste del área permitida
           southwest: Point(coordinates: Position(-77.3400, 1.1400)),
-          // Esquina noreste del área permitida
           northeast: Point(coordinates: Position(-77.2200, 1.2700)),
           infiniteBounds: false),
-      minZoom: 12, // Zoom mínimo permitido
-      maxZoom: 18, // Zoom máximo permitido
+      minZoom: 12,
+      maxZoom: 18,
       minPitch: 0.0,
       maxPitch: 0.0,
     ));
@@ -56,121 +118,112 @@ class MapNotifier extends StateNotifier<MapState> {
 
     state = state.copyWith(isMapReady: true, hasMarkers: false);
 
-    // Si ya teníamos entidades cargadas en memoria, colocamos los marcadores de inmediato
     if (_currentEntities.isNotEmpty) {
       await addMarkers(_currentEntities);
     }
   }
 
-  /// Apaga el seguimiento cuando el usuario arrastra el mapa de forma manual
+  
   void pauseTracking() {
-    if (!state.isTracking) return; // Si ya estaba apagado, no hacemos nada
+    if (!state.isTracking) return;
     state = state.copyWith(isTracking: false);
-    debugPrint("Tracking pausado: El usuario está explorando el mapa.");
   }
 
-  /// Enciende el seguimiento y vuela inmediatamente a la ubicación actual
+
   void resumeTracking() {
     state = state.copyWith(isTracking: true);
     if (_lastKnownPosition != null) {
       _moveCamera(_lastKnownPosition!);
-      debugPrint("Traking renudado");
+      
     }
   }
 
   void location(Position gpsPosition) {
-    // Siempre guardamos la última posición conocida, incluso si el tracking está pausado
     _lastKnownPosition = gpsPosition;
-
-    // Solo movemos la cámara si el mapa está listo y el tracking está activo
     if (!state.isMapReady || _mapboxMap == null || !state.isTracking) return;
-
     _moveCamera(gpsPosition);
   }
 
-  /// 🆕 Limpiar la entidad seleccionada (resetear a null)
   void clearSelectEntity() {
     state = state.copyWith(clearSelectEntity: true);
+    if (_currentEntities.isNotEmpty) {
+      addMarkers(_currentEntities);
+    }
     debugPrint("✅ Entidad deseleccionada");
   }
 
-  /// 📍 Agrega marcadores al mapa desde una lista de ubicaciones
+
   Future<void> addMarkers(List<EntityEntity> entities) async {
     _currentEntities = entities;
-
     if (_mapboxMap == null) {
-      debugPrint("⚠️ El mapa aún no está listo");
       return;
     }
 
-    // Si ya existe el gestor de anotaciones, intentamos limpiarlo
-    if (_pointAnnotationManager != null) {
-      try {
-        await _pointAnnotationManager!.deleteAll();
-        _createAnnotations(entities);
-      } catch (e) {
-        // Si falla (porque el mapa se reinició), creamos un nuevo gestor
-        debugPrint("⚠️ El gestor anterior no es válido, creando uno nuevo...");
-        _pointAnnotationManager = null;
-        await addMarkers(entities); // Llamada recursiva para crear nuevo gestor
+    try {
+      if (_pointAnnotationManager == null) {
+        _pointAnnotationManager =
+            await _mapboxMap!.annotations.createPointAnnotationManager();
+
+        _pointAnnotationManager?.tapEvents(
+          onTap: (PointAnnotation anotation) {
+            try {
+              final getEntity = _currentEntities.firstWhere(
+                (entity) => entity.name.trim() == anotation.textField?.trim(),
+              );
+              selectEntity(getEntity);
+            } catch (e) {
+              debugPrint(
+                  "⚠️ No se encontró la entidad para el marcador: ${anotation.textField}");
+            }
+          },
+        );
       }
-      return;
+
+      await _pointAnnotationManager!.deleteAll();
+      await _createAnnotations(entities);
+    } catch (e) {
+      
+      _pointAnnotationManager = null;
     }
-
-    // Creamos el gestor de anotaciones por primera vez
-    _mapboxMap!.annotations.createPointAnnotationManager().then((manager) {
-      _pointAnnotationManager = manager;
-
-      _pointAnnotationManager?.tapEvents(
-        onTap: (PointAnnotation anotation) {
-          // Buscar la entidad que coincida con el texto del marcador en la lista actualizada
-          try {
-            final getEntity = _currentEntities.firstWhere(
-              (entity) => entity.name.trim() == anotation.textField?.trim(),
-            );
-            state = state.copyWith(selectEntity: getEntity);
-          } catch (e) {
-            debugPrint(
-                "⚠️ No se encontró la entidad para el marcador: ${anotation.textField}");
-          }
-        },
-      );
-      _createAnnotations(entities);
-    });
   }
 
-  /// Método privado que crea las anotaciones
-  void _createAnnotations(List<EntityEntity> entities) async {
-    final annotations = entities.map((entity) {
-      return PointAnnotationOptions(
+  
+  Future<void> _createAnnotations(List<EntityEntity> entities) async {
+    if (_pointAnnotationManager == null || entities.isEmpty) {
+      state = state.copyWith(hasMarkers: entities.isNotEmpty);
+      return;
+    }
 
-          // 📌 Coordenadas del marcador
-          geometry: Point(
-            coordinates: Position(
-              entity.localitation.longitude,
-              entity.localitation.latitude,
-            ),
+    final defaultIconBytes =
+        await MarkerIconGenerator.getMarkerBytes(isSelected: false);
+    final selectedIconBytes =
+        await MarkerIconGenerator.getMarkerBytes(isSelected: true);
+
+    final annotations = entities.map((entity) {
+      final isSelected = state.selectEntity?.id == entity.id ||
+          state.selectEntity?.name == entity.name;
+
+      return PointAnnotationOptions(
+        geometry: Point(
+          coordinates: Position(
+            entity.localitation.longitude,
+            entity.localitation.latitude,
           ),
-          // 🎨 Icono del marcador (puedes cambiarlo)
-          iconImage: state.selectEntity == entity
-              ? "pin"
-              : "mapbox_custom_marker", // Icono predeterminado de Mapbox
-          iconSize: 0.1,
-          iconAnchor: IconAnchor.BOTTOM,
-          // 📝 Texto opcional (aparece al hacer clic)
-          textField: entity.name,
-          textOffset: [0.0, -0.5],
-          textSize: 12.0,
-          textAnchor: TextAnchor.TOP);
+        ),
+        image: isSelected ? selectedIconBytes : defaultIconBytes,
+        iconSize: isSelected ? 1.35 : 1.15,
+        iconAnchor: IconAnchor.BOTTOM,
+        textField: entity.name,
+        textOffset: [0.0, -0.6],
+        textSize: 13.0,
+        textAnchor: TextAnchor.TOP,
+      );
     }).toList();
 
-    // Agregamos todos los marcadores al mapa
-    _pointAnnotationManager?.createMulti(annotations);
-
+    await _pointAnnotationManager?.createMulti(annotations);
     state = state.copyWith(hasMarkers: true);
   }
 
-  // Método privado para evitar duplicar código de animación de cámara (2D plano)
   void _moveCamera(Position gpsPosition) {
     final targetPoint = Point(coordinates: gpsPosition);
 
@@ -180,19 +233,19 @@ class MapNotifier extends StateNotifier<MapState> {
     );
   }
 
-  /// 🗺️ Dibujar ruta desde ubicación actual hasta una entidad con soporte offline
+
   Future<void> drawRouteToEntity(EntityEntity entity) async {
     if (_mapboxMap == null ||
         _polylineAnnotationManager == null ||
         _lastKnownPosition == null) {
-      debugPrint("⚠️ Mapa o ubicación no disponible para trazar ruta");
+      
       return;
     }
 
     state = state.copyWith(isDrawingRoute: true);
 
     try {
-      // Obtener puntos de la ruta usando el servicio híbrido (API -> Caché -> Fallback Directo)
+      
       final routeResult = await MapServices.fetchRoute(
         originLng: _lastKnownPosition!.lng.toDouble(),
         originLat: _lastKnownPosition!.lat.toDouble(),
@@ -207,34 +260,25 @@ class MapNotifier extends StateNotifier<MapState> {
         return;
       }
 
-      // Limpiar rutas anteriores
+   
       await _polylineAnnotationManager!.deleteAll();
 
-      // Definir color y grosor según el tipo de ruta
+   
       final int lineColor;
       final double lineWidth;
 
       switch (routeResult.sourceType) {
-        case RouteSourceType.localAstar:
-          lineColor =
-              0xFF1E88E5; // Azul: ruta completa calculada localmente (A*)
-          lineWidth = 5.0;
-          break;
         case RouteSourceType.mapboxApi:
-          lineColor = 0xFF1565C0; // Azul oscuro: ruta completa vía Mapbox API
-          lineWidth = 5.0;
-          break;
-        case RouteSourceType.cached:
-          lineColor = 0xFF00897B; // Teal: ruta desde historial local
+          lineColor = 0xFF1565C0; // Azul
           lineWidth = 5.0;
           break;
         case RouteSourceType.directFallback:
-          lineColor = 0xFFFF6D00; // Naranja: línea de orientación directa
+          lineColor = 0xFFFF6D00; // Naranja
           lineWidth = 4.5;
           break;
       }
 
-      // Crear la polilínea en Mapbox
+      
       final polylineOptions = PolylineAnnotationOptions(
         geometry: LineString(coordinates: routeResult.points),
         lineColor: lineColor,
@@ -242,7 +286,7 @@ class MapNotifier extends StateNotifier<MapState> {
         lineJoin: LineJoin.ROUND,
       );
 
-      // Dibujar en el mapa
+      
       await _polylineAnnotationManager!.create(polylineOptions);
 
       state = state.copyWith(
@@ -253,15 +297,13 @@ class MapNotifier extends StateNotifier<MapState> {
         hasActiveRoute: true,
       );
 
-      debugPrint(
-          "✅ Ruta trazada (${routeResult.sourceType.name}) con ${routeResult.points.length} puntos: ${routeResult.message}");
     } catch (e) {
-      debugPrint("❌ Error al trazar ruta: $e");
+
       state = state.copyWith(isDrawingRoute: false);
     }
   }
 
-  /// 🧹 Limpiar ruta del mapa
+
   Future<void> clearRoute() async {
     if (_polylineAnnotationManager != null) {
       await _polylineAnnotationManager!.deleteAll();
@@ -270,7 +312,7 @@ class MapNotifier extends StateNotifier<MapState> {
   }
 }
 
-// El Provider global para que la UI escuche y use este controlador
+
 final mapProvider = StateNotifierProvider<MapNotifier, MapState>((ref) {
   return MapNotifier();
 });

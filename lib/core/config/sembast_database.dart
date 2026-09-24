@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_io.dart';
 
 /// Convertidor para codificar y cifrar datos JSON antes de escribirlos en disco
@@ -41,7 +41,7 @@ class _EncryptDecoder extends Converter<String, Object?> {
   }
 }
 
-/// Codec de cifrado compatible con Sembast
+
 class _EncryptCodec extends Codec<Object?, String> {
   final String _key;
   _EncryptCodec(this._key);
@@ -53,7 +53,7 @@ class _EncryptCodec extends Codec<Object?, String> {
   Converter<Object?, String> get encoder => _EncryptEncoder(_key);
 }
 
-/// Singleton para manejar la base de datos local Sembast con soporte de cifrado
+
 class SembastDatabase {
   static final SembastDatabase _instance = SembastDatabase._internal();
 
@@ -87,17 +87,30 @@ class SembastDatabase {
   }
 
   Future<void> _initDatabase() async {
-    try {
-      final appDocumentDir = await getApplicationDocumentsDirectory();
-      final dbPath = join(appDocumentDir.path, _dbName);
+    final appDocumentDir = await getApplicationDocumentsDirectory();
+    final dbPath = join(appDocumentDir.path, _dbName);
 
-      // Abre la base de datos aplicando el codec de cifrado
+    try {
       _database = await databaseFactoryIo.openDatabase(
         dbPath,
         codec: _codec,
       );
 
       _dbOpenCompleter?.complete(_database);
+    } on DatabaseException catch (e) {
+      debugPrint('⚠️ Incompatibilidad de firma en Sembast ($e). Recreando base de datos limpia...');
+      try {
+        await databaseFactoryIo.deleteDatabase(dbPath);
+        _database = await databaseFactoryIo.openDatabase(
+          dbPath,
+          codec: _codec,
+        );
+        _dbOpenCompleter?.complete(_database);
+      } catch (innerError) {
+        _dbOpenCompleter?.completeError(innerError);
+        _dbOpenCompleter = null;
+        rethrow;
+      }
     } catch (e) {
       _dbOpenCompleter?.completeError(e);
       _dbOpenCompleter = null;

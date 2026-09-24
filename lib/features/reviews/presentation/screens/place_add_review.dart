@@ -35,9 +35,8 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
 
   @override
   Widget build(BuildContext context) {
-    Migrant user = widget.user!;
+    final user = widget.user;
 
-    // Escucha el estado de creación de review
     ref.listen(
       reviewNotifierProvider,
       (previous, next) {
@@ -172,12 +171,7 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                   ),
                   TextFormField(
                     validator: (value) {
-                      if (value == null || value.trim().isEmpty) {
-                        return 'Por favor escribe un comentario';
-                      }
-                      if (value.trim().length < 10) {
-                        return 'El comentario debe tener al menos 10 caracteres';
-                      }
+                      if (value == null) return null;
                       if (value.trim().length > 200) {
                         return 'El comentario no puede exceder los 200 caracteres';
                       }
@@ -241,6 +235,11 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                   const SizedBox(height: 10),
                   FloatingMainButton(
                     onTap: () async {
+                      if (user == null) {
+                        SnackbarWidget.error(context,
+                            'Debes iniciar sesión para publicar una reseña');
+                        return;
+                      }
                       if (!formkey.currentState!.validate()) return;
                       final review = ReviewEntity(
                           idMigrante: user.id,

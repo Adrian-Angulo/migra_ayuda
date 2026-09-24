@@ -105,7 +105,7 @@ class AuthNotifier extends AsyncNotifier<Migrant?> {
 
     final loginWithGoogleUseCase = ref.read(loginWithGoogleUseCaseProvider);
 
-    // Autenticar y obtener/crear perfil de usuario vía Caso de Uso
+   
     final result = await loginWithGoogleUseCase();
 
     result.fold(

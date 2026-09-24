@@ -10,13 +10,13 @@ import '../providers/review_providers.dart';
 
 class ReviewItem extends ConsumerWidget {
   final ReviewEntity review;
-  final Migrant user;
+  final Migrant? user;
   final EntityEntity entity;
 
   const ReviewItem(
       {super.key,
       required this.review,
-      required this.user,
+      this.user,
       required this.entity});
 
 
@@ -98,7 +98,7 @@ class ReviewItem extends ConsumerWidget {
                       color: Color(0xFFB0B7C3),
                     ),
                   ),
-                  if (user.id == review.idMigrante)
+                  if (user?.id == review.idMigrante)
                     PopupMenuButton<String>(
                       onSelected: (value) {
                         if (value == 'edit') {

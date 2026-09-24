@@ -34,8 +34,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authState = ref.watch(authNotifierProvider);
     final rateLimiter = ref.watch(loginRateLimiterProvider);
 
-    // Escucha cambios en el estado de autenticación para reaccionar
-    // cuando el usuario inicia sesión correctamente o hay un error
+  
     ref.listen(
       authNotifierProvider,
       (previous, next) {
@@ -44,27 +43,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ref.read(loginRateLimiterProvider.notifier).reset();
 
             if (user.role == 'Migrante') {
-              // Registra la actividad de inicio de sesión en la auditoría
+            
 
               if (!context.mounted) return;
-              // Redirige según el estado del perfil y el rol del usuario
+            
               if (user.profileComplete == false) {
-                // El usuario aún no ha completado su perfil
+            
                 context.go(Routes.completeProfile);
               } else {
                 context.go(Routes.home);
               }
             } else {
-              // Usuario NO es Migrante (Admin u otro rol)
+            
               if (!context.mounted) return;
-              // Mostrar mensaje de error
+           
               SnackbarWidget.info(
                   context, '¡Eres administrador, ingresa al panel web!');
 
-              // Esperar 2 segundos para que el usuario vea el mensaje
+            
               await Future.delayed(const Duration(seconds: 2));
 
-              // Hacer logout después de mostrar el mensaje
+         
               if (context.mounted) {
                 await ref.read(authNotifierProvider.notifier).logout();
               }
@@ -72,7 +71,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           }
         }, error: (error, stackTrace) {
           ref.read(loginRateLimiterProvider.notifier).recordFailedAttempt();
-          // Muestra el error de autenticación en un snackbar
+         
           SnackbarWidget.error(context,
               ErrorMappers.getAuthErrorMessage(error.toString(), context));
         });

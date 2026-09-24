@@ -14,24 +14,24 @@ class FilterActionCoordinator {
   const FilterActionCoordinator(this._ref);
 
   Future<void> applyFilter(String service) async {
-    // 1. Aplicar filtro a las entidades (actualiza lista y notifica)
+    // 1. Aplicar filtro a las entidades (actualiza lista y notifica a los listeners del mapa)
     _ref.read(getAllEntitiesProvider.notifier).filter(query: service);
 
-    // 2. Filtrar los marcadores/puntos del mapa de forma inmediata
-    final filteredEntities = _ref.read(getAllEntitiesProvider).value ?? [];
-    await _ref.read(mapProvider.notifier).addMarkers(filteredEntities);
-
-    // 3. Registrar auditoría solo si es un filtro específico
-    if (service != 'Todos') {
-      await _ref.read(auditNotifierProvider.notifier).create(
-        accion: ActivityActions.filter(),
-        metadata: {'filtro': service},
-      );
-    }
-
-    // 4. Limpiar selección y ruta en el mapa
+    // 2. Limpiar selección y ruta en el mapa
     _ref.read(mapProvider.notifier).clearSelectEntity();
     _ref.read(mapProvider.notifier).clearRoute();
+
+    // 3. Registrar auditoría de manera no bloqueante y segura ante fallos offline
+    if (service != 'Todos') {
+      try {
+        await _ref.read(auditNotifierProvider.notifier).create(
+          accion: ActivityActions.filter(),
+          metadata: {'filtro': service},
+        );
+      } catch (e) {
+        debugPrint("⚠️ Auditoría omitida en modo offline: $e");
+      }
+    }
   }
 }
 

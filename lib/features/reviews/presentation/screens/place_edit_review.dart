@@ -30,7 +30,7 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
   @override
   void initState() {
     super.initState();
-    // Pre-llena los campos con los datos existentes
+    
     rating = widget.existingReview.rating;
     commentController =
         TextEditingController(text: widget.existingReview.comment);
@@ -44,7 +44,7 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
 
   @override
   Widget build(BuildContext context) {
-  bool isloading =  ref.watch(reviewNotifierProvider).isLoading;
+    bool isloading = ref.watch(reviewNotifierProvider).isLoading;
     ref.listen(
       reviewNotifierProvider,
       (previous, next) async {
@@ -52,7 +52,7 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
         if (previous?.isLoading == true && !next.isLoading) {
           if (next.hasError) {
             SnackbarWidget.error(context, next.error);
-          } else if( next.value == ReviewState.updating) {
+          } else if (next.value == ReviewState.updating) {
             SnackbarWidget.success(context, 'Reseña actualizada exitosamente');
             await Future.delayed(const Duration(seconds: 1));
             if (context.mounted) Navigator.pop(context);
@@ -87,15 +87,6 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
             color: Color(0xFF1A1A1A),
           ),
         ),
-        actions: [
-          // Botón de eliminar en el AppBar
-          IconButton(
-            icon: const Icon(Icons.delete_outline, color: Color(0xFFEF4444)),
-            onPressed:
-                () {} /* state.isLoading ? null : _showDeleteConfirmation */,
-            tooltip: 'Eliminar comentario',
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
@@ -228,14 +219,10 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
                 const SizedBox(height: 16),
                 TextFormField(
                   validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Por favor escribe un comentario';
-                    }
-                    if (value.trim().length < 5) {
-                      return 'El comentario debe tener al menos 5 caracteres';
-                    }
-                    if (value.trim().length > 500) {
-                      return 'El comentario no puede exceder 500 caracteres';
+                    if (value == null) return null;
+
+                    if (value.trim().length > 200) {
+                      return 'El comentario no puede exceder los 200 caracteres';
                     }
                     return null;
                   },
@@ -310,7 +297,6 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
                         updatedAt: DateTime.now(),
                         isSynced: false);
 
-        
                     await ref
                         .read(reviewNotifierProvider.notifier)
                         .updateReview(updatedReview);

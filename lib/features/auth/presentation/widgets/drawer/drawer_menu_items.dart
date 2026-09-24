@@ -37,7 +37,7 @@ class DrawerMenuItems extends ConsumerWidget {
         _DrawerOption(
           icon: Icons.logout_rounded,
           label: 'Cerrar Sesión',
-          color: Colors.redAccent,
+          color: Colors.black,
           onTap: onLogout,
         ),
         const SizedBox(height: 12),

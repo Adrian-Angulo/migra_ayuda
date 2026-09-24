@@ -63,6 +63,11 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
             if (!kIsWeb)
               TextButton(
                 onPressed: () {
+                  if (user == null) {
+                    SnackbarWidget.error(context,
+                        "Debes iniciar sesión para añadir un comentario");
+                    return;
+                  }
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -88,7 +93,7 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
           data: (reviews) {
             return reviews.isEmpty
                 ? messageEmty()
-                : containerReviews(reviews, user!);
+                : containerReviews(reviews, user);
           },
           error: (error, stackTrace) {
             debugPrint("error al llamar reviews: $error");
@@ -106,9 +111,8 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
     );
   }
 
-  ListView containerReviews(reviews, Migrant user) {
+  ListView containerReviews(reviews, Migrant? user) {
     return ListView.separated(
-
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: reviews.length,

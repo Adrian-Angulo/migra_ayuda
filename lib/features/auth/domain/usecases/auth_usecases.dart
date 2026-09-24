@@ -32,7 +32,7 @@ class LoginWithGoogleUseCase {
   LoginWithGoogleUseCase(this._authRepository, this._userRepository);
 
   Future<Either<Failure, Migrant>> call() async {
-    // 1. Autenticar con Google
+    
     final authResult = await _authRepository.authWithGoogle();
 
     return authResult.fold(
