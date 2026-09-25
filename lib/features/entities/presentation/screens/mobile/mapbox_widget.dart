@@ -94,8 +94,8 @@ class _MapboxWidgetState extends ConsumerState<MapboxWidget> {
           final bottomOffset = (screenHeight * currentSize);
 
           return Positioned(
-            bottom: bottomOffset,
-            right: 10,
+            bottom: bottomOffset + 8,
+            right: 14,
             child: Opacity(
               opacity: opacity,
               child: child,
@@ -105,16 +105,31 @@ class _MapboxWidgetState extends ConsumerState<MapboxWidget> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 12),
-            // Botón de "Mi ubicación"
-            FloatingActionButton(
-              heroTag: 'location',
-              backgroundColor: const Color(0xFF6FA3A1),
-              child: const Icon(Icons.my_location, color: Colors.white),
-              onPressed: () {
-                // Reactivamos el seguimiento automático
-                ref.read(mapProvider.notifier).resumeTracking();
-              },
+            // Botón estilizado de "Mi ubicación"
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.14),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: FloatingActionButton(
+                heroTag: 'location',
+                backgroundColor: const Color(0xFF00897B),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                focusElevation: 0,
+                hoverElevation: 0,
+                highlightElevation: 0,
+                child: const Icon(Icons.my_location_rounded, size: 22),
+                onPressed: () {
+                  ref.read(mapProvider.notifier).resumeTracking();
+                },
+              ),
             ),
           ],
         ),

@@ -52,6 +52,7 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   riverpod: ^3.4.3
+  google_fonts: ^8.2.1
 
 
 dev_dependencies:

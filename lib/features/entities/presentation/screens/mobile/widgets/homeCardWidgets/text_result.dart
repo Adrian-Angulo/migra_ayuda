@@ -11,18 +11,34 @@ class TextResult extends ConsumerWidget {
     return lista.when(
       data: (entidades) {
         if (entidades.isEmpty) return const SizedBox.shrink();
-        return Row(
-          spacing: 8,
-          children: [
-            Icon(
-              Icons.business,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            Text(
-              '${entidades.length} ${entidades.length == 1 ? "entidad encontrada" : "entidades encontradas"}',
-              textAlign: TextAlign.left,
-            ),
-          ],
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12, top: 4),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF00897B).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.storefront_rounded,
+                  size: 16,
+                  color: Color(0xFF00897B),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '${entidades.length} ${entidades.length == 1 ? "lugar disponible" : "lugares disponibles"}',
+                style: const TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF334155),
+                  letterSpacing: -0.2,
+                ),
+              ),
+            ],
+          ),
         );
       },
       loading: () => const SizedBox.shrink(),
@@ -30,3 +46,4 @@ class TextResult extends ConsumerWidget {
     );
   }
 }
+

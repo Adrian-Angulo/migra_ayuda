@@ -39,6 +39,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     super.dispose();
   }
 
+  String _getInitials(String? name) {
+    if (name == null || name.trim().isEmpty) return '?';
+    final parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    return name.substring(0, name.length >= 2 ? 2 : 1).toUpperCase();
+  }
+
   Future<void> _save() async {
     final isConnected = await ref.read(networkInfoProvider).isConnected;
     if (!isConnected) {
@@ -76,79 +85,301 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = ref.watch(authNotifierProvider).value;
+    final initials = _getInitials(user?.name);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: const _EditProfileAppBar(title: 'Editar Perfil'),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Aviso informativo
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEFF6FF),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFBFDBFE)),
+        child: Column(
+          children: [
+            // 1. Header decorativo con Avatar
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(28),
+                  bottomRight: Radius.circular(28),
                 ),
-                child: const Row(
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0x0A000000),
+                    blurRadius: 12,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      Container(
+                        width: 76,
+                        height: 76,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF00897B), Color(0xFF004D40)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF00897B).withValues(alpha: 0.28),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Center(
+                          child: Text(
+                            initials,
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF00BFA5),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.edit,
+                          size: 13,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    user?.name ?? 'Usuario',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1E293B),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    user?.email ?? '',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF64748B),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // 2. Formulario en Tarjetas
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.info_outline_rounded,
-                        size: 18, color: Color(0xFF3B82F6)),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        'Solo puedes editar tu país de origen, destino y edad.',
-                        style:
-                            TextStyle(fontSize: 13, color: Color(0xFF1D4ED8)),
+                    // Aviso informativo sutil
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF0FDF4),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: const Color(0xFFDCFCE7)),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.info_outline_rounded,
+                              size: 18, color: Color(0xFF16A34A)),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              'Puedes actualizar tu país de origen, destino y tu edad.',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF15803D),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
+                    const SizedBox(height: 20),
+
+                    // Tarjeta de Ruta Migratoria
+                    _FormCard(
+                      title: 'Ruta Migratoria',
+                      icon: Icons.connecting_airports_rounded,
+                      iconColor: const Color(0xFF0284C7),
+                      children: [
+                        const _FieldLabel(
+                          label: 'País de origen',
+                          icon: Icons.flight_takeoff_rounded,
+                          iconColor: Color(0xFF0284C7),
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownFieldWidget(
+                          title: '',
+                          value: _originCountry,
+                          items: ListCountries.contries(),
+                          hint: 'Elige tu país de origen',
+                          onChanged: (v) => setState(() => _originCountry = v),
+                        ),
+                        const SizedBox(height: 18),
+                        const _FieldLabel(
+                          label: 'País de destino',
+                          icon: Icons.flight_land_rounded,
+                          iconColor: Color(0xFF10B981),
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownFieldWidget(
+                          title: '',
+                          value: _destinationCountry,
+                          items: ListCountries.contries(),
+                          hint: 'Elige tu país de destino',
+                          onChanged: (v) =>
+                              setState(() => _destinationCountry = v),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Tarjeta de Datos Personales
+                    _FormCard(
+                      title: 'Datos Personales',
+                      icon: Icons.person_pin_rounded,
+                      iconColor: const Color(0xFFD97706),
+                      children: [
+                        const _FieldLabel(
+                          label: 'Edad actual',
+                          icon: Icons.cake_rounded,
+                          iconColor: Color(0xFFD97706),
+                        ),
+                        const SizedBox(height: 8),
+                        TextFieldNumericWidget(
+                          title: '',
+                          hintText: 'Ej. 24',
+                          controller: _ageController,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Botón Guardar Cambios
+                    _SaveButton(loading: _loading, onPressed: _save),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
-              const SizedBox(height: 28),
-
-              const _SectionLabel(
-                  label: 'País de origen', icon: Icons.flight_takeoff_rounded),
-              const SizedBox(height: 8),
-              DropdownFieldWidget(
-                title: '',
-                value: _originCountry,
-                items: ListCountries.contries(),
-                hint: 'Elige una opción',
-                onChanged: (v) => setState(() => _originCountry = v),
-              ),
-              const SizedBox(height: 24),
-
-              const _SectionLabel(
-                  label: 'País de destino', icon: Icons.flight_land_rounded),
-              const SizedBox(height: 8),
-              DropdownFieldWidget(
-                title: '',
-                value: _destinationCountry,
-                items: ListCountries.contries(),
-                hint: 'Elige una opción',
-                onChanged: (v) => setState(() => _destinationCountry = v),
-              ),
-              const SizedBox(height: 24),
-
-              const _SectionLabel(label: 'Edad', icon: Icons.cake_rounded),
-              const SizedBox(height: 8),
-              TextFieldNumericWidget(
-                title: '',
-                hintText: 'Ej. 24',
-                controller: _ageController,
-              ),
-              const SizedBox(height: 40),
-
-              _SaveButton(loading: _loading, onPressed: _save),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
+    );
+  }
+}
+
+// ── Card Contenedor de Secciones ──────────────────────────────────────────────
+class _FormCard extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Color iconColor;
+  final List<Widget> children;
+
+  const _FormCard({
+    required this.title,
+    required this.icon,
+    required this.iconColor,
+    required this.children,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x06000000),
+            blurRadius: 10,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, size: 18, color: iconColor),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1E293B),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ...children,
+        ],
+      ),
+    );
+  }
+}
+
+// ── Label con Icono ───────────────────────────────────────────────────────────
+class _FieldLabel extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color iconColor;
+
+  const _FieldLabel({
+    required this.label,
+    required this.icon,
+    required this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 15, color: iconColor),
+        const SizedBox(width: 6),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF475569),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -177,43 +408,17 @@ class _EditProfileAppBar extends StatelessWidget
             borderRadius: BorderRadius.circular(10),
           ),
           child: const Icon(Icons.arrow_back_ios_new,
-              size: 18, color: Color(0xFF1A1A1A)),
+              size: 18, color: Color(0xFF1E293B)),
         ),
       ),
       title: Text(
         title,
         style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: Color(0xFF1A1A1A),
+          fontSize: 17,
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF1E293B),
         ),
       ),
-    );
-  }
-}
-
-// ── Section Label ─────────────────────────────────────────────────────────────
-class _SectionLabel extends StatelessWidget {
-  final String label;
-  final IconData icon;
-
-  const _SectionLabel({required this.label, required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: const Color(0xFF5F9EA0)),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF374151),
-          ),
-        ),
-      ],
     );
   }
 }
@@ -227,38 +432,58 @@ class _SaveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
       width: double.infinity,
       height: 54,
-      child: ElevatedButton(
-        onPressed: loading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF5F9EA0),
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          disabledBackgroundColor:
-              const Color(0xFF5F9EA0).withValues(alpha: 0.5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF00897B), Color(0xFF00695C)],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
         ),
-        child: loading
-            ? const SizedBox(
-                width: 22,
-                height: 22,
-                child: CircularProgressIndicator(
-                    strokeWidth: 2.5, color: Colors.white),
-              )
-            : const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.save_outlined, size: 20),
-                  SizedBox(width: 8),
-                  Text(
-                    'Guardar cambios',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF00897B).withValues(alpha: 0.35),
+            blurRadius: 12,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: loading ? null : onPressed,
+          child: Center(
+            child: loading
+                ? const SizedBox(
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: Colors.white,
+                    ),
+                  )
+                : const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.check_circle_outline_rounded,
+                          size: 20, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text(
+                        'Guardar cambios',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+          ),
+        ),
       ),
     );
   }

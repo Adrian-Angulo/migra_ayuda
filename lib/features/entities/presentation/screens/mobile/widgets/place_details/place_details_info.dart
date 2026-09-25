@@ -24,17 +24,17 @@ class PlaceDetailsInfo extends ConsumerWidget {
             const Text(
               'Descripción',
               style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1A1A1A),
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF1E293B),
               ),
             ),
             const SizedBox(height: 6),
             Text(
               entity.description,
               style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF6B7280),
+                fontSize: 13.5,
+                color: Color(0xFF64748B),
                 height: 1.5,
               ),
             ),
@@ -42,15 +42,16 @@ class PlaceDetailsInfo extends ConsumerWidget {
         ),
         const SizedBox(height: 16),
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+            boxShadow: const [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: Color(0x080F172A),
                 blurRadius: 8,
-                offset: const Offset(0, 2),
+                offset: Offset(0, 2),
               ),
             ],
           ),
@@ -64,42 +65,48 @@ class PlaceDetailsInfo extends ConsumerWidget {
                     'HORARIO DE ATENCIÓN',
                     style: TextStyle(
                       fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF9CA3AF),
-                      letterSpacing: 0.8,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF94A3B8),
+                      letterSpacing: 0.6,
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.all(6),
+                    padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(8),
+                      color: const Color(0xFF00897B).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Icon(Icons.access_time_rounded,
-                        size: 16, color: Color(0xFF6B7280)),
+                    child: const Icon(
+                      Icons.access_time_rounded,
+                      size: 15,
+                      color: Color(0xFF00897B),
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              const Divider(height: 1, color: Color(0xFFF3F4F6)),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
+              const Divider(height: 1, color: Color(0xFFF1F5F9)),
+              const SizedBox(height: 10),
               Text(
                 entity.schedule,
-                style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: Color(0xFF334155),
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-              const SizedBox(height: 8),
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         _PlaceContactCard(
-          icon: Icons.phone_outlined,
+          icon: Icons.phone_rounded,
           label: 'Teléfono',
           value: entity.phone,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 10),
         _PlaceContactCard(
-          icon: Icons.location_on_outlined,
+          icon: Icons.location_on_rounded,
           label: 'Dirección',
           value: entity.address,
           subtitle: kIsWeb ? null : 'A $distance De tu ubicación',
@@ -109,7 +116,7 @@ class PlaceDetailsInfo extends ConsumerWidget {
   }
 }
 
-class _PlaceContactCard extends ConsumerWidget {
+class _PlaceContactCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
@@ -123,32 +130,33 @@ class _PlaceContactCard extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        boxShadow: [
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: const [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Color(0x080F172A),
             blurRadius: 8,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
       child: Row(
         children: [
           Container(
-            width: 40,
-            height: 40,
+            width: 38,
+            height: 38,
             decoration: BoxDecoration(
-              color: const Color(0xFF5F9EA0).withValues(alpha: 0.1),
+              color: const Color(0xFF00897B).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, size: 20, color: const Color(0xFF5F9EA0)),
+            child: Icon(icon, size: 18, color: const Color(0xFF00897B)),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,26 +165,29 @@ class _PlaceContactCard extends ConsumerWidget {
                   label,
                   style: const TextStyle(
                     fontSize: 11,
-                    color: Color(0xFF9CA3AF),
-                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF94A3B8),
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   value,
                   style: const TextStyle(
-                    fontSize: 15,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF1A1A1A),
+                    color: Color(0xFF1E293B),
                   ),
                 ),
-                const SizedBox(height: 2),
-                if (subtitle != null)
+                if (subtitle != null) ...[
+                  const SizedBox(height: 2),
                   Text(
                     subtitle!,
-                    style:
-                        const TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF64748B),
+                    ),
                   ),
+                ],
               ],
             ),
           ),

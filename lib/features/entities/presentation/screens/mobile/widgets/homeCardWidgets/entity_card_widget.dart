@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/activity_actions.dart';
-import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/localitation/location_provider.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/map_provider.dart';
@@ -20,116 +19,160 @@ class EntityCardWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    
-
-    return GestureDetector(
-      onTap: () async {
-        ref.read(mapProvider.notifier).selectEntity(entity);
-        await ref.read(auditNotifierProvider.notifier).create(
-            accion: ActivityActions.entityViewed(),
-            metadata: {'service': entity.services[0]});
-      },
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              )
-            ]),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            //contenedor de imagen
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: entity.imageUrl.isNotEmpty
-                  ? CachedNetworkImage(
-                      imageUrl: entity.imageUrl,
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        width: 80,
-                        height: 80,
-                        color: Colors.grey[200],
-                        child: const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        width: 80,
-                        height: 80,
-                        color: Colors.grey[200],
-                        child: const Icon(
-                          Icons.business,
-                          size: 40,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    )
-                  : Container(
-                      width: 80,
-                      height: 80,
-                      color: Colors.grey[200],
-                      child: const Icon(
-                        Icons.business,
-                        size: 40,
-                        color: Colors.grey,
-                      ),
-                    ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    entity.name,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFFE2E8F0),
+          width: 1,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A0F172A),
+            blurRadius: 12,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () async {
+            ref.read(mapProvider.notifier).selectEntity(entity);
+            await ref.read(auditNotifierProvider.notifier).create(
+                  accion: ActivityActions.entityViewed(),
+                  metadata: {
+                    'service':
+                        entity.services.isNotEmpty ? entity.services[0] : 'General'
+                  },
+                );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Contenedor de imagen / placeholder
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: entity.imageUrl.isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: entity.imageUrl,
+                          width: 82,
+                          height: 82,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Container(
+                            width: 82,
+                            height: 82,
+                            color: const Color(0xFFF1F5F9),
+                            child: const Center(
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Color(0xFF00897B),
+                                ),
+                              ),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => _buildPlaceholder(),
+                        )
+                      : _buildPlaceholder(),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.location_on_outlined,
-                          size: 20, color: Colors.grey),
-                      const SizedBox(width: 2),
+                      // Nombre de la entidad
                       Text(
-                        entity.address,
+                        entity.name,
                         style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF98A2B3),
+                          fontSize: 15.5,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1E293B),
+                          height: 1.2,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      const SizedBox(height: 4),
+                      // Dirección
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on_rounded,
+                            size: 14,
+                            color: Color(0xFF00897B),
+                          ),
+                          const SizedBox(width: 3),
+                          Expanded(
+                            child: Text(
+                              entity.address,
+                              style: const TextStyle(
+                                fontSize: 12.5,
+                                color: Color(0xFF64748B),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      // Distancia y Rating
+                      DistanceAndRating(entity: entity),
+                      const SizedBox(height: 7),
+                      // Tags de servicios
+                      Wrap(
+                        spacing: 5,
+                        runSpacing: 4,
+                        children: entity.services
+                            .take(2)
+                            .map((service) => ServiceTag(label: service))
+                            .toList(),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 6),
-                  DistanceAndRating(
-                    entity: entity,
+                ),
+                const SizedBox(width: 4),
+                const Padding(
+                  padding: EdgeInsets.only(top: 28),
+                  child: Icon(
+                    Icons.chevron_right_rounded,
+                    color: Color(0xFF94A3B8),
+                    size: 22,
                   ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 4,
-                    children: entity.services
-                        .map((service) => ServiceTag(label: service))
-                        .toList(),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      width: 82,
+      height: 82,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFFE0F2F1), Color(0xFFB2DFDB)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: const Center(
+        child: Icon(
+          Icons.domain_rounded,
+          size: 34,
+          color: Color(0xFF00796B),
         ),
       ),
     );
@@ -147,36 +190,72 @@ class DistanceAndRating extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncRating = ref.watch(meanReviewByEntity(entity.id));
     final distanceState = ref.watch(distanceProvider(entity));
+
     return Row(
-      spacing: 5,
       children: [
-        const Icon(Icons.straighten, size: 20, color: Color(0xFF667085)),
-        Text(
-          distanceState,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Color(0xFF667085),
-          ),
-        ),
+        // Badge Distancia
         Container(
-          width: 1,
-          height: 15,
-          color: ColorConstants.grey400,
-        ),
-        const Icon(Icons.star_rounded, size: 20, color: Colors.amber),
-        Text(
-          asyncRating.when(
-            data: (data) => (double.tryParse(data['mean'].toString()) ?? 0.0)
-                .toStringAsFixed(1),
-            error: (error, stackTrace) => '0.0',
-            loading: () => '---',
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF1F5F9),
+            borderRadius: BorderRadius.circular(6),
           ),
-          style: const TextStyle(
-            fontSize: 12,
-            color: Colors.blueGrey,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.directions_walk_rounded,
+                size: 13,
+                color: Color(0xFF00897B),
+              ),
+              const SizedBox(width: 3),
+              Text(
+                distanceState,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF334155),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 6),
+        // Badge Calificación
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFEF3C7),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.star_rounded,
+                size: 13,
+                color: Color(0xFFF59E0B),
+              ),
+              const SizedBox(width: 3),
+              Text(
+                asyncRating.when(
+                  data: (data) =>
+                      (double.tryParse(data['mean'].toString()) ?? 0.0)
+                          .toStringAsFixed(1),
+                  error: (error, stackTrace) => '0.0',
+                  loading: () => '...',
+                ),
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF92400E),
+                ),
+              ),
+            ],
           ),
         ),
       ],
     );
   }
 }
+

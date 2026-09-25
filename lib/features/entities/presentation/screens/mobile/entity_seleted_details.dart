@@ -120,28 +120,37 @@ class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
           ],
         ),
         Positioned(
-          top: 0,
-          right: 0,
-          child: IconButton.filled(
-            icon: const Icon(
-              Icons.close,
-              color: Colors.white,
+          top: 8,
+          right: 8,
+          child: Material(
+            color: Colors.black.withValues(alpha: 0.55),
+            shape: const CircleBorder(),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: () {
+                //limpiar entidad seleccionada
+                ref.read(mapProvider.notifier).clearSelectEntity();
+                // limpiamos la ruta trazada
+                ref.read(mapProvider.notifier).clearRoute();
+                //volver a la altura inicial
+                if (widget.controllerD != null &&
+                    widget.controllerD!.isAttached) {
+                  widget.controllerD!.animateTo(
+                    0.3,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                  );
+                }
+              },
+              child: const Padding(
+                padding: EdgeInsets.all(6),
+                child: Icon(
+                  Icons.close_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
             ),
-            onPressed: () {
-              //limpiar entidad seleccionada
-              ref.read(mapProvider.notifier).clearSelectEntity();
-              // limpiamos la ruta trazada
-              ref.read(mapProvider.notifier).clearRoute();
-              //volver a la altura iniciar
-              if (widget.controllerD != null &&
-                  widget.controllerD!.isAttached) {
-                widget.controllerD!.animateTo(
-                  0.3,
-                  duration: const Duration(milliseconds: 500),
-                  curve: Curves.easeInOut,
-                );
-              }
-            },
           ),
         ),
       ],

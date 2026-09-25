@@ -16,13 +16,14 @@ class DrawerMenuItems extends ConsumerWidget {
     return Column(
       children: [
         const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Divider(),
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          child: Divider(color: Color(0xFFF1F5F9)),
         ),
 
         // Opciones del menú
         _DrawerOption(
-          icon: Icons.edit_outlined,
+          icon: Icons.edit_note_rounded,
+          iconColor: const Color(0xFF00897B),
           label: 'Editar Perfil',
           onTap: onEditProfile,
         ),
@@ -31,16 +32,17 @@ class DrawerMenuItems extends ConsumerWidget {
 
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Divider(),
+          child: Divider(color: Color(0xFFF1F5F9)),
         ),
 
         _DrawerOption(
           icon: Icons.logout_rounded,
+          iconColor: const Color(0xFFE53935),
           label: 'Cerrar Sesión',
-          color: Colors.black,
+          labelColor: const Color(0xFFE53935),
           onTap: onLogout,
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
       ],
     );
   }
@@ -48,34 +50,49 @@ class DrawerMenuItems extends ConsumerWidget {
 
 class _DrawerOption extends StatelessWidget {
   final IconData icon;
+  final Color iconColor;
   final String label;
+  final Color? labelColor;
   final VoidCallback onTap;
-  final Color? color;
 
   const _DrawerOption({
     required this.icon,
+    required this.iconColor,
     required this.label,
+    this.labelColor,
     required this.onTap,
-    this.color,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final effectiveColor = color ?? theme.colorScheme.onSurface;
-
-    return ListTile(
-      leading: Icon(icon, color: effectiveColor),
-      title: Text(
-        label,
-        style: theme.textTheme.bodyMedium?.copyWith(
-          color: effectiveColor,
-          fontWeight: FontWeight.w500,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+      child: ListTile(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: iconColor.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: iconColor, size: 20),
         ),
+        title: Text(
+          label,
+          style: TextStyle(
+            color: labelColor ?? const Color(0xFF1E293B),
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
+        ),
+        trailing: const Icon(
+          Icons.chevron_right_rounded,
+          size: 20,
+          color: Color(0xFF94A3B8),
+        ),
+        horizontalTitleGap: 12,
+        onTap: onTap,
       ),
-      trailing: const Icon(Icons.keyboard_arrow_right_outlined),
-      horizontalTitleGap: 4,
-      onTap: onTap,
     );
   }
 }

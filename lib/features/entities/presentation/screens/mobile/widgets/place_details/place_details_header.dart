@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/services_utils.dart';
-
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 
@@ -29,57 +28,65 @@ class PlaceDetailsHeader extends ConsumerWidget {
             Text(
               entity.name,
               style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1A1A1A),
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF1E293B),
+                letterSpacing: -0.3,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             ratingMeanAndLengt.when(
               data: (data) => Row(
                 children: [
-                  const Text(
-                    "Valoración: ",
-                    style:
-                        TextStyle(fontSize: 14, color: Color(0xFF6B7280)),
-                  ),
-                  Text(
-                    '${data['mean']}',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1A1A1A),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFEF3C7),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.star_rounded,
+                            size: 16, color: Color(0xFFF59E0B)),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${data['mean']}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF92400E),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  const Icon(Icons.star_outline_rounded,
-                      size: 16, color: Color(0xFFFBBF24)),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 8),
                   Text(
-                    '(${data['count']})',
+                    '(${data['count']} reseñas)',
                     style: const TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF6B7280),
-                        fontWeight: FontWeight.w500),
+                      fontSize: 13,
+                      color: Color(0xFF64748B),
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
               error: (Object error, StackTrace stackTrace) =>
-                  const Text('Error'),
-              loading: () => const Text('....'),
+                  const SizedBox.shrink(),
+              loading: () => const SizedBox.shrink(),
             ),
             const SizedBox(height: 12),
             Wrap(
-              spacing: 5,
-              runSpacing: 5,
-              children: [
-                ...entity.services.map(
-                  (service) => PlaceInfoChip(
-                    icon: getServiceIcon(service),
-                    label: service,
-                  ),
+              spacing: 6,
+              runSpacing: 6,
+              children: entity.services.map(
+                (service) => PlaceInfoChip(
+                  icon: getServiceIcon(service),
+                  label: service,
+                  color: getServiceColor(service),
                 ),
-              ],
+              ).toList(),
             ),
           ],
         ),
@@ -99,18 +106,18 @@ class _PlaceHeroImage extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       child: SizedBox(
         width: double.infinity,
-        height: 200,
+        height: 180,
         child: imageUrl.isNotEmpty
             ? CachedNetworkImage(
                 imageUrl: imageUrl,
                 fit: BoxFit.cover,
                 placeholder: (context, url) => Container(
-                  color: const Color(0xFFE5E7EB),
+                  color: const Color(0xFFF1F5F9),
                   child: const Center(
                     child: CircularProgressIndicator(
-                      strokeWidth: 3,
+                      strokeWidth: 2.5,
                       valueColor:
-                          AlwaysStoppedAnimation<Color>(Color(0xFF5F9EA0)),
+                          AlwaysStoppedAnimation<Color>(Color(0xFF00897B)),
                     ),
                   ),
                 ),
@@ -127,10 +134,19 @@ class _PlaceHeroImage extends StatelessWidget {
 
   Widget _placeholder() {
     return Container(
-      color: const Color(0xFFE5E7EB),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFFE0F2F1), Color(0xFFB2DFDB)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
       child: const Center(
-        child:
-            Icon(Icons.business_outlined, size: 64, color: Color(0xFF9CA3AF)),
+        child: Icon(
+          Icons.domain_rounded,
+          size: 56,
+          color: Color(0xFF00796B),
+        ),
       ),
     );
   }
@@ -139,40 +155,40 @@ class _PlaceHeroImage extends StatelessWidget {
 class PlaceInfoChip extends StatelessWidget {
   final IconData icon;
   final String label;
+  final MaterialColor? color;
 
   const PlaceInfoChip({
     super.key,
     required this.icon,
     required this.label,
+    this.color,
   });
 
   @override
   Widget build(BuildContext context) {
+    final chipColor = color ?? Colors.teal;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 4,
-            offset: const Offset(0, 1),
-          ),
-        ],
+        color: chipColor.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: chipColor.withValues(alpha: 0.22),
+          width: 0.8,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 15, color: const Color(0xFF5F9EA0)),
-          const SizedBox(width: 6),
+          Icon(icon, size: 14, color: chipColor[700] ?? chipColor),
+          const SizedBox(width: 5),
           Text(
             label,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF374151),
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: chipColor[800] ?? chipColor,
             ),
           ),
         ],
@@ -180,3 +196,4 @@ class PlaceInfoChip extends StatelessWidget {
     );
   }
 }
+
