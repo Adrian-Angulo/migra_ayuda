@@ -64,6 +64,9 @@ class AuditRepositoryImpl implements AuditRepository {
   @override
   Future<Either<Failure, void>> synchronize() async {
     try {
+      final isConnected = await networkInfo.isConnected;
+      if (!isConnected) return const Right(null);
+
       final list = await localDataSource.getPending();
       if (list.isEmpty) return const Right(null);
       await remoteDataSource.synchronize(list);

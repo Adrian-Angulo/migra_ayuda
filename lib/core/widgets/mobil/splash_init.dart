@@ -22,10 +22,22 @@ class _SplashScreenInitState extends ConsumerState<SplashScreenInit> {
   }
 
   Future<void> _initializeApp() async {
-    await SembastDatabase.instance.database;
-    await ref.read(syncProvider.notifier).syncAll();
+    try {
+      await SembastDatabase.instance.database;
+    } catch (e) {
+      debugPrint("⚠️ Error al inicializar base de datos local: $e");
+    }
+
+    try {
+      await ref
+          .read(syncProvider.notifier)
+          .syncAll()
+          .timeout(const Duration(seconds: 3));
+    } catch (e) {
+      debugPrint("ℹ️ Sincronización omitida o sin conexión: $e");
+    }
     
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(milliseconds: 1500));
     if (!mounted) return;
     context.go(Routes.loginMovil);
     ref.read(routerMovilNotifierProvider).refresh();
