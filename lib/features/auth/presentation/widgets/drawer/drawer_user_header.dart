@@ -51,8 +51,8 @@ class DrawerUserHeader extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Avatar circular con iniciales
                       Container(
                         width: 58,
                         height: 58,
@@ -82,41 +82,6 @@ class DrawerUserHeader extends ConsumerWidget {
                       const SizedBox(width: 14),
 
                       // Badge de Rol
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.22),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: Colors.white.withValues(alpha: 0.35),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.verified_user_rounded,
-                                      size: 13, color: Colors.white),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    user?.role ?? 'Migrante',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 0.3,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 14),
@@ -153,7 +118,8 @@ class DrawerUserHeader extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.all(14.0),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 decoration: BoxDecoration(
                   color: const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(14),
@@ -198,7 +164,8 @@ class DrawerUserHeader extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF59E0B).withValues(alpha: 0.12),
+                            color:
+                                const Color(0xFFF59E0B).withValues(alpha: 0.12),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(

@@ -12,7 +12,7 @@ class ExportButtonWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 100,
+      width: 150,
       height: 38,
       child: ElevatedButton.icon(
         onPressed: onPressed,

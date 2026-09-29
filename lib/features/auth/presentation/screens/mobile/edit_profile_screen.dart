@@ -94,7 +94,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // 1. Header decorativo con Avatar
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
@@ -120,20 +119,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       Container(
                         width: 76,
                         height: 76,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           shape: BoxShape.circle,
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF00897B), Color(0xFF004D40)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF00897B).withValues(alpha: 0.28),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                          color: Color(0xFF004D40),
                         ),
                         child: Center(
                           child: Text(
@@ -189,62 +177,22 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Aviso informativo sutil
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF0FDF4),
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: const Color(0xFFDCFCE7)),
-                      ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.info_outline_rounded,
-                              size: 18, color: Color(0xFF16A34A)),
-                          SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              'Puedes actualizar tu país de origen, destino y tu edad.',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Color(0xFF15803D),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-
                     // Tarjeta de Ruta Migratoria
                     _FormCard(
                       title: 'Ruta Migratoria',
                       icon: Icons.connecting_airports_rounded,
                       iconColor: const Color(0xFF0284C7),
                       children: [
-                        const _FieldLabel(
-                          label: 'País de origen',
-                          icon: Icons.flight_takeoff_rounded,
-                          iconColor: Color(0xFF0284C7),
-                        ),
-                        const SizedBox(height: 8),
                         DropdownFieldWidget(
-                          title: '',
+                          title: 'País de origen',
                           value: _originCountry,
                           items: ListCountries.contries(),
                           hint: 'Elige tu país de origen',
                           onChanged: (v) => setState(() => _originCountry = v),
                         ),
                         const SizedBox(height: 18),
-                        const _FieldLabel(
-                          label: 'País de destino',
-                          icon: Icons.flight_land_rounded,
-                          iconColor: Color(0xFF10B981),
-                        ),
-                        const SizedBox(height: 8),
                         DropdownFieldWidget(
-                          title: '',
+                          title: 'País de destino',
                           value: _destinationCountry,
                           items: ListCountries.contries(),
                           hint: 'Elige tu país de destino',
@@ -261,14 +209,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                       icon: Icons.person_pin_rounded,
                       iconColor: const Color(0xFFD97706),
                       children: [
-                        const _FieldLabel(
-                          label: 'Edad actual',
-                          icon: Icons.cake_rounded,
-                          iconColor: Color(0xFFD97706),
-                        ),
-                        const SizedBox(height: 8),
                         TextFieldNumericWidget(
-                          title: '',
+                          title: 'Edad actual',
                           hintText: 'Ej. 24',
                           controller: _ageController,
                         ),
@@ -349,37 +291,6 @@ class _FormCard extends StatelessWidget {
           ...children,
         ],
       ),
-    );
-  }
-}
-
-// ── Label con Icono ───────────────────────────────────────────────────────────
-class _FieldLabel extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final Color iconColor;
-
-  const _FieldLabel({
-    required this.label,
-    required this.icon,
-    required this.iconColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 15, color: iconColor),
-        const SizedBox(width: 6),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF475569),
-          ),
-        ),
-      ],
     );
   }
 }

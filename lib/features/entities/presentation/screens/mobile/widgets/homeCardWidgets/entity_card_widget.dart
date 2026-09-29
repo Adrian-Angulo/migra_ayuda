@@ -44,26 +44,25 @@ class EntityCardWidget extends ConsumerWidget {
           onTap: () async {
             ref.read(mapProvider.notifier).selectEntity(entity);
             await ref.read(auditNotifierProvider.notifier).create(
-                  accion: ActivityActions.entityViewed(),
-                  metadata: {
-                    'service':
-                        entity.services.isNotEmpty ? entity.services[0] : 'General'
-                  },
-                );
+              accion: ActivityActions.entityViewed(),
+              metadata: {
+                'service':
+                    entity.services.isNotEmpty ? entity.services[0] : 'General'
+              },
+            );
           },
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Contenedor de imagen / placeholder
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: entity.imageUrl.isNotEmpty
                       ? CachedNetworkImage(
                           imageUrl: entity.imageUrl,
-                          width: 82,
-                          height: 82,
+                          width: 100,
+                          height: 100,
                           fit: BoxFit.cover,
                           placeholder: (context, url) => Container(
                             width: 82,
@@ -80,7 +79,8 @@ class EntityCardWidget extends ConsumerWidget {
                               ),
                             ),
                           ),
-                          errorWidget: (context, url, error) => _buildPlaceholder(),
+                          errorWidget: (context, url, error) =>
+                              _buildPlaceholder(),
                         )
                       : _buildPlaceholder(),
                 ),
@@ -89,7 +89,6 @@ class EntityCardWidget extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Nombre de la entidad
                       Text(
                         entity.name,
                         style: const TextStyle(
@@ -102,7 +101,6 @@ class EntityCardWidget extends ConsumerWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
-                      // Dirección
                       Row(
                         children: [
                           const Icon(
@@ -125,15 +123,12 @@ class EntityCardWidget extends ConsumerWidget {
                         ],
                       ),
                       const SizedBox(height: 6),
-                      // Distancia y Rating
                       DistanceAndRating(entity: entity),
                       const SizedBox(height: 7),
-                      // Tags de servicios
                       Wrap(
-                        spacing: 5,
+                        spacing: 6,
                         runSpacing: 4,
                         children: entity.services
-                            .take(2)
                             .map((service) => ServiceTag(label: service))
                             .toList(),
                       ),
@@ -258,4 +253,3 @@ class DistanceAndRating extends ConsumerWidget {
     );
   }
 }
-

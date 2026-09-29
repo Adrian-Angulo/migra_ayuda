@@ -15,12 +15,12 @@ class ModalFormEntity extends ConsumerStatefulWidget {
 class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
   @override
   Widget build(BuildContext context) {
-    // Escucha el resultado del CRUD y cierra el modal al completar.
+  
     ref.listen<AsyncValue<CrudOperation>>(entitiesCrudProvider, (previous, next) {
       if (previous?.isLoading == true && !next.isLoading) {
         if (next.hasValue && !next.hasError) {
           final op = next.value;
-          // Cierra el modal tanto para editar como para registrar
+         
           if ((op == CrudOperation.register || op == CrudOperation.update) && mounted) {
             Navigator.pop(context);
           }
@@ -49,7 +49,7 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ── Header dinámico ──────────────────────────────────────
+          
             Container(
               padding: const EdgeInsets.all(28),
               decoration: const BoxDecoration(
@@ -115,7 +115,7 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
               ),
             ),
 
-            // ── Formulario ───────────────────────────────────────────
+         
             FormEntity(entity: widget.entity),
           ],
         ),

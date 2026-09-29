@@ -68,7 +68,6 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Encabezado ────────────────────────────────────────────────
 
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -15,24 +15,12 @@ class DrawerMenuItems extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: Divider(color: Color(0xFFF1F5F9)),
-        ),
-
         // Opciones del menú
         _DrawerOption(
           icon: Icons.edit_note_rounded,
           iconColor: const Color(0xFF00897B),
           label: 'Editar Perfil',
           onTap: onEditProfile,
-        ),
-
-        const Spacer(),
-
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16),
-          child: Divider(color: Color(0xFFF1F5F9)),
         ),
 
         _DrawerOption(

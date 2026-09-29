@@ -101,30 +101,30 @@ class FormEntityState extends ConsumerState<FormEntity> {
     final isEdit = widget.entity != null;
 
     final entity = EntityEntity(
-      id: isEdit
-          ? widget.entity!.id
-          : '', // Usa el id si es edición, si no, vacío para registro nuevo
+      id: isEdit ? widget.entity!.id : '',
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
       services: selectServices,
       address: _addressController.text.trim(),
       localitation: GeoPoint(cordinates!.latitude, cordinates.longitude),
-      phone: _phoneController.text.trim(),
+      phone: _phoneController.text.trim() == ""
+          ? "no disponible"
+          : _phoneController.text.trim(),
       imageUrl: isEdit
           ? widget.entity!.imageUrl
           : '', // Conserva url imagen existente en edición
-      schedule: _scheduleController.text.trim(),
+      schedule: _scheduleController.text.trim() == ""
+          ? "no disponible"
+          : _scheduleController.text.trim(),
     );
 
     if (isEdit) {
-      // Lógica de edición
       ref.read(entitiesCrudProvider.notifier).updateEntity(
             entity: entity,
-            imagenBytes: imagenbytes, // Puede ser null si no cambió la imagen
+            imagenBytes: imagenbytes,
             fileName: 'Abc${_nameController.text}',
           );
     } else {
-      // Lógica de registro
       ref.read(entitiesCrudProvider.notifier).registerEntity(
             entity: entity,
             imagenBytes: imagenbytes!,
@@ -281,9 +281,6 @@ class FormEntityState extends ConsumerState<FormEntity> {
                       icon: Icons.phone_outlined,
                       maxLength: 10,
                       onlyNumbers: true,
-                      validator: (v) => (v == null || v.isEmpty)
-                          ? 'El teléfono es requerido'
-                          : null,
                     ),
                     const SizedBox(height: 32),
 
@@ -299,9 +296,6 @@ class FormEntityState extends ConsumerState<FormEntity> {
                       hint: 'Ej. Lunes a viernes 8:30 AM a 12:00 PM',
                       icon: null,
                       maxLines: 4,
-                      validator: (v) => (v == null || v.isEmpty)
-                          ? 'El horario es requerido'
-                          : null,
                     ),
                     const SizedBox(height: 32),
                   ],
