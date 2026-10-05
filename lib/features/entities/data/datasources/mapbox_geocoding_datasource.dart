@@ -14,7 +14,7 @@ class MapboxGeocodingDatasource implements IGeocodingRemoteDataSource {
   @override
   Future<LatLng?> getCoordinates(String address) async {
     try {
-      final token = await Loadtoken.getMapboxToken();
+      final token = await LoadEnv.getMapboxToken();
       if (token.isEmpty) {
         debugPrint('⚠️ Mapbox token no configurado');
         return null;

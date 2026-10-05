@@ -24,7 +24,7 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
 
     state = await AsyncValue.guard(
       () async {
-        final repository = ref.read(entityRepositoryProvider);
+        final repository = ref.read(entityWebRepositoryProvider);
 
         final registerEntityUseCase = RegisterEntityUseCase(repository);
         final result = await registerEntityUseCase(
@@ -49,7 +49,7 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
     await Future.delayed(const Duration(milliseconds: 500));
 
     state = await AsyncValue.guard(() async {
-      final repository = ref.read(entityRepositoryProvider);
+      final repository = ref.read(entityWebRepositoryProvider);
 
       final updateEntityUseCase = UpdateEntityUseCase(repository);
       final result = await updateEntityUseCase(
@@ -68,7 +68,7 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
     state = const AsyncLoading();
 
     state = await AsyncValue.guard(() async {
-      final repository = ref.read(entityRepositoryProvider);
+      final repository = ref.read(entityWebRepositoryProvider);
       final deleteEntityUseCase = DeleteEntityUseCase(repository);
 
       final reviewR = ref.read(reviewRepositoryProvider);
@@ -90,7 +90,7 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
   }
 
   Future<void> actualizarTotalYPromedioEntidad(String entidadId) async {
-    final repository = ref.read(entityRepositoryProvider);
+    final repository = ref.read(entityWebRepositoryProvider);
     final getEntityByIdUseCase = GetEntityByIdUseCase(repository);
 
     // Obtener la entidad actual por ID
@@ -101,8 +101,7 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
       (entidad) async {
         // Obtener las reseñas relacionadas a la entidad
         final reviewRepo = ref.read(reviewRepositoryProvider);
-        final reviewsResult =
-            await reviewRepo.getReviewsByEntity(entidadId);
+        final reviewsResult = await reviewRepo.getReviewsByEntity(entidadId);
         final List<ReviewEntity> reviews =
             reviewsResult.fold((_) => [], (r) => r);
 

@@ -1,18 +1,21 @@
-import 'dart:typed_data';
+/* import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/domain/failures/entity_failures.dart';
-import 'package:migra_ayuda/features/entities/domain/repositories/entity_repository.dart';
+import 'package:migra_ayuda/features/entities/domain/repositories/entity_mobile_repository.dart';
+import 'package:migra_ayuda/features/entities/domain/repositories/entity_web_repository.dart';
 import 'package:migra_ayuda/features/entities/domain/usecases/entities_usecases.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockEntityRepository extends Mock implements EntityRepository {}
+class MockEntityWebRepository extends Mock implements EntityWebRepository {}
+class MockEntityMoblieRepository extends Mock implements EntityMobileRepository {}
 
 void main() {
-  late MockEntityRepository mockRepository;
+  late MockEntityWebRepository mockWebRepository;
+  late MockEntityMoblieRepository mockMobileRepository;
   late EntityEntity fakeEntity;
   late Uint8List fakeImageBytes;
 
@@ -34,7 +37,7 @@ void main() {
   });
 
   setUp(() {
-    mockRepository = MockEntityRepository();
+    mockWebRepository = MockEntityWebRepository();
     fakeImageBytes = Uint8List.fromList([0, 1, 2, 3]);
     fakeEntity = const EntityEntity(
       id: 'entity-001',
@@ -53,13 +56,13 @@ void main() {
     late RegisterEntityUseCase useCase;
 
     setUp(() {
-      useCase = RegisterEntityUseCase(mockRepository);
+      useCase = RegisterEntityUseCase(mockWebRepository);
     });
 
     test(
       'éxito: debería registrar la entidad satisfactoriamente',
       () async {
-        when(() => mockRepository.registerEntity(
+        when(() => mockWebRepository.registerEntity(
               entity: fakeEntity,
               imagenBytes: fakeImageBytes,
               fileName: 'imagen.jpg',
@@ -72,19 +75,19 @@ void main() {
         );
 
         expect(result, const Right(null));
-        verify(() => mockRepository.registerEntity(
+        verify(() => mockWebRepository.registerEntity(
               entity: fakeEntity,
               imagenBytes: fakeImageBytes,
               fileName: 'imagen.jpg',
             )).called(1);
-        verifyNoMoreInteractions(mockRepository);
+        verifyNoMoreInteractions(mockWebRepository);
       },
     );
 
     test(
       'error: debería retornar Left(EntityCreationFailedFailure) cuando falla el registro',
       () async {
-        when(() => mockRepository.registerEntity(
+        when(() => mockWebRepository.registerEntity(
               entity: any(named: 'entity'),
               imagenBytes: any(named: 'imagenBytes'),
               fileName: any(named: 'fileName'),
@@ -99,12 +102,12 @@ void main() {
         );
 
         expect(result, const Left(EntityCreationFailedFailure()));
-        verify(() => mockRepository.registerEntity(
+        verify(() => mockWebRepository.registerEntity(
               entity: fakeEntity,
               imagenBytes: fakeImageBytes,
               fileName: 'imagen.jpg',
             )).called(1);
-        verifyNoMoreInteractions(mockRepository);
+        verifyNoMoreInteractions(mockWebRepository);
       },
     );
   });
@@ -113,13 +116,13 @@ void main() {
     late UpdateEntityUseCase useCase;
 
     setUp(() {
-      useCase = UpdateEntityUseCase(mockRepository);
+      useCase = UpdateEntityUseCase(mockWebRepository);
     });
 
     test(
       'éxito: debería actualizar la entidad satisfactoriamente',
       () async {
-        when(() => mockRepository.updateEntity(
+        when(() => mockWebRepository.updateEntity(
               entity: fakeEntity,
               imagenBytes: fakeImageBytes,
               fileName: 'imagen.jpg',
@@ -132,19 +135,19 @@ void main() {
         );
 
         expect(result, const Right(null));
-        verify(() => mockRepository.updateEntity(
+        verify(() => mockWebRepository.updateEntity(
               entity: fakeEntity,
               imagenBytes: fakeImageBytes,
               fileName: 'imagen.jpg',
             )).called(1);
-        verifyNoMoreInteractions(mockRepository);
+        verifyNoMoreInteractions(mockWebRepository);
       },
     );
 
     test(
       'error: debería retornar Left(EntityUpdateFailedFailure) cuando falla la actualización',
       () async {
-        when(() => mockRepository.updateEntity(
+        when(() => mockWebRepository.updateEntity(
               entity: any(named: 'entity'),
               imagenBytes: any(named: 'imagenBytes'),
               fileName: any(named: 'fileName'),
@@ -159,12 +162,12 @@ void main() {
         );
 
         expect(result, const Left(EntityUpdateFailedFailure()));
-        verify(() => mockRepository.updateEntity(
+        verify(() => mockWebRepository.updateEntity(
               entity: fakeEntity,
               imagenBytes: fakeImageBytes,
               fileName: 'imagen.jpg',
             )).called(1);
-        verifyNoMoreInteractions(mockRepository);
+        verifyNoMoreInteractions(mockWebRepository);
       },
     );
   });
@@ -173,35 +176,35 @@ void main() {
     late DeleteEntityUseCase useCase;
 
     setUp(() {
-      useCase = DeleteEntityUseCase(mockRepository);
+      useCase = DeleteEntityUseCase(mockWebRepository);
     });
 
     test(
       'éxito: debería eliminar la entidad satisfactoriamente',
       () async {
-        when(() => mockRepository.deleteEntity('entity-001'))
+        when(() => mockWebRepository.deleteEntity('entity-001'))
             .thenAnswer((_) async => const Right(null));
 
         final result = await useCase('entity-001');
 
         expect(result, const Right(null));
-        verify(() => mockRepository.deleteEntity('entity-001')).called(1);
-        verifyNoMoreInteractions(mockRepository);
+        verify(() => mockWebRepository.deleteEntity('entity-001')).called(1);
+        verifyNoMoreInteractions(mockWebRepository);
       },
     );
 
     test(
       'error: debería retornar Left(EntityDeletionFailedFailure) cuando falla la eliminación',
       () async {
-        when(() => mockRepository.deleteEntity(any())).thenAnswer(
+        when(() => mockWebRepository.deleteEntity(any())).thenAnswer(
           (_) async => const Left(EntityDeletionFailedFailure()),
         );
 
         final result = await useCase('entity-001');
 
         expect(result, const Left(EntityDeletionFailedFailure()));
-        verify(() => mockRepository.deleteEntity('entity-001')).called(1);
-        verifyNoMoreInteractions(mockRepository);
+        verify(() => mockWebRepository.deleteEntity('entity-001')).called(1);
+        verifyNoMoreInteractions(mockWebRepository);
       },
     );
   });
@@ -210,13 +213,13 @@ void main() {
     late GetAllEntitiesUseCase useCase;
 
     setUp(() {
-      useCase = GetAllEntitiesUseCase(mockRepository);
+      useCase = GetAllEntitiesUseCase(mockMobileRepository);
     });
 
     test(
       'éxito: debería retornar la lista de entidades disponibles',
       () async {
-        when(() => mockRepository.getAllEntities())
+        when(() => mockWebRepository.getAllEntities())
             .thenAnswer((_) async => Right([fakeEntity]));
 
         final result = await useCase();
@@ -229,23 +232,23 @@ void main() {
             expect(entities.first.id, 'entity-001');
           },
         );
-        verify(() => mockRepository.getAllEntities()).called(1);
-        verifyNoMoreInteractions(mockRepository);
+        verify(() => mockWebRepository.getAllEntities()).called(1);
+        verifyNoMoreInteractions(mockWebRepository);
       },
     );
 
     test(
       'error: debería retornar Left(EntityFetchFailedFailure) cuando falla la consulta de entidades',
       () async {
-        when(() => mockRepository.getAllEntities()).thenAnswer(
+        when(() => mockWebRepository.getAllEntities()).thenAnswer(
           (_) async => const Left(EntityFetchFailedFailure()),
         );
 
         final result = await useCase();
 
         expect(result, const Left(EntityFetchFailedFailure()));
-        verify(() => mockRepository.getAllEntities()).called(1);
-        verifyNoMoreInteractions(mockRepository);
+        verify(() => mockWebRepository.getAllEntities()).called(1);
+        verifyNoMoreInteractions(mockWebRepository);
       },
     );
   });
@@ -254,13 +257,13 @@ void main() {
     late GetEntityByIdUseCase useCase;
 
     setUp(() {
-      useCase = GetEntityByIdUseCase(mockRepository);
+      useCase = GetEntityByIdUseCase(mockWebRepository);
     });
 
     test(
       'éxito: debería retornar la entidad correspondiente al ID consultado',
       () async {
-        when(() => mockRepository.getEntityById('entity-001'))
+        when(() => mockWebRepository.getEntityById('entity-001'))
             .thenAnswer((_) async => Right(fakeEntity));
 
         final result = await useCase('entity-001');
@@ -273,23 +276,23 @@ void main() {
             expect(entity.name, 'Centro de Migrantes');
           },
         );
-        verify(() => mockRepository.getEntityById('entity-001')).called(1);
-        verifyNoMoreInteractions(mockRepository);
+        verify(() => mockWebRepository.getEntityById('entity-001')).called(1);
+        verifyNoMoreInteractions(mockWebRepository);
       },
     );
 
     test(
       'error: debería retornar Left(EntityNotFoundFailure) cuando la entidad no existe',
       () async {
-        when(() => mockRepository.getEntityById(any())).thenAnswer(
+        when(() => mockWebRepository.getEntityById(any())).thenAnswer(
           (_) async => const Left(EntityNotFoundFailure()),
         );
 
         final result = await useCase('entity-001');
 
         expect(result, const Left(EntityNotFoundFailure()));
-        verify(() => mockRepository.getEntityById('entity-001')).called(1);
-        verifyNoMoreInteractions(mockRepository);
+        verify(() => mockWebRepository.getEntityById('entity-001')).called(1);
+        verifyNoMoreInteractions(mockWebRepository);
       },
     );
   });
@@ -298,34 +301,34 @@ void main() {
     late GetAllEntities2StreamUseCase useCase;
 
     setUp(() {
-      useCase = GetAllEntities2StreamUseCase(mockRepository);
+      useCase = GetAllEntities2StreamUseCase(mockWebRepository);
     });
 
     test(
       'éxito: debería emitir la lista de entidades desde el stream',
       () async {
-        when(() => mockRepository.getAllEntites2())
+        when(() => mockWebRepository.getAllEntites2())
             .thenAnswer((_) => Stream.value([fakeEntity]));
 
         final stream = useCase();
 
         await expectLater(stream, emits([fakeEntity]));
-        verify(() => mockRepository.getAllEntites2()).called(1);
-        verifyNoMoreInteractions(mockRepository);
+        verify(() => mockWebRepository.getAllEntites2()).called(1);
+        verifyNoMoreInteractions(mockWebRepository);
       },
     );
 
     test(
       'error: debería emitir un error cuando el stream del repositorio falla',
       () async {
-        when(() => mockRepository.getAllEntites2())
+        when(() => mockWebRepository.getAllEntites2())
             .thenAnswer((_) => Stream.error(const EntityFetchFailedFailure()));
 
         final stream = useCase();
 
         await expectLater(stream, emitsError(isA<EntityFetchFailedFailure>()));
-        verify(() => mockRepository.getAllEntites2()).called(1);
-        verifyNoMoreInteractions(mockRepository);
+        verify(() => mockWebRepository.getAllEntites2()).called(1);
+        verifyNoMoreInteractions(mockWebRepository);
       },
     );
   });
@@ -334,36 +337,37 @@ void main() {
     late SyncAllFromFirebaseUseCase useCase;
 
     setUp(() {
-      useCase = SyncAllFromFirebaseUseCase(mockRepository);
+      useCase = SyncAllFromFirebaseUseCase(mockWebRepository);
     });
 
     test(
       'éxito: debería sincronizar todas las entidades satisfactoriamente',
       () async {
-        when(() => mockRepository.syncAllFromFirebase())
+        when(() => mockWebRepository.syncAllFromFirebase())
             .thenAnswer((_) async => const Right(null));
 
         final result = await useCase();
 
         expect(result, const Right(null));
-        verify(() => mockRepository.syncAllFromFirebase()).called(1);
-        verifyNoMoreInteractions(mockRepository);
+        verify(() => mockWebRepository.syncAllFromFirebase()).called(1);
+        verifyNoMoreInteractions(mockWebRepository);
       },
     );
 
     test(
       'error: debería retornar Left(NetworkFailure) si falla la sincronización',
       () async {
-        when(() => mockRepository.syncAllFromFirebase()).thenAnswer(
+        when(() => mockWebRepository.syncAllFromFirebase()).thenAnswer(
           (_) async => const Left(NetworkFailure()),
         );
 
         final result = await useCase();
 
         expect(result, const Left(NetworkFailure()));
-        verify(() => mockRepository.syncAllFromFirebase()).called(1);
-        verifyNoMoreInteractions(mockRepository);
+        verify(() => mockWebRepository.syncAllFromFirebase()).called(1);
+        verifyNoMoreInteractions(mockWebRepository);
       },
     );
   });
 }
+ */

@@ -2,12 +2,12 @@ import 'dart:typed_data';
 import 'package:dartz/dartz.dart';
 import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/entities/data/datasources/entity_remote_datasource.dart';
-import 'package:migra_ayuda/features/entities/data/models/entity_models.dart';
+import 'package:migra_ayuda/features/entities/data/mappers/entity_mappers.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/domain/failures/entity_failures.dart';
-import 'package:migra_ayuda/features/entities/domain/repositories/entity_repository.dart';
+import 'package:migra_ayuda/features/entities/domain/repositories/entity_web_repository.dart';
 
-class EntityWebRepositoryImpl extends EntityRepository {
+class EntityWebRepositoryImpl extends EntityWebRepository {
   final EntityRemoteDataSource remoteDataSource;
 
   EntityWebRepositoryImpl({required this.remoteDataSource});
@@ -18,17 +18,7 @@ class EntityWebRepositoryImpl extends EntityRepository {
     required Uint8List imagenBytes,
     required String fileName,
   }) async {
-    final modelo = EntityModels(
-      id: '',
-      name: entity.name,
-      description: entity.description,
-      services: entity.services,
-      address: entity.address,
-      localitation: entity.localitation,
-      phone: entity.phone,
-      imageUrl: '',
-      schedule: entity.schedule,
-    );
+    final modelo = EntityMappers.toModel(entity);
 
     try {
       await remoteDataSource.registerEntity(
@@ -48,19 +38,7 @@ class EntityWebRepositoryImpl extends EntityRepository {
     Uint8List? imagenBytes,
     String? fileName,
   }) async {
-    final modelo = EntityModels(
-      id: entity.id,
-      name: entity.name,
-      description: entity.description,
-      services: entity.services,
-      address: entity.address,
-      localitation: entity.localitation,
-      phone: entity.phone,
-      averageRating: entity.averageRating,
-      totalReviews: entity.totalReviews,
-      imageUrl: entity.imageUrl,
-      schedule: entity.schedule,
-    );
+    final modelo = EntityMappers.toModel(entity);
 
     try {
       await remoteDataSource.updateEntity(
@@ -84,59 +62,25 @@ class EntityWebRepositoryImpl extends EntityRepository {
     }
   }
 
-  @override
-  Future<Either<Failure, List<EntityEntity>>> getAllEntities() async {
-    try {
-      final entitiesModel = await remoteDataSource.getAllEntities();
-      final entities =
-          entitiesModel.map((e) => _entityModelsToEntityEntity(e)).toList();
-      return Right(entities);
-    } catch (_) {
-      return const Left(EntityFetchFailedFailure());
-    }
-  }
+
 
   @override
   Future<Either<Failure, EntityEntity>> getEntityById(String id) async {
     try {
       final entityModel = await remoteDataSource.getEntityById(id);
-      return Right(_entityModelsToEntityEntity(entityModel));
+      return Right(EntityMappers.toEntity(entityModel));
     } catch (_) {
       return const Left(EntityNotFoundFailure());
     }
   }
 
-  @override
-  Future<Either<Failure, void>> syncAllFromFirebase() async {
-    return const Left(
-      UnexpectedFailure(
-       
-      ),
-    );
-  }
 
   @override
   Stream<List<EntityEntity>> getAllEntites2() {
     return remoteDataSource.getAllEntitiesStream().map((list) {
-      return list.map((e) => _entityModelsToEntityEntity(e)).toList();
+      return list.map((e) => EntityMappers.toEntity(e)).toList();
     }).handleError((_) {
       throw const EntityFetchFailedFailure();
     });
-  }
-
-  EntityEntity _entityModelsToEntityEntity(EntityModels modelo) {
-    return EntityEntity(
-      id: modelo.id,
-      name: modelo.name,
-      description: modelo.description,
-      services: modelo.services,
-      address: modelo.address,
-      localitation: modelo.localitation,
-      phone: modelo.phone,
-      imageUrl: modelo.imageUrl,
-      averageRating: modelo.averageRating,
-      totalReviews: modelo.totalReviews,
-      schedule: modelo.schedule,
-    );
   }
 }

@@ -1,10 +1,9 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
-class Loadtoken {
+class LoadEnv {
   static String? _cachedToken;
 
-  
   static Future<String> getMapboxToken() async {
     if (_cachedToken != null && _cachedToken!.isNotEmpty) {
       return _cachedToken!;
@@ -20,6 +19,7 @@ class Loadtoken {
   static Future<void> setup() async {
     await dotenv.load(fileName: '.env');
     final token = dotenv.env['MAPBOX_ACCESS_TOKEN'];
+
     if (token == null || token.isEmpty) {
       throw Exception('MAPBOX_ACCESS_TOKEN is not se in .env file');
     }

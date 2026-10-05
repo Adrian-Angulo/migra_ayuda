@@ -2,10 +2,11 @@ import 'dart:typed_data';
 import 'package:dartz/dartz.dart';
 import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/features/entities/domain/repositories/entity_repository.dart';
+import 'package:migra_ayuda/features/entities/domain/repositories/entity_mobile_repository.dart';
+import 'package:migra_ayuda/features/entities/domain/repositories/entity_web_repository.dart';
 
 class RegisterEntityUseCase {
-  final EntityRepository repository;
+  final EntityWebRepository repository;
 
   RegisterEntityUseCase(this.repository);
 
@@ -23,7 +24,7 @@ class RegisterEntityUseCase {
 }
 
 class UpdateEntityUseCase {
-  final EntityRepository repository;
+  final EntityWebRepository repository;
 
   UpdateEntityUseCase(this.repository);
 
@@ -41,7 +42,7 @@ class UpdateEntityUseCase {
 }
 
 class DeleteEntityUseCase {
-  final EntityRepository repository;
+  final EntityWebRepository repository;
 
   DeleteEntityUseCase(this.repository);
 
@@ -51,7 +52,7 @@ class DeleteEntityUseCase {
 }
 
 class GetAllEntities2StreamUseCase {
-  final EntityRepository repository;
+  final EntityWebRepository repository;
 
   GetAllEntities2StreamUseCase(this.repository);
 
@@ -60,18 +61,10 @@ class GetAllEntities2StreamUseCase {
   }
 }
 
-class GetAllEntitiesUseCase {
-  final EntityRepository repository;
 
-  GetAllEntitiesUseCase(this.repository);
-
-  Future<Either<Failure, List<EntityEntity>>> call() {
-    return repository.getAllEntities();
-  }
-}
 
 class GetEntityByIdUseCase {
-  final EntityRepository repository;
+  final EntityWebRepository repository;
 
   GetEntityByIdUseCase(this.repository);
 
@@ -80,8 +73,20 @@ class GetEntityByIdUseCase {
   }
 }
 
+// Casos de uso para mobile
+
+class GetAllEntitiesUseCase {
+  final EntityMobileRepository repository;
+
+  GetAllEntitiesUseCase(this.repository);
+
+  Future<Either<Failure, List<EntityEntity>>> call() {
+    return repository.getAllEntities();
+  }
+}
+
 class SyncAllFromFirebaseUseCase {
-  final EntityRepository repository;
+  final EntityMobileRepository repository;
 
   SyncAllFromFirebaseUseCase(this.repository);
 

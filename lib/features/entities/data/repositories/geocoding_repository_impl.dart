@@ -18,13 +18,13 @@ class GeocodingRepositoryImpl implements IGeocodingRepository {
   @override
   Future<Either<Failure, LatLng>> getCoordinatesFromAddress(String address) async {
     try {
-      // 1. Intento con motor principal (Mapbox Places)
+     
       final primaryCoords = await primaryDataSource.getCoordinates(address);
       if (primaryCoords != null) {
         return Right(primaryCoords);
       }
 
-      // 2. Intento con motor de respaldo (Nominatim / OSM) si está configurado
+     
       if (fallbackDataSource != null) {
         debugPrint('🔄 Mapbox no encontró la dirección, probando motor de respaldo...');
         final fallbackCoords = await fallbackDataSource!.getCoordinates(address);

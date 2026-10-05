@@ -1,69 +1,33 @@
 // data/datasources/entidad_remote_datasource.dart
 
-import 'dart:convert';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/rendering.dart';
-import 'package:http/http.dart' as http;
+import 'package:migra_ayuda/features/entities/data/datasources/image_remote_datasource.dart';
 import 'package:migra_ayuda/features/entities/data/models/entity_models.dart';
-
 
 class EntityRemoteDataSource {
   final FirebaseFirestore _firestore;
-  static const _cloudName = "dyprnvoff";
-  static const _uploadPreset = "MigraAyuda";
+  final ImageRemoteDatasource _imageDatasource = ImageRemoteDatasource();
 
   EntityRemoteDataSource({FirebaseFirestore? firestore})
       : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  Future<String> _uploadImage({
-    required Uint8List bytes,
-    required String fileName,
-  }) async {
-    try {
-      final url = Uri.parse(
-        'https://api.cloudinary.com/v1_1/$_cloudName/image/upload',
-      );
-      final request = http.MultipartRequest('POST', url);
-      request.fields['upload_preset'] = _uploadPreset;
-      request.fields['public_id'] =
-          '${DateTime.now().millisecondsSinceEpoch}_$fileName';
-      request.files.add(
-        http.MultipartFile.fromBytes('file', bytes, filename: fileName),
-      );
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-
-      if (response.statusCode != 200) {
-        throw Exception('Error al subir imagen: ${response.body}');
-      }
-
-      final json = jsonDecode(response.body);
-      return json['secure_url'];
-    } catch (e) {
-      throw Exception('Error al subir imagen: $e');
-    }
-  }
-  //lib/features/entities/data/datasources/entity_remote_datasource.dart
   Future<void> registerEntity({
     required EntityModels entityModel,
     required Uint8List imageBytes,
     required String fileName,
   }) async {
     try {
-      
-      final String imagenUrl =
-          await _uploadImage(bytes: imageBytes, fileName: fileName);
+      final String imagenUrl = await _imageDatasource.uploadImage(
+          bytes: imageBytes, fileName: fileName);
 
-    
       final entidadConImagen =
           entityModel.copyWith(id: '', imageUrl: imagenUrl);
 
-    
       final docRef =
           await _firestore.collection('entities').add(entidadConImagen.toMap());
 
-      
       await docRef.update({'id': docRef.id});
     } catch (e) {
       throw 'Ocurrio un error inesperado';
@@ -77,10 +41,9 @@ class EntityRemoteDataSource {
   }) async {
     try {
       String imagenUrl = entityModel.imageUrl;
-
-      // Solo subir nueva imagen si se proporcionó
       if (imageBytes != null && fileName != null) {
-        imagenUrl = await _uploadImage(bytes: imageBytes, fileName: fileName);
+        imagenUrl = await _imageDatasource.uploadImage(
+            bytes: imageBytes, fileName: fileName);
       }
 
       final entidadActualizada = entityModel.copyWith(imageUrl: imagenUrl);

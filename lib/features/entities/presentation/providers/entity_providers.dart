@@ -11,7 +11,7 @@ import 'package:migra_ayuda/features/entities/data/datasources/entity_remote_dat
 import 'package:migra_ayuda/features/entities/data/repositories/entity_mobil_repository_impl.dart';
 import 'package:migra_ayuda/features/entities/data/repositories/entity_web_repository_impl.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/features/entities/domain/repositories/entity_repository.dart';
+import 'package:migra_ayuda/features/entities/domain/repositories/entity_web_repository.dart';
 
 final entityRemoteDataSourceProvider = Provider<EntityRemoteDataSource>((ref) {
   return EntityRemoteDataSource(firestore: FirebaseFirestore.instance);
@@ -22,14 +22,17 @@ final entityLocalDataSourceProvider = Provider<EntityLocalDataSource>((ref) {
   return EntityLocalDataSource(sembastDatabase: sembastDb);
 });
 
-final entityRepositoryProvider = Provider<EntityRepository>((ref) {
+final entityWebRepositoryProvider = Provider<EntityWebRepository>((ref) {
+  final remoteDataSource = ref.watch(entityRemoteDataSourceProvider);
+
+  return EntityWebRepositoryImpl(remoteDataSource: remoteDataSource);
+});
+
+final entityMobilRepositoryProvider = Provider<EntityMobilRepositoryImpl>((ref) {
   final remoteDataSource = ref.watch(entityRemoteDataSourceProvider);
   final localDataSource = ref.watch(entityLocalDataSourceProvider);
   final networkInfo = ref.watch(networkInfoProvider);
 
-  if (kIsWeb) {
-    return EntityWebRepositoryImpl(remoteDataSource: remoteDataSource);
-  }
   return EntityMobilRepositoryImpl(
     remoteDataSource: remoteDataSource,
     localDataSource: localDataSource,
@@ -39,7 +42,7 @@ final entityRepositoryProvider = Provider<EntityRepository>((ref) {
 
 final entities2StreamProvider = StreamProvider<List<EntityEntity>>(
   (ref) {
-    final repo = ref.watch(entityRepositoryProvider);
+    final repo = ref.watch(entityWebRepositoryProvider);
     return repo.getAllEntites2();
   },
 );
@@ -62,7 +65,7 @@ class EntityListNotifier extends AsyncNotifier<List<EntityEntity>> {
 
   Future<List<EntityEntity>> _loadEntities() async {
     state = const AsyncValue.loading();
-    final result = await ref.read(entityRepositoryProvider).getAllEntities();
+    final result = await ref.read(entityMobilRepositoryProvider).getAllEntities();
     return result.fold(
       (failure) => throw failure,
       (entities) {

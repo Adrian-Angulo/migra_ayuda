@@ -28,7 +28,7 @@ class SyncNotifier extends AsyncNotifier<SyncState> {
 
   Future<void> _syncAll() async {
     try {
-      await ref.read(entityRepositoryProvider).syncAllFromFirebase();
+      await ref.read(entityMobilRepositoryProvider).syncAllFromFirebase();
     } catch (_) {}
     try {
       await ref.read(reviewRepositoryProvider).syncPendingReviews();
