@@ -26,20 +26,12 @@ class RouteResult {
     required this.message,
   });
 
-  /// La ruta sigue calles reales
   bool get isStreetRoute => sourceType == RouteSourceType.mapboxApi;
-
-  /// La ruta es de respaldo / sin conexión
   bool get isOffline => sourceType == RouteSourceType.directFallback;
-
-  /// Indica si es ruta de contingencia (línea directa)
   bool get isFallback => sourceType == RouteSourceType.directFallback;
-
-  /// Indica si se obtuvo online
   bool get isOnline => sourceType == RouteSourceType.mapboxApi;
 }
 
-/// Contrato abstracto para fuentes de datos remotas de direcciones
 abstract class DirectionsRemoteDataSource {
   Future<List<Position>?> getWalkingDirections({
     required double originLng,
@@ -102,7 +94,7 @@ abstract class DirectionsService {
   });
 }
 
-/// Servicio de rutas que implementa la estrategia de fallback ante fallo de red
+
 class MapServices implements DirectionsService {
   final DirectionsRemoteDataSource _remoteDataSource;
 
@@ -144,7 +136,6 @@ class MapServices implements DirectionsService {
       debugPrint("⚠️ Error al obtener ruta de Mapbox API: $e");
     }
 
-    // Fallback directo
     debugPrint("📍 Usando línea directa de orientación al destino");
     return RouteResult(
       points: [
@@ -156,7 +147,6 @@ class MapServices implements DirectionsService {
     );
   }
 
-  /// Método estático para calcular la ruta
   static Future<RouteResult> fetchRoute({
     required double originLng,
     required double originLat,
@@ -173,7 +163,7 @@ class MapServices implements DirectionsService {
     );
   }
 
-  /// Método retrocompatible para obtener únicamente los puntos
+
   static Future<List<Position>> fetchRoutePoints({
     required double originLng,
     required double originLat,

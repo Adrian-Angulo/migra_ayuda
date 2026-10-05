@@ -7,7 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:migra_ayuda/features/entities/data/models/entity_models.dart';
 
-/// Implementación del datasource remoto usando Firebase
+
 class EntityRemoteDataSource {
   final FirebaseFirestore _firestore;
   static const _cloudName = "dyprnvoff";
@@ -24,17 +24,13 @@ class EntityRemoteDataSource {
       final url = Uri.parse(
         'https://api.cloudinary.com/v1_1/$_cloudName/image/upload',
       );
-
       final request = http.MultipartRequest('POST', url);
-
       request.fields['upload_preset'] = _uploadPreset;
       request.fields['public_id'] =
           '${DateTime.now().millisecondsSinceEpoch}_$fileName';
-
       request.files.add(
         http.MultipartFile.fromBytes('file', bytes, filename: fileName),
       );
-
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
 
@@ -48,31 +44,28 @@ class EntityRemoteDataSource {
       throw Exception('Error al subir imagen: $e');
     }
   }
-
+  //lib/features/entities/data/datasources/entity_remote_datasource.dart
   Future<void> registerEntity({
     required EntityModels entityModel,
     required Uint8List imageBytes,
     required String fileName,
   }) async {
     try {
-      // Subir la imagen a Cloudinary y obtener la URL segura
+      
       final String imagenUrl =
           await _uploadImage(bytes: imageBytes, fileName: fileName);
 
-      // Crear una copia del modelo de entidad con la nueva imagen y sin ID
+    
       final entidadConImagen =
           entityModel.copyWith(id: '', imageUrl: imagenUrl);
 
-      // Añadir a Firestore y obtener la referencia al nuevo documento
+    
       final docRef =
           await _firestore.collection('entities').add(entidadConImagen.toMap());
 
-      // Actualizar el documento con su ID generado automáticamente
+      
       await docRef.update({'id': docRef.id});
-    } catch (e, stackTrace) {
-      // Imprimir stacktrace para ayudar en la depuración
-      debugPrint('Error al registrar entidad: $e');
-      debugPrint('Stacktrace: $stackTrace');
+    } catch (e) {
       throw 'Ocurrio un error inesperado';
     }
   }
@@ -91,19 +84,6 @@ class EntityRemoteDataSource {
       }
 
       final entidadActualizada = entityModel.copyWith(imageUrl: imagenUrl);
-      debugPrint('ID: ${entidadActualizada.id}');
-      debugPrint('Nombre: ${entidadActualizada.name}');
-      debugPrint('Descripción: ${entidadActualizada.description}');
-      debugPrint('Servicios: ${entidadActualizada.services.join(', ')}');
-      debugPrint('Dirección: ${entidadActualizada.address}');
-      debugPrint(
-          'Localización: Latitud: ${entidadActualizada.localitation.latitude}, Longitud: ${entidadActualizada.localitation.longitude}');
-      debugPrint('Teléfono: ${entidadActualizada.phone}');
-      debugPrint('Imagen URL: ${entidadActualizada.imageUrl}');
-      debugPrint('Rating promedio: ${entidadActualizada.averageRating}');
-      debugPrint('Total de reseñas: ${entidadActualizada.totalReviews}');
-      debugPrint('Horario: ${entidadActualizada.schedule}');
-
       await _firestore
           .collection('entities')
           .doc(entityModel.id)

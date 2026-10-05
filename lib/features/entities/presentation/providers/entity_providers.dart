@@ -17,7 +17,6 @@ final entityRemoteDataSourceProvider = Provider<EntityRemoteDataSource>((ref) {
   return EntityRemoteDataSource(firestore: FirebaseFirestore.instance);
 });
 
-
 final entityLocalDataSourceProvider = Provider<EntityLocalDataSource>((ref) {
   final sembastDb = SembastDatabase.instance;
   return EntityLocalDataSource(sembastDatabase: sembastDb);
@@ -38,7 +37,6 @@ final entityRepositoryProvider = Provider<EntityRepository>((ref) {
   );
 });
 
-
 final entities2StreamProvider = StreamProvider<List<EntityEntity>>(
   (ref) {
     final repo = ref.watch(entityRepositoryProvider);
@@ -48,6 +46,10 @@ final entities2StreamProvider = StreamProvider<List<EntityEntity>>(
 
 final filterProvider = StateProvider<String>(
   (ref) => 'Todos',
+);
+final listSelectedServicesFormProviders =
+    StateProvider.autoDispose<List<String>>(
+  (ref) => [],
 );
 
 class EntityListNotifier extends AsyncNotifier<List<EntityEntity>> {

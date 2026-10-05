@@ -12,11 +12,10 @@ final messageErrorImageProvider = StateProvider<String?>(
 );
 
 
-final listSelectedServicesFormProviders = StateProvider.autoDispose<List<String>>((ref) => [],); 
 
 class GeocodingNotifier extends AsyncNotifier<LatLng?> {
   @override
-  Future<LatLng?> build() async => null; // estado inicial, sin búsqueda
+  Future<LatLng?> build() async => null; 
 
   Future<void> search(String address) async {
     state = const AsyncValue.loading();

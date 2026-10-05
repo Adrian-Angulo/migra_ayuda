@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/form_add_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/button_save_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/image_picker_widget.dart';
@@ -61,7 +62,6 @@ class FormEntityState extends ConsumerState<FormEntity> {
   @override
   void didUpdateWidget(covariant FormEntity oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Si el entity cambia (por hot reload o update), recargamos los datos
     if (widget.entity != null && oldWidget.entity != widget.entity) {
       final entity = widget.entity!;
       _nameController.text = entity.name;
