@@ -55,7 +55,7 @@ class EntityRemoteDataSource {
     }
   }
 
-  Future<void> deleteEntity(String entityId, String imageUrl) async {
+  Future<void> deleteEntity(String entityId) async {
     try {
       await _firestore.collection('entities').doc(entityId).delete();
     } catch (e) {

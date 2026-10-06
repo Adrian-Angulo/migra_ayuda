@@ -46,8 +46,8 @@ class DeleteEntityUseCase {
 
   DeleteEntityUseCase(this.repository);
 
-  Future<Either<Failure, void>> call(String entityId, String imageUrl) {
-    return repository.deleteEntity(entityId, imageUrl);
+  Future<Either<Failure, void>> call(String entityId) {
+    return repository.deleteEntity(entityId);
   }
 }
 
@@ -60,8 +60,6 @@ class GetAllEntities2StreamUseCase {
     return repository.getAllEntites2();
   }
 }
-
-
 
 class GetEntityByIdUseCase {
   final EntityWebRepository repository;

@@ -1,17 +1,17 @@
-
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:migra_ayuda/core/config/load_token.dart';
 
 class MapboxDatasource {
+  static const Duration _timeout = Duration(seconds: 8);
   final http.Client _client;
 
   MapboxDatasource({http.Client? client})
       : _client = client ?? http.Client();
 
-
+  
   Future<LatLng?> getCoordinates(String address) async {
     try {
       final token = await LoadEnv.getMapboxToken();
@@ -33,7 +33,7 @@ class MapboxDatasource {
       final response = await _client.get(
         url,
         headers: {'Accept': 'application/json'},
-      ).timeout(const Duration(seconds: 8));
+      ).timeout(_timeout);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -44,17 +44,55 @@ class MapboxDatasource {
           final center = first['center'] as List<dynamic>?;
 
           if (center != null && center.length >= 2) {
-           
             final lng = (center[0] as num).toDouble();
             final lat = (center[1] as num).toDouble();
-        
             return LatLng(lat, lng);
           }
         }
-      } 
+      }
       return null;
-    } catch (e) {
+    } catch (_) {
       return null;
     }
+  }
+
+ 
+  Future<List<Position>?> getWalkingDirections({
+    required double originLng,
+    required double originLat,
+    required double destLng,
+    required double destLat,
+  }) async {
+    final token = await LoadEnv.getMapboxToken();
+    if (token.isEmpty) {
+      return null;
+    }
+
+    final url =
+        'https://api.mapbox.com/directions/v5/mapbox/walking/$originLng,$originLat;$destLng,$destLat'
+        '?geometries=geojson&access_token=$token';
+
+    final response = await _client.get(Uri.parse(url)).timeout(_timeout);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body) as Map<String, dynamic>;
+      final routes = data['routes'] as List<dynamic>?;
+      if (routes == null || routes.isEmpty) return null;
+
+      final geometry = routes[0]['geometry'] as Map<String, dynamic>?;
+      final coords = geometry?['coordinates'] as List<dynamic>?;
+      if (coords == null || coords.isEmpty) return null;
+
+      final positions = coords
+          .map<Position>((c) => Position(
+                (c[0] as num).toDouble(),
+                (c[1] as num).toDouble(),
+              ))
+          .toList();
+
+      return positions.isNotEmpty ? positions : null;
+    }
+
+    return null;
   }
 }

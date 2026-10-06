@@ -58,7 +58,9 @@ class ActionButtons extends ConsumerWidget {
           onPressed: () {
             showDialog(
               context: context,
-              builder: (context) => ModalFormEntity(entity:entity ,),
+              builder: (context) => ModalFormEntity(
+                entity: entity,
+              ),
             );
           },
         ),
@@ -75,7 +77,7 @@ class ActionButtons extends ConsumerWidget {
                 onConfirm: () async {
                   await ref
                       .read(entitiesCrudProvider.notifier)
-                      .deleteEntity(entity.id, entity.imageUrl);
+                      .deleteEntity(entity.id);
                 },
               ),
             );

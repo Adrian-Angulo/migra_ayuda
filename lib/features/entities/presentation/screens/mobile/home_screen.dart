@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/drawer/app_drawer.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/mobile/mapbox_widget.dart';
+import 'package:migra_ayuda/features/map/presentation/widgets/mapbox_widget.dart';
 
 class HomeScreen extends ConsumerWidget {
   HomeScreen({super.key});

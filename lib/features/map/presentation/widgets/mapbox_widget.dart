@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:migra_ayuda/core/localitation/location_provider.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/map_provider.dart';
+import 'package:migra_ayuda/features/map/presentation/providers/map_display_provider.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/list_Entities_home.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/filter_container.dart';
 
@@ -105,7 +105,7 @@ class _MapboxWidgetState extends ConsumerState<MapboxWidget> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Botón estilizado de "Mi ubicación"
+           
             Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,

@@ -73,7 +73,7 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
     });
   }
 
-  Future<void> deleteEntity(String id, String imageUrl) async {
+  Future<void> deleteEntity(String id) async {
     state = const AsyncLoading();
 
     state = await AsyncValue.guard(() async {
@@ -85,7 +85,7 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
       final List<ReviewEntity> reviews =
           reviewsResult.fold((_) => [], (r) => r);
 
-      final result = await deleteEntityUseCase(id, imageUrl);
+      final result = await deleteEntityUseCase(id);
       return await result.fold(
         (failure) => throw failure,
         (_) async {

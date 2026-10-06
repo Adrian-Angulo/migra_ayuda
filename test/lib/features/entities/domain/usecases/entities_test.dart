@@ -1,4 +1,4 @@
-/* import 'dart:typed_data';
+import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,7 +11,9 @@ import 'package:migra_ayuda/features/entities/domain/usecases/entities_usecases.
 import 'package:mocktail/mocktail.dart';
 
 class MockEntityWebRepository extends Mock implements EntityWebRepository {}
-class MockEntityMoblieRepository extends Mock implements EntityMobileRepository {}
+
+class MockEntityMoblieRepository extends Mock
+    implements EntityMobileRepository {}
 
 void main() {
   late MockEntityWebRepository mockWebRepository;
@@ -52,7 +54,7 @@ void main() {
     );
   });
 
-  group('RegisterEntityUseCase', () {
+  group('Register entity', () {
     late RegisterEntityUseCase useCase;
 
     setUp(() {
@@ -112,7 +114,7 @@ void main() {
     );
   });
 
-  group('UpdateEntityUseCase', () {
+  group('Update entity', () {
     late UpdateEntityUseCase useCase;
 
     setUp(() {
@@ -370,4 +372,3 @@ void main() {
     );
   });
 }
- */

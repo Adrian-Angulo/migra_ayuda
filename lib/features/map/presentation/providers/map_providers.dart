@@ -1,18 +1,23 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:migra_ayuda/features/map/data/repository/map_repository_impl.dart';
-import 'package:migra_ayuda/features/map/domain/usecases/map_usecase.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:migra_ayuda/features/map/data/repository/map_repository_impl.dart';
+import 'package:migra_ayuda/features/map/domain/repository/map_repository.dart';
+import 'package:migra_ayuda/features/map/domain/usecases/calculate_route_usecase.dart';
+import 'package:migra_ayuda/features/map/domain/usecases/map_usecase.dart';
 
-final mapRepositoryProvider = Provider<MapRepositoryImpl>((ref) {
+final mapRepositoryProvider = Provider<MapRepository>((ref) {
   return MapRepositoryImpl();
 });
-
 
 final getCoordinatesUsecaseProvider = Provider<GetCoordinatesUsecase>((ref) {
   final mapRepository = ref.watch(mapRepositoryProvider);
   return GetCoordinatesUsecase(mapRepository);
 });
 
+final calculateRouteUseCaseProvider = Provider<CalculateRouteUseCase>((ref) {
+  final mapRepository = ref.watch(mapRepositoryProvider);
+  return CalculateRouteUseCase(mapRepository);
+});
 
 class CoordinatesNotifier extends AsyncNotifier<LatLng?> {
   @override
@@ -36,5 +41,5 @@ class CoordinatesNotifier extends AsyncNotifier<LatLng?> {
 }
 
 final coordinatesNotifierProvider =
-    AsyncNotifierProvider<CoordinatesNotifier, LatLng?>(() => CoordinatesNotifier());
-
+    AsyncNotifierProvider<CoordinatesNotifier, LatLng?>(
+        () => CoordinatesNotifier());

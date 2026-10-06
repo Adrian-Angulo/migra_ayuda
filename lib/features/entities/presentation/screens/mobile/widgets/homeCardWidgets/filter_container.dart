@@ -4,7 +4,7 @@ import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/constants/services_utils.dart';
 import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/map_provider.dart';
+import 'package:migra_ayuda/features/map/presentation/providers/map_display_provider.dart';
 
 /// Coordinador de acciones de filtrado (Principio de Responsabilidad Única - SRP).
 /// Encapsula la lógica de negocio: filtrar entidades, registrar auditoría y limpiar estado en el mapa.

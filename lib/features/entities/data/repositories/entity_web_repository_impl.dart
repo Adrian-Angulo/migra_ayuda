@@ -53,9 +53,9 @@ class EntityWebRepositoryImpl extends EntityWebRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteEntity(String entityId, String imageUrl) async {
+  Future<Either<Failure, void>> deleteEntity(String entityId) async {
     try {
-      await remoteDataSource.deleteEntity(entityId, imageUrl );
+      await remoteDataSource.deleteEntity(entityId );
       return const Right(null);
     } catch (_) {
       return const Left(EntityDeletionFailedFailure());

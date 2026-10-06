@@ -40,7 +40,7 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(26), // .withValues is not a valid method for Color; used withAlpha(26) for ~10%
+              color: Colors.black.withAlpha(26), 
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -68,7 +68,7 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withAlpha(51), // 20% opacity
+                      color: Colors.white.withAlpha(51), 
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
