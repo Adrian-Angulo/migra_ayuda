@@ -5,12 +5,11 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
-/// Tipo de origen de la ruta calculada
+
 enum RouteSourceType {
-  /// Online por calles (Mapbox Directions API)
   mapboxApi,
 
-  /// Offline / Sin conexión (Línea recta directa de orientación)
+
   directFallback,
 }
 

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/domain/usecases/entities_usecases.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
@@ -8,6 +10,13 @@ import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart'
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 
 enum CrudOperation { register, update, delete, none }
+
+
+final imagenSelectProvider = StateProvider<XFile?>((ref) => null);
+final imagenInBytesProvider = StateProvider<Uint8List?>((ref) => null);
+final messageErrorImageProvider = StateProvider<String?>(
+  (ref) => null,
+);
 
 class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
   @override
@@ -64,7 +73,7 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
     });
   }
 
-  Future<void> deleteEntity(String id) async {
+  Future<void> deleteEntity(String id, String imageUrl) async {
     state = const AsyncLoading();
 
     state = await AsyncValue.guard(() async {
@@ -76,7 +85,7 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
       final List<ReviewEntity> reviews =
           reviewsResult.fold((_) => [], (r) => r);
 
-      final result = await deleteEntityUseCase(id);
+      final result = await deleteEntityUseCase(id, imageUrl);
       return await result.fold(
         (failure) => throw failure,
         (_) async {
@@ -93,13 +102,11 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
     final repository = ref.read(entityWebRepositoryProvider);
     final getEntityByIdUseCase = GetEntityByIdUseCase(repository);
 
-    // Obtener la entidad actual por ID
     final entityResult = await getEntityByIdUseCase(entidadId);
 
     await entityResult.fold(
       (failure) => null,
       (entidad) async {
-        // Obtener las reseñas relacionadas a la entidad
         final reviewRepo = ref.read(reviewRepositoryProvider);
         final reviewsResult = await reviewRepo.getReviewsByEntity(entidadId);
         final List<ReviewEntity> reviews =

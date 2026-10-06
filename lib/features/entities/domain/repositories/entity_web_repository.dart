@@ -16,7 +16,7 @@ abstract class EntityWebRepository {
     String? fileName,
   });
 
-  Future<Either<Failure, void>> deleteEntity(String entityId);
+  Future<Either<Failure, void>> deleteEntity(String entityId, String imageUrl);
   Stream<List<EntityEntity>> getAllEntites2();
 
   Future<Either<Failure, EntityEntity>> getEntityById(String id);

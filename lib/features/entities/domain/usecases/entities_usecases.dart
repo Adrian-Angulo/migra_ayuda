@@ -46,8 +46,8 @@ class DeleteEntityUseCase {
 
   DeleteEntityUseCase(this.repository);
 
-  Future<Either<Failure, void>> call(String entityId) {
-    return repository.deleteEntity(entityId);
+  Future<Either<Failure, void>> call(String entityId, String imageUrl) {
+    return repository.deleteEntity(entityId, imageUrl);
   }
 }
 

@@ -5,11 +5,11 @@ import 'package:migra_ayuda/features/entities/presentation/screens/web/models/en
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 
-// ── Providers legacy ─────────────────────────────────────────────────────────
+
 
 final searchControllerProvider = StateProvider<String>((ref) => '');
 
-// Conservado por compatibilidad con datasourceProvider
+
 final seletedServiceProvider = StateProvider<String>((ref) => services[0]);
 
 final selectedEntityProvider = StateProvider<EntityEntity?>((ref) => null);
@@ -22,22 +22,20 @@ final datasourceProvider = Provider<EntityDataSource>(
   ),
 );
 
-// ── Providers reactivos para EntitiesScreen (nuevo enfoque) ──────────────────
 
-/// Texto de búsqueda por nombre o dirección
 final queryEntityProvider = StateProvider<String>((ref) => '');
 
-/// Servicio seleccionado en el filtro ('Todos' = sin filtro)
+
 final selectedServiceFilterProvider =
     StateProvider<String>((ref) => services[0]);
 
-/// Columna de ordenamiento: 0 = Nombre, 1 = Dirección, null = sin orden
+
 final entitySortColumnProvider = StateProvider<int?>((ref) => null);
 
-/// Dirección del ordenamiento
+
 final entitySortAscendingProvider = StateProvider<bool>((ref) => true);
 
-/// Lista de entidades filtrada y ordenada, derivada reactivamente del stream.
+
 final entitiesFilterProvider =
     StateProvider.autoDispose<AsyncValue<List<EntityEntity>>>((ref) {
   final entitiesAsync = ref.watch(entities2StreamProvider);

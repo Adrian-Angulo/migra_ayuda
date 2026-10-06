@@ -2,12 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
+import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
 
-import 'package:migra_ayuda/features/entities/presentation/providers/form_add_providers.dart';
-
-/// Widget personalizado para seleccionar e indicar imágenes mediante la galería del dispositivo.
-/// Puede manejar una imagen local seleccionada, bytes de imagen, o una URL de imagen remota existente.
-/// También permite notificar al widget padre cuando una nueva imagen ha sido elegida.
 class ImagePickerWidget extends ConsumerStatefulWidget {
   final String? imagenUrl;
   
@@ -29,12 +25,11 @@ class _ImagePickerWidgetState extends ConsumerState<ImagePickerWidget> {
     super.initState();
   }
 
-  /// Abre la galería del usuario y permite seleccionar una imagen.
-  /// Si se selecciona, actualiza el estado y notifica al padre si es necesario.
+
   Future<void> _elegirImagen() async {
-    //elegir imagen de la galeria
+    
     final resultado = await picker.pickImage(source: ImageSource.gallery);
-    if (resultado == null) return; // si el usuario cancela la operacion
+    if (resultado == null) return; 
      final bytes = await resultado.readAsBytes();
     setState(() {
       imagen = resultado;
@@ -45,12 +40,11 @@ class _ImagePickerWidgetState extends ConsumerState<ImagePickerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // InkWell para detectar taps y mostrar un feedback visual táctil
 
     return FormField<XFile?>(
       initialValue: imagen,
       validator: (value) {
-        // Si no hay imagen cargada desde galería, y tampoco url, mostrar error
+       
         if (value == null && (widget.imagenUrl == null || widget.imagenUrl!.isEmpty)) {
           return 'Debes seleccionar una imagen';
         }
@@ -91,7 +85,7 @@ class _ImagePickerWidgetState extends ConsumerState<ImagePickerWidget> {
     );
   }
 
-  /// Muestra la imagen seleccionada localmente, o la de internet si imagenUrl existe, o el placeholder si ninguna
+
   Widget _buildImageToShow() {
     if (imagen != null && imagenBytes != null) {
       return ClipRRect(
@@ -125,7 +119,7 @@ class _ImagePickerWidgetState extends ConsumerState<ImagePickerWidget> {
     }
   }
 
-  /// Widget placeholder: se muestra cuando todavía no hay ninguna imagen seleccionada
+ 
   Widget _buildPlaceholder() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,

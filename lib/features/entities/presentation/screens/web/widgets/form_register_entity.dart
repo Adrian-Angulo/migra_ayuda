@@ -2,16 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:migra_ayuda/core/utils/validators/address_validator.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/form_add_providers.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/button_save_widget.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/image_picker_widget.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/service_type_checklist_widget.dart';
+
 import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/build_section_title.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/build_text_field.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/button_save_widget.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/container_map_address.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/image_picker_widget.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/service_type_checklist_widget.dart';
+import 'package:migra_ayuda/features/map/presentation/providers/map_providers.dart';
 
 class FormEntity extends ConsumerStatefulWidget {
   /// Si se proporciona, el formulario opera en modo edición prellenando los campos.
@@ -23,6 +25,8 @@ class FormEntity extends ConsumerStatefulWidget {
 }
 
 class FormEntityState extends ConsumerState<FormEntity> {
+  static const String _defaultUnavailableText = 'no disponible';
+
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<FormFieldState> _addressFieldKey =
       GlobalKey<FormFieldState>();
@@ -30,32 +34,14 @@ class FormEntityState extends ConsumerState<FormEntity> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _latitudController = TextEditingController();
-  final TextEditingController _longitudController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _scheduleController = TextEditingController();
-
-  bool? errorCoridenates;
 
   @override
   void initState() {
     super.initState();
-
-    // Si recibimos una entidad, precargamos los datos en los campos
     if (widget.entity != null) {
-      final entity = widget.entity!;
-      _nameController.text = entity.name;
-      _descriptionController.text = entity.description;
-      _addressController.text = entity.address;
-      _phoneController.text = entity.phone;
-      _scheduleController.text = entity.schedule;
-      // Preselecciona servicios si tiene entidad
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(listSelectedServicesFormProviders.notifier).state =
-            List<String>.from(entity.services);
-        ref.read(geocodingProvider.notifier).setCoordinate(LatLng(
-            entity.localitation.latitude, entity.localitation.longitude));
-      });
+      _populateFields(widget.entity!);
     }
   }
 
@@ -63,19 +49,27 @@ class FormEntityState extends ConsumerState<FormEntity> {
   void didUpdateWidget(covariant FormEntity oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.entity != null && oldWidget.entity != widget.entity) {
-      final entity = widget.entity!;
-      _nameController.text = entity.name;
-      _descriptionController.text = entity.description;
-      _addressController.text = entity.address;
-      _latitudController.text = entity.localitation.latitude.toString();
-      _longitudController.text = entity.localitation.longitude.toString();
-      _phoneController.text = entity.phone;
-      _scheduleController.text = entity.schedule;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        ref.read(listSelectedServicesFormProviders.notifier).state =
-            entity.services;
-      });
+      _populateFields(widget.entity!);
     }
+  }
+
+  void _populateFields(EntityEntity entity) {
+    _nameController.text = entity.name;
+    _descriptionController.text = entity.description;
+    _addressController.text = entity.address;
+    _phoneController.text = entity.phone;
+    _scheduleController.text = entity.schedule;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(listSelectedServicesFormProviders.notifier).state =
+          List<String>.from(entity.services);
+      ref.read(coordinatesNotifierProvider.notifier).setCoordinate(
+            LatLng(
+              entity.localitation.latitude,
+              entity.localitation.longitude,
+            ),
+          );
+    });
   }
 
   @override
@@ -83,59 +77,95 @@ class FormEntityState extends ConsumerState<FormEntity> {
     _nameController.dispose();
     _descriptionController.dispose();
     _addressController.dispose();
-    _latitudController.dispose();
-    _longitudController.dispose();
     _phoneController.dispose();
     _scheduleController.dispose();
     super.dispose();
   }
 
-  /// Método de submit que identifica si es registro o edición.
-  void _handleSubmit() {
-    if (!_formKey.currentState!.validate()) return;
-    _formKey.currentState!.save();
+  void _onSearchAddress() {
+    final formatError = AddressValidator.validate(_addressController.text);
+    if (formatError != null) {
+      _addressFieldKey.currentState?.validate();
+      return;
+    }
+    ref
+        .read(coordinatesNotifierProvider.notifier)
+        .getCoordinates(_addressController.text.trim());
+  }
 
-    final imagenbytes = ref.read(imagenInBytesProvider);
-    final selectServices = ref.read(listSelectedServicesFormProviders);
-    final cordinates = ref.read(geocodingProvider).value;
+  void _handleSubmit() {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    _formKey.currentState?.save();
+
+    final coordinates = ref.read(coordinatesNotifierProvider).value;
+    if (coordinates == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor, busca y confirma la ubicación en el mapa.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final imageBytes = ref.read(imagenInBytesProvider);
     final isEdit = widget.entity != null;
+
+    if (!isEdit && imageBytes == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Por favor, selecciona una imagen para la entidad.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final selectedServices = ref.read(listSelectedServicesFormProviders);
+    final phone = _phoneController.text.trim();
+    final schedule = _scheduleController.text.trim();
 
     final entity = EntityEntity(
       id: isEdit ? widget.entity!.id : '',
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
-      services: selectServices,
+      services: selectedServices,
       address: _addressController.text.trim(),
-      localitation: GeoPoint(cordinates!.latitude, cordinates.longitude),
-      phone: _phoneController.text.trim() == ""
-          ? "no disponible"
-          : _phoneController.text.trim(),
-      imageUrl: isEdit
-          ? widget.entity!.imageUrl
-          : '', // Conserva url imagen existente en edición
-      schedule: _scheduleController.text.trim() == ""
-          ? "no disponible"
-          : _scheduleController.text.trim(),
+      localitation: GeoPoint(coordinates.latitude, coordinates.longitude),
+      phone: phone.isEmpty ? _defaultUnavailableText : phone,
+      imageUrl: isEdit ? widget.entity!.imageUrl : '',
+      schedule: schedule.isEmpty ? _defaultUnavailableText : schedule,
     );
+
+    final fileName = _buildImageFileName(_nameController.text.trim());
 
     if (isEdit) {
       ref.read(entitiesCrudProvider.notifier).updateEntity(
             entity: entity,
-            imagenBytes: imagenbytes,
-            fileName: 'Abc${_nameController.text}',
+            imagenBytes: imageBytes,
+            fileName: fileName,
           );
     } else {
       ref.read(entitiesCrudProvider.notifier).registerEntity(
             entity: entity,
-            imagenBytes: imagenbytes!,
-            fileName: 'Abc${_nameController.text}',
+            imagenBytes: imageBytes!,
+            fileName: fileName,
           );
     }
   }
 
+  String _buildImageFileName(String entityName) {
+    final sanitizedName = entityName.replaceAll(RegExp(r'\s+'), '_');
+    return 'entity_$sanitizedName';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final cordinates = ref.watch(geocodingProvider);
+    final coordinates = ref.watch(coordinatesNotifierProvider);
+
+    ref.listen(coordinatesNotifierProvider, (_, __) {
+      _addressFieldKey.currentState?.validate();
+    });
 
     return Expanded(
       child: Form(
@@ -144,19 +174,17 @@ class FormEntityState extends ConsumerState<FormEntity> {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ── Imagen ───────────────────────────────────────────────
                     ImagePickerWidget(
                       imagenUrl: widget.entity?.imageUrl,
                     ),
-
                     const SizedBox(height: 32),
-
-                    // ── Información básica ───────────────────────────────────
                     const BuildSectionTitle(
                       title: 'Información Básica',
                       icon: Icons.info_outline,
@@ -168,9 +196,10 @@ class FormEntityState extends ConsumerState<FormEntity> {
                       hint: 'Ej: Centro de Salud Norte',
                       icon: Icons.business_outlined,
                       maxLength: 20,
-                      validator: (v) => (v == null || v.isEmpty)
-                          ? 'El nombre es requerido'
-                          : null,
+                      validator: (value) =>
+                          (value == null || value.trim().isEmpty)
+                              ? 'El nombre es requerido'
+                              : null,
                     ),
                     const SizedBox(height: 20),
                     BuildTextField(
@@ -183,8 +212,6 @@ class FormEntityState extends ConsumerState<FormEntity> {
                       maxLength: 500,
                     ),
                     const SizedBox(height: 32),
-
-                    // ── Tipos de servicio ────────────────────────────────────
                     const BuildSectionTitle(
                       title: 'Tipos de Servicio',
                       icon: Icons.category_outlined,
@@ -192,16 +219,14 @@ class FormEntityState extends ConsumerState<FormEntity> {
                     const SizedBox(height: 12),
                     Text(
                       'Seleccione los servicios que ofrece esta entidad (máximo 2)',
-                      style:
-                          TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade600,
+                      ),
                     ),
                     const SizedBox(height: 16),
-
                     const ServiceTypeChecklistWidget(),
-
                     const SizedBox(height: 32),
-
-                    // ── Ubicación y contacto ─────────────────────────────────
                     const BuildSectionTitle(
                       title: 'Ubicación y Contacto',
                       icon: Icons.location_on_outlined,
@@ -213,66 +238,26 @@ class FormEntityState extends ConsumerState<FormEntity> {
                       label: 'Dirección',
                       hint: 'Ej. Calle 123 #45-67, Pasto',
                       icon: Icons.location_on_outlined,
-                      suffixIcon: Builder(
-                        builder: (context) {
-                          return Container(
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary,
-                              borderRadius: const BorderRadius.only(
-                                topRight: Radius.circular(11),
-                                bottomRight: Radius.circular(11),
-                              ),
-                            ),
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: () {
-                                  ref
-                                      .read(geocodingProvider.notifier)
-                                      .search(_addressController.text.trim());
-                                  _addressFieldKey.currentState!.validate();
-                                },
-                                child: SizedBox(
-                                  width: 48,
-                                  height: 48,
-                                  child: Center(
-                                    child: cordinates.isLoading
-                                        ? const CircularProgressIndicator()
-                                        : const Icon(Icons.search,
-                                            color: Colors.white),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
+                      suffixIcon: _SearchAddressButton(
+                        isLoading: coordinates.isLoading,
+                        onTap: _onSearchAddress,
                       ),
-                      validator: cordinates.hasValue
-                          ? null
-                          : (v) {
-                              // Validar formato
-                              final regExp = RegExp(
-                                r'^(Calle|Carrera)\s+\d+\s*#\d+-\d+,\s*Pasto$',
-                                caseSensitive: false,
-                              );
-                              if (v == null || v.isEmpty) {
-                                return 'La dirección es requerida';
-                              } else if (!regExp.hasMatch(v.trim())) {
-                                return 'La dirección debe tener el formato: Calle/Carrera 123 #45-67, Pasto';
-                              } else if (cordinates.value == null) {
-                                return 'No se encontró la ubicación para esta dirección. Por favor, verifica que esté escrita correctamente e intenta de nuevo.';
-                              } else if (cordinates.hasError) {
-                                return 'Ha ocurrido un error inesperado';
-                              }
-                              return null;
-                            },
+                      validator: (value) {
+                        if (coordinates.hasError) {
+                          return 'No se encontró la ubicación para esta dirección. Verifica que esté escrita correctamente.';
+                        }
+
+                        if (coordinates.value == null &&
+                            !coordinates.isLoading) {
+                          return 'Debe buscar y confirmar la ubicación en el mapa';
+                        }
+
+                        return null;
+                      },
                     ),
                     const SizedBox(height: 12),
-
-                    if (cordinates.value != null)
-                      ContainerMapAddress(location: cordinates.value),
-
+                    if (coordinates.value != null)
+                      ContainerMapAddress(location: coordinates.value),
                     const SizedBox(height: 20),
                     BuildTextField(
                       controller: _phoneController,
@@ -283,8 +268,6 @@ class FormEntityState extends ConsumerState<FormEntity> {
                       onlyNumbers: true,
                     ),
                     const SizedBox(height: 32),
-
-                    // ── Horario ──────────────────────────────────────────────
                     const BuildSectionTitle(
                       title: 'Horario de Atención',
                       icon: Icons.access_time,
@@ -302,50 +285,111 @@ class FormEntityState extends ConsumerState<FormEntity> {
                 ),
               ),
             ),
-            Container(
-              padding: const EdgeInsets.all(28),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
-                ),
-                border: Border(top: BorderSide(color: Colors.grey.shade200)),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        side: BorderSide(color: Colors.grey.shade300),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: Text(
-                        'Cancelar',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey.shade700,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: ButtonSaveWidget(
-                      onPressed: _handleSubmit,
-                    ),
-                  ),
-                ],
-              ),
+            _FormBottomBar(
+              onCancel: () => Navigator.pop(context),
+              onSave: _handleSubmit,
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SearchAddressButton extends StatelessWidget {
+  final bool isLoading;
+  final VoidCallback onTap;
+
+  const _SearchAddressButton({
+    required this.isLoading,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary,
+        borderRadius: const BorderRadius.only(
+          topRight: Radius.circular(11),
+          bottomRight: Radius.circular(11),
+        ),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          child: Center(
+            child: isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : const Icon(Icons.search, color: Colors.white),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FormBottomBar extends StatelessWidget {
+  final VoidCallback onCancel;
+  final VoidCallback onSave;
+
+  const _FormBottomBar({
+    required this.onCancel,
+    required this.onSave,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(20),
+          bottomRight: Radius.circular(20),
+        ),
+        border: Border(top: BorderSide(color: Colors.grey.shade200)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              onPressed: onCancel,
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                side: BorderSide(color: Colors.grey.shade300),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                'Cancelar',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey.shade700,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            flex: 2,
+            child: ButtonSaveWidget(
+              onPressed: onSave,
+            ),
+          ),
+        ],
       ),
     );
   }

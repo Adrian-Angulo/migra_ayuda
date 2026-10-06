@@ -75,7 +75,7 @@ class ActionButtons extends ConsumerWidget {
                 onConfirm: () async {
                   await ref
                       .read(entitiesCrudProvider.notifier)
-                      .deleteEntity(entity.id);
+                      .deleteEntity(entity.id, entity.imageUrl);
                 },
               ),
             );

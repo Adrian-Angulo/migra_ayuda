@@ -2,7 +2,6 @@
 
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/rendering.dart';
 import 'package:migra_ayuda/features/entities/data/datasources/image_remote_datasource.dart';
 import 'package:migra_ayuda/features/entities/data/models/entity_models.dart';
 
@@ -52,16 +51,15 @@ class EntityRemoteDataSource {
           .doc(entityModel.id)
           .update(entidadActualizada.toMap());
     } catch (e) {
-      debugPrint('Erro en updateEntity: $e');
       throw 'Ocurrio un error inesperado';
     }
   }
 
-  Future<void> deleteEntity(String entityId) async {
+  Future<void> deleteEntity(String entityId, String imageUrl) async {
     try {
       await _firestore.collection('entities').doc(entityId).delete();
     } catch (e) {
-      throw Exception('Error al eliminar entidad: $e');
+      throw Exception('Error al eliminar entidad:');
     }
   }
 
@@ -76,7 +74,7 @@ class EntityRemoteDataSource {
 
       return entities;
     } catch (e) {
-      throw Exception('Error al obtener entidades: $e');
+      throw Exception('Error al obtener entidades');
     }
   }
 
@@ -92,7 +90,7 @@ class EntityRemoteDataSource {
 
       return entity;
     } catch (e) {
-      throw Exception('Error al obtener entidad: $e');
+      throw Exception('Error al obtener entidad');
     }
   }
 

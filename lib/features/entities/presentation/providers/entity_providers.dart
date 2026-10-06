@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:migra_ayuda/core/config/sembast_database.dart';
@@ -13,6 +12,7 @@ import 'package:migra_ayuda/features/entities/data/repositories/entity_web_repos
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/domain/repositories/entity_web_repository.dart';
 
+//Datasources-----------------------------------------------
 final entityRemoteDataSourceProvider = Provider<EntityRemoteDataSource>((ref) {
   return EntityRemoteDataSource(firestore: FirebaseFirestore.instance);
 });
@@ -21,7 +21,7 @@ final entityLocalDataSourceProvider = Provider<EntityLocalDataSource>((ref) {
   final sembastDb = SembastDatabase.instance;
   return EntityLocalDataSource(sembastDatabase: sembastDb);
 });
-
+//repositories-----------------------------------------------
 final entityWebRepositoryProvider = Provider<EntityWebRepository>((ref) {
   final remoteDataSource = ref.watch(entityRemoteDataSourceProvider);
 
@@ -39,6 +39,7 @@ final entityMobilRepositoryProvider = Provider<EntityMobilRepositoryImpl>((ref) 
     networkInfo: networkInfo,
   );
 });
+
 
 final entities2StreamProvider = StreamProvider<List<EntityEntity>>(
   (ref) {

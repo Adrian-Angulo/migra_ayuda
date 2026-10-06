@@ -19,7 +19,6 @@ class AddressValidator {
     if (!_addressRegExp.hasMatch(trimmed)) {
       return 'Formato requerido: Calle/Carrera 123 #45-67, Pasto';
     }
-
     return null;
   }
 }
