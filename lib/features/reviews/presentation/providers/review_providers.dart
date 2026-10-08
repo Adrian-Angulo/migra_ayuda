@@ -12,16 +12,11 @@ import 'package:migra_ayuda/features/reviews/data/datasources/review_local_datas
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
 import 'package:migra_ayuda/features/reviews/domain/repositories/review_repository.dart';
 import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
+import 'package:migra_ayuda/features/reviews/presentation/config/review_constants.dart';
 import '../../data/datasources/review_remote_datasource.dart';
 import '../../data/repositories/review_repository_impl.dart';
 import 'package:migra_ayuda/features/reviews/domain/usecases/review_usecases.dart';
 
-enum ReviewState {
-  initial,
-  creating,
-  updating,
-  deleting,
-}
 
 
 final reviewRepositoryProvider = Provider<ReviewRepository>((ref) {

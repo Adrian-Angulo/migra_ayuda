@@ -6,6 +6,7 @@ import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart
 
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/floating_main_button.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
+import 'package:migra_ayuda/features/reviews/presentation/config/review_constants.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 
 class PlaceEditReview extends ConsumerStatefulWidget {
@@ -48,7 +49,7 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
     ref.listen(
       reviewNotifierProvider,
       (previous, next) async {
-        // Solo reacciona cuando termina de cargar (igual que en place_add_review)
+        
         if (previous?.isLoading == true && !next.isLoading) {
           if (next.hasError) {
             SnackbarWidget.error(context, next.error);

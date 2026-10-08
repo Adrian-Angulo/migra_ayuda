@@ -90,7 +90,7 @@ void main() {
     test(
       'error: debería emitir un error cuando el stream del repositorio falla',
       () async {
-        final failure = const AuditFetchFailedFailure();
+        const failure = AuditFetchFailedFailure();
         when(() => mockAuditRepository.getAll())
             .thenAnswer((_) => Stream.error(failure));
 
