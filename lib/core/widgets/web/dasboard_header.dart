@@ -13,7 +13,7 @@ class HeaderWeb extends StatelessWidget {
         Text(
           title,
           style: const TextStyle(
-            fontSize: 32,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),

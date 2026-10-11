@@ -62,9 +62,9 @@ class _DeleteConfirmationDialogState
             ),
             const SizedBox(height: 24),
 
-            // ── Título ───────────────────────────────────────────────
+            
             const Text(
-              '¿Eliminar entidad?',
+              '¿Eliminar Organización?',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -74,7 +74,7 @@ class _DeleteConfirmationDialogState
             ),
             const SizedBox(height: 12),
 
-            // ── Mensaje ──────────────────────────────────────────────
+            
             RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
@@ -84,7 +84,7 @@ class _DeleteConfirmationDialogState
                   height: 1.5,
                 ),
                 children: [
-                  const TextSpan(text: 'Está a punto de eliminar la entidad '),
+                  const TextSpan(text: 'Está a punto de eliminar la Organización '),
                   TextSpan(
                     text: '"${widget.entityName}"',
                     style: const TextStyle(

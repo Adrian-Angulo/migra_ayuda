@@ -61,7 +61,7 @@ class HomeScreen extends StatelessWidget {
                         const SizedBox(height: 8),
                         SidebarMenuItemWidget(
                           icon: Icons.business_rounded,
-                          title: 'Entidades',
+                          title: 'Organizaciones',
                           isActive: location.startsWith('/dashboard/entities'),
                           onTap: () => context.go('/dashboard/entities'),
                         ),

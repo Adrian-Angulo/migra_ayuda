@@ -192,7 +192,7 @@ class FormEntityState extends ConsumerState<FormEntity> {
                     const SizedBox(height: 20),
                     BuildTextField(
                       controller: _nameController,
-                      label: 'Nombre de la entidad',
+                      label: 'Nombre de la Organización',
                       hint: 'Ej: Centro de Salud Norte',
                       icon: Icons.business_outlined,
                       maxLength: 20,
@@ -218,7 +218,7 @@ class FormEntityState extends ConsumerState<FormEntity> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Seleccione los servicios que ofrece esta entidad (máximo 2)',
+                      'Seleccione los servicios que ofrece esta Organización (máximo 2)',
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey.shade600,

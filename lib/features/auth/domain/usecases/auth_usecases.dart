@@ -15,6 +15,8 @@ class GetCurrentUserUseCase {
   }
 }
 
+
+
 class LoginWithEmailUseCase {
   final AuthRepository _repository;
 
@@ -55,7 +57,6 @@ class LoginWithGoogleUseCase {
               originCountry: '-',
               destinationCountry: '-',
               age: '-',
-              role: 'Migrante',
               profileComplete: false,
               createdAt: DateTime.now(),
             );
@@ -113,7 +114,6 @@ class RegisterWithEmailUseCase {
   RegisterWithEmailUseCase(this._authRepository, this._userRepository);
 
   Future<Either<Failure, AuthUser>> call(RegisterUserParams params) async {
-    // 1. Registrar credenciales en Auth
     final authResult = await _authRepository.registerWithEmail(
       params.email,
       params.password,
@@ -122,7 +122,6 @@ class RegisterWithEmailUseCase {
     return authResult.fold(
       (failure) => Left(failure),
       (authUser) async {
-        // 2. Crear el perfil de usuario en base de datos (Users)
         final migrant = Migrant(
           id: authUser.id,
           name: params.name,
@@ -139,12 +138,12 @@ class RegisterWithEmailUseCase {
 
         return createResult.fold(
           (userFailure) async {
-            // Rollback: Eliminar usuario en Auth si falla la creación en base de datos
+            
             await _authRepository.deleteCurrentUser();
             return Left(userFailure);
           },
           (_) async {
-            // 3. cerrar sesión para forzar verificación de correo
+           
             await _authRepository.logout();
             return Right(authUser);
           },

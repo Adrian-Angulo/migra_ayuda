@@ -68,15 +68,15 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const HeaderWeb(
-                  title: 'Gestión de entidades',
-                  subTitle: 'Gestiona las entidades registradas en el sistema'),
+                  title: 'Gestión de Organizaciones',
+                  subTitle:
+                      'Gestiona las Organizaciones registradas en el sistema'),
               AddButtonWidget(
-                text: 'Registrar entidad',
+                text: 'Registrar Organización',
                 onTap: () {
                   showDialog(
                     context: context,

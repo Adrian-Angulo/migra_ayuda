@@ -15,13 +15,14 @@ class ModalFormEntity extends ConsumerStatefulWidget {
 class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
   @override
   Widget build(BuildContext context) {
-  
-    ref.listen<AsyncValue<CrudOperation>>(entitiesCrudProvider, (previous, next) {
+    ref.listen<AsyncValue<CrudOperation>>(entitiesCrudProvider,
+        (previous, next) {
       if (previous?.isLoading == true && !next.isLoading) {
         if (next.hasValue && !next.hasError) {
           final op = next.value;
-         
-          if ((op == CrudOperation.register || op == CrudOperation.update) && mounted) {
+
+          if ((op == CrudOperation.register || op == CrudOperation.update) &&
+              mounted) {
             Navigator.pop(context);
           }
         }
@@ -40,7 +41,7 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(26), 
+              color: Colors.black.withAlpha(26),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -49,7 +50,6 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-          
             Container(
               padding: const EdgeInsets.all(28),
               decoration: const BoxDecoration(
@@ -68,7 +68,7 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withAlpha(51), 
+                      color: Colors.white.withAlpha(51),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
@@ -83,7 +83,7 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          isEdit ? 'Editar Entidad' : 'Nueva Entidad',
+                          isEdit ? 'Editar Organización' : 'Nueva Organización',
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -93,8 +93,8 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
                         const SizedBox(height: 4),
                         Text(
                           isEdit
-                            ? 'Modifique los datos de la entidad colaboradora'
-                            : 'Complete los datos de la nueva entidad colaboradora',
+                              ? 'Modifique los datos de la Organización colaboradora'
+                              : 'Complete los datos de la nueva Organización colaboradora',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.white.withOpacity(0.9),
@@ -108,14 +108,13 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
                     icon: const Icon(Icons.close),
                     color: Colors.white,
                     style: IconButton.styleFrom(
-                      backgroundColor: Colors.white.withAlpha(51), // 20% opacity
+                      backgroundColor:
+                          Colors.white.withAlpha(51), // 20% opacity
                     ),
                   ),
                 ],
               ),
             ),
-
-         
             FormEntity(entity: widget.entity),
           ],
         ),

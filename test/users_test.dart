@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:mocktail/mocktail.dart';
 
 import 'package:migra_ayuda/features/users/domain/entities/migrant.dart';
 import 'package:migra_ayuda/features/users/domain/failures/users_failures.dart';
@@ -8,27 +9,24 @@ import 'package:migra_ayuda/features/users/domain/usecases/complete_profile_usec
 import 'package:migra_ayuda/features/users/domain/usecases/create_user_profile_usecase.dart';
 import 'package:migra_ayuda/features/users/domain/usecases/get_all_users_usecase.dart';
 import 'package:migra_ayuda/features/users/domain/usecases/get_user_profile_usecase.dart';
-import 'package:mocktail/mocktail.dart';
-
-
 
 class MockUserRepository extends Mock implements UserRepository {}
 
 void main() {
   late MockUserRepository mockUserRepository;
-
-  final fakeMigrant = Migrant(
-    id: 'user-id-123',
-    name: 'Juan Perez',
-    email: 'juan@example.com',
-    originCountry: 'Colombia',
-    destinationCountry: 'España',
-    age: '28',
-    role: 'Migrante',
-    profileComplete: true,
-  );
+  late Migrant fakeMigrant;
 
   setUpAll(() {
+    fakeMigrant = Migrant(
+      id: 'user-001',
+      name: 'Juan Perez',
+      email: 'juan@example.com',
+      originCountry: 'Colombia',
+      destinationCountry: 'España',
+      age: '28',
+      role: 'Migrante',
+      profileComplete: true,
+    );
     registerFallbackValue(fakeMigrant);
   });
 
@@ -36,76 +34,69 @@ void main() {
     mockUserRepository = MockUserRepository();
   });
 
-  group('CompleteProfileUseCase', () {
+  group('Completar perfil', () {
     late CompleteProfileUseCase useCase;
 
     setUp(() {
       useCase = CompleteProfileUseCase(mockUserRepository);
     });
 
-    test(
-      'éxito: debería completar el perfil satisfactoriamente',
-      () async {
-        when(() => mockUserRepository.completeProfile(
-              id: 'user-id-123',
-              originCountry: 'Colombia',
-              destinationCountry: 'España',
-              age: 28,
-            )).thenAnswer((_) async => const Right(null));
+    test('éxito - debe completar el perfil satisfactoriamente', () async {
+      when(() => mockUserRepository.completeProfile(
+            id: fakeMigrant.id,
+            originCountry: fakeMigrant.originCountry,
+            destinationCountry: fakeMigrant.destinationCountry,
+            age: 28,
+          )).thenAnswer((_) async => const Right(null));
 
-        final result = await useCase(
-          id: 'user-id-123',
-          originCountry: 'Colombia',
-          destinationCountry: 'España',
-          age: 28,
-        );
+      final result = await useCase(
+        id: fakeMigrant.id,
+        originCountry: fakeMigrant.originCountry,
+        destinationCountry: fakeMigrant.destinationCountry,
+        age: 28,
+      );
 
-        expect(result, const Right(null));
-        verify(() => mockUserRepository.completeProfile(
-              id: 'user-id-123',
-              originCountry: 'Colombia',
-              destinationCountry: 'España',
-              age: 28,
-            )).called(1);
-        verifyNoMoreInteractions(mockUserRepository);
-      },
-    );
+      expect(result, const Right(null));
+      verify(() => mockUserRepository.completeProfile(
+            id: fakeMigrant.id,
+            originCountry: fakeMigrant.originCountry,
+            destinationCountry: fakeMigrant.destinationCountry,
+            age: 28,
+          )).called(1);
+      verifyNoMoreInteractions(mockUserRepository);
+    }, tags: ['sprint_1']);
 
     test(
-      'error: debería retornar Error cuando falla la actualización del perfil',
-      () async {
-        // Arrange
-        when(() => mockUserRepository.completeProfile(
-              id: any(named: 'id'),
-              originCountry: any(named: 'originCountry'),
-              destinationCountry: any(named: 'destinationCountry'),
-              age: any(named: 'age'),
-            )).thenAnswer(
-          (_) async => const Left(UserProfileUpdateFailedFailure()),
-        );
+        'error - debe retornar Left(UserProfileUpdateFailedFailure) cuando ocurre un fallo',
+        () async {
+      when(() => mockUserRepository.completeProfile(
+            id: any(named: 'id'),
+            originCountry: any(named: 'originCountry'),
+            destinationCountry: any(named: 'destinationCountry'),
+            age: any(named: 'age'),
+          )).thenAnswer(
+        (_) async => const Left(UserProfileUpdateFailedFailure()),
+      );
 
-        // Act
-        final result = await useCase(
-          id: 'user-id-123',
-          originCountry: 'Colombia',
-          destinationCountry: 'España',
-          age: 28,
-        );
+      final result = await useCase(
+        id: fakeMigrant.id,
+        originCountry: fakeMigrant.originCountry,
+        destinationCountry: fakeMigrant.destinationCountry,
+        age: 28,
+      );
 
-        // Assert
-        expect(result, const Left(UserProfileUpdateFailedFailure()));
-        verify(() => mockUserRepository.completeProfile(
-              id: 'user-id-123',
-              originCountry: 'Colombia',
-              destinationCountry: 'España',
-              age: 28,
-            )).called(1);
-        verifyNoMoreInteractions(mockUserRepository);
-      },
-    );
+      expect(result, const Left(UserProfileUpdateFailedFailure()));
+      verify(() => mockUserRepository.completeProfile(
+            id: fakeMigrant.id,
+            originCountry: fakeMigrant.originCountry,
+            destinationCountry: fakeMigrant.destinationCountry,
+            age: 28,
+          )).called(1);
+      verifyNoMoreInteractions(mockUserRepository);
+    }, tags: ['sprint_1']);
   });
 
-  group('CreateUserProfileUseCase', () {
+  group('Crear perfil de usuario', () {
     late CreateUserProfileUseCase useCase;
 
     setUp(() {
@@ -113,16 +104,13 @@ void main() {
     });
 
     test(
-      'éxito: debería crear el perfil de usuario satisfactoriamente.',
+      'éxito - debe crear el perfil de usuario satisfactoriamente',
       () async {
-        // Arrange
         when(() => mockUserRepository.createUser(fakeMigrant))
             .thenAnswer((_) async => const Right(null));
 
-        // Act
         final result = await useCase(fakeMigrant);
 
-        // Assert
         expect(result, const Right(null));
         verify(() => mockUserRepository.createUser(fakeMigrant)).called(1);
         verifyNoMoreInteractions(mockUserRepository);
@@ -130,25 +118,20 @@ void main() {
     );
 
     test(
-      'error: debería retornar UserProfileCreationFailedFailure cuando falla la creación del perfil',
-      () async {
-        // Arrange
-        when(() => mockUserRepository.createUser(any())).thenAnswer(
-          (_) async => const Left(UserProfileCreationFailedFailure()),
-        );
+        'error - debe retornar Left(UserProfileCreationFailedFailure) cuando falla la creación',
+        () async {
+      when(() => mockUserRepository.createUser(any())).thenAnswer(
+          (_) async => const Left(UserProfileCreationFailedFailure()));
 
-        // Act
-        final result = await useCase(fakeMigrant);
+      final result = await useCase(fakeMigrant);
 
-        // Assert
-        expect(result, const Left(UserProfileCreationFailedFailure()));
-        verify(() => mockUserRepository.createUser(fakeMigrant)).called(1);
-        verifyNoMoreInteractions(mockUserRepository);
-      },
-    );
+      expect(result, const Left(UserProfileCreationFailedFailure()));
+      verify(() => mockUserRepository.createUser(fakeMigrant)).called(1);
+      verifyNoMoreInteractions(mockUserRepository);
+    }, tags: ['sprint_1']);
   });
 
-  group('GetAllUsersUseCase', () {
+  group('Obtener todos los usuarios', () {
     late GetAllUsersUseCase useCase;
 
     setUp(() {
@@ -156,81 +139,64 @@ void main() {
     });
 
     test(
-      'éxito: debería emitir la lista de usuarios migrantes desde el stream',
-      () async {
-        // Arrange
-        final usersList = [fakeMigrant];
-        when(() => mockUserRepository.getAllUsers())
-            .thenAnswer((_) => Stream.value(usersList));
+        'éxito - debe emitir la lista de migrantes desde el stream correctamente',
+        () async {
+      final fakeUserList = [fakeMigrant];
+      when(() => mockUserRepository.getAllUsers())
+          .thenAnswer((_) => Stream.value(fakeUserList));
 
-        // Act
-        final stream = useCase();
+      final resultStream = useCase();
 
-        // Assert
-        await expectLater(stream, emits(usersList));
-        verify(() => mockUserRepository.getAllUsers()).called(1);
-        verifyNoMoreInteractions(mockUserRepository);
-      },
-    );
+      await expectLater(resultStream, emits(fakeUserList));
+      verify(() => mockUserRepository.getAllUsers()).called(1);
+      verifyNoMoreInteractions(mockUserRepository);
+    }, tags: ['sprint_1']);
 
-    test(
-      'error: debería emitir un error cuando el stream del repositorio falla',
-      () async {
-        // Arrange
-        final exception = Exception('Error al obtener la lista de usuarios');
-        when(() => mockUserRepository.getAllUsers())
-            .thenAnswer((_) => Stream.error(exception));
+    test('error - debe emitir un error cuando el stream del repositorio falla',
+        () async {
+      final exception = Exception('Error al obtener la lista de usuarios');
+      when(() => mockUserRepository.getAllUsers())
+          .thenAnswer((_) => Stream.error(exception));
 
-        // Act
-        final stream = useCase();
+      final resultStream = useCase();
 
-        // Assert
-        await expectLater(stream, emitsError(isA<Exception>()));
-        verify(() => mockUserRepository.getAllUsers()).called(1);
-        verifyNoMoreInteractions(mockUserRepository);
-      },
-    );
+      await expectLater(resultStream, emitsError(isA<Exception>()));
+      verify(() => mockUserRepository.getAllUsers()).called(1);
+      verifyNoMoreInteractions(mockUserRepository);
+    }, tags: ['sprint_1']);
   });
 
-  group('GetUserProfileUseCase', () {
+  group('Obtener Perfil de Usuario', () {
     late GetUserProfileUseCase useCase;
 
     setUp(() {
       useCase = GetUserProfileUseCase(mockUserRepository);
     });
 
-    test(
-      'éxito: debería retornar el perfil del migrante cuando existe en el repositorio',
-      () async {
-        // Arrange
-        when(() => mockUserRepository.getUserById('user-id-123'))
-            .thenAnswer((_) async => Right(fakeMigrant));
+    test('éxito - debe retornar el perfil del migrante cuando existe',
+        () async {
+      when(() => mockUserRepository.getUserById(fakeMigrant.id))
+          .thenAnswer((_) async => Right(fakeMigrant));
 
-        // Act
-        final result = await useCase('user-id-123');
+      final result = await useCase(fakeMigrant.id);
 
-        // Assert
-        expect(result, Right(fakeMigrant));
-        verify(() => mockUserRepository.getUserById('user-id-123')).called(1);
-        verifyNoMoreInteractions(mockUserRepository);
-      },
-    );
+      expect(result, Right(fakeMigrant));
+      verify(() => mockUserRepository.getUserById(fakeMigrant.id)).called(1);
+      verifyNoMoreInteractions(mockUserRepository);
+    }, tags: ['sprint_1']);
 
     test(
-      'error: debería retornar UserNotFoundFailure cuando el usuario no existe',
-      () async {
-        // Arrange
-        when(() => mockUserRepository.getUserById('inexistent-id'))
-            .thenAnswer((_) async => const Left(UserNotFoundFailure()));
+        'error - debe retornar Left(UserNotFoundFailure) cuando el usuario no existe',
+        () async {
+      const fakeInvalidId = 'non-existent-id';
+      when(() => mockUserRepository.getUserById(fakeInvalidId))
+          .thenAnswer((_) async => const Left(UserNotFoundFailure()));
 
-        // Act
-        final result = await useCase('inexistent-id');
+      final result = await useCase(fakeInvalidId);
 
-        // Assert
-        expect(result, const Left(UserNotFoundFailure()));
-        verify(() => mockUserRepository.getUserById('inexistent-id')).called(1);
-        verifyNoMoreInteractions(mockUserRepository);
-      },
-    );
+      expect(result, const Left(UserNotFoundFailure()));
+      verify(() => mockUserRepository.getUserById(fakeInvalidId)).called(1);
+      verifyNoMoreInteractions(mockUserRepository);
+    }, tags: ['sprint_1']);
   });
 }
