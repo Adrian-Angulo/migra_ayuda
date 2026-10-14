@@ -92,7 +92,8 @@ void main() {
                     imagenBytes: any(named: 'imagenBytes'),
                     fileName: any(named: 'fileName'),
                   ))
-              .thenAnswer((_) async => const Left(EntityCreationFailedFailure()));
+              .thenAnswer(
+                  (_) async => const Left(EntityCreationFailedFailure()));
 
           final result = await useCase(
             entity: fakeEntity,
@@ -143,10 +144,10 @@ void main() {
         'error - debe retornar Left(EntityUpdateFailedFailure) al fallar',
         () async {
           when(() => mockWebRepository.updateEntity(
-                entity: any(named: 'entity'),
-                imagenBytes: any(named: 'imagenBytes'),
-                fileName: any(named: 'fileName'),
-              ))
+                    entity: any(named: 'entity'),
+                    imagenBytes: any(named: 'imagenBytes'),
+                    fileName: any(named: 'fileName'),
+                  ))
               .thenAnswer((_) async => const Left(EntityUpdateFailedFailure()));
 
           final result = await useCase(
@@ -186,8 +187,8 @@ void main() {
       test(
         'error - debe retornar Left(EntityDeletionFailedFailure) al fallar',
         () async {
-          when(() => mockWebRepository.deleteEntity(any()))
-              .thenAnswer((_) async => const Left(EntityDeletionFailedFailure()));
+          when(() => mockWebRepository.deleteEntity(any())).thenAnswer(
+              (_) async => const Left(EntityDeletionFailedFailure()));
 
           final result = await useCase('entity-001');
 
@@ -276,7 +277,7 @@ void main() {
 
         expect(result, Right([fakeEntity]));
         verify(() => mockMobileRepository.getAllEntities()).called(1);
-      });
+      }, tags: ['spring_3']);
 
       test('error - debe retornar Left(EntityFetchFailedFailure) al fallar',
           () async {
@@ -287,7 +288,7 @@ void main() {
 
         expect(result, const Left(EntityFetchFailedFailure()));
         verify(() => mockMobileRepository.getAllEntities()).called(1);
-      });
+      }, tags: ['spring_3']);
     });
 
     group('Sincronizar todas las entidades desde Firebase', () {
@@ -306,7 +307,7 @@ void main() {
 
         expect(result, const Right(null));
         verify(() => mockMobileRepository.syncAllFromFirebase()).called(1);
-      });
+      }, tags: ['spring_3']);
 
       test(
           'error - debe retornar Left(NetworkFailure) si falla la sincronización',
@@ -318,7 +319,7 @@ void main() {
 
         expect(result, const Left(NetworkFailure()));
         verify(() => mockMobileRepository.syncAllFromFirebase()).called(1);
-      });
+      }, tags: ['spring_3']);
     });
   });
 }

@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/map/data/repository/map_repository_impl.dart';
-import 'package:migra_ayuda/features/map/domain/entities/map_state.dart';
+import 'package:migra_ayuda/features/map/presentation/providers/map_state.dart';
 import 'package:migra_ayuda/features/map/domain/entities/route_result.dart';
 import 'package:migra_ayuda/features/map/domain/usecases/calculate_route_usecase.dart';
 import 'package:migra_ayuda/features/map/presentation/helpers/marker_icon_generator.dart';

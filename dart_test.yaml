@@ -1,0 +1,20 @@
+reporter: expanded
+
+tags:
+  sprint_1:
+    description: sprint 1
+    owner: sprint_1
+  sprint_2:
+    description: sprint 2
+    owner: sprint_2
+  sprint_3:
+    description: sprint 3
+    owner: sprint_3
+  unit: {}
+  smoke: {}
+  slow:
+    timeout: 2x     
+  flaky:
+    retry: 2        # Reintenta hasta 2 veces si falla
+  integration:
+    timeout: 60s

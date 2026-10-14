@@ -24,87 +24,82 @@ void main() {
   const destLng = -77.2750;
   const destLat = 1.2180;
 
-  group('CalculateRouteUseCase & MapRepositoryImpl', () {
-    test(
-      'éxito: debería retornar RouteSourceType.mapboxApi cuando el datasource responde con puntos',
+  test(
+      'éxito - debe retornar RouteSourceType.mapboxApi cuando el datasource responde con puntos',
       () async {
-        final fakePoints = [
-          Position(originLng, originLat),
-          Position(-77.2780, 1.2150),
-          Position(destLng, destLat),
-        ];
+    final fakePoints = [
+      Position(originLng, originLat),
+      Position(-77.2780, 1.2150),
+      Position(destLng, destLat),
+    ];
 
-        when(() => mockDatasource.getWalkingDirections(
-              originLng: originLng,
-              originLat: originLat,
-              destLng: destLng,
-              destLat: destLat,
-            )).thenAnswer((_) async => fakePoints);
-
-        final result = await useCase(
+    when(() => mockDatasource.getWalkingDirections(
           originLng: originLng,
           originLat: originLat,
           destLng: destLng,
           destLat: destLat,
-        );
+        )).thenAnswer((_) async => fakePoints);
 
-        expect(result.sourceType, RouteSourceType.mapboxApi);
-        expect(result.isOnline, true);
-        expect(result.isOffline, false);
-        expect(result.points.length, 3);
-        expect(result.points, fakePoints);
-      },
+    final result = await useCase(
+      originLng: originLng,
+      originLat: originLat,
+      destLng: destLng,
+      destLat: destLat,
     );
 
-    test(
+    expect(result.sourceType, RouteSourceType.mapboxApi);
+    expect(result.isOnline, true);
+    expect(result.isOffline, false);
+    expect(result.points.length, 3);
+    expect(result.points, fakePoints);
+  }, tags: ['sprint_3']);
+
+  test(
       'fallback: debería retornar RouteSourceType.directFallback con 2 puntos cuando el datasource retorna null',
       () async {
-        when(() => mockDatasource.getWalkingDirections(
-              originLng: originLng,
-              originLat: originLat,
-              destLng: destLng,
-              destLat: destLat,
-            )).thenAnswer((_) async => null);
-
-        final result = await useCase(
+    when(() => mockDatasource.getWalkingDirections(
           originLng: originLng,
           originLat: originLat,
           destLng: destLng,
           destLat: destLat,
-        );
+        )).thenAnswer((_) async => null);
 
-        expect(result.sourceType, RouteSourceType.directFallback);
-        expect(result.isOffline, true);
-        expect(result.isFallback, true);
-        expect(result.points.length, 2);
-        expect(result.points.first.lng, originLng);
-        expect(result.points.first.lat, originLat);
-        expect(result.points.last.lng, destLng);
-        expect(result.points.last.lat, destLat);
-      },
+    final result = await useCase(
+      originLng: originLng,
+      originLat: originLat,
+      destLng: destLng,
+      destLat: destLat,
     );
 
-    test(
+    expect(result.sourceType, RouteSourceType.directFallback);
+    expect(result.isOffline, true);
+    expect(result.isFallback, true);
+    expect(result.points.length, 2);
+    expect(result.points.first.lng, originLng);
+    expect(result.points.first.lat, originLat);
+    expect(result.points.last.lng, destLng);
+    expect(result.points.last.lat, destLat);
+  }, tags: ['sprint_3']);
+
+  test(
       'fallback: debería retornar RouteSourceType.directFallback cuando el datasource lanza una excepción',
       () async {
-        when(() => mockDatasource.getWalkingDirections(
-              originLng: originLng,
-              originLat: originLat,
-              destLng: destLng,
-              destLat: destLat,
-            )).thenThrow(Exception('Network timeout'));
-
-        final result = await useCase(
+    when(() => mockDatasource.getWalkingDirections(
           originLng: originLng,
           originLat: originLat,
           destLng: destLng,
           destLat: destLat,
-        );
+        )).thenThrow(Exception('Network timeout'));
 
-        expect(result.sourceType, RouteSourceType.directFallback);
-        expect(result.isOffline, true);
-        expect(result.points.length, 2);
-      },
+    final result = await useCase(
+      originLng: originLng,
+      originLat: originLat,
+      destLng: destLng,
+      destLat: destLat,
     );
-  });
+
+    expect(result.sourceType, RouteSourceType.directFallback);
+    expect(result.isOffline, true);
+    expect(result.points.length, 2);
+  }, tags: ['sprint_3']);
 }

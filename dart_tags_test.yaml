@@ -1,5 +1,0 @@
-tags:
-  sprint_1: "Pruebas del Sprint 1 (Auth y Users)"
-  sprint_2: "Pruebas del Sprint 2 (Entities)"
-  unit: "Pruebas unitarias puras"
-  integration: "Pruebas con base de datos o servicios"
