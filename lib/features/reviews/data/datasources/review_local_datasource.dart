@@ -1,39 +1,27 @@
-import 'package:flutter/foundation.dart' show debugPrint, kIsWeb;
+import 'package:migra_ayuda/features/reviews/data/datasources/utils.dart';
 import 'package:sembast/sembast.dart';
 import 'package:migra_ayuda/core/config/sembast_database.dart';
 import 'package:migra_ayuda/features/reviews/data/models/review_model.dart';
 
 class ReviewLocalDataSource {
-  final SembastDatabase _sembastDatabase;
-  final StoreRef<String, Map<String, dynamic>> _store = stringMapStoreFactory.store('reviews');
+  final SembastDatabase _sembastDatabase = SembastDatabase.instance;
+  final StoreRef<String, Map<String, dynamic>> _store =
+      stringMapStoreFactory.store('reviews');
 
-  ReviewLocalDataSource({required SembastDatabase sembastDatabase})
-      : _sembastDatabase = sembastDatabase;
+  ReviewLocalDataSource();
 
-  /// Gets the Sembast database instance.
   Future<Database> get _db async => _sembastDatabase.database;
 
-  bool get _isLocalCacheAvailable => !kIsWeb;
-
-  Future<List<ReviewModel>> getCachedReviews() async {
-    if (!_isLocalCacheAvailable) return [];
+  Future<void> createReview(ReviewModel review) async {
+    final db = await _db;
     try {
-      final db = await _db;
-      final finder = Finder(
-        filter: Filter.isNull('deletedAt'),
-        sortOrders: [SortOrder('createdAt', false)],
-      );
-      final records = await _store.find(db, finder: finder);
-      return records
-          .map((record) => ReviewModel.fromSembastMap(record.key, record.value))
-          .toList();
-    } catch (_) {
-      throw 'Error al obtener reviews del caché';
+      await _store.record(review.id).put(db, review.toMap());
+
+    } catch (e) {
+      throw 'Error al guardar review en la base de datos local: $e';
     }
   }
-
   Future<List<ReviewModel>> getReviewsByEntity(String entityId) async {
-    if (!_isLocalCacheAvailable) return [];
     try {
       final db = await _db;
       final finder = Finder(
@@ -48,30 +36,26 @@ class ReviewLocalDataSource {
           .map((record) => ReviewModel.fromSembastMap(record.key, record.value))
           .toList();
     } catch (e) {
-      debugPrint('❌ Error en getReviewsByEntity: $e');
-      throw 'Error al obtener reviews de la entidad del caché: $e';
+      throw 'Ha Ocurrido un error inesperado';
     }
   }
 
-  Future<void> cacheReview(ReviewModel review) async {
-    if (!_isLocalCacheAvailable) return;
+  Future<void> updateReview(ReviewModel review) async {
     try {
       final db = await _db;
-      final localRecord = await _store.record(review.id).get(db);
-      if (_shouldSkipOverwrite(localRecord)) return;
       await _store.record(review.id).put(db, review.toMap());
     } catch (e) {
-      throw 'Error al guardar review en caché: $e';
+      throw 'Error al actualizar review';
     }
   }
 
-  Future<void> cacheReviews(List<ReviewModel> reviews) async {
-    if (!_isLocalCacheAvailable) return;
+
+  Future<void> createReviews(List<ReviewModel> reviews) async {
     try {
       final db = await _db;
       for (final review in reviews) {
         final localRecord = await _store.record(review.id).get(db);
-        if (_shouldSkipOverwrite(localRecord)) continue;
+        if (shouldPreserveLocalRecord(localRecord)) continue;
         await _store.record(review.id).put(db, review.toMap());
       }
     } catch (e) {
@@ -80,99 +64,92 @@ class ReviewLocalDataSource {
   }
 
   Future<void> deleteReview(String reviewId) async {
-    if (!_isLocalCacheAvailable) return;
     try {
       final db = await _db;
       final record = await _store.record(reviewId).get(db);
-      debugPrint('record a eliminar $record');
-      if (record == null) throw 'Review no encontrada en caché';
-      final updatedRecord = Map<String, dynamic>.from(record)
-        ..['deletedAt'] = DateTime.now().toUtc().toIso8601String()
-        ..['isSynced'] = false;
+
+      if (record == null) {
+        throw Exception('Review no encontrada');
+      }
+
+      final updatedRecord = {
+        ...record,
+        'deletedAt': DateTime.now().toUtc().toIso8601String(),
+        'isSynced': false,
+      };
+
       await _store.record(reviewId).put(db, updatedRecord);
     } catch (e) {
-      throw 'Error al eliminar review del caché: $e';
+      throw Exception('Error al eliminar review');
+    }
+  }
+
+  Future<ReviewModel> getReviewById(String reviewId) async {
+    try {
+      final db = await _db;
+      final record = await _store.record(reviewId).get(db);
+      if (record == null) return throw Exception('review no encontrada');
+      return ReviewModel.fromSembastMap(reviewId, record);
+    } catch (e) {
+      throw Exception('Error al obtener la review');
     }
   }
 
   Future<List<ReviewModel>> getPendingReviews() async {
-    if (!_isLocalCacheAvailable) return [];
     try {
       final db = await _db;
-      final finder = Finder(
+
+      final pendingReviewsFinder = Finder(
         filter: Filter.equals('isSynced', false),
         sortOrders: [SortOrder('createdAt', false)],
       );
-      final records = await _store.find(db, finder: finder);
-      return records
+
+      final pendingRecords =
+          await _store.find(db, finder: pendingReviewsFinder);
+
+      return pendingRecords
           .map((record) => ReviewModel.fromSembastMap(record.key, record.value))
           .toList();
-    } catch (e) {
-      throw 'Error al obtener reviews pendientes: $e';
+    } catch (error) {
+      throw 'Error al obtener reviews pendientes';
     }
   }
 
   Future<void> markAsSynced(String reviewId) async {
-    if (!_isLocalCacheAvailable) return;
     try {
       final db = await _db;
       final record = await _store.record(reviewId).get(db);
-      if (record == null) throw 'Review no encontrada en caché';
-      final updatedRecord = Map<String, dynamic>.from(record)
-        ..['isSynced'] = true;
+
+      if (record == null) {
+        throw Exception('Review no encontrada en caché');
+      }
+
+      final updatedRecord = {
+        ...record,
+        'isSynced': true,
+      };
+
       await _store.record(reviewId).put(db, updatedRecord);
     } catch (e) {
-      throw 'Error al marcar review como sincronizada: $e';
+      throw Exception('Error al marcar review como sincronizada: $e');
     }
   }
 
   Future<void> clearCache() async {
-    if (!_isLocalCacheAvailable) return;
     try {
       final db = await _db;
       await _store.delete(db);
     } catch (e) {
-      throw 'Error al limpiar caché de reviews: $e';
-    }
-  }
-
-  Future<ReviewModel?> getUserReviewByEntity(
-      String userId, String entityId) async {
-    if (!_isLocalCacheAvailable) return null;
-    try {
-      final db = await _db;
-      final finder = Finder(
-        filter: Filter.and([
-          Filter.equals('idMigrante', userId),
-          Filter.equals('idEntity', entityId),
-          Filter.isNull('deletedAt'),
-        ]),
-        sortOrders: [SortOrder('createdAt', false)],
-        limit: 1,
-      );
-
-      final records = await _store.find(db, finder: finder);
-      if (records.isEmpty) return null;
-      return ReviewModel.fromSembastMap(records.first.key, records.first.value);
-    } catch (e) {
-      throw 'Error al obtener review del usuario en caché: $e';
+      throw Exception('Error al limpiar caché de reviews');
     }
   }
 
   Future<void> deleteLocalRecord(String recordId) async {
-    if (!_isLocalCacheAvailable) return;
     try {
       final db = await _db;
       await _store.record(recordId).delete(db);
     } catch (e) {
       throw 'Error al eliminar registro local: $e';
     }
-  }
-
-  bool _shouldSkipOverwrite(Map<String, dynamic>? localRecord) {
-    if (localRecord == null) return false;
-    final isLocalSynced = localRecord['isSynced'] as bool? ?? true;
-    final isLocalDeleted = localRecord['deletedAt'] != null;
-    return !isLocalSynced || isLocalDeleted;
   }
 }

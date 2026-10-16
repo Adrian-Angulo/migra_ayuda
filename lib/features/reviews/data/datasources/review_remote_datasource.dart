@@ -17,20 +17,20 @@ class ReviewRemoteDataSource {
   ReviewRemoteDataSource({FirebaseFirestore? firestore})
       : _firestore = firestore ?? FirebaseFirestore.instance;
 
-  Future<String> createReview(ReviewModel review) async {
+  Future<void> saveReview(ReviewModel review) async {
     try {
-      // Marca la review como sincronizada antes de guardar en Firebase
       final reviewToSave = review.copyWith(isSynced: true);
-
-      // Crea el documento en Firestore con el objeto corregido
-      final docRef =
-          await _firestore.collection('reviews').add(reviewToSave.toMap());
-
-      // Retorna el ID generado por Firebase
-      return docRef.id;
+      await _firestore
+          .collection('reviews')
+          .doc(review.id)
+          .set(reviewToSave.toMap(), SetOptions(merge: true));
     } catch (e) {
-      throw ServerException('Error al crear review en Firebase: $e');
+      throw ServerException('Error al guardar review en Firebase: $e');
     }
+  }
+
+  Future<void> createReview(ReviewModel review) async {
+    await saveReview(review);
   }
 
   Future<List<ReviewModel>> getAllReviews() async {
@@ -73,20 +73,11 @@ class ReviewRemoteDataSource {
   }
 
   Future<void> updateReview(ReviewModel review) async {
-    try {
-      // Actualiza el documento en Firestore
-      await _firestore
-          .collection('reviews')
-          .doc(review.id)
-          .update(review.toMap());
-    } catch (e) {
-      throw ServerException('Error al actualizar review en Firebase: $e');
-    }
+    await saveReview(review);
   }
 
   Future<void> deleteReview(String reviewId) async {
     try {
-      // Elimina el documento de Firestore (hard delete)
       await _firestore.collection('reviews').doc(reviewId).delete();
     } catch (e) {
       throw ServerException('Error al eliminar review de Firebase: $e');

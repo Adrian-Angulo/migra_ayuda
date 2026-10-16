@@ -10,7 +10,6 @@ import 'package:migra_ayuda/features/reviews/presentation/config/review_constant
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 import 'package:migra_ayuda/features/users/domain/entities/migrant.dart';
 
-
 class PlaceAddReview extends ConsumerStatefulWidget {
   final EntityEntity entity;
   final Migrant? user;
@@ -43,9 +42,8 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
         if (previous?.isLoading == true && !next.isLoading) {
           if (next.value == ReviewState.creating) {
             SnackbarWidget.success(context, '¡Reseña publicada exitosamente!');
-            Future.delayed(const Duration(seconds: 1), () {
-              if (context.mounted) Navigator.pop(context);
-            });
+
+            Navigator.pop(context);
           } else if (next.hasError) {
             SnackbarWidget.error(context, next.error);
           }
@@ -277,8 +275,12 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
                 _buildCommentField(),
                 const SizedBox(height: 10),
                 FloatingMainButton(
-                  onTap: () async => await _handleSubmit(context, isLoading),
-                  text: isLoading ? 'Enviando...' : 'Enviar reseña',
+                  onTap: isLoading
+                      ? () {}
+                      : () async {
+                          await _handleSubmit(context, isLoading);
+                        },
+                  text: 'Enviar reseña',
                 )
               ],
             ),

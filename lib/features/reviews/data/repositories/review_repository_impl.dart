@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:dartz/dartz.dart';
 import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/core/network/network_info.dart';
@@ -25,9 +26,18 @@ class ReviewRepositoryImpl implements ReviewRepository {
   @override
   Future<Either<Failure, void>> createReview(ReviewEntity review) async {
     try {
-      final localId = const Uuid().v4();
-      final reviewModel = ReviewModel.fromReviewEntity(review).copyWith(id: localId);
-      await _localDataSource.cacheReview(reviewModel);
+      String localId = review.id.isNotEmpty ? review.id : const Uuid().v4();
+      ReviewModel reviewModel = ReviewModel.fromReviewEntity(review)
+          .copyWith(id: localId, isSynced: kIsWeb);
+
+      if (kIsWeb) {
+        await _remoteDataSource.saveReview(reviewModel);
+        return const Right(null);
+      }
+
+      await _localDataSource
+          .createReview(reviewModel.copyWith(isSynced: false));
+      _triggerBackgroundSync();
       return const Right(null);
     } catch (_) {
       return const Left(ReviewCreationFailedFailure());
@@ -35,34 +45,34 @@ class ReviewRepositoryImpl implements ReviewRepository {
   }
 
   @override
-  Future<Either<Failure, List<ReviewEntity>>> getReviewsByEntity(String entityId) async {
+  Future<Either<Failure, List<ReviewEntity>>> getReviewsByEntity(
+      String entityId) async {
     try {
+      if (kIsWeb) {
+        final remoteReviews =
+            await _remoteDataSource.getReviewsByEntity(entityId);
+        final reviewEntities = remoteReviews.map((r) => r.toEntity()).toList();
+        return Right(reviewEntities);
+      }
+
       final cachedReviews = await _localDataSource.getReviewsByEntity(entityId);
-      final reviewEntities = cachedReviews.map((reviewModel) => reviewModel.toEntity()).toList();
+      final reviewEntities =
+          cachedReviews.map((reviewModel) => reviewModel.toEntity()).toList();
       return Right(reviewEntities);
     } catch (error) {
       return const Left(ReviewFetchFailedFailure());
     }
   }
 
-
   @override
   Future<Either<Failure, List<ReviewEntity>>> getAllReviews() async {
     try {
-      final isConnected = await _networkInfo.isConnected;
+      List<ReviewModel> reviews;
 
-      if (isConnected) {
-        try {
-          final remoteReviews = await _remoteDataSource.getAllReviews();
-          await _localDataSource.cacheReviews(remoteReviews);
-          return Right(remoteReviews.map((r) => r.toEntity()).toList());
-        } on ServerException {
-          
-        }
-      }
+      reviews = await _remoteDataSource.getAllReviews();
 
-      final cachedReviews = await _localDataSource.getCachedReviews();
-      return Right(cachedReviews.map((r) => r.toEntity()).toList());
+      final reviewEntities = reviews.map((r) => r.toEntity()).toList();
+      return Right(reviewEntities);
     } catch (_) {
       return const Left(ReviewFetchFailedFailure());
     }
@@ -71,12 +81,20 @@ class ReviewRepositoryImpl implements ReviewRepository {
   @override
   Future<Either<Failure, void>> updateReview(ReviewEntity review) async {
     try {
+      if (kIsWeb) {
+        final model = ReviewModel.fromReviewEntity(review, isSynced: true)
+            .copyWith(updatedAt: DateTime.now());
+        await _remoteDataSource.saveReview(model);
+        return const Right(null);
+      }
+
       final updatedModel = ReviewModel.fromReviewEntity(
         review,
         isSynced: false,
       ).copyWith(updatedAt: DateTime.now());
 
-      await _localDataSource.cacheReview(updatedModel);
+      await _localDataSource.updateReview(updatedModel);
+      _triggerBackgroundSync();
       return const Right(null);
     } catch (_) {
       return const Left(ReviewUpdateFailedFailure());
@@ -86,15 +104,38 @@ class ReviewRepositoryImpl implements ReviewRepository {
   @override
   Future<Either<Failure, void>> deleteReview(String reviewId) async {
     try {
-      await _localDataSource.deleteReview(reviewId);
+      if (kIsWeb) {
+        await _remoteDataSource.deleteReview(reviewId);
+        return const Right(null);
+      }
+
+      final review = await _localDataSource.getReviewById(reviewId);
+
+      final updatedReview = review.copyWith(
+        isSynced: false,
+        deletedAt: DateTime.now(),
+      );
+
+      await _localDataSource.updateReview(updatedReview);
+      _triggerBackgroundSync();
       return const Right(null);
     } catch (_) {
       return const Left(ReviewDeletionFailedFailure());
     }
   }
 
+  void _triggerBackgroundSync() {
+    if (kIsWeb) return;
+    syncPendingReviews().catchError((_) {
+      return const Left(ReviewSyncFailedFailure());
+    });
+  }
+
   @override
   Future<Either<Failure, void>> syncPendingReviews() async {
+    if (kIsWeb) {
+      return const Right(null);
+    }
     try {
       final isConnected = await _networkInfo.isConnected;
       if (!isConnected) {
@@ -111,70 +152,18 @@ class ReviewRepositoryImpl implements ReviewRepository {
           if (review.deletedAt != null) {
             await _remoteDataSource.deleteReview(review.id);
             await _localDataSource.deleteLocalRecord(review.id);
-          } else if (review.updatedAt != null) {
-            await _remoteDataSource.updateReview(review);
-            await _localDataSource.markAsSynced(review.id);
           } else {
-            final localId = review.id;
-            final firebaseId = await _remoteDataSource.createReview(review);
-            final syncedReview = review.copyWith(id: firebaseId, isSynced: true);
-            await _localDataSource.cacheReview(syncedReview);
-            await _localDataSource.deleteLocalRecord(localId);
+            await _remoteDataSource.saveReview(review);
+            await _localDataSource.markAsSynced(review.id);
           }
-        } catch (_) {
-          
+        } catch (e) {
           continue;
         }
       }
+
       return const Right(null);
-    } catch (_) {
+    } catch (e) {
       return const Left(ReviewSyncFailedFailure());
-    }
-  }
-
-
-  @override
-  Future<Either<Failure, ReviewEntity?>> getUserReviewByEntity(
-    String userId,
-    String entityId,
-  ) async {
-    try {
-      final cachedReview = await _tryGetCachedReview(userId, entityId);
-
-      final isConnected = await _networkInfo.isConnected;
-      if (!isConnected) {
-        return Right(cachedReview?.toEntity());
-      }
-
-      try {
-        final remoteReview = await _remoteDataSource.getUserReviewByEntity(userId, entityId);
-
-        if (remoteReview != null) {
-          await _localDataSource.cacheReview(remoteReview);
-          return Right(remoteReview.toEntity());
-        }
-
-        if (cachedReview != null && !cachedReview.isSynced) {
-          return Right(cachedReview.toEntity());
-        }
-
-        return const Right(null);
-      } on ServerException {
-        if (cachedReview != null) {
-          return Right(cachedReview.toEntity());
-        }
-        return const Left(ReviewFetchFailedFailure());
-      }
-    } catch (_) {
-      return const Left(ReviewNotFoundFailure());
-    }
-  }
-
-  Future<ReviewModel?> _tryGetCachedReview(String userId, String entityId) async {
-    try {
-      return await _localDataSource.getUserReviewByEntity(userId, entityId);
-    } catch (_) {
-      return null;
     }
   }
 }

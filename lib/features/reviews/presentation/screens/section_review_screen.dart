@@ -32,7 +32,7 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
 
     final int countReviews = asyncReviews.value?.length ?? 0;
 
-    //Mostrar mensaje de eliminacion;
+    
     ref.listen(
       reviewNotifierProvider,
       (previous, next) {
@@ -97,7 +97,7 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
                 : containerReviews(reviews, user);
           },
           error: (error, stackTrace) {
-            debugPrint("error al llamar reviews: $error");
+           
             return messageError();
           },
           loading: () {

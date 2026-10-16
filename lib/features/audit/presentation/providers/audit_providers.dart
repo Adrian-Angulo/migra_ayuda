@@ -11,14 +11,9 @@ import 'package:migra_ayuda/features/audit/data/repositories/audit_repository_im
 import 'package:migra_ayuda/features/audit/domain/entities/audit_entity.dart';
 import 'package:migra_ayuda/features/audit/domain/repositories/audit_repository.dart';
 
-// ---------------------------------------------------------------------------
-// Providers para la tabla web de actividades
-// ---------------------------------------------------------------------------
-
-/// Texto de búsqueda ingresado en la barra de la tabla
 final queryAuditProvider = StateProvider<String>((ref) => '');
 
-/// Lista de actividades filtrada según [queryAuditProvider]
+
 final auditFilterProvider =
     StateProvider.autoDispose<AsyncValue<List<AuditEntity>>>((ref) {
   final query = ref.watch(queryAuditProvider);
@@ -60,21 +55,15 @@ final auditNotifierProvider =
 
 class AuditNotifier extends AsyncNotifier<ActivityState> {
   @override
-  FutureOr<ActivityState> build() {
-    return ActivityState.init;
-  }
+  FutureOr<ActivityState> build() => ActivityState.init;
 
   Future<void> create({
     required String accion,
     Map<String, dynamic>? metadata,
   }) async {
-    //inicializa el estado de carga
     state = const AsyncValue.loading();
 
-    //obtiene el usuario autenticado
-    final user = ref.watch(authNotifierProvider).value;
-
-    //si no existe usuario manda un error
+    final user = ref.read(authNotifierProvider).value;
     if (user == null) {
       state = AsyncValue.error(
         'El usuario no está autenticado',
@@ -82,25 +71,31 @@ class AuditNotifier extends AsyncNotifier<ActivityState> {
       );
       return;
     }
-    //crear una accion del usuario
-    final activity = AuditEntity(
-        id: user.id,
-        idUser: user.id,
-        accion: accion,
-        nombre: user.name,
-        correo: user.email,
-        metadata: metadata,
-        pais: user.originCountry);
 
-    // guard. captura errores automaticamente
+    final activity = _buildAuditEntity(user, accion, metadata);
+
     state = await AsyncValue.guard(() async {
-      //crear la actividad
-      final result =
-          await ref.read(auditRepositoryProvider).createActivity(activity);
+      final result = await ref.read(auditRepositoryProvider).createActivity(activity);
       return result.fold(
         (failure) => throw failure,
         (_) => ActivityState.success,
       );
     });
+  }
+
+  AuditEntity _buildAuditEntity(
+    dynamic user,
+    String accion,
+    Map<String, dynamic>? metadata,
+  ) {
+    return AuditEntity(
+      id: user.id,
+      idUser: user.id,
+      accion: accion,
+      nombre: user.name,
+      correo: user.email,
+      metadata: metadata,
+      pais: user.originCountry,
+    );
   }
 }

@@ -53,15 +53,7 @@ class DeleteReviewUseCase {
   }
 }
 
-class GetUserReviewByEntityUseCase {
-  final ReviewRepository repository;
 
-  GetUserReviewByEntityUseCase(this.repository);
-
-  Future<Either<Failure, ReviewEntity?>> call(String userId, String entityId) {
-    return repository.getUserReviewByEntity(userId, entityId);
-  }
-}
 
 class SyncPendingReviewsUseCase {
   final ReviewRepository repository;

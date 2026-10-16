@@ -46,6 +46,7 @@ class ReviewSyncFailedFailure extends ReviewFailure {
   });
 }
 
+
 class GenericReviewFailure extends ReviewFailure {
   const GenericReviewFailure({
     required super.message,

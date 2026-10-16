@@ -31,7 +31,7 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
   @override
   void initState() {
     super.initState();
-    
+
     rating = widget.existingReview.rating;
     commentController =
         TextEditingController(text: widget.existingReview.comment);
@@ -46,17 +46,17 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
   @override
   Widget build(BuildContext context) {
     bool isloading = ref.watch(reviewNotifierProvider).isLoading;
+
     ref.listen(
       reviewNotifierProvider,
       (previous, next) async {
-        
         if (previous?.isLoading == true && !next.isLoading) {
           if (next.hasError) {
             SnackbarWidget.error(context, next.error);
           } else if (next.value == ReviewState.updating) {
             SnackbarWidget.success(context, 'Reseña actualizada exitosamente');
-            await Future.delayed(const Duration(seconds: 1));
-            if (context.mounted) Navigator.pop(context);
+            ref.read(reviewNotifierProvider.notifier).resetState();
+            Navigator.pop(context);
           }
         }
       },
@@ -284,24 +284,24 @@ class _PlaceEditReviewState extends ConsumerState<PlaceEditReview> {
                 ),
                 const SizedBox(height: 24),
 
-                // Botón de actualizar
                 FloatingMainButton(
-                  onTap: () async {
-                    if (!formkey.currentState!.validate()) {
-                      debugPrint('❌ Validación falló');
-                      return;
-                    }
-                    // ✅ Construye la review con los datos EDITADOS
-                    final updatedReview = widget.existingReview.copyWith(
-                        rating: rating,
-                        comment: commentController.text.trim(),
-                        updatedAt: DateTime.now(),
-                        isSynced: false);
+                  onTap: isloading
+                      ? () {}
+                      : () async {
+                          if (!formkey.currentState!.validate()) {
+                            return;
+                          }
 
-                    await ref
-                        .read(reviewNotifierProvider.notifier)
-                        .updateReview(updatedReview);
-                  },
+                          final updatedReview = widget.existingReview.copyWith(
+                              rating: rating,
+                              comment: commentController.text.trim(),
+                              updatedAt: DateTime.now(),
+                              isSynced: false);
+
+                          await ref
+                              .read(reviewNotifierProvider.notifier)
+                              .updateReview(updatedReview);
+                        },
                   text: isloading ? 'Actualizando...' : 'Actualizar Comentario',
                 ),
               ],

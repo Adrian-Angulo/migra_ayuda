@@ -13,10 +13,7 @@ abstract class ReviewRepository {
 
   Future<Either<Failure, void>> deleteReview(String reviewId);
 
-  Future<Either<Failure, ReviewEntity?>> getUserReviewByEntity(
-    String userId,
-    String entityId,
-  );
+
 
   Future<Either<Failure, void>> syncPendingReviews();
 }

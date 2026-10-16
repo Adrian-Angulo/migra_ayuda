@@ -4,9 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:migra_ayuda/core/constants/activity_actions.dart';
-import 'package:migra_ayuda/core/config/sembast_database.dart';
 import 'package:migra_ayuda/core/network/network_provider.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/reviews/data/datasources/review_local_datasource.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
@@ -17,12 +15,9 @@ import '../../data/datasources/review_remote_datasource.dart';
 import '../../data/repositories/review_repository_impl.dart';
 import 'package:migra_ayuda/features/reviews/domain/usecases/review_usecases.dart';
 
-
-
 final reviewRepositoryProvider = Provider<ReviewRepository>((ref) {
   final remoteDatasource = ReviewRemoteDataSource();
-  final localDatasource =
-      ReviewLocalDataSource(sembastDatabase: SembastDatabase.instance);
+  final localDatasource = ReviewLocalDataSource();
   final networkInfo = ref.watch(networkInfoProvider);
 
   return ReviewRepositoryImpl(
@@ -52,16 +47,10 @@ final deleteReviewUseCaseProvider = Provider<DeleteReviewUseCase>(
   (ref) => DeleteReviewUseCase(ref.watch(reviewRepositoryProvider)),
 );
 
-final getUserReviewByEntityUseCaseProvider =
-    Provider<GetUserReviewByEntityUseCase>(
-  (ref) => GetUserReviewByEntityUseCase(ref.watch(reviewRepositoryProvider)),
-);
-
 final syncPendingReviewsUseCaseProvider = Provider<SyncPendingReviewsUseCase>(
   (ref) => SyncPendingReviewsUseCase(ref.watch(reviewRepositoryProvider)),
 );
 
-// FutureProvider para reviews de una entidad usando usecase provider
 final getReviewsByEntity =
     FutureProvider.autoDispose.family<List<ReviewEntity>, String>(
   (ref, entityId) async {
@@ -101,28 +90,16 @@ class ReviewsNotifier extends AsyncNotifier<ReviewState> {
 
   Future<void> createReview(ReviewEntity review) async {
     state = const AsyncValue.loading();
+
     state = await AsyncValue.guard(() async {
       final createReview = ref.read(createReviewUseCaseProvider);
       final result = await createReview(review);
       return result.fold(
         (failure) => throw failure,
         (_) async {
-          try {
-            await ref
-                .read(entitiesCrudProvider.notifier)
-                .actualizarTotalYPromedioEntidad(review.idEntity);
-          } catch (e) {
-            debugPrint('⚠️ Error actualizando total y promedio de entidad: $e');
-          }
-          try {
-            await ref
-                .read(auditNotifierProvider.notifier)
-                .create(accion: ActivityActions.addComment());
-          } catch (e) {
-            debugPrint('⚠️ Error creando registro de auditoría: $e');
-          }
           ref.invalidate(getReviewsByEntity(review.idEntity));
           ref.invalidate(getAllEntitiesProvider);
+          _logAudit(ActivityActions.addComment());
           return ReviewState.creating;
         },
       );
@@ -131,30 +108,17 @@ class ReviewsNotifier extends AsyncNotifier<ReviewState> {
 
   Future<void> updateReview(ReviewEntity review) async {
     state = const AsyncValue.loading();
+
     state = await AsyncValue.guard(() async {
       final updateReview = ref.read(updateReviewUseCaseProvider);
       final result = await updateReview(review);
+
       return result.fold(
         (failure) => throw failure,
         (_) async {
-          try {
-            await ref
-                .read(entitiesCrudProvider.notifier)
-                .actualizarTotalYPromedioEntidad(review.idEntity);
-          } catch (e) {
-            debugPrint('⚠️ Error actualizando total y promedio de entidad: $e');
-          }
-
-          try {
-            await ref
-                .read(auditNotifierProvider.notifier)
-                .create(accion: ActivityActions.updateComment());
-          } catch (e) {
-            debugPrint('⚠️ Error creando registro de auditoría: $e');
-          }
-
           ref.invalidate(getReviewsByEntity(review.idEntity));
           ref.invalidate(getAllEntitiesProvider);
+          _logAudit(ActivityActions.updateComment());
           return ReviewState.updating;
         },
       );
@@ -169,31 +133,27 @@ class ReviewsNotifier extends AsyncNotifier<ReviewState> {
       return result.fold(
         (failure) => throw failure,
         (_) async {
-          try {
-            await ref
-                .read(entitiesCrudProvider.notifier)
-                .actualizarTotalYPromedioEntidad(review.idEntity);
-          } catch (e) {
-            debugPrint('⚠️ Error actualizando total y promedio de entidad: $e');
-          }
-
-          try {
-            await ref
-                .read(auditNotifierProvider.notifier)
-                .create(accion: ActivityActions.deleteComment());
-          } catch (e) {
-            debugPrint('⚠️ Error creando registro de auditoría: $e');
-          }
-
           ref.invalidate(getReviewsByEntity(review.idEntity));
           ref.invalidate(getAllEntitiesProvider);
+          _logAudit(ActivityActions.deleteComment());
           return ReviewState.deleting;
         },
       );
     });
   }
-}
 
+  void resetState() {
+    state = const AsyncValue.data(ReviewState.initial);
+  }
+
+  void _logAudit(String action) {
+    try {
+      ref.read(auditNotifierProvider.notifier).create(accion: action);
+    } catch (e) {
+      debugPrint("Error registrando auditoría");
+    }
+  }
+}
 
 final queryReviewProvider = StateProvider<String>((ref) => '');
 

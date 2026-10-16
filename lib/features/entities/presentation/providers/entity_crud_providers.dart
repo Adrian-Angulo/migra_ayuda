@@ -11,7 +11,6 @@ import 'package:migra_ayuda/features/reviews/presentation/providers/review_provi
 
 enum CrudOperation { register, update, delete, none }
 
-
 final imagenSelectProvider = StateProvider<XFile?>((ref) => null);
 final imagenInBytesProvider = StateProvider<Uint8List?>((ref) => null);
 final messageErrorImageProvider = StateProvider<String?>(
@@ -98,32 +97,36 @@ class EntitiesCrudNotifier extends AsyncNotifier<CrudOperation> {
     });
   }
 
-  Future<void> actualizarTotalYPromedioEntidad(String entidadId) async {
+  Future<void> updateEntityTotalAndAverageRating(String entityId) async {
     final repository = ref.read(entityWebRepositoryProvider);
     final getEntityByIdUseCase = GetEntityByIdUseCase(repository);
 
-    final entityResult = await getEntityByIdUseCase(entidadId);
+    final entityResult = await getEntityByIdUseCase(entityId);
 
     await entityResult.fold(
       (failure) => null,
-      (entidad) async {
-        final reviewRepo = ref.read(reviewRepositoryProvider);
-        final reviewsResult = await reviewRepo.getReviewsByEntity(entidadId);
-        final List<ReviewEntity> reviews =
-            reviewsResult.fold((_) => [], (r) => r);
+      (entity) async {
+        final reviewRepository = ref.read(reviewRepositoryProvider);
+        final reviewsResult =
+            await reviewRepository.getReviewsByEntity(entityId);
+        final reviews = reviewsResult.fold<List<ReviewEntity>>(
+          (_) => [],
+          (r) => r,
+        );
 
-        int totalReviews = reviews.length;
-        double totalRating = reviews.fold(0.0, (sum, r) => sum + r.rating);
-        double promedio = totalReviews > 0 ? totalRating / totalReviews : 0.0;
+        final int totalReviews = reviews.length;
+        final double sumRatings =
+            reviews.fold(0.0, (sum, review) => sum + review.rating);
+        final double averageRating =
+            totalReviews > 0 ? sumRatings / totalReviews : 0.0;
 
-        // Actualizar los campos de la entidad
-        final EntityEntity entidadActualizada = entidad.copyWith(
+        final updatedEntity = entity.copyWith(
           totalReviews: totalReviews,
-          averageRating: promedio,
+          averageRating: averageRating,
         );
 
         final updateEntityUseCase = UpdateEntityUseCase(repository);
-        await updateEntityUseCase(entity: entidadActualizada);
+        await updateEntityUseCase(entity: updatedEntity);
       },
     );
   }

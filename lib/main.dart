@@ -9,12 +9,13 @@ import 'package:migra_ayuda/core/config/load_token.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/router/app_router.dart';
 import 'package:migra_ayuda/core/router/app_router_mobile.dart';
+import 'package:migra_ayuda/core/sync/sync_manager.dart';
 import 'core/config/firebase_options.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-   await dotenv.load(fileName: '.env');
+  await dotenv.load(fileName: '.env');
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -31,6 +32,7 @@ class MainApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(syncProvider);
     final router = ref.watch(kIsWeb ? routerProvider : routerMobile);
 
     return MaterialApp.router(

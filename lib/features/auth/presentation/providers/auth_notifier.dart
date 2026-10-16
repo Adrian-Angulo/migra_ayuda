@@ -16,7 +16,7 @@ class AuthNotifier extends AsyncNotifier<Migrant?> {
       final authResult = await getCurrentUserUseCase();
       return await authResult.fold(
         (failure) async {
-          debugPrint('❌ Error al obtener usuario inicial: ${failure.message}');
+          
           return null;
         },
         (authUser) async {
@@ -38,7 +38,7 @@ class AuthNotifier extends AsyncNotifier<Migrant?> {
         },
       );
     } catch (e) {
-      debugPrint('❌ Error al construir AuthNotifier: $e');
+      
       return null;
     }
   }
