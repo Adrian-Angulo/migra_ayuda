@@ -5,17 +5,17 @@ import 'package:migra_ayuda/features/audit/data/models/audit_model.dart';
 class AuditLocalDataSource {
   final SembastDatabase sembastDatabase = SembastDatabase.instance;
 
-  // Store para las actividades de usuario
+  
   final _store = stringMapStoreFactory.store('user_activities');
 
-  /// Obtiene la instancia de la base de datos
+  
   Future<Database> get _db async => await sembastDatabase.database;
 
   Future<void> save(AuditModel activity) async {
     try {
       final db = await _db;
 
-      // Guarda o actualiza la actividad
+      
       await _store.record(activity.id).put(db, activity.toMap());
     } catch (e) {
       throw Exception('Error al guardar actividad en caché: $e');

@@ -10,7 +10,7 @@ class ServerException implements Exception {
   String toString() => 'ServerException: $message';
 }
 
-/// Implementación del datasource remoto usando Firebase Firestore
+
 class ReviewRemoteDataSource {
   final FirebaseFirestore _firestore;
 
@@ -35,13 +35,13 @@ class ReviewRemoteDataSource {
 
   Future<List<ReviewModel>> getAllReviews() async {
     try {
-      // Obtiene todas las reviews ordenadas por fecha de creación
+      
       final snapshot = await _firestore
           .collection('reviews')
           .orderBy('createdAt', descending: true)
           .get();
 
-      // Convierte los documentos a ReviewModel
+      
       final reviews = snapshot.docs.map((doc) {
         return _fromFirestore(doc);
       }).toList();
@@ -54,13 +54,13 @@ class ReviewRemoteDataSource {
 
   Future<List<ReviewModel>> getReviewsByEntity(String entityId) async {
     try {
-      // Filtra por entityId y ordena por fecha
+    
       final snapshot = await _firestore
           .collection('reviews')
           .where('idEntity', isEqualTo: entityId)
           .get();
 
-      // Convierte los documentos a ReviewModel
+    
       final reviews = snapshot.docs.map((doc) {
         return _fromFirestore(doc);
       }).toList();
@@ -87,7 +87,7 @@ class ReviewRemoteDataSource {
   Future<ReviewModel?> getUserReviewByEntity(
       String userId, String entityId) async {
     try {
-      // Filtra por userId (idMigrante) y entityId
+      
       final snapshot = await _firestore
           .collection('reviews')
           .where('idMigrante', isEqualTo: userId)
@@ -95,12 +95,12 @@ class ReviewRemoteDataSource {
           .limit(1)
           .get();
 
-      // Si no hay documentos, retorna null
+      
       if (snapshot.docs.isEmpty) {
         return null;
       }
 
-      // Convierte el primer documento a ReviewModel
+      
       return _fromFirestore(snapshot.docs.first);
     } catch (e) {
       throw ServerException(
@@ -108,7 +108,7 @@ class ReviewRemoteDataSource {
     }
   }
 
-  /// Convierte un documento de Firestore a ReviewModel
+  
   ReviewModel _fromFirestore(DocumentSnapshot doc) {
     final data = (doc.data() as Map<String, dynamic>?) ?? {};
     return ReviewModel(
