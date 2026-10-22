@@ -1,3 +1,4 @@
+import 'package:migra_ayuda/features/entities/domain/usecases/entities_usecases.dart';
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -48,6 +49,18 @@ final entities2StreamProvider = StreamProvider<List<EntityEntity>>(
   },
 );
 
+
+final getAllEntitiesUseCaseProvider = Provider<GetAllEntitiesUseCase>((ref) {
+  final repo = ref.watch(entityMobilRepositoryProvider);
+  return GetAllEntitiesUseCase(repo);
+});
+
+final syncAllFromFirebaseUseCaseProvider =
+    Provider<SyncAllFromFirebaseUseCase>((ref) {
+  final repo = ref.watch(entityMobilRepositoryProvider);
+  return SyncAllFromFirebaseUseCase(repo);
+});
+
 final filterProvider = StateProvider<String>(
   (ref) => 'Todos',
 );
@@ -66,7 +79,7 @@ class EntityListNotifier extends AsyncNotifier<List<EntityEntity>> {
 
   Future<List<EntityEntity>> _loadEntities() async {
     state = const AsyncValue.loading();
-    final result = await ref.read(entityMobilRepositoryProvider).getAllEntities();
+    final result = await ref.read(getAllEntitiesUseCaseProvider).call();
     return result.fold(
       (failure) => throw failure,
       (entities) {

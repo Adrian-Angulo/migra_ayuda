@@ -110,7 +110,7 @@ class AuthNotifier extends AsyncNotifier<Migrant?> {
 
     result.fold(
       (failure) {
-        debugPrint('❌ Error de autenticación con Google: ${failure.message}');
+        debugPrint('❌ Error de autenticación con Google: ${failure.message} (type: ${failure.runtimeType}, code: ${failure.code})');
         state = AsyncValue.error(failure.code ?? failure.message, StackTrace.current);
       },
       (userData) {

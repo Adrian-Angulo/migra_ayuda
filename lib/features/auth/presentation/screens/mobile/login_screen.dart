@@ -79,7 +79,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ref.read(loginRateLimiterProvider.notifier).recordFailedAttempt();
          
           SnackbarWidget.error(context,
-              ErrorMappers.getAuthErrorMessage(error.toString(), context));
+              ErrorMappers.getAuthErrorMessage(error, context));
         });
       },
     );

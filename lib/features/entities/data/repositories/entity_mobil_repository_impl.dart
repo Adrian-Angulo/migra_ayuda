@@ -22,9 +22,24 @@ class EntityMobilRepositoryImpl implements EntityMobileRepository {
   @override
   Future<Either<Failure, List<EntityEntity>>> getAllEntities() async {
     try {
-      final entities = await localDataSource.getCachedEntities();
-      final entityList = entities.map((model) => EntityMappers.toEntity(model)).toList();
-      return Right(entityList);
+      final cachedEntities = await localDataSource.getCachedEntities();
+      if (cachedEntities.isNotEmpty) {
+        final entityList =
+            cachedEntities.map((model) => EntityMappers.toEntity(model)).toList();
+        return Right(entityList);
+      }
+
+      // Si la base de datos local está vacía (primer inicio), consultar Firebase
+      final isConnected = await networkInfo.isConnected;
+      if (isConnected) {
+        final remoteEntities = await remoteDataSource.getAllEntities();
+        await localDataSource.cacheEntities(remoteEntities);
+        final entityList =
+            remoteEntities.map((model) => EntityMappers.toEntity(model)).toList();
+        return Right(entityList);
+      }
+
+      return const Right([]);
     } catch (_) {
       return const Left(EntityFetchFailedFailure());
     }

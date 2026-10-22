@@ -11,13 +11,13 @@ import 'package:migra_ayuda/features/users/presentation/providers/datatable_prov
 import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/export_button_widget.dart';
 import 'package:migra_ayuda/features/users/presentation/widgets/users_datatable_source.dart';
 
-// Pantalla principal para la gestión de usuarios en la versión web.
+
 class UsersScreen extends ConsumerWidget {
   const UsersScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Obtenemos el estado filtrado de los usuarios usando Riverpod
+    
     final usersState = ref.watch(usersFilterProvider);
 
     return Padding(
