@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:dartz/dartz.dart';
+import 'package:fpdart/fpdart.dart';
 import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/core/network/network_info.dart';
 import 'package:migra_ayuda/features/reviews/data/datasources/review_local_datasource.dart';
