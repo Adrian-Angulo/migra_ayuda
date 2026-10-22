@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/drawer/app_drawer.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/mobile/list_Entities_home.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/list_entities_home.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/filter_container.dart';
 import 'package:migra_ayuda/features/map/presentation/providers/map_display_provider.dart';
 import 'package:migra_ayuda/features/map/presentation/widgets/mapbox_widget.dart';

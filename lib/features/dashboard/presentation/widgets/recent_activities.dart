@@ -57,7 +57,7 @@ class RecentActivities extends ConsumerWidget {
                   ),
                   TextButton(
                     onPressed: () {
-                      context.go(Routes.reviews);
+                      context.go(Routes.userActivity);
                     },
                     child: const Text(
                       'Ver todas',

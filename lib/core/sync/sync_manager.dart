@@ -87,12 +87,12 @@ class SyncNotifier extends AsyncNotifier<SyncState> {
       debugPrint("Error al sincronizar entidades: $e");
     }
     try {
-      await ref.read(reviewRepositoryProvider).syncPendingReviews();
+      await ref.read(syncPendingReviewsUseCaseProvider).call();
     } catch (e) {
       debugPrint("Error al sincronizar reviews: $e");
     }
     try {
-      await ref.read(auditRepositoryProvider).synchronize();
+      await ref.read(synchronizeAuditUseCaseProvider).call();
     } catch (e) {
       debugPrint("Error al sincronizar auditoría: $e");
     }

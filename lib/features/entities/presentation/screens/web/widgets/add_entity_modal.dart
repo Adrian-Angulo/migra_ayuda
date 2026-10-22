@@ -97,7 +97,7 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
                               : 'Complete los datos de la nueva Organización colaboradora',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                           ),
                         ),
                       ],

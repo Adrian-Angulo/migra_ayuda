@@ -1,3 +1,4 @@
+import 'package:migra_ayuda/features/audit/domain/usecases/audit_usecases.dart';
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,8 +48,21 @@ final auditRepositoryProvider = Provider<AuditRepository>(
         networkInfo: network);
   },
 );
+
+final registerActivityUseCaseProvider = Provider<RegisterActivityUsecase>(
+  (ref) => RegisterActivityUsecase(ref.watch(auditRepositoryProvider)),
+);
+
+final getAllActivitiesUseCaseProvider = Provider<GetAllActitiesUsecase>(
+  (ref) => GetAllActitiesUsecase(ref.watch(auditRepositoryProvider)),
+);
+
+final synchronizeAuditUseCaseProvider = Provider<SyncronizeUsecase>(
+  (ref) => SyncronizeUsecase(ref.watch(auditRepositoryProvider)),
+);
+
 final getAllAuditProvider =
-    StreamProvider((ref) => ref.read(auditRepositoryProvider).getAll());
+    StreamProvider((ref) => ref.read(getAllActivitiesUseCaseProvider).call());
 
 final auditNotifierProvider =
     AsyncNotifierProvider<AuditNotifier, ActivityState>(AuditNotifier.new);
@@ -75,7 +89,7 @@ class AuditNotifier extends AsyncNotifier<ActivityState> {
     final activity = _buildAuditEntity(user, accion, metadata);
 
     state = await AsyncValue.guard(() async {
-      final result = await ref.read(auditRepositoryProvider).createActivity(activity);
+      final result = await ref.read(registerActivityUseCaseProvider).call(activity);
       return result.fold(
         (failure) => throw failure,
         (_) => ActivityState.success,

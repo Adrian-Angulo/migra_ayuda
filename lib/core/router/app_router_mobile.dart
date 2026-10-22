@@ -42,7 +42,7 @@ final routerMobile = Provider<GoRouter>(
    
     return GoRouter(
       initialLocation: Routes.splashInit, 
-      refreshListenable: notifier, 
+      refreshListenable: Listenable.merge([notifier, ref.watch(routerMovilNotifierProvider)]), 
       redirect: (context, state) => mobileRedirectGuard(context, state, ref), 
       routes: [
        
@@ -71,7 +71,7 @@ final routerMobile = Provider<GoRouter>(
        
         GoRoute(
           path: Routes.home,
-          builder: (context, state) => HomeScreen(),
+          builder: (context, state) => const HomeScreen(),
         ),
         
         GoRoute(

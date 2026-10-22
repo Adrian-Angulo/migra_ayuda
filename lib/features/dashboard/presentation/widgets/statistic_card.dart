@@ -26,7 +26,7 @@ class StatisticCard extends StatelessWidget {
       return Colors.green;
     } else if (lowerTitle.contains('reseñas')) {
       return const Color(0xFF9333EA);
-    } else if (lowerTitle.contains('Inicios de sesion')) {
+    } else if (lowerTitle.contains('inicios de sesion') || lowerTitle.contains('ruta')) {
       return const Color(0xFFEA580C);
     }
     return Colors.grey;
