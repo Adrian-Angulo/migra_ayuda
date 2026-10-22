@@ -42,7 +42,7 @@ class AlertSuccessRegister extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           const Text(
-            'Te hemos enviado un enlace de confirmación a tu correo. Verifica tu cuenta antes de iniciar sesión. Si no lo encuentras, revisa también la carpeta de spam o correo no deseado.',
+            'Tu cuenta ha sido creada exitosamente. Ya puedes iniciar sesión con tu correo y contraseña.',
             style: TextStyle(
               fontSize: 14,
               color: Color(0xFF6B7280),

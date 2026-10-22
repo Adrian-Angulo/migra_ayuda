@@ -23,15 +23,7 @@ class AuthRemoteDataSource {
       throw Exception('user-not-found');
     }
 
-    await user.reload();
-    final refreshedUser = _auth.currentUser ?? user;
-
-    if (!refreshedUser.emailVerified) {
-      await _auth.signOut();
-      throw Exception('email-not-verified');
-    }
-
-    return AuthUserModel.fromFirebaseUser(refreshedUser);
+    return AuthUserModel.fromFirebaseUser(user);
   }
 
   Future<AuthUserModel> registerWithEmail(String email, String password) async {
@@ -45,7 +37,6 @@ class AuthRemoteDataSource {
       throw Exception('user_creation_failed');
     }
 
-    await user.sendEmailVerification();
     return AuthUserModel.fromFirebaseUser(user);
   }
 
