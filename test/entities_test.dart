@@ -270,14 +270,16 @@ void main() {
       });
 
       test('éxito - debe devolver una lista de entidades', () async {
+        final entityList = [fakeEntity];
+
         when(() => mockMobileRepository.getAllEntities())
-            .thenAnswer((_) async => Right([fakeEntity]));
+            .thenAnswer((_) async => Right(entityList));
 
         final result = await useCase();
 
-        expect(result, Right([fakeEntity]));
+        expect(result, Right(entityList));
         verify(() => mockMobileRepository.getAllEntities()).called(1);
-      }, tags: ['spring_3']);
+      }, tags: ['sprint_3']);
 
       test('error - debe retornar Left(EntityFetchFailedFailure) al fallar',
           () async {
@@ -288,7 +290,7 @@ void main() {
 
         expect(result, const Left(EntityFetchFailedFailure()));
         verify(() => mockMobileRepository.getAllEntities()).called(1);
-      }, tags: ['spring_3']);
+      }, tags: ['sprint_3']);
     });
 
     group('Sincronizar todas las entidades desde Firebase', () {
@@ -307,7 +309,7 @@ void main() {
 
         expect(result, const Right(null));
         verify(() => mockMobileRepository.syncAllFromFirebase()).called(1);
-      }, tags: ['spring_3']);
+      }, tags: ['sprint_3']);
 
       test(
           'error - debe retornar Left(NetworkFailure) si falla la sincronización',
@@ -319,7 +321,7 @@ void main() {
 
         expect(result, const Left(NetworkFailure()));
         verify(() => mockMobileRepository.syncAllFromFirebase()).called(1);
-      }, tags: ['spring_3']);
+      }, tags: ['sprint_3']);
     });
   });
 }

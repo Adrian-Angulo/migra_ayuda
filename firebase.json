@@ -23,6 +23,7 @@
     }
   },
   "hosting": {
+    "site": "migra-ayuda",
     "public": "build/web",
     "ignore": [
       "firebase.json",
