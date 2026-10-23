@@ -13,6 +13,7 @@ import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/in
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_password_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/inputs/text_field_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/mobile/widgets/rate_limiter_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/widgets/need_help_button_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/register_card.dart';
 
 // Pantalla principal de autenticación que alterna entre login y registro
@@ -40,7 +41,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final authState = ref.watch(authNotifierProvider);
     final rateLimiter = ref.watch(loginRateLimiterProvider);
 
-  
     ref.listen(
       authNotifierProvider,
       (previous, next) {
@@ -49,27 +49,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             ref.read(loginRateLimiterProvider.notifier).reset();
 
             if (user.role == 'Migrante') {
-            
-
               if (!context.mounted) return;
-            
+
               if (user.profileComplete == false) {
-            
                 context.go(Routes.completeProfile);
               } else {
                 context.go(Routes.home);
               }
             } else {
-            
               if (!context.mounted) return;
-           
+
               SnackbarWidget.info(
                   context, '¡Eres administrador, ingresa al panel web!');
 
-            
               await Future.delayed(const Duration(seconds: 2));
 
-         
               if (context.mounted) {
                 await ref.read(authNotifierProvider.notifier).logout();
               }
@@ -77,191 +71,198 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           }
         }, error: (error, stackTrace) {
           ref.read(loginRateLimiterProvider.notifier).recordFailedAttempt();
-         
-          SnackbarWidget.error(context,
-              ErrorMappers.getAuthErrorMessage(error, context));
+
+          SnackbarWidget.error(
+              context, ErrorMappers.getAuthErrorMessage(error, context));
         });
       },
     );
 
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: double.infinity,
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Sección del encabezado: logo y texto de bienvenida
-                  Stack(
-                    alignment: Alignment.center,
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: double.infinity,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Image.asset(
-                        'assets/logo/Fondo.png',
-                        width: double.infinity,
-                        fit: BoxFit.cover,
+                      // Sección del encabezado: logo y texto de bienvenida
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/logo/Fondo.png',
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 24),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Hero(
+                                  tag: 'app-logo',
+                                  child: Image.asset(
+                                    'assets/logo/Logo.png',
+                                    width: 110,
+                                    height: 110,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Hero(
+                                  tag: 'app-logo2',
+                                  child: Image.asset(
+                                    'assets/logo/MigraAyuda.png',
+                                    width: 180,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                Text(
+                                  "¡Bienvenido!",
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineSmall
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFF1B1B1B),
+                                      ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  "Tu guía para migrar comienza aqui.",
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        color: const Color(0xFF0B8A6D),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  "Inicia sesión para continuar",
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall
+                                      ?.copyWith(
+                                        color: Colors.grey.shade600,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 24),
+                      if (rateLimiter.isLocked) ...[
+                        FadeInUp(
+                            child: RateLimiterWidget(rateLimiter: rateLimiter)),
+                      ],
+
+                      Form(
+                        key: formKey,
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Hero(
-                              tag: 'app-logo',
-                              child: Image.asset(
-                                'assets/logo/Logo.png',
-                                width: 110,
-                                height: 110,
-                                fit: BoxFit.contain,
-                              ),
+                            const SizedBox(height: 16),
+                            TextFieldWidget(
+                              title: 'Correo electrónico',
+                              hintText: "correo@ejemplo.com",
+                              controller: emailController,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'El correo es obligatorio';
+                                }
+                                final emailRegex =
+                                    RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$');
+                                if (!emailRegex.hasMatch(value.trim())) {
+                                  return 'Ingresa un correo válido';
+                                }
+                                return null;
+                              },
                             ),
-                            const SizedBox(height: 8),
-                            Hero(
-                              tag: 'app-logo2',
-                              child: Image.asset(
-                                'assets/logo/MigraAyuda.png',
-                                width: 180,
-                                fit: BoxFit.contain,
-                              ),
+                            const SizedBox(height: 16),
+                            TextFieldPaswordWidget(
+                              title: 'Contraseña',
+                              controller: passController,
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'La contraseña es obligatoria';
+                                }
+                                if (value.length < 8) {
+                                  return 'La contraseña debe tener al menos 8 caracteres';
+                                }
+
+                                return null;
+                              },
                             ),
-                            const SizedBox(height: 20),
-                            Text(
-                              "¡Bienvenido!",
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: const Color(0xFF1B1B1B),
-                                  ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                TextButton(
+                                  onPressed: () {
+                                    context.push(Routes.resetPassword);
+                                  },
+                                  child:
+                                      const Text('¿Olvidaste tu contraseña?'),
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 6),
-                            Text(
-                              "Tu guía para migrar comienza aqui.",
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodyMedium
-                                  ?.copyWith(
-                                    color: const Color(0xFF0B8A6D),
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                            ButtonWidget(
+                              loading: authState.isLoading,
+                              text: 'Iniciar Sesión',
+                              onPressed: rateLimiter.isLocked
+                                  ? null
+                                  : () async {
+                                      if (formKey.currentState!.validate()) {
+                                        await ref
+                                            .read(authNotifierProvider.notifier)
+                                            .login(emailController.text,
+                                                passController.text);
+                                      }
+                                    },
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              "Inicia sesión para continuar",
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
-                                    color: Colors.grey.shade600,
-                                  ),
+                            const SizedBox(height: 16),
+                            const Row(
+                              children: [
+                                Expanded(child: Divider(height: 2)),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 20),
+                                  child: Text("O continúa con"),
+                                ),
+                                Expanded(child: Divider(height: 2)),
+                              ],
                             ),
+                            const SizedBox(height: 16),
+                            const ButtonGoogleWidget(),
+                            const SizedBox(
+                              height: 16,
+                            ),
+                            RegisterCard(onPressed: () {
+                              context.push(Routes.registerMovil);
+                            })
                           ],
                         ),
                       ),
+                      const SizedBox(height: 16),
+                      const NeedHelpButtonWidget(),
+                      const SizedBox(height: 100)
                     ],
                   ),
-                  if (rateLimiter.isLocked) ...[
-                    FadeInUp(
-                        child: RateLimiterWidget(rateLimiter: rateLimiter)),
-                  ],
-
-                  Form(
-                    key: formKey,
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 16),
-                        TextFieldWidget(
-                          title: 'Correo electrónico',
-                          hintText: "correo@ejemplo.com",
-                          controller: emailController,
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'El correo es obligatorio';
-                            }
-                            final emailRegex =
-                                RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$');
-                            if (!emailRegex.hasMatch(value.trim())) {
-                              return 'Ingresa un correo válido';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        TextFieldPaswordWidget(
-                          title: 'Contraseña',
-                          controller: passController,
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'La contraseña es obligatoria';
-                            }
-                            if (value.length < 8) {
-                              return 'La contraseña debe tener al menos 8 caracteres';
-                            }
-
-                            return null;
-                          },
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                context.push(Routes.resetPassword);
-                              },
-                              child: const Text('¿Olvidaste tu contraseña?'),
-                            ),
-                          ],
-                        ),
-                        ButtonWidget(
-                         
-                          loading: authState.isLoading,
-                          text: 'Iniciar Sesión',
-                          onPressed: rateLimiter.isLocked
-                              ? null
-                              : () async {
-                                  if (formKey.currentState!.validate()) {
-                                    await ref
-                                        .read(authNotifierProvider.notifier)
-                                        .login(emailController.text,
-                                            passController.text);
-                                  }
-                                },
-                        ),
-                        const SizedBox(height: 16),
-                        const Row(
-                          children: [
-                            Expanded(child: Divider(height: 2)),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 20),
-                              child: Text("O continúa con"),
-                            ),
-                            Expanded(child: Divider(height: 2)),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        const ButtonGoogleWidget(),
-                        const SizedBox(
-                          height: 16,
-                        ),
-                        RegisterCard(onPressed: () {
-                          context.push(Routes.registerMovil);
-                        })
-                      ],
-                    ),
-                  )
-                ],
+                ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

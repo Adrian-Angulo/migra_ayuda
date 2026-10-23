@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/sync/sync_manager.dart';
+import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/drawer/app_drawer.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/list_entities_home.dart';
@@ -123,6 +125,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                const SynchronizationButton(),
+                const SizedBox(
+                  height: 8,
+                ),
                 Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
@@ -153,6 +159,80 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           const FilterContainer(),
         ],
+      ),
+    );
+  }
+}
+
+class SynchronizationButton extends ConsumerWidget {
+  const SynchronizationButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isSyncing = ref.watch(syncProvider).isLoading;
+
+    return Container(
+      height: 50,
+      width: 50,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.14),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: FloatingActionButton(
+        heroTag: 'sincronization',
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF00897B),
+        elevation: 0,
+        focusElevation: 0,
+        hoverElevation: 0,
+        highlightElevation: 0,
+        onPressed: isSyncing
+            ? null
+            : () async {
+                final result = await ref.read(syncProvider.notifier).syncAll();
+                if (!context.mounted) return;
+
+                switch (result) {
+                  case SyncResult.success:
+                    SnackbarWidget.success(
+                      context,
+                      'Sincronización completada con éxito',
+                    );
+                    break;
+                  case SyncResult.noConnection:
+                    SnackbarWidget.warning(
+                      context,
+                      'No hay conexión a internet para sincronizar',
+                    );
+                    break;
+                  case SyncResult.error:
+                    SnackbarWidget.error(
+                      context,
+                      'Ocurrió un error al sincronizar los datos',
+                    );
+                    break;
+                  case SyncResult.alreadySyncing:
+                    break;
+                }
+              },
+        child: isSyncing
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF00897B)),
+                ),
+              )
+            : const Icon(Icons.sync, size: 22),
       ),
     );
   }
