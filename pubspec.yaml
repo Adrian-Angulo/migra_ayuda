@@ -44,6 +44,7 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   google_fonts: ^8.2.1
+  showcaseview: ^5.1.0
 
 dev_dependencies:
   flutter_test:

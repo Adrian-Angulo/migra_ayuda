@@ -8,6 +8,8 @@ import 'package:migra_ayuda/features/entities/presentation/screens/mobile/list_e
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/filter_container.dart';
 import 'package:migra_ayuda/features/map/presentation/providers/map_display_provider.dart';
 import 'package:migra_ayuda/features/map/presentation/widgets/mapbox_widget.dart';
+import 'package:migra_ayuda/features/tutorial/presentation/widgets/home_showcase_wrapper.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -47,119 +49,150 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final initials = _getInitials(user?.name);
     final screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      key: scaffoldKey,
-      endDrawer: const AppDrawer(),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: false,
-        title: Image.asset(
-          "assets/logo/MigraAyuda.png",
-          height: 36,
-          fit: BoxFit.contain,
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 14.0),
-            child: GestureDetector(
-              onTap: () => scaffoldKey.currentState?.openEndDrawer(),
-              child: Container(
-                width: 45,
-                height: 45,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF00897B), Color(0xFF004D40)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  border:
-                      Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
-                ),
-                child: Center(
-                  child: Text(
-                    initials,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
+    return HomeShowcaseWrapper(
+      builder: (context, showcase) {
+        return Scaffold(
+          key: scaffoldKey,
+          endDrawer: const AppDrawer(),
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            surfaceTintColor: Colors.transparent,
+            elevation: 0,
+            centerTitle: false,
+            title: Image.asset(
+              "assets/logo/MigraAyuda.png",
+              height: 36,
+              fit: BoxFit.contain,
+            ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 14.0),
+                child: GestureDetector(
+                  onTap: () => scaffoldKey.currentState?.openEndDrawer(),
+                  child: Container(
+                    width: 45,
+                    height: 45,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF00897B), Color(0xFF004D40)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      border: Border.all(
+                          color: const Color(0xFFE2E8F0), width: 1.5),
+                    ),
+                    child: Center(
+                      child: Text(
+                        initials,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
-      body: Stack(
-        children: [
-          const MapboxWidget(
-            key: ValueKey('mapbox_main'),
-          ),
-          ListEntitesHome(sheetController: _sheetController),
-          AnimatedBuilder(
-            animation: _sheetController,
-            builder: (context, child) {
-              final currentSize =
-                  _sheetController.isAttached ? _sheetController.size : 0.3;
-
-              if (currentSize >= 0.95) {
-                return const SizedBox.shrink();
-              }
-
-              final opacity =
-                  ((0.95 - currentSize) / (0.95 - 0.70)).clamp(0.0, 1.0);
-              final bottomOffset = (screenHeight * currentSize);
-
-              return Positioned(
-                bottom: bottomOffset + 8,
-                right: 14,
-                child: Opacity(
-                  opacity: opacity,
-                  child: child,
+          body: Stack(
+            children: [
+              Showcase(
+                key: showcase.mapKey,
+                title: 'Explora las organizaciones',
+                description:
+                    'Visualiza y explora en el mapa las organizaciones disponibles según el tipo de servicio que brindan. Utiliza los filtros para encontrar fácilmente la ayuda que necesitas.',
+                child: const MapboxWidget(
+                  key: ValueKey('mapbox_main'),
                 ),
-              );
-            },
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SynchronizationButton(),
-                const SizedBox(
-                  height: 8,
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.14),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
+              ),
+              ListEntitesHome(sheetController: _sheetController),
+              AnimatedBuilder(
+                animation: _sheetController,
+                builder: (context, child) {
+                  final currentSize =
+                      _sheetController.isAttached ? _sheetController.size : 0.3;
+
+                  if (currentSize >= 0.95) {
+                    return const SizedBox.shrink();
+                  }
+
+                  final opacity =
+                      ((0.95 - currentSize) / (0.95 - 0.70)).clamp(0.0, 1.0);
+                  final bottomOffset = (screenHeight * currentSize);
+
+                  return Positioned(
+                    bottom: bottomOffset + 8,
+                    right: 14,
+                    child: Opacity(
+                      opacity: opacity,
+                      child: child,
+                    ),
+                  );
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Showcase(
+                      key: showcase.syncKey,
+                      title: 'Sincronizar datos',
+                      description:
+                          'Presiona este botón para actualizar y obtener los datos más recientes disponibles en la aplicación.',
+                      targetShapeBorder: const CircleBorder(),
+                      child: const SynchronizationButton(),
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    Showcase(
+                      key: showcase.locationKey,
+                      title: 'Mi ubicación',
+                      description:
+                          'Presiona este botón para centrar el mapa en tu ubicación actual. Esto te permitirá ver tu posición en el mapa y encontrar organizaciones cercanas con mayor facilidad.',
+                      targetShapeBorder: const CircleBorder(),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.14),
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: FloatingActionButton(
+                          heroTag: 'location',
+                          backgroundColor: const Color(0xFF00897B),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          focusElevation: 0,
+                          hoverElevation: 0,
+                          highlightElevation: 0,
+                          child:
+                              const Icon(Icons.my_location_rounded, size: 22),
+                          onPressed: () {
+                            ref.read(mapProvider.notifier).resumeTracking();
+                          },
+                        ),
                       ),
-                    ],
-                  ),
-                  child: FloatingActionButton(
-                    heroTag: 'location',
-                    backgroundColor: const Color(0xFF00897B),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    focusElevation: 0,
-                    hoverElevation: 0,
-                    highlightElevation: 0,
-                    child: const Icon(Icons.my_location_rounded, size: 22),
-                    onPressed: () {
-                      ref.read(mapProvider.notifier).resumeTracking();
-                    },
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              Showcase(
+                  key: showcase.filterKey,
+                  title: 'Filtrar organizaciones',
+                  description:
+                      'Taca aqui para filtrar organizaciones de un servicio en especifico',
+                  targetShapeBorder: const CircleBorder(),
+                  child: const FilterContainer()),
+            ],
           ),
-          const FilterContainer(),
-        ],
-      ),
+        );
+      },
     );
   }
 }
