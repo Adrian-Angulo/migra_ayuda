@@ -1,21 +1,21 @@
-
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
 import 'package:migra_ayuda/core/errors/failure.dart';
 
-
 class StatisticCard extends StatelessWidget {
   final String title;
   final AsyncValue<int> value;
   final IconData icon;
+  final double? width;
 
   const StatisticCard({
     super.key,
     required this.title,
     required this.value,
     required this.icon,
+    this.width,
   });
 
   Color _getColorByTitle(String title) {
@@ -36,10 +36,9 @@ class StatisticCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final cardColor = _getColorByTitle(title);
     return FadeInRight(
-      
       child: Container(
         height: 110,
-        width: 280,
+        width: width ?? double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         decoration: ContainerDecorationBorder.decorationBox(),
         child: Row(
@@ -89,7 +88,6 @@ class StatisticCard extends StatelessWidget {
                       ),
                     ),
                   )
-
                 ],
               ),
             ),

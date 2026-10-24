@@ -28,30 +28,37 @@ class UserActivityWebScreen extends ConsumerWidget {
         children: [
           // ── Encabezado ────────────────────────────────────────────────
           const HeaderWeb(
-              title: 'Acciones de usuarios',
-              subTitle: 'Registro de acciones realiadas por los usuarios'),
+            title: 'Acciones de usuarios',
+            subTitle: 'Registro de acciones realizadas por los usuarios',
+          ),
           const SizedBox(height: UIConstants.spacingM),
 
-          // ── Barra de búsqueda + exportar ──────────────────────────────
-          SizedBox(
-            height: 40,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextFielSearchWeb(
-                  onChanged: (String value) {
-                    ref.read(queryAuditProvider.notifier).state =
-                        value.toLowerCase().trim();
-                  },
-                  hintText: 'Buscar por usuario, correo o acción...',
+          // ── Barra de búsqueda + exportar adaptable ───────────────────
+          Row(
+            children: [
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextFielSearchWeb(
+                    onChanged: (String value) {
+                      ref.read(queryAuditProvider.notifier).state =
+                          value.toLowerCase().trim();
+                    },
+                    hintText: 'Buscar por usuario, correo o acción...',
+                  ),
                 ),
-                ExportButtonWidget(
-                    label: 'Exportar',
-                    onPressed: () {
-                      ExportService.exportActivities(activitiesState.value!);
-                    }),
-              ],
-            ),
+              ),
+              const SizedBox(width: 12),
+              ExportButtonWidget(
+                label: 'Exportar',
+                onPressed: () {
+                  if (activitiesState.value != null &&
+                      activitiesState.value!.isNotEmpty) {
+                    ExportService.exportActivities(activitiesState.value!);
+                  }
+                },
+              ),
+            ],
           ),
           const SizedBox(height: UIConstants.spacingM),
 

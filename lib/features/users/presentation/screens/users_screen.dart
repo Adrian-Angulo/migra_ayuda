@@ -11,62 +11,59 @@ import 'package:migra_ayuda/features/users/presentation/providers/datatable_prov
 import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/export_button_widget.dart';
 import 'package:migra_ayuda/features/users/presentation/widgets/users_datatable_source.dart';
 
-
 class UsersScreen extends ConsumerWidget {
   const UsersScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    
     final usersState = ref.watch(usersFilterProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(
-          horizontal: UIConstants.spacingL, vertical: UIConstants.spacingL),
+        horizontal: UIConstants.spacingL,
+        vertical: UIConstants.spacingL,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Encabezado con el título y el botón para registrar administrador
+          // Encabezado con el título
           const HeaderWeb(
-              title: "Gestión de usuarios",
-              subTitle: "Gestiona los usuarios registrados en el sistema"),
+            title: "Gestión de usuarios",
+            subTitle: "Gestiona los usuarios registrados en el sistema",
+          ),
+          const SizedBox(height: UIConstants.spacingM),
 
-          const SizedBox(
-            height: UIConstants.spacingM,
-          ),
-          // Barra de búsqueda y acciones (filtrar/exportar)
-          SizedBox(
-            height: 40,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Campo de búsqueda básica
-                TextFielSearchWeb(
-                  onChanged: (String value) {
-                    // Cambiamos el filtro de búsqueda con el texto ingresado
-                    ref.read(queryUserProvider.notifier).state =
-                        value.toLowerCase().trim();
-                  },
-                  hintText: 'Buscar usuario...',
+          // Barra de búsqueda y acciones adaptable
+          Row(
+            children: [
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextFielSearchWeb(
+                    onChanged: (String value) {
+                      ref.read(queryUserProvider.notifier).state =
+                          value.toLowerCase().trim();
+                    },
+                    hintText: 'Buscar usuario...',
+                  ),
                 ),
-                ExportButtonWidget(
-                    label: 'Exportar',
-                    onPressed: () {
-                      ExportService.exportUsers(usersState.value ?? []);
-                    }),
-              ],
-            ),
+              ),
+              const SizedBox(width: 12),
+              ExportButtonWidget(
+                label: 'Exportar',
+                onPressed: () {
+                  ExportService.exportUsers(usersState.value ?? []);
+                },
+              ),
+            ],
           ),
-          const SizedBox(
-            height: UIConstants.spacingM,
-          ),
+          const SizedBox(height: UIConstants.spacingM),
+
           // Sección donde se muestran los datos de la tabla según el estado
           usersState.when(
             data: (users) {
-              // Creamos las filas de la tabla con los usuarios
               final rows = UsersDatatableSource(listUsers: users);
 
-              // Tabla personalizada mostrando los usuarios y sus propiedades
               return BuildTable(
                 rows: rows,
                 columns: [
@@ -105,11 +102,9 @@ class UsersScreen extends ConsumerWidget {
                 ],
               );
             },
-            // Mostrar mensaje si ocurre un error al cargar los usuarios
             error: (error, stackTrace) {
               return Text('Error $error');
             },
-            // Indicador de carga mientras se cargan los usuarios
             loading: () => const Expanded(
               child: Center(child: CircularProgressIndicator()),
             ),

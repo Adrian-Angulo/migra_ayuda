@@ -6,45 +6,66 @@ import 'package:migra_ayuda/features/dashboard/presentation/widgets/recent_activ
 import 'package:migra_ayuda/features/dashboard/presentation/widgets/section_statics_card.dart';
 import 'package:migra_ayuda/features/dashboard/presentation/widgets/service_more_filter_container.dart';
 
+
 class Dashboard extends StatelessWidget {
-  const Dashboard({
-    super.key,
-  });
+  const Dashboard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const SafeArea(
+    return SafeArea(
       child: SingleChildScrollView(
-        child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              spacing: 24,
+        padding: const EdgeInsets.all(16),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isWideScreen = constraints.maxWidth >= 1024;
+
+            return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                //header-----------------
-                HeaderWeb(title: 'Dashboard', subTitle: 'Resumen general'),
+                // Header
+                const HeaderWeb(title: 'Dashboard', subTitle: 'Resumen general'),
+                const SizedBox(height: 24),
 
-                //secciones de cards------
-                SectionStaticsCard(),
+                // Secciones de tarjetas métricas
+                const SectionStaticsCard(),
+                const SizedBox(height: 24),
 
-                //seccion de activis
-                Row(
-                  spacing: 16,
-                  children: [
-                    Expanded(flex: 2, child: ActivityChartCard()),
-                    Expanded(flex: 1, child: RecentActivities())
-                  ],
-                ),
+                // Sección de gráficos de actividad y actividades recientes
+                if (isWideScreen)
+                  const Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(flex: 2, child: ActivityChartCard()),
+                      SizedBox(width: 16),
+                      Expanded(flex: 1, child: RecentActivities()),
+                    ],
+                  )
+                else ...[
+                  const ActivityChartCard(),
+                  const SizedBox(height: 24),
+                  const RecentActivities(),
+                ],
+                const SizedBox(height: 24),
 
-                Row(
-                  spacing: 16,
-                  children: [
-                    Expanded(child: CategoryChart()),
-                    Expanded(child: ServiceMoreFilterContainer())
-                  ],
-                )
+                // Sección de categorías y destinos más requeridos
+                if (isWideScreen)
+                  const Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(child: CategoryChart()),
+                      SizedBox(width: 16),
+                      Expanded(child: ServiceMoreFilterContainer()),
+                    ],
+                  )
+                else ...[
+                  const CategoryChart(),
+                  const SizedBox(height: 24),
+                  const ServiceMoreFilterContainer(),
+                ],
               ],
-            )),
+            );
+          },
+        ),
       ),
     );
   }

@@ -30,12 +30,22 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
     });
 
     final isEdit = widget.entity != null;
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final isCompact = screenWidth < 768;
 
     return Dialog(
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: isCompact ? 12 : 24,
+        vertical: isCompact ? 16 : 24,
+      ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
-        width: 700,
-        constraints: const BoxConstraints(maxHeight: 850),
+        width: isCompact ? double.infinity : 700,
+        constraints: BoxConstraints(
+          maxWidth: 700,
+          maxHeight: screenHeight * 0.9,
+        ),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -50,8 +60,9 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // ── Encabezado del modal ──────────────────────────────────
             Container(
-              padding: const EdgeInsets.all(28),
+              padding: EdgeInsets.all(isCompact ? 16 : 24),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -66,7 +77,7 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: Colors.white.withAlpha(51),
                       borderRadius: BorderRadius.circular(12),
@@ -74,29 +85,29 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
                     child: const Icon(
                       Icons.business,
                       color: Colors.white,
-                      size: 24,
+                      size: 22,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           isEdit ? 'Editar Organización' : 'Nueva Organización',
-                          style: const TextStyle(
-                            fontSize: 24,
+                          style: TextStyle(
+                            fontSize: isCompact ? 18 : 22,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         Text(
                           isEdit
-                              ? 'Modifique los datos de la Organización colaboradora'
-                              : 'Complete los datos de la nueva Organización colaboradora',
+                              ? 'Modifique los datos de la Organización'
+                              : 'Complete los datos de la nueva Organización',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: isCompact ? 12 : 13,
                             color: Colors.white.withValues(alpha: 0.9),
                           ),
                         ),
@@ -108,13 +119,13 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
                     icon: const Icon(Icons.close),
                     color: Colors.white,
                     style: IconButton.styleFrom(
-                      backgroundColor:
-                          Colors.white.withAlpha(51), // 20% opacity
+                      backgroundColor: Colors.white.withAlpha(51),
                     ),
                   ),
                 ],
               ),
             ),
+            // ── Formulario con scroll interno ─────────────────────────
             FormEntity(entity: widget.entity),
           ],
         ),

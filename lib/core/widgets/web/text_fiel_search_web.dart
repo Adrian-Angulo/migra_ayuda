@@ -1,17 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+
 class TextFielSearchWeb extends ConsumerWidget {
   final Function(String)? onChanged;
   final String hintText;
+  final double? width;
 
-  const TextFielSearchWeb(
-      {super.key, required this.onChanged, required this.hintText});
+  const TextFielSearchWeb({
+    super.key,
+    required this.onChanged,
+    required this.hintText,
+    this.width,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return SizedBox(
-      width: 450,
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: width ?? 450,
+      ),
       child: TextField(
         onChanged: onChanged,
         decoration: InputDecoration(
@@ -27,9 +35,10 @@ class TextFielSearchWeb extends ConsumerWidget {
           ),
           filled: true,
           fillColor: Colors.white,
+          isDense: true,
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: 18,
-            vertical: 16,
+            horizontal: 16,
+            vertical: 12,
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),

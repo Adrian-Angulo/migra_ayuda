@@ -27,36 +27,36 @@ class ReviewsScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── Encabezado ────────────────────────────────────────────────
-
           const HeaderWeb(
-              title: 'Gestión de reseñas',
-              subTitle:
-                  'Gestiona los comentarios y valoraciones de los usuarios'),
-
+            title: 'Gestión de reseñas',
+            subTitle: 'Gestiona los comentarios y valoraciones de los usuarios',
+          ),
           const SizedBox(height: UIConstants.spacingM),
 
-          // ── Barra de búsqueda + exportar ──────────────────────────────
-          SizedBox(
-            height: 40,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextFielSearchWeb(
-                  onChanged: (String value) {
-                    ref.read(queryReviewProvider.notifier).state =
-                        value.toLowerCase().trim();
-                  },
-                  hintText: 'Buscar por usuario, entidad o país...',
+          // ── Barra de búsqueda + exportar adaptable ───────────────────
+          Row(
+            children: [
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextFielSearchWeb(
+                    onChanged: (String value) {
+                      ref.read(queryReviewProvider.notifier).state =
+                          value.toLowerCase().trim();
+                    },
+                    hintText: 'Buscar por usuario, entidad o país...',
+                  ),
                 ),
-                ExportButtonWidget(
-                  label: 'Exportar',
-                  onPressed: reviewsState.value != null &&
-                          reviewsState.value!.isNotEmpty
-                      ? () => ExportService.exportReviews(reviewsState.value!)
-                      : () {},
-                ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 12),
+              ExportButtonWidget(
+                label: 'Exportar',
+                onPressed: reviewsState.value != null &&
+                        reviewsState.value!.isNotEmpty
+                    ? () => ExportService.exportReviews(reviewsState.value!)
+                    : () {},
+              ),
+            ],
           ),
           const SizedBox(height: UIConstants.spacingM),
 

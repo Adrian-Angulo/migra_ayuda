@@ -34,11 +34,16 @@ class _DeleteConfirmationDialogState
       }
     });
 
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final isCompact = screenWidth < 480;
+
     return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Container(
-        width: 450,
-        padding: const EdgeInsets.all(32),
+        width: isCompact ? double.infinity : 450,
+        constraints: const BoxConstraints(maxWidth: 450),
+        padding: EdgeInsets.all(isCompact ? 20 : 32),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -48,39 +53,37 @@ class _DeleteConfirmationDialogState
           children: [
             // ── Ícono ────────────────────────────────────────────────
             Container(
-              width: 80,
-              height: 80,
+              width: isCompact ? 64 : 80,
+              height: isCompact ? 64 : 80,
               decoration: BoxDecoration(
                 color: Colors.red.shade50,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.warning_amber_rounded,
-                size: 40,
+                size: isCompact ? 32 : 40,
                 color: Colors.red.shade400,
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
-            
-            const Text(
+            Text(
               '¿Eliminar Organización?',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: isCompact ? 20 : 24,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF111827),
+                color: const Color(0xFF111827),
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
 
-            
             RichText(
               textAlign: TextAlign.center,
               text: TextSpan(
-                style: const TextStyle(
-                  fontSize: 15,
-                  color: Color(0xFF6B7280),
+                style: TextStyle(
+                  fontSize: isCompact ? 13 : 15,
+                  color: const Color(0xFF6B7280),
                   height: 1.5,
                 ),
                 children: [
@@ -99,7 +102,7 @@ class _DeleteConfirmationDialogState
                 ],
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 28),
 
             // ── Botones ──────────────────────────────────────────────
             Row(
@@ -109,7 +112,7 @@ class _DeleteConfirmationDialogState
                     onPressed:
                         isLoading ? null : () => Navigator.of(context).pop(),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                       side: BorderSide(color: Colors.grey.shade300),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -118,7 +121,7 @@ class _DeleteConfirmationDialogState
                     child: Text(
                       'Cancelar',
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: Colors.grey.shade700,
                       ),
@@ -132,7 +135,7 @@ class _DeleteConfirmationDialogState
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red.shade500,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -152,7 +155,7 @@ class _DeleteConfirmationDialogState
                         : const Text(
                             'Eliminar',
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
                           ),

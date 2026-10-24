@@ -68,13 +68,18 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // ── Encabezado adaptable (Wrap) ──────────────────────────────
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: UIConstants.spacingM,
+            runSpacing: UIConstants.spacingM,
             children: [
               const HeaderWeb(
-                  title: 'Gestión de Organizaciones',
-                  subTitle:
-                      'Gestiona las Organizaciones registradas en el sistema'),
+                title: 'Gestión de Organizaciones',
+                subTitle:
+                    'Gestiona las Organizaciones registradas en el sistema',
+              ),
               AddButtonWidget(
                 text: 'Registrar Organización',
                 onTap: () {
@@ -88,26 +93,29 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
           ),
           const SizedBox(height: UIConstants.spacingM),
 
-          // ── Barra de búsqueda + filtro + exportar ─────────────────────
-          SizedBox(
-            height: 40,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextFielSearchWeb(
-                  onChanged: (String value) {
-                    ref.read(queryEntityProvider.notifier).state =
-                        value.toLowerCase().trim();
-                  },
-                  hintText: 'Buscar por nombre o dirección...',
+          // ── Barra de búsqueda + exportar adaptable ───────────────────
+          Row(
+            children: [
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextFielSearchWeb(
+                    onChanged: (String value) {
+                      ref.read(queryEntityProvider.notifier).state =
+                          value.toLowerCase().trim();
+                    },
+                    hintText: 'Buscar por nombre o dirección...',
+                  ),
                 ),
-                ExportButtonWidget(
-                    label: 'Exportar',
-                    onPressed: () {
-                      ExportService.exportEntities(entitiesState.value ?? []);
-                    }),
-              ],
-            ),
+              ),
+              const SizedBox(width: 12),
+              ExportButtonWidget(
+                label: 'Exportar',
+                onPressed: () {
+                  ExportService.exportEntities(entitiesState.value ?? []);
+                },
+              ),
+            ],
           ),
           const SizedBox(height: UIConstants.spacingM),
 
