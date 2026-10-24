@@ -50,7 +50,7 @@ class AuthNotifier extends AsyncNotifier<Migrant?> {
     final getUserProfileUseCase = ref.read(getUserProfileUseCaseProvider);
     final activity = ref.read(auditNotifierProvider.notifier);
 
-    // 1. Autenticar credenciales
+
     final loginResult = await loginUseCase(email, password);
 
     await loginResult.fold(
@@ -59,7 +59,7 @@ class AuthNotifier extends AsyncNotifier<Migrant?> {
         state = AsyncValue.error(failure.code ?? failure.message, StackTrace.current);
       },
       (authUser) async {
-        // 2. Obtener datos completos del perfil de usuario
+        
         final profileResult = await getUserProfileUseCase(authUser.id);
 
         profileResult.fold(
@@ -69,13 +69,9 @@ class AuthNotifier extends AsyncNotifier<Migrant?> {
           },
           (userData) {
             state = AsyncValue.data(userData);
-            debugPrint('✅ Login exitoso: ${userData?.name ?? authUser.email}');
-
-            if (!kIsWeb) {
               activity.create(
                 accion: ActivityActions.login(),
               );
-            }
           },
         );
       },
