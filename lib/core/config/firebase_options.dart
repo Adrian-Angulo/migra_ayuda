@@ -52,7 +52,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCS9dWZSewXldqcf4jWbNCKzzP_OsjG6zw',
-    appId: '1:230355024122:android:529414eae9fb827a57f143',
+    appId: '1:230355024122:android:0a49423fe4a390cf57f143',
     messagingSenderId: '230355024122',
     projectId: 'migraayuda-fb971',
     storageBucket: 'migraayuda-fb971.firebasestorage.app',

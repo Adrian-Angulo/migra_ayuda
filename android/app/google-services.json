@@ -7,56 +7,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:230355024122:android:529414eae9fb827a57f143",
+        "mobilesdk_app_id": "1:230355024122:android:0a49423fe4a390cf57f143",
         "android_client_info": {
-          "package_name": "com.example.migra_ayuda"
+          "package_name": "com.umariana.migra_ayuda"
         }
       },
       "oauth_client": [
         {
-          "client_id": "230355024122-qqjak7cg72fch9bd1gcpjo2oa9qhdpn4.apps.googleusercontent.com",
+          "client_id": "230355024122-488i2bdga0gmaeeksierj683urtoenf2.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.migra_ayuda",
-            "certificate_hash": "d185ba40eb3d183585fe1876e3e60d67a8d6c4cb"
+            "package_name": "com.umariana.migra_ayuda",
+            "certificate_hash": "765ffeff53bb0f9846af85edd73907df662b7a9c"
           }
         },
-        {
-          "client_id": "230355024122-1dn13j2cddcva1gq52gr69gsml8t0r6c.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCS9dWZSewXldqcf4jWbNCKzzP_OsjG6zw"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "230355024122-1dn13j2cddcva1gq52gr69gsml8t0r6c.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "230355024122-6sj90en1kb9657aors0j6q1ksmnkcalq.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.migraAyudaAdministracion"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:230355024122:android:b53b8fd978d3d7df57f143",
-        "android_client_info": {
-          "package_name": "com.example.migra_ayuda_administracion"
-        }
-      },
-      "oauth_client": [
         {
           "client_id": "230355024122-1dn13j2cddcva1gq52gr69gsml8t0r6c.apps.googleusercontent.com",
           "client_type": 3

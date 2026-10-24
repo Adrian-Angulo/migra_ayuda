@@ -1,4 +1,4 @@
-package com.example.migra_ayuda
+package com.umariana.migra_ayuda
 
 import io.flutter.embedding.android.FlutterActivity
 

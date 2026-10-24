@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/auth/data/datasources/auth_remote_datasource.dart';
@@ -22,6 +23,7 @@ class AuthRepositoryImpl implements AuthRepository {
     } on FirebaseAuthException catch (e) {
       return Left(AuthExceptionMapper.fromFirebaseAuthException(e));
     } catch (e) {
+      debugPrint('❌ Error detallado en authWithGoogle: $e');
       if (e.toString().contains('email-not-verified')) {
         return const Left(EmailNotVerifiedFailure());
       }
@@ -38,6 +40,7 @@ class AuthRepositoryImpl implements AuthRepository {
     } on FirebaseAuthException catch (e) {
       return Left(AuthExceptionMapper.fromFirebaseAuthException(e));
     } catch (e) {
+      debugPrint('❌ Error detallado en authWithGoogle: $e');
       if (e.toString().contains('cancel') ||
           e.toString().contains('google-sign-in-cancelled')) {
         return const Left(GoogleSignInCancelledFailure());
@@ -54,6 +57,7 @@ class AuthRepositoryImpl implements AuthRepository {
     } on FirebaseAuthException catch (e) {
       return Left(AuthExceptionMapper.fromFirebaseAuthException(e));
     } catch (e) {
+      debugPrint('❌ Error detallado en authWithGoogle: $e');
       return const Left(UnexpectedFailure());
     }
   }
@@ -66,6 +70,7 @@ class AuthRepositoryImpl implements AuthRepository {
     } on FirebaseAuthException catch (e) {
       return Left(AuthExceptionMapper.fromFirebaseAuthException(e));
     } catch (e) {
+      debugPrint('❌ Error detallado en authWithGoogle: $e');
       return const Left(UnexpectedFailure());
     }
   }
@@ -78,6 +83,7 @@ class AuthRepositoryImpl implements AuthRepository {
     } on FirebaseAuthException catch (e) {
       return Left(AuthExceptionMapper.fromFirebaseAuthException(e));
     } catch (e) {
+      debugPrint('❌ Error detallado en authWithGoogle: $e');
       return const Left(UnexpectedFailure());
     }
   }
@@ -90,6 +96,7 @@ class AuthRepositoryImpl implements AuthRepository {
     } on FirebaseAuthException catch (e) {
       return Left(AuthExceptionMapper.fromFirebaseAuthException(e));
     } catch (e) {
+      debugPrint('❌ Error detallado en authWithGoogle: $e');
       return const Left(UnexpectedFailure());
     }
   }
@@ -107,6 +114,7 @@ class AuthRepositoryImpl implements AuthRepository {
     } on FirebaseAuthException catch (e) {
       return Left(AuthExceptionMapper.fromFirebaseAuthException(e));
     } catch (e) {
+      debugPrint('❌ Error detallado en authWithGoogle: $e');
       return const Left(UnexpectedFailure());
     }
   }
