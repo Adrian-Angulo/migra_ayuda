@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/services_utils.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/place_hero_image.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 
 class PlaceDetailsHeader extends ConsumerWidget {
@@ -20,7 +21,7 @@ class PlaceDetailsHeader extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _PlaceHeroImage(imageUrl: entity.imageUrl),
+        PlaceHeroImage(imageUrl: entity.imageUrl),
         const SizedBox(height: 16),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,62 +96,7 @@ class PlaceDetailsHeader extends ConsumerWidget {
   }
 }
 
-class _PlaceHeroImage extends StatelessWidget {
-  final String imageUrl;
 
-  const _PlaceHeroImage({required this.imageUrl});
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: SizedBox(
-        width: double.infinity,
-        height: 180,
-        child: imageUrl.isNotEmpty
-            ? CachedNetworkImage(
-                imageUrl: imageUrl,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  color: const Color(0xFFF1F5F9),
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(Color(0xFF00897B)),
-                    ),
-                  ),
-                ),
-                errorWidget: (context, url, error) => _placeholder(),
-                maxHeightDiskCache: 800,
-                maxWidthDiskCache: 800,
-                memCacheHeight: 800,
-                memCacheWidth: 800,
-              )
-            : _placeholder(),
-      ),
-    );
-  }
-
-  Widget _placeholder() {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFFE0F2F1), Color(0xFFB2DFDB)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: const Center(
-        child: Icon(
-          Icons.domain_rounded,
-          size: 56,
-          color: Color(0xFF00796B),
-        ),
-      ),
-    );
-  }
-}
 
 class PlaceInfoChip extends StatelessWidget {
   final IconData icon;
