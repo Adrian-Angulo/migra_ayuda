@@ -8,7 +8,7 @@ import 'package:migra_ayuda/core/services/export/export_services.dart';
 import 'package:migra_ayuda/core/widgets/web/dasboard_header.dart';
 import 'package:migra_ayuda/core/widgets/web/text_fiel_search_web.dart';
 import 'package:migra_ayuda/features/users/presentation/providers/datatable_providers.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/export_button_widget.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/export_button.dart';
 import 'package:migra_ayuda/features/users/presentation/widgets/users_datatable_source.dart';
 
 class UsersScreen extends ConsumerWidget {
@@ -49,7 +49,7 @@ class UsersScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              ExportButtonWidget(
+              ExportButton(
                 label: 'Exportar',
                 onPressed: () {
                   ExportService.exportUsers(usersState.value ?? []);

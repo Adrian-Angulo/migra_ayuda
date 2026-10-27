@@ -4,27 +4,24 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/services_utils.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 
-
-
-class ServiceTypeChecklistWidget extends ConsumerWidget {
-  const ServiceTypeChecklistWidget({
-    super.key,
-  });
+class ServiceTypeChecklist extends ConsumerWidget {
+  const ServiceTypeChecklist({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final List<String> selectedServices = ref.watch(listSelectedServicesFormProviders);
+    final List<String> selectedServices =
+        ref.watch(listSelectedServicesFormProviders);
 
     return FormField<List<String>>(
-      // Cuando se guarda el formulario, se actualiza el provider global
       onSaved: (newValue) {
         ref.read(listSelectedServicesFormProviders.notifier).state =
             newValue ?? [];
       },
       initialValue: selectedServices,
-      // Validador para requerir al menos un servicio seleccionado
       validator: (value) {
-        if (value == null || value.isEmpty) return 'Debe seleccionar al menos un servicio';
+        if (value == null || value.isEmpty) {
+          return 'Debe seleccionar al menos un servicio';
+        }
         return null;
       },
       builder: (field) {
@@ -46,8 +43,10 @@ class ServiceTypeChecklistWidget extends ConsumerWidget {
 
                 return InkWell(
                   onTap: () {
-                    final notifier = ref.read(listSelectedServicesFormProviders.notifier);
-                    final current = List<String>.from(ref.read(listSelectedServicesFormProviders));
+                    final notifier =
+                        ref.read(listSelectedServicesFormProviders.notifier);
+                    final current = List<String>.from(
+                        ref.read(listSelectedServicesFormProviders));
                     if (isSelected) {
                       current.remove(service);
                     } else {
@@ -63,7 +62,8 @@ class ServiceTypeChecklistWidget extends ConsumerWidget {
                     duration: const Duration(milliseconds: 200),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? (getServiceColor(service) as Color).withValues(alpha: 0.1)
+                          ? (getServiceColor(service) as Color)
+                              .withValues(alpha: 0.1)
                           : Colors.grey.shade50,
                       borderRadius: BorderRadius.circular(12),
                       border: field.hasError

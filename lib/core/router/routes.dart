@@ -2,6 +2,7 @@ class Routes {
   // Rutas Panel Web
   static const String login = "/login";
   static const String resetPassword = "/reset-password";
+  static const String privacyPolicy = "/privacy-policy";
   static const String dashboard = "/dashboard";
   static const String dashboardHome = "/dashboard/home";
   static const String userActivity = "/dashboard/userActivity";

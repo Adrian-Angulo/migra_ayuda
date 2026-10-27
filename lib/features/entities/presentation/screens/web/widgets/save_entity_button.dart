@@ -2,19 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
 
-/// Botón de guardar genérico para el modal de entidad.
-///
-/// Recibe [onPressed] como callback, tipicamente el método `_submit`
-/// expuesto desde [FormRegisterEntity] a través de su GlobalKey.
-class ButtonSaveWidget extends ConsumerWidget {
-  const ButtonSaveWidget({
+class SaveEntityButton extends ConsumerWidget {
+  const SaveEntityButton({
     super.key,
     required this.onPressed,
   });
 
   final VoidCallback onPressed;
-
-
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,14 +27,11 @@ class ButtonSaveWidget extends ConsumerWidget {
             )
           : const Icon(Icons.save, size: 20),
       label: Text(
-        crudState.isLoading
-            ? 'Guardando...'
-            : 'Guardar Entidad',
+        crudState.isLoading ? 'Guardando...' : 'Guardar Entidad',
         style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
       ),
       style: ElevatedButton.styleFrom(
-        backgroundColor:
-             const Color(0xFF2D5F4F),
+        backgroundColor: const Color(0xFF2D5F4F),
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

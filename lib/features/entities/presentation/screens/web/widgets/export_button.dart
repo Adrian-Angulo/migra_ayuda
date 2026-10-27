@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class ExportButtonWidget extends StatelessWidget {
+class ExportButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
   final double? width;
 
-  const ExportButtonWidget({
+  const ExportButton({
     super.key,
     required this.label,
     required this.onPressed,

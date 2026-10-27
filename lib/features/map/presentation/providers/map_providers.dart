@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:migra_ayuda/features/map/data/repository/map_repository_impl.dart';
+import 'package:migra_ayuda/features/map/domain/entities/geocoding_result.dart';
 import 'package:migra_ayuda/features/map/domain/repository/map_repository.dart';
 import 'package:migra_ayuda/features/map/domain/usecases/calculate_route_usecase.dart';
 import 'package:migra_ayuda/features/map/domain/usecases/map_usecase.dart';
@@ -19,9 +20,9 @@ final calculateRouteUseCaseProvider = Provider<CalculateRouteUseCase>((ref) {
   return CalculateRouteUseCase(mapRepository);
 });
 
-class CoordinatesNotifier extends AsyncNotifier<LatLng?> {
+class CoordinatesNotifier extends AsyncNotifier<GeocodingResult?> {
   @override
-  Future<LatLng?> build() async {
+  Future<GeocodingResult?> build() async {
     return null;
   }
 
@@ -35,11 +36,28 @@ class CoordinatesNotifier extends AsyncNotifier<LatLng?> {
     );
   }
 
-  void setCoordinate(LatLng coordinates) {
-    state = AsyncValue.data(coordinates);
+  void setCoordinate(
+    LatLng coordinates, {
+    String? placeName,
+    bool isManual = false,
+  }) {
+    state = AsyncValue.data(
+      GeocodingResult(
+        point: coordinates,
+        placeName: placeName ??
+            (isManual
+                ? 'Ubicación ajustada manualmente en el mapa'
+                : 'Ubicación confirmada'),
+        isManualSelection: isManual,
+      ),
+    );
+  }
+
+  void clear() {
+    state = const AsyncValue.data(null);
   }
 }
 
 final coordinatesNotifierProvider =
-    AsyncNotifierProvider<CoordinatesNotifier, LatLng?>(
+    AsyncNotifierProvider<CoordinatesNotifier, GeocodingResult?>(
         () => CoordinatesNotifier());

@@ -2,15 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 
-class TextResult extends ConsumerWidget {
-  const TextResult({super.key});
+class ResultsCounter extends ConsumerWidget {
+  const ResultsCounter({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final lista = ref.watch(getAllEntitiesProvider);
-    return lista.when(
-      data: (entidades) {
-        if (entidades.isEmpty) return const SizedBox.shrink();
+    final listAsync = ref.watch(getAllEntitiesProvider);
+
+    return listAsync.when(
+      data: (entities) {
+        if (entities.isEmpty) return const SizedBox.shrink();
+        final label = entities.length == 1
+            ? '1 lugar disponible'
+            : '${entities.length} lugares disponibles';
+
         return Padding(
           padding: const EdgeInsets.only(bottom: 12, top: 4),
           child: Row(
@@ -29,7 +34,7 @@ class TextResult extends ConsumerWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                '${entidades.length} ${entidades.length == 1 ? "lugar disponible" : "lugares disponibles"}',
+                label,
                 style: const TextStyle(
                   fontSize: 13.5,
                   fontWeight: FontWeight.w700,
@@ -46,4 +51,3 @@ class TextResult extends ConsumerWidget {
     );
   }
 }
-

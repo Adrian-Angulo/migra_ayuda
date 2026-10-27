@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 
-class RatingWidget extends ConsumerWidget {
+class RatingDisplay extends ConsumerWidget {
   final EntityEntity entity;
 
-  const RatingWidget({super.key, required this.entity});
+  const RatingDisplay({super.key, required this.entity});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -50,9 +50,9 @@ class RatingWidget extends ConsumerWidget {
         Text(
           displayRating,
           style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w800,
-            color: Colors.black,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF1A1A1A),
           ),
         ),
       ],

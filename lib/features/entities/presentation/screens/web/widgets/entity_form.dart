@@ -6,25 +6,24 @@ import 'package:migra_ayuda/core/utils/validators/address_validator.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
-
-import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/build_section_title.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/build_text_field.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/button_save_widget.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/container_map_address.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/image_picker_widget.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/service_type_checklist_widget.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/entity_address_map.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/entity_image_picker.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/entity_text_field.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/save_entity_button.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/section_title.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/service_type_checklist.dart';
+import 'package:migra_ayuda/features/map/domain/entities/geocoding_result.dart';
 import 'package:migra_ayuda/features/map/presentation/providers/map_providers.dart';
 
-class FormEntity extends ConsumerStatefulWidget {
-  /// Si se proporciona, el formulario opera en modo edición prellenando los campos.
+class EntityForm extends ConsumerStatefulWidget {
   final EntityEntity? entity;
-  const FormEntity({super.key, this.entity});
+  const EntityForm({super.key, this.entity});
 
   @override
-  ConsumerState<FormEntity> createState() => FormEntityState();
+  ConsumerState<EntityForm> createState() => EntityFormState();
 }
 
-class FormEntityState extends ConsumerState<FormEntity> {
+class EntityFormState extends ConsumerState<EntityForm> {
   static const String _defaultUnavailableText = 'no disponible';
 
   final _formKey = GlobalKey<FormState>();
@@ -40,13 +39,17 @@ class FormEntityState extends ConsumerState<FormEntity> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(imagenSelectProvider.notifier).state = null;
+      ref.read(imagenInBytesProvider.notifier).state = null;
+    });
     if (widget.entity != null) {
       _populateFields(widget.entity!);
     }
   }
 
   @override
-  void didUpdateWidget(covariant FormEntity oldWidget) {
+  void didUpdateWidget(covariant EntityForm oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.entity != null && oldWidget.entity != widget.entity) {
       _populateFields(widget.entity!);
@@ -68,6 +71,7 @@ class FormEntityState extends ConsumerState<FormEntity> {
               entity.localitation.latitude,
               entity.localitation.longitude,
             ),
+            placeName: entity.address,
           );
     });
   }
@@ -79,6 +83,10 @@ class FormEntityState extends ConsumerState<FormEntity> {
     _addressController.dispose();
     _phoneController.dispose();
     _scheduleController.dispose();
+    Future.microtask(() {
+      ref.read(imagenSelectProvider.notifier).state = null;
+      ref.read(imagenInBytesProvider.notifier).state = null;
+    });
     super.dispose();
   }
 
@@ -97,8 +105,8 @@ class FormEntityState extends ConsumerState<FormEntity> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     _formKey.currentState?.save();
 
-    final coordinates = ref.read(coordinatesNotifierProvider).value;
-    if (coordinates == null) {
+    final geocodingResult = ref.read(coordinatesNotifierProvider).value;
+    if (geocodingResult == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Por favor, busca y confirma la ubicación en el mapa.'),
@@ -131,7 +139,10 @@ class FormEntityState extends ConsumerState<FormEntity> {
       description: _descriptionController.text.trim(),
       services: selectedServices,
       address: _addressController.text.trim(),
-      localitation: GeoPoint(coordinates.latitude, coordinates.longitude),
+      localitation: GeoPoint(
+        geocodingResult.point.latitude,
+        geocodingResult.point.longitude,
+      ),
       phone: phone.isEmpty ? _defaultUnavailableText : phone,
       imageUrl: isEdit ? widget.entity!.imageUrl : '',
       schedule: schedule.isEmpty ? _defaultUnavailableText : schedule,
@@ -181,16 +192,16 @@ class FormEntityState extends ConsumerState<FormEntity> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ImagePickerWidget(
+                    EntityImagePicker(
                       imagenUrl: widget.entity?.imageUrl,
                     ),
                     const SizedBox(height: 32),
-                    const BuildSectionTitle(
+                    const SectionTitle(
                       title: 'Información Básica',
                       icon: Icons.info_outline,
                     ),
                     const SizedBox(height: 20),
-                    BuildTextField(
+                    EntityTextField(
                       controller: _nameController,
                       label: 'Nombre de la Organización',
                       hint: 'Ej: Centro de Salud Norte',
@@ -202,7 +213,7 @@ class FormEntityState extends ConsumerState<FormEntity> {
                               : null,
                     ),
                     const SizedBox(height: 20),
-                    BuildTextField(
+                    EntityTextField(
                       controller: _descriptionController,
                       label: 'Descripción',
                       hint:
@@ -212,7 +223,7 @@ class FormEntityState extends ConsumerState<FormEntity> {
                       maxLength: 500,
                     ),
                     const SizedBox(height: 32),
-                    const BuildSectionTitle(
+                    const SectionTitle(
                       title: 'Tipos de Servicio',
                       icon: Icons.category_outlined,
                     ),
@@ -225,26 +236,29 @@ class FormEntityState extends ConsumerState<FormEntity> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const ServiceTypeChecklistWidget(),
+                    const ServiceTypeChecklist(),
                     const SizedBox(height: 32),
-                    const BuildSectionTitle(
+                    const SectionTitle(
                       title: 'Ubicación y Contacto',
                       icon: Icons.location_on_outlined,
                     ),
                     const SizedBox(height: 20),
-                    BuildTextField(
+                    EntityTextField(
                       inputKey: _addressFieldKey,
                       controller: _addressController,
-                      label: 'Dirección',
-                      hint: 'Ej. Calle 123 #45-67, Pasto',
+                      label: 'Dirección o Punto de Referencia',
+                      hint: 'Ej. Calle 18 # 25-30, Pasto o Plaza de Nariño',
                       icon: Icons.location_on_outlined,
                       suffixIcon: _SearchAddressButton(
                         isLoading: coordinates.isLoading,
                         onTap: _onSearchAddress,
                       ),
                       validator: (value) {
+                        final formatError = AddressValidator.validate(value);
+                        if (formatError != null) return formatError;
+
                         if (coordinates.hasError) {
-                          return 'No se encontró la ubicación para esta dirección. Verifica que esté escrita correctamente.';
+                          return 'No se encontró la ubicación dentro de Pasto. Verifica la dirección o selecciónala en el mapa.';
                         }
 
                         if (coordinates.value == null &&
@@ -256,10 +270,22 @@ class FormEntityState extends ConsumerState<FormEntity> {
                       },
                     ),
                     const SizedBox(height: 12),
-                    if (coordinates.value != null)
-                      ContainerMapAddress(location: coordinates.value),
+                    if (coordinates.value != null) ...[
+                      _ResolvedAddressFeedback(
+                        geocodingResult: coordinates.value!,
+                      ),
+                      const SizedBox(height: 10),
+                      EntityAddressMap(
+                        location: coordinates.value!.point,
+                        onLocationChanged: (newPoint) {
+                          ref
+                              .read(coordinatesNotifierProvider.notifier)
+                              .setCoordinate(newPoint, isManual: true);
+                        },
+                      ),
+                    ],
                     const SizedBox(height: 20),
-                    BuildTextField(
+                    EntityTextField(
                       controller: _phoneController,
                       label: 'Teléfono de contacto',
                       hint: '(57+) 3225321234',
@@ -268,12 +294,12 @@ class FormEntityState extends ConsumerState<FormEntity> {
                       onlyNumbers: true,
                     ),
                     const SizedBox(height: 32),
-                    const BuildSectionTitle(
+                    const SectionTitle(
                       title: 'Horario de Atención',
                       icon: Icons.access_time,
                     ),
                     const SizedBox(height: 12),
-                    BuildTextField(
+                    EntityTextField(
                       controller: _scheduleController,
                       label: '',
                       hint: 'Ej. Lunes a viernes 8:30 AM a 12:00 PM',
@@ -291,6 +317,68 @@ class FormEntityState extends ConsumerState<FormEntity> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ResolvedAddressFeedback extends StatelessWidget {
+  final GeocodingResult geocodingResult;
+
+  const _ResolvedAddressFeedback({required this.geocodingResult});
+
+  @override
+  Widget build(BuildContext context) {
+    final isManual = geocodingResult.isManualSelection;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: isManual ? Colors.blue.shade50 : Colors.green.shade50,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: isManual ? Colors.blue.shade200 : Colors.green.shade200,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            isManual ? Icons.touch_app_outlined : Icons.check_circle_outline,
+            color: isManual ? Colors.blue.shade700 : Colors.green.shade700,
+            size: 20,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isManual
+                      ? 'Ubicación ajustada manualmente en el mapa'
+                      : 'Ubicación identificada:',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color:
+                        isManual ? Colors.blue.shade900 : Colors.green.shade900,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  geocodingResult.placeName,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isManual
+                        ? Colors.blue.shade800
+                        : Colors.green.shade800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -385,7 +473,7 @@ class _FormBottomBar extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             flex: 2,
-            child: ButtonSaveWidget(
+            child: SaveEntityButton(
               onPressed: onSave,
             ),
           ),

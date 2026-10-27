@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class BuildTextField extends StatelessWidget {
-  const BuildTextField({
+class EntityTextField extends StatelessWidget {
+  const EntityTextField({
     super.key,
     required this.controller,
     required this.label,
@@ -14,8 +14,9 @@ class BuildTextField extends StatelessWidget {
     this.suffixIcon,
     this.maxLength,
     this.onlyNumbers = false,
-     this.inputKey,
+    this.inputKey,
   });
+
   final GlobalKey? inputKey;
   final Widget? suffixIcon;
   final TextEditingController controller;
@@ -88,7 +89,7 @@ class BuildTextField extends StatelessWidget {
               horizontal: 16,
               vertical: 14,
             ),
-            counterText: "", // Hides the counter if you wish
+            counterText: '',
           ),
           validator: validator,
         ),

@@ -9,7 +9,6 @@ import 'package:migra_ayuda/core/utils/format/time_formatter.dart';
 import 'package:migra_ayuda/features/audit/domain/entities/audit_entity.dart';
 import 'package:migra_ayuda/features/dashboard/presentation/providers/dashboard_providers.dart';
 
-
 class RecentActivities extends ConsumerWidget {
   const RecentActivities({super.key});
 
@@ -73,21 +72,32 @@ class RecentActivities extends ConsumerWidget {
               Expanded(
                   child: audirRecentState.when(
                       data: (list) {
+                        if (list.isEmpty) {
+                          return const Center(
+                            child: Text(
+                              'No hay actividades recientes todavía.',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.grey,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          );
+                        }
                         return ListView.separated(
-                            itemBuilder: (context, index) {
-                              final AuditEntity audit = list[index];
-                              return ActivityItem(
-                                  icon: Icons.person_outline,
-                                  title: _mapAccion(audit.accion),
-                                  subtitle: _getMetadatos(audit)!,
-                                  time: TimeFormatter.formatDate(
-                                      audit.createdAt));
-                            },
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                            itemCount: list.length);
+                          itemBuilder: (context, index) {
+                            final AuditEntity audit = list[index];
+                            return ActivityItem(
+                              icon: Icons.person_outline,
+                              title: _mapAccion(audit.accion),
+                              subtitle: _getMetadatos(audit)!,
+                              time: TimeFormatter.formatDate(audit.createdAt),
+                            );
+                          },
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 5),
+                          itemCount: list.length,
+                        );
                       },
                       error: (error, stackTrace) => Center(
                             child: Column(
@@ -110,7 +120,6 @@ class RecentActivities extends ConsumerWidget {
                       loading: () => const Center(
                             child: CircularProgressIndicator(),
                           ))),
-
             ],
           ),
         ),

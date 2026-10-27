@@ -5,7 +5,7 @@ import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/auth/presentation/widgets/drawer/app_drawer.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/list_entities_home.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/filter_container.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/home/service_filter_selector.dart';
 import 'package:migra_ayuda/features/map/presentation/providers/map_display_provider.dart';
 import 'package:migra_ayuda/features/map/presentation/widgets/mapbox_widget.dart';
 import 'package:migra_ayuda/features/tutorial/presentation/widgets/home_showcase_wrapper.dart';
@@ -205,6 +205,7 @@ class SynchronizationButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isSyncing = ref.watch(syncProvider).isLoading;
+    final filter = FilterActionCoordinator(ref);
 
     return Container(
       height: 50,
@@ -232,13 +233,14 @@ class SynchronizationButton extends ConsumerWidget {
             : () async {
                 final result = await ref.read(syncProvider.notifier).syncAll();
                 if (!context.mounted) return;
-
+                filter.applyFilter('Todos');
                 switch (result) {
                   case SyncResult.success:
                     SnackbarWidget.success(
                       context,
                       'Sincronización completada con éxito',
                     );
+
                     break;
                   case SyncResult.noConnection:
                     SnackbarWidget.warning(

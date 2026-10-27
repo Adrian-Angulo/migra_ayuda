@@ -3,28 +3,36 @@ import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:migra_ayuda/core/config/load_token.dart';
+import 'package:migra_ayuda/core/utils/helpers/address_normalizer.dart';
+import 'package:migra_ayuda/features/map/domain/entities/geocoding_result.dart';
 
 class MapboxDatasource {
   static const Duration _timeout = Duration(seconds: 8);
+  /// Bounding Box que delimita estrictamente la zona de Pasto y su área metropolitana
+  static const String _pastoBbox = '-77.34,1.15,-77.22,1.27';
+  static const String _pastoProximity = '-77.2811,1.2136';
+
   final http.Client _client;
 
   MapboxDatasource({http.Client? client})
       : _client = client ?? http.Client();
 
-  
-  Future<LatLng?> getCoordinates(String address) async {
+  Future<GeocodingResult?> getCoordinates(String address) async {
     try {
       final token = await LoadEnv.getMapboxToken();
       if (token.isEmpty) {
         return null;
       }
 
-      final encoded = Uri.encodeComponent(address);
+      final normalizedAddress = AddressNormalizer.normalize(address);
+      final encoded = Uri.encodeComponent(normalizedAddress);
+
       final url = Uri.parse(
         'https://api.mapbox.com/geocoding/v5/mapbox.places/$encoded.json'
         '?access_token=$token'
         '&country=co'
-        '&proximity=-77.2811,1.2136'
+        '&proximity=$_pastoProximity'
+        '&bbox=$_pastoBbox'
         '&types=address,poi,neighborhood,locality'
         '&language=es'
         '&limit=1',
@@ -42,11 +50,15 @@ class MapboxDatasource {
         if (features != null && features.isNotEmpty) {
           final first = features.first as Map<String, dynamic>;
           final center = first['center'] as List<dynamic>?;
+          final placeName = (first['place_name'] as String?) ?? address;
 
           if (center != null && center.length >= 2) {
             final lng = (center[0] as num).toDouble();
             final lat = (center[1] as num).toDouble();
-            return LatLng(lat, lng);
+            return GeocodingResult(
+              point: LatLng(lat, lng),
+              placeName: placeName,
+            );
           }
         }
       }
@@ -56,7 +68,6 @@ class MapboxDatasource {
     }
   }
 
- 
   Future<List<Position>?> getWalkingDirections({
     required double originLng,
     required double originLat,

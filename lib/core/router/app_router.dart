@@ -8,7 +8,8 @@ import 'package:migra_ayuda/features/auth/presentation/screens/mobile/reset_pass
 import 'package:migra_ayuda/features/dashboard/presentation/dasboard_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/home_admin_screen/home_screen.dart';
 import 'package:migra_ayuda/features/auth/presentation/screens/web/screens/login_web.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/screens/entities_screen.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/entities_screen.dart';
+import 'package:migra_ayuda/features/legal/presentation/screens/web/privacy_policy_web_screen.dart';
 import 'package:migra_ayuda/features/reviews/presentation/screens/web/reviews_screen.dart';
 import 'package:migra_ayuda/features/audit/presentation/screens/web/user_activity_web_screen.dart';
 import 'package:migra_ayuda/features/users/presentation/screens/users_screen.dart';
@@ -29,6 +30,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.resetPassword,
         builder: (context, state) => const SendEmailScreen(),
+      ),
+      // Ruta pública accesible únicamente por URL directa (sin menú ni sidebar)
+      GoRoute(
+        path: Routes.privacyPolicy,
+        builder: (context, state) => const PrivacyPolicyWebScreen(),
       ),
       ShellRoute(
         builder: (context, state, child) => HomeScreen(child: child),

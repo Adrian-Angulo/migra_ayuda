@@ -6,22 +6,16 @@ import 'package:migra_ayuda/features/audit/presentation/providers/audit_provider
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 import 'package:migra_ayuda/features/map/presentation/providers/map_display_provider.dart';
 
-/// Coordinador de acciones de filtrado (Principio de Responsabilidad Única - SRP).
-/// Encapsula la lógica de negocio: filtrar entidades, registrar auditoría y limpiar estado en el mapa.
 class FilterActionCoordinator {
   final WidgetRef _ref;
 
   const FilterActionCoordinator(this._ref);
 
   Future<void> applyFilter(String service) async {
-    // 1. Aplicar filtro a las entidades (actualiza lista y notifica a los listeners del mapa)
     _ref.read(getAllEntitiesProvider.notifier).filter(query: service);
-
-    // 2. Limpiar selección y ruta en el mapa
     _ref.read(mapProvider.notifier).clearSelectEntity();
     _ref.read(mapProvider.notifier).clearRoute();
 
-    // 3. Registrar auditoría de manera no bloqueante y segura ante fallos offline
     if (service != 'Todos') {
       try {
         await _ref.read(auditNotifierProvider.notifier).create(
@@ -29,16 +23,14 @@ class FilterActionCoordinator {
           metadata: {'filtro': service},
         );
       } catch (e) {
-        debugPrint("⚠️ Auditoría omitida en modo offline: $e");
+        debugPrint('Auditoría omitida: $e');
       }
     }
   }
 }
 
-/// Botón de filtro con menú desplegable emergente (Opción 2 - PopupMenuButton).
-/// Mantiene la firma pública [FilterContainer] para respetar compatibilidad (LSP).
-class FilterContainer extends ConsumerWidget {
-  const FilterContainer({super.key});
+class ServiceFilterSelector extends ConsumerWidget {
+  const ServiceFilterSelector({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -98,20 +90,20 @@ class FilterContainer extends ConsumerWidget {
                           CircleAvatar(
                             radius: 14,
                             backgroundColor: color.withValues(alpha: 0.12),
-                            child: Icon(icon, color: color, size: 16),
+                            child: Icon(icon, size: 16, color: color),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               service,
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 13,
                                 fontWeight: isSelected
                                     ? FontWeight.bold
                                     : FontWeight.normal,
                                 color: isSelected
                                     ? theme.colorScheme.primary
-                                    : Colors.black87,
+                                    : Colors.grey[800],
                               ),
                             ),
                           ),
@@ -127,11 +119,9 @@ class FilterContainer extends ConsumerWidget {
                   }).toList();
                 },
                 child: Padding(
-                  padding: EdgeInsets.only(
-                    left: 12.0,
-                    top: 8.0,
-                    bottom: 8.0,
-                    right: isFiltered ? 4.0 : 12.0,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -140,47 +130,47 @@ class FilterContainer extends ConsumerWidget {
                         isFiltered
                             ? getServiceIcon(selectedFiltro)
                             : Icons.tune_rounded,
-                        size: 18,
-                        color: isFiltered ? Colors.white : Colors.black87,
+                        size: 16,
+                        color:
+                            isFiltered ? Colors.white : Colors.grey.shade700,
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 6),
                       Text(
-                        isFiltered ? selectedFiltro : 'Filtrar por servicio',
+                        selectedFiltro,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 13,
                           fontWeight: FontWeight.w600,
-                          color: isFiltered ? Colors.white : Colors.black87,
+                          color:
+                              isFiltered ? Colors.white : Colors.grey.shade800,
                         ),
                       ),
                       const SizedBox(width: 4),
                       Icon(
-                        Icons.arrow_drop_down_rounded,
-                        size: 20,
-                        color: isFiltered ? Colors.white70 : Colors.grey[600],
+                        Icons.keyboard_arrow_down_rounded,
+                        size: 16,
+                        color:
+                            isFiltered ? Colors.white : Colors.grey.shade600,
                       ),
                     ],
                   ),
                 ),
               ),
-              if (isFiltered)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: GestureDetector(
-                    onTap: () => coordinator.applyFilter('Todos'),
-                    child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.25),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.close_rounded,
-                        size: 14,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+              if (isFiltered) ...[
+                Container(
+                  width: 1,
+                  height: 20,
+                  color: Colors.white.withValues(alpha: 0.3),
                 ),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded, size: 14),
+                  color: Colors.white,
+                  tooltip: 'Quitar filtro',
+                  visualDensity: VisualDensity.compact,
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  constraints: const BoxConstraints(minWidth: 28),
+                  onPressed: () => coordinator.applyFilter('Todos'),
+                ),
+              ],
             ],
           ),
         ),
@@ -188,3 +178,5 @@ class FilterContainer extends ConsumerWidget {
     );
   }
 }
+
+typedef FilterContainer = ServiceFilterSelector;

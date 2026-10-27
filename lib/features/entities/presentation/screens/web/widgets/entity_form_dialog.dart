@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/form_register_entity.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/entity_form.dart';
 
-class ModalFormEntity extends ConsumerStatefulWidget {
+class EntityFormDialog extends ConsumerStatefulWidget {
   final EntityEntity? entity;
-  const ModalFormEntity({super.key, this.entity});
+  const EntityFormDialog({super.key, this.entity});
 
   @override
-  ConsumerState<ModalFormEntity> createState() => _AddEntityModalState();
+  ConsumerState<EntityFormDialog> createState() => _EntityFormDialogState();
 }
 
-class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
+class _EntityFormDialogState extends ConsumerState<EntityFormDialog> {
   @override
   Widget build(BuildContext context) {
     ref.listen<AsyncValue<CrudOperation>>(entitiesCrudProvider,
@@ -25,6 +26,16 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
               mounted) {
             Navigator.pop(context);
           }
+        } else if (next.hasError && mounted) {
+          final error = next.error;
+          final message = error is Failure ? error.message : error.toString();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(message),
+              backgroundColor: Colors.red.shade700,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
         }
       }
     });
@@ -60,7 +71,6 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ── Encabezado del modal ──────────────────────────────────
             Container(
               padding: EdgeInsets.all(isCompact ? 16 : 24),
               decoration: const BoxDecoration(
@@ -125,8 +135,7 @@ class _AddEntityModalState extends ConsumerState<ModalFormEntity> {
                 ],
               ),
             ),
-            // ── Formulario con scroll interno ─────────────────────────
-            FormEntity(entity: widget.entity),
+            EntityForm(entity: widget.entity),
           ],
         ),
       ),

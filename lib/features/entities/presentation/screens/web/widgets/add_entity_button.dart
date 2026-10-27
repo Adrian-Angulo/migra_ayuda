@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
-
-class AddButtonWidget extends StatelessWidget {
+class AddEntityButton extends StatelessWidget {
   final String text;
   final VoidCallback onTap;
 
-  const AddButtonWidget({
+  const AddEntityButton({
     super.key,
     required this.text,
     required this.onTap,
@@ -51,10 +50,9 @@ class AddButtonWidget extends StatelessWidget {
                 Text(
                   text,
                   style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
                     color: Colors.white,
-                    letterSpacing: 0.3,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
                   ),
                 ),
               ],

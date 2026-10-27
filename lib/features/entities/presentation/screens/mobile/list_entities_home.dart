@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/entity_selected_details.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/home/entity_card.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/home/results_counter.dart';
 import 'package:migra_ayuda/features/map/presentation/providers/map_display_provider.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/mobile/entity_seleted_details.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/entity_card_widget.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/text_result.dart';
 
-class ListEntitesHome extends ConsumerWidget {
-  const ListEntitesHome({
+class ListEntitiesHome extends ConsumerWidget {
+  const ListEntitiesHome({
     super.key,
     required this.sheetController,
   });
@@ -16,7 +16,7 @@ class ListEntitesHome extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    String selectedFiltro = ref.watch(filterProvider);
+    final selectedFiltro = ref.watch(filterProvider);
     final listEntity = ref.watch(getAllEntitiesProvider);
     final map = ref.watch(mapProvider);
 
@@ -27,87 +27,103 @@ class ListEntitesHome extends ConsumerWidget {
       maxChildSize: 1,
       builder: (context, scrollController) {
         return Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(24),
-                topRight: Radius.circular(24),
-              ),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black26, blurRadius: 10, spreadRadius: 1),
-              ],
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
             ),
-            child: ListView(
-              controller: scrollController,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              children: [
-                Center(
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 12),
-                    width: 40,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 10,
+                spreadRadius: 1,
+              ),
+            ],
+          ),
+          child: ListView(
+            controller: scrollController,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            children: [
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.symmetric(vertical: 12),
+                  width: 40,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                if (map.selectEntity == null)
-                  listEntity.when(
-                      data: (data) {
-                        if (data.isEmpty) {
-                          return Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.search_off,
-                                    size: 48, color: Colors.grey),
-                                const SizedBox(height: 12),
-                                Text(
-                                  'No se encontraron entidades proveedoras de servicio: $selectedFiltro',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                          );
-                        }
-                        return Column(
-                          spacing: 5,
-                          key: const ValueKey('lista'),
+              ),
+              if (map.selectEntity == null)
+                listEntity.when(
+                  data: (data) {
+                    if (data.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const TextResult(),
-                            ...List.generate(
-                              data.length,
-                              (index) => EntityCardWidget(entity: data[index]),
+                            const Icon(
+                              Icons.search_off,
+                              size: 48,
+                              color: Colors.grey,
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              'No se encontraron entidades proveedoras de servicio: $selectedFiltro',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.grey),
                             ),
                           ],
-                        );
-                      },
-                      error: (error, stackTrace) => Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.error_outline,
-                                    color: Colors.red, size: 48),
-                                const SizedBox(height: 12),
-                                Text(
-                                  'Ocurrió un error al cargar los servicios',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(color: Colors.red[700]),
-                                ),
-                              ],
-                            ),
-                          ),
-                      loading: () => const Center(
-                            child: CircularProgressIndicator(),
-                          ))
-                else
-                  EntitySeletedDetails(map: map, controllerD: sheetController),
-              ],
-            ));
+                        ),
+                      );
+                    }
+                    return Column(
+                      spacing: 5,
+                      key: const ValueKey('lista'),
+                      children: [
+                        const ResultsCounter(),
+                        ...List.generate(
+                          data.length,
+                          (index) => EntityCard(entity: data[index]),
+                        ),
+                      ],
+                    );
+                  },
+                  error: (error, stackTrace) => Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          color: Colors.red,
+                          size: 48,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Ocurrió un error al cargar los servicios',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.red[700]),
+                        ),
+                      ],
+                    ),
+                  ),
+                  loading: () => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              else
+                EntitySelectedDetails(
+                  map: map,
+                  controllerD: sheetController,
+                ),
+            ],
+          ),
+        );
       },
     );
   }
 }
+
+typedef ListEntitesHome = ListEntitiesHome;

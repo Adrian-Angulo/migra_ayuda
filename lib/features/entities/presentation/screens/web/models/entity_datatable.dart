@@ -2,7 +2,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/action_buttons.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/rating_widget.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/rating_display.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/service_chip.dart';
 
 class EntityDatatable extends DataTableSource {
@@ -19,7 +19,6 @@ class EntityDatatable extends DataTableSource {
     return DataRow2.byIndex(
       index: index,
       cells: [
-        // Nombre
         DataCell(
           Row(
             children: [
@@ -29,8 +28,11 @@ class EntityDatatable extends DataTableSource {
                   color: Colors.blue.shade50,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child:
-                    Icon(Icons.business, size: 20, color: Colors.blue.shade700),
+                child: Icon(
+                  Icons.business,
+                  size: 20,
+                  color: Colors.blue.shade700,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -47,24 +49,28 @@ class EntityDatatable extends DataTableSource {
             ],
           ),
         ),
-        // Dirección
         DataCell(
           Row(
             children: [
-              Icon(Icons.location_on_outlined,
-                  size: 16, color: Colors.grey.shade500),
+              Icon(
+                Icons.location_on_outlined,
+                size: 16,
+                color: Colors.grey.shade500,
+              ),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   entity.address,
-                  style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey.shade600,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
         ),
-        // Servicios
         DataCell(
           Wrap(
             spacing: 4,
@@ -75,11 +81,11 @@ class EntityDatatable extends DataTableSource {
                 .toList(),
           ),
         ),
-        // Valoración
         DataCell(
-          Center(child: RatingWidget(entity: entity)),
+          Center(
+            child: RatingDisplay(entity: entity),
+          ),
         ),
-        // Acciones
         DataCell(
           ActionButtons(entity: entity),
         ),

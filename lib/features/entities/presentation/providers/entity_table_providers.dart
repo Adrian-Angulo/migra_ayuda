@@ -1,45 +1,26 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:migra_ayuda/core/constants/services_utils.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/models/entities_datasource.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
 
-
-
 final searchControllerProvider = StateProvider<String>((ref) => '');
-
-
-final seletedServiceProvider = StateProvider<String>((ref) => services[0]);
 
 final selectedEntityProvider = StateProvider<EntityEntity?>((ref) => null);
 
-final datasourceProvider = Provider<EntityDataSource>(
-  (ref) => EntityDataSource(
-    onRowSelected: (entity) {
-      ref.read(selectedEntityProvider.notifier).state = entity;
-    },
-  ),
-);
-
-
 final queryEntityProvider = StateProvider<String>((ref) => '');
-
 
 final selectedServiceFilterProvider =
     StateProvider<String>((ref) => services[0]);
 
-
 final entitySortColumnProvider = StateProvider<int?>((ref) => null);
 
-
 final entitySortAscendingProvider = StateProvider<bool>((ref) => true);
-
 
 final entitiesFilterProvider =
     StateProvider.autoDispose<AsyncValue<List<EntityEntity>>>((ref) {
   final entitiesAsync = ref.watch(entities2StreamProvider);
-  final query = ref.watch(queryEntityProvider);
+  final query = ref.watch(queryEntityProvider).trim().toLowerCase();
   final service = ref.watch(selectedServiceFilterProvider);
   final sortColumn = ref.watch(entitySortColumnProvider);
   final ascending = ref.watch(entitySortAscendingProvider);

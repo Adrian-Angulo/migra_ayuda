@@ -3,16 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/services/google_maps/google_maps_controllers.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
-import 'package:migra_ayuda/features/map/presentation/providers/map_state.dart';
-import 'package:migra_ayuda/features/map/presentation/providers/map_display_provider.dart';
+import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/floating_main_button.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/place_details_header.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/place_details_info.dart';
+import 'package:migra_ayuda/features/map/presentation/providers/map_display_provider.dart';
+import 'package:migra_ayuda/features/map/presentation/providers/map_state.dart';
 import 'package:migra_ayuda/features/reviews/presentation/screens/section_review_screen.dart';
-import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
 
-class EntitySeletedDetails extends ConsumerStatefulWidget {
-  const EntitySeletedDetails({
+class EntitySelectedDetails extends ConsumerStatefulWidget {
+  const EntitySelectedDetails({
     super.key,
     required this.map,
     required this.controllerD,
@@ -22,25 +22,23 @@ class EntitySeletedDetails extends ConsumerStatefulWidget {
   final DraggableScrollableController? controllerD;
 
   @override
-  ConsumerState<EntitySeletedDetails> createState() =>
-      _EntitySeletedDetailsState();
+  ConsumerState<EntitySelectedDetails> createState() =>
+      _EntitySelectedDetailsState();
 }
 
-class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
+class _EntitySelectedDetailsState extends ConsumerState<EntitySelectedDetails> {
   @override
   Widget build(BuildContext context) {
+    final entity = widget.map.selectEntity!;
+
     return Stack(
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            PlaceDetailsHeader(
-              entity: widget.map.selectEntity!,
-            ),
+            PlaceDetailsHeader(entity: entity),
             const SizedBox(height: 16),
-            PlaceDetailsInfo(
-              entity: widget.map.selectEntity!,
-            ),
+            PlaceDetailsInfo(entity: entity),
             const SizedBox(height: 16),
             Row(
               spacing: 10,
@@ -50,7 +48,7 @@ class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
                     onTap: () async {
                       await ref
                           .read(mapProvider.notifier)
-                          .drawRouteToEntity(widget.map.selectEntity!);
+                          .drawRouteToEntity(entity);
 
                       if (context.mounted) {
                         final currentMapState = ref.read(mapProvider);
@@ -70,11 +68,14 @@ class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
                       }
 
                       await ref.read(auditNotifierProvider.notifier).create(
-                          accion: ActivityActions.routeRequested(),
-                          metadata: {
-                            'service': widget.map.selectEntity!.services[0],
-                            'entidad': widget.map.selectEntity!.name
-                          });
+                            accion: ActivityActions.routeRequested(),
+                            metadata: {
+                              'service': entity.services.isNotEmpty
+                                  ? entity.services[0]
+                                  : 'General',
+                              'entidad': entity.name,
+                            },
+                          );
 
                       if (widget.controllerD != null &&
                           widget.controllerD!.isAttached) {
@@ -84,7 +85,6 @@ class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
                           curve: Curves.easeInOut,
                         );
                       }
-                      
                     },
                     text: 'Cómo llegar',
                     icon: Icons.directions,
@@ -97,15 +97,19 @@ class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
                       await ref
                           .read(starNavigationNotifierProvider.notifier)
                           .starNavigation(
-                              widget.map.selectEntity!.localitation.latitude,
-                              widget.map.selectEntity!.localitation.longitude);
+                            entity.localitation.latitude,
+                            entity.localitation.longitude,
+                          );
 
                       await ref.read(auditNotifierProvider.notifier).create(
-                          accion: ActivityActions.navigationMaps(),
-                          metadata: {
-                            'service': widget.map.selectEntity!.services[0],
-                            'entidad': widget.map.selectEntity!.name
-                          });
+                            accion: ActivityActions.navigationMaps(),
+                            metadata: {
+                              'service': entity.services.isNotEmpty
+                                  ? entity.services[0]
+                                  : 'General',
+                              'entidad': entity.name,
+                            },
+                          );
                     },
                     text: 'Iniciar viaje',
                     icon: Icons.navigation,
@@ -114,8 +118,7 @@ class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
                 ),
               ],
             ),
-            // Sección de comentarios
-            SectionReviews(entity: widget.map.selectEntity!),
+            SectionReviews(entity: entity),
             const SizedBox(height: 16),
           ],
         ),
@@ -128,11 +131,8 @@ class _EntitySeletedDetailsState extends ConsumerState<EntitySeletedDetails> {
             child: InkWell(
               customBorder: const CircleBorder(),
               onTap: () {
-                //limpiar entidad seleccionada
                 ref.read(mapProvider.notifier).clearSelectEntity();
-                // limpiamos la ruta trazada
                 ref.read(mapProvider.notifier).clearRoute();
-                //volver a la altura inicial
                 if (widget.controllerD != null &&
                     widget.controllerD!.isAttached) {
                   widget.controllerD!.animateTo(

@@ -15,12 +15,18 @@ String? webRedirectGuard(BuildContext context, GoRouterState state, Ref ref) {
 
   final user = authState.value;
   final currentPath = state.matchedLocation;
-  final isPublicRoute =
+
+  // Ruta pública accesible directamente por URL sin restricciones
+  if (currentPath == Routes.privacyPolicy) {
+    return null;
+  }
+
+  final isAuthRoute =
       currentPath == Routes.login || currentPath == Routes.resetPassword;
 
   // 2. Usuario no autenticado
   if (user == null) {
-    if (isPublicRoute) {
+    if (isAuthRoute) {
       return null;
     }
     return Routes.login;
@@ -35,7 +41,7 @@ String? webRedirectGuard(BuildContext context, GoRouterState state, Ref ref) {
   }
 
   // 4. Usuario Administrador autenticado intentando entrar a login o reset-password
-  if (isPublicRoute) {
+  if (isAuthRoute) {
     return Routes.dashboardHome;
   }
 

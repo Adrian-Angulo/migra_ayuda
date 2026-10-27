@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/activity_actions.dart';
 import 'package:migra_ayuda/core/localitation/location_provider.dart';
-import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
-import 'package:migra_ayuda/features/map/presentation/providers/map_display_provider.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/homeCardWidgets/service_tag.dart';
-import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 import 'package:migra_ayuda/features/audit/presentation/providers/audit_providers.dart';
+import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/home/service_tag.dart';
+import 'package:migra_ayuda/features/map/presentation/providers/map_display_provider.dart';
+import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 
-class EntityCardWidget extends ConsumerWidget {
-  const EntityCardWidget({
+class EntityCard extends ConsumerWidget {
+  const EntityCard({
     super.key,
     required this.entity,
   });
@@ -47,7 +47,7 @@ class EntityCardWidget extends ConsumerWidget {
               accion: ActivityActions.entityViewed(),
               metadata: {
                 'service':
-                    entity.services.isNotEmpty ? entity.services[0] : 'General'
+                    entity.services.isNotEmpty ? entity.services[0] : 'General',
               },
             );
           },
@@ -188,7 +188,6 @@ class DistanceAndRating extends ConsumerWidget {
 
     return Row(
       children: [
-        // Badge Distancia
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
@@ -216,7 +215,6 @@ class DistanceAndRating extends ConsumerWidget {
           ),
         ),
         const SizedBox(width: 6),
-        // Badge Calificación
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
           decoration: BoxDecoration(
@@ -253,3 +251,5 @@ class DistanceAndRating extends ConsumerWidget {
     );
   }
 }
+
+typedef EntityCardWidget = EntityCard;

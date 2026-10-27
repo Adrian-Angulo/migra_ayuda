@@ -1,9 +1,14 @@
-// Exportación de widgets de entidades
-export 'search_bar_widget.dart';
-export 'add_button_widget.dart';
-export 'add_entity_modal.dart';
+export 'action_buttons.dart';
+export 'add_entity_button.dart';
 export 'delete_confirmation_dialog.dart';
-export 'image_picker_widget.dart';
-export 'day_selector_widget.dart';
-export 'service_type_checklist_widget.dart';
-  
+export 'entity_address_map.dart';
+export 'entity_form.dart';
+export 'entity_form_dialog.dart';
+export 'entity_image_picker.dart';
+export 'entity_text_field.dart';
+export 'export_button.dart';
+export 'rating_display.dart';
+export 'save_entity_button.dart';
+export 'section_title.dart';
+export 'service_chip.dart';
+export 'service_type_checklist.dart';

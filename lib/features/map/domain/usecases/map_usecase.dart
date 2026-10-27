@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:migra_ayuda/core/errors/failure.dart';
+import 'package:migra_ayuda/features/map/domain/entities/geocoding_result.dart';
 import 'package:migra_ayuda/features/map/domain/repository/map_repository.dart';
 
 class GetCoordinatesUsecase {
@@ -8,7 +8,7 @@ class GetCoordinatesUsecase {
 
   GetCoordinatesUsecase(this.repository);
 
-  Future<Either<Failure, LatLng?>> call(String address) {
+  Future<Either<Failure, GeocodingResult?>> call(String address) {
     return repository.getCoordinates(address);
   }
 }

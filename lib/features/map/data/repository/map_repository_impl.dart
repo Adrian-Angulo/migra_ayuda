@@ -1,8 +1,8 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/map/data/datasources/mapbox_datasource.dart';
+import 'package:migra_ayuda/features/map/domain/entities/geocoding_result.dart';
 import 'package:migra_ayuda/features/map/domain/entities/route_result.dart';
 import 'package:migra_ayuda/features/map/domain/failures/map_failures.dart';
 import 'package:migra_ayuda/features/map/domain/repository/map_repository.dart';
@@ -14,10 +14,10 @@ class MapRepositoryImpl implements MapRepository {
       : _mapboxDatasource = mapboxDatasource ?? MapboxDatasource();
 
   @override
-  Future<Either<Failure, LatLng?>> getCoordinates(String address) async {
+  Future<Either<Failure, GeocodingResult?>> getCoordinates(String address) async {
     try {
-      final LatLng? coordinates = await _mapboxDatasource.getCoordinates(address);
-      return Right(coordinates);
+      final GeocodingResult? result = await _mapboxDatasource.getCoordinates(address);
+      return Right(result);
     } catch (_) {
       return const Left(MapGeocodingFailure());
     }

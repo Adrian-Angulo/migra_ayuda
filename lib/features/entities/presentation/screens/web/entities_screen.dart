@@ -2,17 +2,19 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/constants/app_constants.dart';
-import 'package:migra_ayuda/core/widgets/tables/build_header_cell.dart';
-import 'package:migra_ayuda/core/widgets/tables/build_table.dart';
+import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/core/services/export/export_services.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_web_widget.dart';
+import 'package:migra_ayuda/core/widgets/tables/build_header_cell.dart';
+import 'package:migra_ayuda/core/widgets/tables/build_table.dart';
 import 'package:migra_ayuda/core/widgets/web/dasboard_header.dart';
 import 'package:migra_ayuda/core/widgets/web/text_fiel_search_web.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/models/entity_datatable.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
-import 'package:migra_ayuda/features/entities/presentation/providers/tabla_providers.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/export_button_widget.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/widgets.dart';
+import 'package:migra_ayuda/features/entities/presentation/providers/entity_table_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/models/entity_datatable.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/add_entity_button.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/entity_form_dialog.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/export_button.dart';
 
 class EntitiesScreen extends ConsumerStatefulWidget {
   const EntitiesScreen({super.key});
@@ -55,7 +57,10 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
             }
           },
           loading: () {},
-          error: (error, _) => SnackbarWebWidget.error(context, '$error'),
+          error: (error, _) => SnackbarWebWidget.error(
+            context,
+            error is Failure ? error.message : '$error',
+          ),
         );
       }
     });
@@ -68,32 +73,56 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Encabezado adaptable (Wrap) ──────────────────────────────
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: UIConstants.spacingM,
-            runSpacing: UIConstants.spacingM,
-            children: [
-              const HeaderWeb(
-                title: 'Gestión de Organizaciones',
-                subTitle:
-                    'Gestiona las Organizaciones registradas en el sistema',
-              ),
-              AddButtonWidget(
-                text: 'Registrar Organización',
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => const ModalFormEntity(),
-                  );
-                },
-              ),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isWideScreen = constraints.maxWidth >= 600;
+              if (isWideScreen) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Expanded(
+                      child: HeaderWeb(
+                        title: 'Gestión de Organizaciones',
+                        subTitle:
+                            'Gestiona las Organizaciones registradas en el sistema',
+                      ),
+                    ),
+                    AddEntityButton(
+                      text: 'Registrar Organización',
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => const EntityFormDialog(),
+                        );
+                      },
+                    ),
+                  ],
+                );
+              } else {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const HeaderWeb(
+                      title: 'Gestión de Organizaciones',
+                      subTitle:
+                          'Gestiona las Organizaciones registradas en el sistema',
+                    ),
+                    const SizedBox(height: 12),
+                    AddEntityButton(
+                      text: 'Registrar Organización',
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => const EntityFormDialog(),
+                        );
+                      },
+                    ),
+                  ],
+                );
+              }
+            },
           ),
           const SizedBox(height: UIConstants.spacingM),
-
-          // ── Barra de búsqueda + exportar adaptable ───────────────────
           Row(
             children: [
               Expanded(
@@ -109,7 +138,7 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              ExportButtonWidget(
+              ExportButton(
                 label: 'Exportar',
                 onPressed: () {
                   ExportService.exportEntities(entitiesState.value ?? []);
@@ -118,8 +147,6 @@ class _EntitiesScreenState extends ConsumerState<EntitiesScreen> {
             ],
           ),
           const SizedBox(height: UIConstants.spacingM),
-
-          // ── Tabla ─────────────────────────────────────────────────────
           entitiesState.when(
             data: (entities) {
               final rows = EntityDatatable(listEntities: entities);

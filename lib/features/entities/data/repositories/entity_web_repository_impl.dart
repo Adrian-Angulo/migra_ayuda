@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:migra_ayuda/core/errors/failure.dart';
 import 'package:migra_ayuda/features/entities/data/datasources/entity_remote_datasource.dart';
@@ -27,8 +28,15 @@ class EntityWebRepositoryImpl extends EntityWebRepository {
         fileName: fileName,
       );
       return const Right(null);
-    } catch (_) {
-      return const Left(EntityCreationFailedFailure());
+    } on FirebaseException catch (e) {
+      return Left(GenericEntityFailure(
+        message: e.message ?? 'Error de base de datos al registrar la entidad',
+        code: e.code,
+      ));
+    } catch (e) {
+      return Left(GenericEntityFailure(
+        message: e.toString().replaceFirst('Exception: ', ''),
+      ));
     }
   }
 
@@ -47,22 +55,34 @@ class EntityWebRepositoryImpl extends EntityWebRepository {
         fileName: fileName,
       );
       return const Right(null);
-    } catch (_) {
-      return const Left(EntityUpdateFailedFailure());
+    } on FirebaseException catch (e) {
+      return Left(GenericEntityFailure(
+        message: e.message ?? 'Error de base de datos al actualizar la entidad',
+        code: e.code,
+      ));
+    } catch (e) {
+      return Left(GenericEntityFailure(
+        message: e.toString().replaceFirst('Exception: ', ''),
+      ));
     }
   }
 
   @override
   Future<Either<Failure, void>> deleteEntity(String entityId) async {
     try {
-      await remoteDataSource.deleteEntity(entityId );
+      await remoteDataSource.deleteEntity(entityId);
       return const Right(null);
-    } catch (_) {
-      return const Left(EntityDeletionFailedFailure());
+    } on FirebaseException catch (e) {
+      return Left(GenericEntityFailure(
+        message: e.message ?? 'Error de base de datos al eliminar la entidad',
+        code: e.code,
+      ));
+    } catch (e) {
+      return Left(GenericEntityFailure(
+        message: e.toString().replaceFirst('Exception: ', ''),
+      ));
     }
   }
-
-
 
   @override
   Future<Either<Failure, EntityEntity>> getEntityById(String id) async {
@@ -73,7 +93,6 @@ class EntityWebRepositoryImpl extends EntityWebRepository {
       return const Left(EntityNotFoundFailure());
     }
   }
-
 
   @override
   Stream<List<EntityEntity>> getAllEntites2() {
