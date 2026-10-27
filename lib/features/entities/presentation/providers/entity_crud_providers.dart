@@ -11,9 +11,9 @@ import 'package:migra_ayuda/features/reviews/presentation/providers/review_provi
 
 enum CrudOperation { register, update, delete, none }
 
-final imagenSelectProvider = StateProvider<XFile?>((ref) => null);
-final imagenInBytesProvider = StateProvider<Uint8List?>((ref) => null);
-final messageErrorImageProvider = StateProvider<String?>(
+final imagenSelectProvider = StateProvider.autoDispose<XFile?>((ref) => null);
+final imagenInBytesProvider = StateProvider.autoDispose<Uint8List?>((ref) => null);
+final messageErrorImageProvider = StateProvider.autoDispose<String?>(
   (ref) => null,
 );
 

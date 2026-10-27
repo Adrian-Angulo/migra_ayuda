@@ -1,6 +1,5 @@
 import 'package:latlong2/latlong.dart';
 
-/// Representa el resultado de una consulta de geocodificación (búsqueda de dirección).
 class GeocodingResult {
   final LatLng point;
   final String placeName;

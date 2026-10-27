@@ -22,7 +22,7 @@ final calculateRouteUseCaseProvider = Provider<CalculateRouteUseCase>((ref) {
 
 class CoordinatesNotifier extends AsyncNotifier<GeocodingResult?> {
   @override
-  Future<GeocodingResult?> build() async {
+  GeocodingResult? build() {
     return null;
   }
 
@@ -59,5 +59,5 @@ class CoordinatesNotifier extends AsyncNotifier<GeocodingResult?> {
 }
 
 final coordinatesNotifierProvider =
-    AsyncNotifierProvider<CoordinatesNotifier, GeocodingResult?>(
+    AsyncNotifierProvider.autoDispose<CoordinatesNotifier, GeocodingResult?>(
         () => CoordinatesNotifier());

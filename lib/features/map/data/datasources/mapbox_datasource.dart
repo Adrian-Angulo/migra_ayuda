@@ -8,7 +8,7 @@ import 'package:migra_ayuda/features/map/domain/entities/geocoding_result.dart';
 
 class MapboxDatasource {
   static const Duration _timeout = Duration(seconds: 8);
-  /// Bounding Box que delimita estrictamente la zona de Pasto y su área metropolitana
+  
   static const String _pastoBbox = '-77.34,1.15,-77.22,1.27';
   static const String _pastoProximity = '-77.2811,1.2136';
 

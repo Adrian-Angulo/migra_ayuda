@@ -6,13 +6,13 @@ import 'package:migra_ayuda/core/utils/validators/address_validator.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_crud_providers.dart';
 import 'package:migra_ayuda/features/entities/presentation/providers/entity_providers.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/dialog/form_bottom_bar.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/dialog/search_address_button.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/entity_address_map.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/entity_image_picker.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/entity_text_field.dart';
-import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/save_entity_button.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/section_title.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/web/widgets/service_type_checklist.dart';
-import 'package:migra_ayuda/features/map/domain/entities/geocoding_result.dart';
 import 'package:migra_ayuda/features/map/presentation/providers/map_providers.dart';
 
 class EntityForm extends ConsumerStatefulWidget {
@@ -66,6 +66,7 @@ class EntityFormState extends ConsumerState<EntityForm> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(listSelectedServicesFormProviders.notifier).state =
           List<String>.from(entity.services);
+          
       ref.read(coordinatesNotifierProvider.notifier).setCoordinate(
             LatLng(
               entity.localitation.latitude,
@@ -83,10 +84,6 @@ class EntityFormState extends ConsumerState<EntityForm> {
     _addressController.dispose();
     _phoneController.dispose();
     _scheduleController.dispose();
-    Future.microtask(() {
-      ref.read(imagenSelectProvider.notifier).state = null;
-      ref.read(imagenInBytesProvider.notifier).state = null;
-    });
     super.dispose();
   }
 
@@ -174,311 +171,143 @@ class EntityFormState extends ConsumerState<EntityForm> {
   Widget build(BuildContext context) {
     final coordinates = ref.watch(coordinatesNotifierProvider);
 
-    ref.listen(coordinatesNotifierProvider, (_, __) {
+    /* ref.listen(coordinatesNotifierProvider, (_, __) {
       _addressFieldKey.currentState?.validate();
-    });
+    }); */
 
     return Expanded(
-      child: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    EntityImagePicker(
-                      imagenUrl: widget.entity?.imageUrl,
+        child: Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 10,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  EntityImagePicker(
+                    imagenUrl: widget.entity?.imageUrl,
+                  ),
+                  const SizedBox(height: 32),
+                  const SectionTitle(
+                    title: 'Información Básica',
+                    icon: Icons.info_outline,
+                  ),
+                  const SizedBox(height: 20),
+                  EntityTextField(
+                    controller: _nameController,
+                    label: 'Nombre de la Organización',
+                    hint: 'Ej: Centro de Salud Norte',
+                    icon: Icons.business_outlined,
+                    maxLength: 20,
+                    validator: (value) =>
+                        (value == null || value.trim().isEmpty)
+                            ? 'El nombre es requerido'
+                            : null,
+                  ),
+                  const SizedBox(height: 20),
+                  EntityTextField(
+                    controller: _descriptionController,
+                    label: 'Descripción',
+                    hint:
+                        'Describa brevemente los servicios que ofrece esta entidad',
+                    icon: null,
+                    maxLines: 4,
+                    maxLength: 500,
+                  ),
+                  const SizedBox(height: 32),
+                  const SectionTitle(
+                    title: 'Tipos de Servicio',
+                    icon: Icons.category_outlined,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Seleccione los servicios que ofrece esta Organización (máximo 2)',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.grey.shade600,
                     ),
-                    const SizedBox(height: 32),
-                    const SectionTitle(
-                      title: 'Información Básica',
-                      icon: Icons.info_outline,
+                  ),
+                  const SizedBox(height: 16),
+                  const ServiceTypeChecklist(),
+                  const SizedBox(height: 32),
+                  const SectionTitle(
+                    title: 'Ubicación y Contacto',
+                    icon: Icons.location_on_outlined,
+                  ),
+                  const SizedBox(height: 20),
+                  EntityTextField(
+                    inputKey: _addressFieldKey,
+                    controller: _addressController,
+                    label: 'Dirección o Punto de Referencia',
+                    hint: 'Ej. Calle 18 # 25-30, Pasto o Plaza de Nariño',
+                    icon: Icons.location_on_outlined,
+                    suffixIcon: SearchAddressButton(
+                      isLoading: coordinates.isLoading,
+                      onTap: _onSearchAddress,
                     ),
-                    const SizedBox(height: 20),
-                    EntityTextField(
-                      controller: _nameController,
-                      label: 'Nombre de la Organización',
-                      hint: 'Ej: Centro de Salud Norte',
-                      icon: Icons.business_outlined,
-                      maxLength: 20,
-                      validator: (value) =>
-                          (value == null || value.trim().isEmpty)
-                              ? 'El nombre es requerido'
-                              : null,
-                    ),
-                    const SizedBox(height: 20),
-                    EntityTextField(
-                      controller: _descriptionController,
-                      label: 'Descripción',
-                      hint:
-                          'Describa brevemente los servicios que ofrece esta entidad',
-                      icon: null,
-                      maxLines: 4,
-                      maxLength: 500,
-                    ),
-                    const SizedBox(height: 32),
-                    const SectionTitle(
-                      title: 'Tipos de Servicio',
-                      icon: Icons.category_outlined,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Seleccione los servicios que ofrece esta Organización (máximo 2)',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const ServiceTypeChecklist(),
-                    const SizedBox(height: 32),
-                    const SectionTitle(
-                      title: 'Ubicación y Contacto',
-                      icon: Icons.location_on_outlined,
-                    ),
-                    const SizedBox(height: 20),
-                    EntityTextField(
-                      inputKey: _addressFieldKey,
-                      controller: _addressController,
-                      label: 'Dirección o Punto de Referencia',
-                      hint: 'Ej. Calle 18 # 25-30, Pasto o Plaza de Nariño',
-                      icon: Icons.location_on_outlined,
-                      suffixIcon: _SearchAddressButton(
-                        isLoading: coordinates.isLoading,
-                        onTap: _onSearchAddress,
-                      ),
-                      validator: (value) {
-                        final formatError = AddressValidator.validate(value);
-                        if (formatError != null) return formatError;
+                    validator: (value) {
+                      final formatError = AddressValidator.validate(value);
+                      if (formatError != null) return formatError;
 
-                        if (coordinates.hasError) {
-                          return 'No se encontró la ubicación dentro de Pasto. Verifica la dirección o selecciónala en el mapa.';
-                        }
+                      if (coordinates.hasError) {
+                        return 'No se encontró la ubicación dentro de Pasto. Verifica la dirección o selecciónala en el mapa.';
+                      }
 
-                        if (coordinates.value == null &&
-                            !coordinates.isLoading) {
-                          return 'Debe buscar y confirmar la ubicación en el mapa';
-                        }
+                      if (coordinates.value == null && !coordinates.isLoading) {
+                        return 'Debe buscar y confirmar la ubicación en el mapa';
+                      }
 
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    if (coordinates.value != null) ...[
-                      _ResolvedAddressFeedback(
-                        geocodingResult: coordinates.value!,
-                      ),
-                      const SizedBox(height: 10),
-                      EntityAddressMap(
-                        location: coordinates.value!.point,
-                        onLocationChanged: (newPoint) {
-                          ref
-                              .read(coordinatesNotifierProvider.notifier)
-                              .setCoordinate(newPoint, isManual: true);
-                        },
-                      ),
-                    ],
-                    const SizedBox(height: 20),
-                    EntityTextField(
-                      controller: _phoneController,
-                      label: 'Teléfono de contacto',
-                      hint: '(57+) 3225321234',
-                      icon: Icons.phone_outlined,
-                      maxLength: 10,
-                      onlyNumbers: true,
-                    ),
-                    const SizedBox(height: 32),
-                    const SectionTitle(
-                      title: 'Horario de Atención',
-                      icon: Icons.access_time,
-                    ),
-                    const SizedBox(height: 12),
-                    EntityTextField(
-                      controller: _scheduleController,
-                      label: '',
-                      hint: 'Ej. Lunes a viernes 8:30 AM a 12:00 PM',
-                      icon: null,
-                      maxLines: 4,
-                    ),
-                    const SizedBox(height: 32),
-                  ],
-                ),
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  if (coordinates.value != null) 
+                  EntityAddressMap(
+                    location: coordinates.value!.point,
+                    onLocationChanged: (newPoint) {
+                      ref
+                          .read(coordinatesNotifierProvider.notifier)
+                          .setCoordinate(newPoint, isManual: true);
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  EntityTextField(
+                    controller: _phoneController,
+                    label: 'Teléfono de contacto',
+                    hint: '(57+) 3225321234',
+                    icon: Icons.phone_outlined,
+                    maxLength: 10,
+                    onlyNumbers: true,
+                  ),
+                  const SizedBox(height: 32),
+                  const SectionTitle(
+                    title: 'Horario de Atención',
+                    icon: Icons.access_time,
+                  ),
+                  const SizedBox(height: 12),
+                  EntityTextField(
+                    controller: _scheduleController,
+                    label: '',
+                    hint: 'Ej. Lunes a viernes 8:30 AM a 12:00 PM',
+                    icon: null,
+                    maxLines: 4,
+                  ),
+                  const SizedBox(height: 32),
+                ],
               ),
             ),
-            _FormBottomBar(
-              onCancel: () => Navigator.pop(context),
-              onSave: _handleSubmit,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ResolvedAddressFeedback extends StatelessWidget {
-  final GeocodingResult geocodingResult;
-
-  const _ResolvedAddressFeedback({required this.geocodingResult});
-
-  @override
-  Widget build(BuildContext context) {
-    final isManual = geocodingResult.isManualSelection;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: isManual ? Colors.blue.shade50 : Colors.green.shade50,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: isManual ? Colors.blue.shade200 : Colors.green.shade200,
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            isManual ? Icons.touch_app_outlined : Icons.check_circle_outline,
-            color: isManual ? Colors.blue.shade700 : Colors.green.shade700,
-            size: 20,
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isManual
-                      ? 'Ubicación ajustada manualmente en el mapa'
-                      : 'Ubicación identificada:',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color:
-                        isManual ? Colors.blue.shade900 : Colors.green.shade900,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  geocodingResult.placeName,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isManual
-                        ? Colors.blue.shade800
-                        : Colors.green.shade800,
-                  ),
-                ),
-              ],
-            ),
+          FormBottomBar(
+            onCancel: () => Navigator.pop(context),
+            onSave: _handleSubmit,
           ),
         ],
       ),
-    );
-  }
-}
-
-class _SearchAddressButton extends StatelessWidget {
-  final bool isLoading;
-  final VoidCallback onTap;
-
-  const _SearchAddressButton({
-    required this.isLoading,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary,
-        borderRadius: const BorderRadius.only(
-          topRight: Radius.circular(11),
-          bottomRight: Radius.circular(11),
-        ),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          child: Center(
-            child: isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : const Icon(Icons.search, color: Colors.white),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _FormBottomBar extends StatelessWidget {
-  final VoidCallback onCancel;
-  final VoidCallback onSave;
-
-  const _FormBottomBar({
-    required this.onCancel,
-    required this.onSave,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(20),
-          bottomRight: Radius.circular(20),
-        ),
-        border: Border(top: BorderSide(color: Colors.grey.shade200)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: OutlinedButton(
-              onPressed: onCancel,
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                side: BorderSide(color: Colors.grey.shade300),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text(
-                'Cancelar',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey.shade700,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            flex: 2,
-            child: SaveEntityButton(
-              onPressed: onSave,
-            ),
-          ),
-        ],
-      ),
-    );
+    ));
   }
 }
