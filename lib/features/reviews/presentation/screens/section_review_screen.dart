@@ -4,12 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
 import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
+import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/floating_main_button.dart';
 import 'package:migra_ayuda/features/reviews/presentation/config/review_constants.dart';
 import 'package:migra_ayuda/features/reviews/presentation/providers/review_providers.dart';
 import 'package:migra_ayuda/features/reviews/presentation/screens/place_add_review.dart';
 import 'package:migra_ayuda/features/users/domain/entities/migrant.dart';
 import '../widgets/review_item.dart';
-
 
 class SectionReviews extends ConsumerStatefulWidget {
   const SectionReviews({
@@ -32,7 +32,6 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
 
     final int countReviews = asyncReviews.value?.length ?? 0;
 
-    
     ref.listen(
       reviewNotifierProvider,
       (previous, next) {
@@ -64,17 +63,11 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
             if (!kIsWeb)
               TextButton(
                 onPressed: () {
-                  if (user == null) {
-                    SnackbarWidget.error(context,
-                        "Debes iniciar sesión para añadir un comentario");
-                    return;
-                  }
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => PlaceAddReview(
                         entity: widget.entity,
-                        user: user,
                       ),
                     ),
                   );
@@ -97,7 +90,6 @@ class _SectionReviewsState extends ConsumerState<SectionReviews> {
                 : containerReviews(reviews, user);
           },
           error: (error, stackTrace) {
-           
             return messageError();
           },
           loading: () {

@@ -30,11 +30,6 @@ class ReviewRepositoryImpl implements ReviewRepository {
       ReviewModel reviewModel = ReviewModel.fromReviewEntity(review)
           .copyWith(id: localId, isSynced: kIsWeb);
 
-      if (kIsWeb) {
-        await _remoteDataSource.saveReview(reviewModel);
-        return const Right(null);
-      }
-
       await _localDataSource
           .createReview(reviewModel.copyWith(isSynced: false));
       _triggerBackgroundSync();
@@ -48,12 +43,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
   Future<Either<Failure, List<ReviewEntity>>> getReviewsByEntity(
       String entityId) async {
     try {
-      if (kIsWeb) {
-        final remoteReviews =
-            await _remoteDataSource.getReviewsByEntity(entityId);
-        final reviewEntities = remoteReviews.map((r) => r.toEntity()).toList();
-        return Right(reviewEntities);
-      }
+      
 
       final cachedReviews = await _localDataSource.getReviewsByEntity(entityId);
       final reviewEntities =
@@ -81,12 +71,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
   @override
   Future<Either<Failure, void>> updateReview(ReviewEntity review) async {
     try {
-      if (kIsWeb) {
-        final model = ReviewModel.fromReviewEntity(review, isSynced: true)
-            .copyWith(updatedAt: DateTime.now());
-        await _remoteDataSource.saveReview(model);
-        return const Right(null);
-      }
+     
 
       final updatedModel = ReviewModel.fromReviewEntity(
         review,
@@ -104,11 +89,7 @@ class ReviewRepositoryImpl implements ReviewRepository {
   @override
   Future<Either<Failure, void>> deleteReview(String reviewId) async {
     try {
-      if (kIsWeb) {
-        await _remoteDataSource.deleteReview(reviewId);
-        return const Right(null);
-      }
-
+     
       final review = await _localDataSource.getReviewById(reviewId);
 
       final updatedReview = review.copyWith(
@@ -125,7 +106,6 @@ class ReviewRepositoryImpl implements ReviewRepository {
   }
 
   void _triggerBackgroundSync() {
-    if (kIsWeb) return;
     syncPendingReviews().catchError((_) {
       return const Left(ReviewSyncFailedFailure());
     });
@@ -133,9 +113,6 @@ class ReviewRepositoryImpl implements ReviewRepository {
 
   @override
   Future<Either<Failure, void>> syncPendingReviews() async {
-    if (kIsWeb) {
-      return const Right(null);
-    }
     try {
       final isConnected = await _networkInfo.isConnected;
       if (!isConnected) {
@@ -143,23 +120,24 @@ class ReviewRepositoryImpl implements ReviewRepository {
       }
 
       final pendingReviews = await _localDataSource.getPendingReviews();
-      if (pendingReviews.isEmpty) {
-        return const Right(null);
-      }
-
-      for (final review in pendingReviews) {
-        try {
-          if (review.deletedAt != null) {
-            await _remoteDataSource.deleteReview(review.id);
-            await _localDataSource.deleteLocalRecord(review.id);
-          } else {
-            await _remoteDataSource.saveReview(review);
-            await _localDataSource.markAsSynced(review.id);
+      if (pendingReviews.isNotEmpty) {
+        for (final review in pendingReviews) {
+          try {
+            if (review.deletedAt != null) {
+              await _remoteDataSource.deleteReview(review.id);
+              await _localDataSource.deleteLocalRecord(review.id);
+            } else {
+              await _remoteDataSource.saveReview(review);
+              await _localDataSource.markAsSynced(review.id);
+            }
+          } catch (e) {
+            continue;
           }
-        } catch (e) {
-          continue;
         }
       }
+
+      final remoteReviews = await _remoteDataSource.getAllReviews();
+      await _localDataSource.createReviews(remoteReviews);
 
       return const Right(null);
     } catch (e) {

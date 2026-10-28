@@ -3,6 +3,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:migra_ayuda/core/widgets/mobil/app_bar_widget.dart';
 import 'package:migra_ayuda/core/widgets/mobil/snackbar_widget.dart';
+import 'package:migra_ayuda/features/auth/presentation/providers/auth_notifier.dart';
 import 'package:migra_ayuda/features/entities/domain/entities/entity_entity.dart';
 import 'package:migra_ayuda/features/entities/presentation/screens/mobile/widgets/place_details/floating_main_button.dart';
 import 'package:migra_ayuda/features/reviews/domain/entities/review_entity.dart';
@@ -12,12 +13,12 @@ import 'package:migra_ayuda/features/users/domain/entities/migrant.dart';
 
 class PlaceAddReview extends ConsumerStatefulWidget {
   final EntityEntity entity;
-  final Migrant? user;
+ 
 
   const PlaceAddReview({
     super.key,
     required this.entity,
-    required this.user,
+    
   });
 
   @override
@@ -28,11 +29,18 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
   double _rating = 3;
   final _formKey = GlobalKey<FormState>();
   final _commentController = TextEditingController();
+  Migrant? user;
 
   @override
   void dispose() {
     _commentController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    user = ref.watch(authNotifierProvider).value;
   }
 
   void _listenReviewState(BuildContext context) {
@@ -53,7 +61,7 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
   }
 
   Widget _buildUserAvatar() {
-    final user = widget.user;
+    
     final String initials = (user?.name ?? "")
         .trim()
         .split(' ')
@@ -93,7 +101,7 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
   }
 
   Widget _buildUserInfo() {
-    final user = widget.user;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -206,7 +214,7 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
   }
 
   Future<void> _handleSubmit(BuildContext context, bool isLoading) async {
-    final user = widget.user;
+    
     if (user == null) {
       SnackbarWidget.error(
           context, 'Debes iniciar sesión para publicar una reseña');
@@ -214,10 +222,10 @@ class _PlaceAddReviewState extends ConsumerState<PlaceAddReview> {
     }
     if (!_formKey.currentState!.validate()) return;
     final review = ReviewEntity(
-      idMigrante: user.id,
+      idMigrante: user!.id,
       idEntity: widget.entity.id,
-      userName: user.name,
-      userCountry: user.originCountry,
+      userName: user!.name,
+      userCountry: user!.originCountry,
       rating: _rating,
       comment: _commentController.text,
       isSynced: false,
