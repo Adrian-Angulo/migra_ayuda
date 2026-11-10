@@ -1,1 +1,75 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"migraayuda-fb971","appId":"1:230355024122:android:0a49423fe4a390cf57f143","fileOutput":"android/app/google-services.json"}},"dart":{"lib/core/config/firebase_options.dart":{"projectId":"migraayuda-fb971","configurations":{"android":"1:230355024122:android:0a49423fe4a390cf57f143","web":"1:230355024122:web:940c577ddc26078157f143"}}}}},"hosting":{"site":"migra-ayuda","public":"build/web","ignore":["firebase.json","**/.*","**/node_modules/**"],"rewrites":[{"source":"**","destination":"/index.html"}]},"firestore":{"database":"(default)","location":"nam5","rules":"firestore.rules","indexes":"firestore.indexes.json"},"auth":{"providers":{"emailPassword":true,"googleSignIn":{"oAuthBrandDisplayName":"n","supportEmail":"n"}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "migraayuda-fb971",
+          "appId": "1:230355024122:android:0a49423fe4a390cf57f143",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/core/config/firebase_options.dart": {
+          "projectId": "migraayuda-fb971",
+          "configurations": {
+            "android": "1:230355024122:android:0a49423fe4a390cf57f143",
+            "web": "1:230355024122:web:940c577ddc26078157f143"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "site": "migra-ayuda",
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "X-Frame-Options",
+            "value": "DENY"
+          },
+          {
+            "key": "X-XSS-Protection",
+            "value": "1; mode=block"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin-when-cross-origin"
+          }
+        ]
+      }
+    ]
+  },
+  "firestore": {
+    "database": "(default)",
+    "location": "nam5",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "auth": {
+    "providers": {
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "n",
+        "supportEmail": "n"
+      }
+    }
+  }
+}

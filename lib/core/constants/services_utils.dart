@@ -7,7 +7,7 @@ final services = [
   'Apoyo Alimentario',
   'Hospedaje Temporal',
   'Inserción Laboral',
-  'Movilidad y Transporte'
+  'Movilidad y Transporte',
 ];
 
 MaterialColor getServiceColor(String service) {
@@ -43,6 +43,8 @@ IconData getServiceIcon(String service) {
       return Icons.work;
     case 'movilidad y transporte':
       return Icons.directions_bus;
+    case 'wifi gratis':
+      return Icons.wifi;
     default:
       return Icons.category;
   }

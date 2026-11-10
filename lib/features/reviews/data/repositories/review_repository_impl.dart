@@ -42,15 +42,26 @@ class ReviewRepositoryImpl implements ReviewRepository {
   @override
   Future<Either<Failure, List<ReviewEntity>>> getReviewsByEntity(
       String entityId) async {
-    try {
-      
-
-      final cachedReviews = await _localDataSource.getReviewsByEntity(entityId);
-      final reviewEntities =
-          cachedReviews.map((reviewModel) => reviewModel.toEntity()).toList();
-      return Right(reviewEntities);
-    } catch (error) {
-      return const Left(ReviewFetchFailedFailure());
+    if (kIsWeb) {
+      try {
+        final cachedReviews =
+            await _remoteDataSource.getReviewsByEntity(entityId);
+        final reviewEntities =
+            cachedReviews.map((reviewModel) => reviewModel.toEntity()).toList();
+        return Right(reviewEntities);
+      } catch (error) {
+        return const Left(ReviewFetchFailedFailure());
+      }
+    } else {
+      try {
+        final cachedReviews =
+            await _localDataSource.getReviewsByEntity(entityId);
+        final reviewEntities =
+            cachedReviews.map((reviewModel) => reviewModel.toEntity()).toList();
+        return Right(reviewEntities);
+      } catch (error) {
+        return const Left(ReviewFetchFailedFailure());
+      }
     }
   }
 
@@ -71,8 +82,6 @@ class ReviewRepositoryImpl implements ReviewRepository {
   @override
   Future<Either<Failure, void>> updateReview(ReviewEntity review) async {
     try {
-     
-
       final updatedModel = ReviewModel.fromReviewEntity(
         review,
         isSynced: false,
@@ -89,7 +98,6 @@ class ReviewRepositoryImpl implements ReviewRepository {
   @override
   Future<Either<Failure, void>> deleteReview(String reviewId) async {
     try {
-     
       final review = await _localDataSource.getReviewById(reviewId);
 
       final updatedReview = review.copyWith(
